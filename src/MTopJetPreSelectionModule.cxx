@@ -52,7 +52,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
   std::unique_ptr<TopJetCorrector>             topjet_corrector;
   std::unique_ptr<SubJetCorrector>             topjet_subjet_corrector;
   std::unique_ptr<GenericJetResolutionSmearer> topjetER_smearer;
-  std::unique_ptr<TopJetLeptonDeltaRCleaner>   topjetlepton_cleaner;
+  // std::unique_ptr<TopJetLeptonDeltaRCleaner>   topjetlepton_cleaner;
   std::unique_ptr<TopJetCleaner>               topjet_cleaner;
 
   // selections
@@ -72,7 +72,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
 
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_jetsel_event, h_jetsel_elec, h_jetsel_muon, h_jetsel_jets, h_metsel_event, h_metsel_elec, h_metsel_muon, h_metsel_jets, h_htsel_event, h_htsel_elec, h_htsel_muon, h_htsel_jets, h_twodsel_event, h_twodsel_elec, h_twodsel_muon, h_twodsel_jets;
+  // std::unique_ptr<Hists> h_jetsel_event, h_jetsel_elec, h_jetsel_muon, h_jetsel_jets, h_metsel_event, h_metsel_elec, h_metsel_muon, h_metsel_jets, h_htsel_event, h_htsel_elec, h_htsel_muon, h_htsel_jets, h_twodsel_event, h_twodsel_elec, h_twodsel_muon, h_twodsel_jets;
 
   // Event::Handle<float> tt_TMVA_response;// response of TMVA method, dummy value at this step
 
@@ -172,8 +172,8 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
     ctx.declare_event_input<std::vector<Particle> >(ctx.get("TopJetCollectionGEN"), "topjetsGEN");
     topjetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "topjetsGEN", false));
   }
-  topjetlepton_cleaner.reset(new TopJetLeptonDeltaRCleaner(.8));
-  topjet_cleaner.reset(new TopJetCleaner(ctx, TopJetId(PtEtaCut(200., 2.4))));
+  // topjetlepton_cleaner.reset(new TopJetLeptonDeltaRCleaner(.8));   // TopJetLeptonDeltaRCleaner removes all AK8 Jets from AK8 Jet Collection, where a Lepton is clustered into the AK8 jet -> test different cleaner in further selection
+  topjet_cleaner.reset(new TopJetCleaner(ctx, TopJetId(PtEtaCut(200., 2.4)))); // All AK8 Jets have pt>200 (already implied in ntuples)
   ////
 
   //// EVENT SELECTION
@@ -187,25 +187,25 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   ////
 
   //// set up Hists classes:
-  h_jetsel_event.reset(new EventHists(ctx, "01_JetSel_Event"));
-  h_jetsel_elec.reset(new ElectronHists(ctx, "01_JetSel_Elec"));
-  h_jetsel_muon.reset(new MuonHists(ctx, "01_JetSel_Muon"));
-  h_jetsel_jets.reset(new JetHists(ctx, "01_JetSel_Jets"));
+  // h_jetsel_event.reset(new EventHists(ctx, "01_JetSel_Event"));
+  // h_jetsel_elec.reset(new ElectronHists(ctx, "01_JetSel_Elec"));
+  // h_jetsel_muon.reset(new MuonHists(ctx, "01_JetSel_Muon"));
+  // h_jetsel_jets.reset(new JetHists(ctx, "01_JetSel_Jets"));
 
-  h_metsel_event.reset(new EventHists(ctx, "02_METSel_Event"));
-  h_metsel_elec.reset(new ElectronHists(ctx, "02_METSel_Elec"));
-  h_metsel_muon.reset(new MuonHists(ctx, "02_METSel_Muon"));
-  h_metsel_jets.reset(new JetHists(ctx, "02_METSel_Jets"));
+  // h_metsel_event.reset(new EventHists(ctx, "02_METSel_Event"));
+  // h_metsel_elec.reset(new ElectronHists(ctx, "02_METSel_Elec"));
+  // h_metsel_muon.reset(new MuonHists(ctx, "02_METSel_Muon"));
+  // h_metsel_jets.reset(new JetHists(ctx, "02_METSel_Jets"));
 
-  h_htsel_event.reset(new EventHists(ctx, "03_HTSel_Event"));
-  h_htsel_elec.reset(new ElectronHists(ctx, "03_HTSel_Elec"));
-  h_htsel_muon.reset(new MuonHists(ctx, "03_HTSel_Muon"));
-  h_htsel_jets.reset(new JetHists(ctx, "03_HTSel_Jets"));
+  // h_htsel_event.reset(new EventHists(ctx, "03_HTSel_Event"));
+  // h_htsel_elec.reset(new ElectronHists(ctx, "03_HTSel_Elec"));
+  // h_htsel_muon.reset(new MuonHists(ctx, "03_HTSel_Muon"));
+  // h_htsel_jets.reset(new JetHists(ctx, "03_HTSel_Jets"));
 
-  h_twodsel_event.reset(new EventHists(ctx, "04_TwoDSel_Event"));
-  h_twodsel_elec.reset(new ElectronHists(ctx, "04_TwoDSel_Elec"));
-  h_twodsel_muon.reset(new MuonHists(ctx, "04_TwoDSel_Muon"));
-  h_twodsel_jets.reset(new JetHists(ctx, "04_TwoDSel_Jets"));
+  // h_twodsel_event.reset(new EventHists(ctx, "04_TwoDSel_Event"));
+  // h_twodsel_elec.reset(new ElectronHists(ctx, "04_TwoDSel_Elec"));
+  // h_twodsel_muon.reset(new MuonHists(ctx, "04_TwoDSel_Muon"));
+  // h_twodsel_jets.reset(new JetHists(ctx, "04_TwoDSel_Jets"));
 
   ////
 
@@ -284,7 +284,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   topjet_corrector->process(event);
   topjet_subjet_corrector->process(event);
   if(topjetER_smearer.get()) topjetER_smearer->process(event);
-  topjetlepton_cleaner->process(event);
+  // topjetlepton_cleaner->process(event);
   topjet_cleaner->process(event);
   sort_by_pt<TopJet>(*event.topjets);
 
@@ -296,37 +296,37 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   const bool pass_jet1 = jet1_sel->passes(event);
   if(!pass_jet1) return false;
 
-  h_jetsel_event->fill(event);
-  h_jetsel_elec->fill(event);
-  h_jetsel_muon->fill(event);
-  h_jetsel_jets->fill(event);
+  // h_jetsel_event->fill(event);
+  // h_jetsel_elec->fill(event);
+  // h_jetsel_muon->fill(event);
+  // h_jetsel_jets->fill(event);
   ////
 
   //// MET selection
   const bool pass_met = met_sel->passes(event);
   if(!pass_met) return false;
-  h_metsel_event->fill(event);
-  h_metsel_elec->fill(event);
-  h_metsel_muon->fill(event);
-  h_metsel_jets->fill(event);
+  // h_metsel_event->fill(event);
+  // h_metsel_elec->fill(event);
+  // h_metsel_muon->fill(event);
+  // h_metsel_jets->fill(event);
   ////
 
   //// HT_lep selection
   const bool pass_htlep = htlep_sel->passes(event);
   if(!pass_htlep) return false;
-  h_htsel_event->fill(event);
-  h_htsel_elec->fill(event);
-  h_htsel_muon->fill(event);
-  h_htsel_jets->fill(event);
+  // h_htsel_event->fill(event);
+  // h_htsel_elec->fill(event);
+  // h_htsel_muon->fill(event);
+  // h_htsel_jets->fill(event);
   
 
   
   //// LEPTON-2Dcut selection
   if(!pass_twodcut) return false;
-  h_twodsel_event->fill(event);
-  h_twodsel_elec->fill(event);
-  h_twodsel_muon->fill(event);
-  h_twodsel_jets->fill(event);
+  // h_twodsel_event->fill(event);
+  // h_twodsel_elec->fill(event);
+  // h_twodsel_muon->fill(event);
+  // h_twodsel_jets->fill(event);
   ////
 
   return true;
