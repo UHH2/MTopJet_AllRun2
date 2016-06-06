@@ -35,6 +35,10 @@ MTopJetHists::MTopJetHists(uhh2::Context & ctx, const std::string & dirname): Hi
   deltaR_lep_topjet1 = book<TH1F>("deltaR_lep_topjet1", "#Delta R(lep,1st Top Jet)", 80, 0, 4.0);
   deltaR_lep_topjet2 = book<TH1F>("deltaR_lep_topjet2", "#Delta R(lep,2nd Top Jet)", 80, 0, 4.0);
 
+  // delta Phi (lep, TopJet)
+  deltaPhi_lep_topjet1 = book<TH1F>("deltaPhi_lep_topjet1", "#Delta Phi(lep,1st Top Jet)", 80, 0, 4.0);
+  deltaPhi_lep_topjet2 = book<TH1F>("deltaPhi_lep_topjet2", "#Delta Phi(lep,2nd Top Jet)", 80, 0, 4.0);
+
   // TopJetMass1 vs TopJetMass2
   TopJetMass1_TopJetMass2 = book<TH2F>("TopJetMass1_TopJetMass2", "x=M_Top1 y=M_Top2", 30, 0, 300., 30, 0, 300.);
 }
@@ -139,6 +143,34 @@ void MTopJetHists::fill(const Event & event){
   else dR1 = deltaR(event.electrons->at(0), event.topjets->at(0));
 
   deltaR_lep_topjet1->Fill(dR1, weight);
+  }
+  //
+
+  // delta Phi Top Jet
+  if((event.topjets->size())>0){
+    double dphi;
+    const Particle* TopJet = &event.topjets->at(0);
+    if((event.muons->size())!= 0){
+      const Particle* Lep = &event.muons->at(0);
+      dphi = abs((TopJet->v4().Phi()) - (Lep->v4().Phi()));
+    }
+    else {
+      const Particle* Lep = &event.electrons->at(0);
+      dphi = abs((TopJet->v4().Phi()) - (Lep->v4().Phi()));
+    }
+      deltaPhi_lep_topjet1->Fill(dphi, weight);
+  }
+  //
+
+  // delta Phi Top Jet2
+  if((event.topjets->size())>1){
+  double dphi2;
+  if((event.muons->size())!= 0){
+    dphi2 = deltaR(event.muons->at(0), event.topjets->at(1));
+  }
+  else dphi2 = deltaR(event.electrons->at(0), event.topjets->at(1));
+
+  deltaPhi_lep_topjet2->Fill(dphi2, weight);
   }
   //
 

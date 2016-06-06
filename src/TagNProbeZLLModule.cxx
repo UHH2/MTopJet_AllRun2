@@ -20,9 +20,9 @@
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
 
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicSelections.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
-#include <UHH2/ZprimeSemiLeptonic/include/SF_elec.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicSelections.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/SF_elec.h>
 
 class TagNProbeZLLModule: public AnalysisModule {
 

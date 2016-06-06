@@ -23,16 +23,16 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TopPtReweight.h>
 
-#include <UHH2/ZprimeSemiLeptonic/include/ModuleBASE.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicSelections.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
-#include <UHH2/ZprimeSemiLeptonic/include/TTbarLJHists.h>
-#include <UHH2/ZprimeSemiLeptonic/include/DileptonHists.h>
-#include <UHH2/ZprimeSemiLeptonic/include/EffyTTbarRECOHists.h>
+#include <UHH2/MTopJet/include/ModuleBASE.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicSelections.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/TTbarLJHists.h>
+#include <UHH2/MTopJet/include/DileptonHists.h>
+#include <UHH2/MTopJet/include/EffyTTbarRECOHists.h>
 
-#include <UHH2/ZprimeSemiLeptonic/include/SF_elec.h>
-#include <UHH2/ZprimeSemiLeptonic/include/SF_ttagging.h>
-#include <UHH2/ZprimeSemiLeptonic/include/SF_WjetsREWGT.h>
+#include <UHH2/MTopJet/include/SF_elec.h>
+#include <UHH2/MTopJet/include/SF_ttagging.h>
+#include <UHH2/MTopJet/include/SF_WjetsREWGT.h>
 
 #include <TMVA/Tools.h>
 #include <TMVA/Reader.h>
@@ -885,8 +885,8 @@ TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule(uhh2::Context& ctx){
   reader->AddVariable("log(lep_pt_ljet/Mttbar)", &varMVA[8]);
   reader->AddVariable("MwT/Mttbar", &varMVA[9]);
  
-  TString dir    = "/afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/ZprimeSemiLeptonic/TMVA_weights/76X/"; 
-  //TString dir    = "/afs/desy.de/user/k/karavdia/xxl/af-cms/CMSSW_7_6_3_patch2/src/UHH2/ZprimeSemiLeptonic/TMVA_weights/76X/"; //ToDo: make it param in xml
+  TString dir    = "/afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/TMVA_weights/76X/"; 
+  //TString dir    = "/afs/desy.de/user/k/karavdia/xxl/af-cms/CMSSW_7_6_3_patch2/src/UHH2/MTopJet/TMVA_weights/76X/"; //ToDo: make it param in xml
 
   // methodName = "BDT::BDTG";
   // TString weightfile = dir + "Homemade_TTbarMVAClassification_BDTG_DataDrivenMET70_10Vars.weights.xml";

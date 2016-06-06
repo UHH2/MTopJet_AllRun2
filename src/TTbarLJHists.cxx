@@ -1,6 +1,6 @@
-#include <UHH2/ZprimeSemiLeptonic/include/TTbarLJHists.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
-#include <UHH2/ZprimeSemiLeptonic/include/utils.h>
+#include <UHH2/MTopJet/include/TTbarLJHists.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/utils.h>
 
 #include <UHH2/core/include/Utils.h>
 

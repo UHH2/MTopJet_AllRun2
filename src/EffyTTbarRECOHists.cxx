@@ -1,4 +1,4 @@
-#include <UHH2/ZprimeSemiLeptonic/include/EffyTTbarRECOHists.h>
+#include <UHH2/MTopJet/include/EffyTTbarRECOHists.h>
 
 #include <UHH2/common/include/ReconstructionHypothesisDiscriminators.h>
 

@@ -1,5 +1,5 @@
-#include <UHH2/ZprimeSemiLeptonic/include/SF_ttagging.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/SF_ttagging.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
 
 #include <iostream>
 #include <string>

@@ -19,10 +19,10 @@
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
 
-#include <UHH2/ZprimeSemiLeptonic/include/ModuleBASE.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicSelections.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
-#include <UHH2/ZprimeSemiLeptonic/include/TTbarLJHists.h>
+#include <UHH2/MTopJet/include/ModuleBASE.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicSelections.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/TTbarLJHists.h>
 
 class TTbarLJSkimmingModule : public ModuleBASE {
 

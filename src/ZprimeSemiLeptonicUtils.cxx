@@ -1,4 +1,4 @@
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
 #include <UHH2/core/include/LorentzVector.h>
 
 bool JetLeptonDeltaRCleaner::process(uhh2::Event& event){

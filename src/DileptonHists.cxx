@@ -1,4 +1,4 @@
-#include <UHH2/ZprimeSemiLeptonic/include/DileptonHists.h>
+#include <UHH2/MTopJet/include/DileptonHists.h>
 
 #include <UHH2/core/include/Utils.h>
 

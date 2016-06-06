@@ -25,9 +25,9 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGenHists.h>
 
-#include <UHH2/ZprimeSemiLeptonic/include/ModuleBASE.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicSelections.h>
-#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/ModuleBASE.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicSelections.h>
+#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
 
 class MTopJetPreSelectionModule : public ModuleBASE {
 

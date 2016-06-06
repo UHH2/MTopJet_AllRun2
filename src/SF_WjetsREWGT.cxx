@@ -1,4 +1,4 @@
-#include <UHH2/ZprimeSemiLeptonic/include/SF_WjetsREWGT.h>
+#include <UHH2/MTopJet/include/SF_WjetsREWGT.h>
 
 weightcalc_WjetsREWGT::weightcalc_WjetsREWGT() {}
 
