@@ -1,6 +1,6 @@
 #pragma once
 
-#include <UHH2/ZprimeSemiLeptonic/include/HistsBASE.h>
+#include <UHH2/MTopJet/include/HistsBASE.h>
 #include <UHH2/core/include/Event.h>
 #include <UHH2/common/include/TopJetIds.h>
 

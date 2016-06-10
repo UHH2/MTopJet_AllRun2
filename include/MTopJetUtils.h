@@ -3,6 +3,13 @@
 #include <UHH2/core/include/AnalysisModule.h>
 #include <UHH2/core/include/Event.h>
 #include <UHH2/core/include/NtupleObjects.h>
+#include "UHH2/common/include/ObjectIdUtils.h"
+#include "UHH2/common/include/Utils.h"
+#include "UHH2/common/include/JetCorrections.h"
+#include "UHH2/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
+
+////
 
 class JetLeptonDeltaRCleaner : public uhh2::AnalysisModule {
 
@@ -95,4 +102,4 @@ class TopTagID_SoftDrop {
   float  tau32_max_;
   float sjbtag_min_;
 };
-////
+//

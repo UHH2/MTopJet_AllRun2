@@ -1,5 +1,5 @@
 #include <UHH2/MTopJet/include/TTbarLJHists.h>
-#include <UHH2/MTopJet/include/ZprimeSemiLeptonicUtils.h>
+#include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/utils.h>
 
 #include <UHH2/core/include/Utils.h>

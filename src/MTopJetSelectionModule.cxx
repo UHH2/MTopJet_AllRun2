@@ -88,10 +88,11 @@ class MTopJetSelectionModule : public ModuleBASE {
     h_trianc_event, h_trianc_elec, h_trianc_muon, h_trianc_jets, h_trianc_topjets, h_trianc_event2,
     h_htlep100_event, h_htlep100_elec, h_htlep100_muon, h_htlep100_jets, h_htlep100_topjets, h_htlep100_event2,
     h_htlep150_event, h_htlep150_elec, h_htlep150_muon, h_htlep150_jets, h_htlep150_topjets, h_htlep150_event2,
-    h_topjet_event, h_topjet_elec, h_topjet_muon, h_topjet_jets, h_topjet_topjets, h_topjet_event2,
-    // h_toplepdR_event, h_toplepdR_elec, h_toplepdR_muon, h_toplepdR_jets, h_toplepdR_topjets, h_toplepdR_event2,  
+    // h_topjet_event, h_topjet_elec, h_topjet_muon, h_topjet_jets, h_topjet_topjets, h_topjet_event2,
+    // h_toplepcleaner_event, h_toplepcleaner_elec, h_toplepcleaner_muon, h_toplepcleaner_jets, h_toplepcleaner_topjets, h_toplepcleaner_event2,
+    // h_toplepdR_event, h_toplepdR_elec, h_toplepdR_muon, h_toplepdR_jets, h_toplepdR_topjets, h_toplepdR_event2,	
   // h_jetlepdR_event, h_jetlepdR_elec, h_jetlepdR_muon, h_jetlepdR_jets, h_jetlepdR_topjets, h_jetlepdR_event2, 
-    h_topmass_event, h_topmass_elec, h_topmass_muon, h_topmass_jets, h_topmass_topjets, h_topmass_event2,
+    // h_topmass_event, h_topmass_elec, h_topmass_muon, h_topmass_jets, h_topmass_topjets, h_topmass_event2,
     h_btag_event, h_btag_elec, h_btag_muon, h_btag_jets, h_btag_topjets, h_btag_event2;
 
   // Event::Handle<float> tt_TMVA_response;// response of TMVA method, dummy value at this step
@@ -125,8 +126,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ////
 
   //// OBJ CLEANING
+
+  // topjetlepton_cleaner.reset(new TopJetLeptonDeltaRCleaner(.8));  
  
-  //// EVENT SELECTION
+ //// EVENT SELECTION
 
   const std::string& trigger = ctx.get("trigger", "NULL");
   if(trigger != "NULL") trigger_sel.reset(new TriggerSelection(trigger));
@@ -155,9 +158,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   else if(channel_ == muon) triangc_sel.reset(new uhh2::AndSelection(ctx));
 
   // topjet2_sel.reset(new NTopJetSelection(2, 2, TopJetId(PtEtaCut(200, 2.4))));
-  topjet1_sel.reset(new NTopJetSelection(1, -1, TopJetId(PtEtaCut(400, 2.4))));
+  // topjet1_sel.reset(new NTopJetSelection(1, 2, TopJetId(PtEtaCut(400, 2.4))));
   
-  topmass_sel.reset(new TopJetMassCut());
+  // topmass_sel.reset(new TopJetMassCut());
   
   // deltarak4cut_sel.reset(new deltaRCutAK4(.4));
   // deltarcut_sel.reset(new deltaRCut(.8));
@@ -207,33 +210,33 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_htlep150_topjets.reset(new TopJetHists(ctx, "05_htlep150_TopJets"));
   h_htlep150_event2.reset(new MTopJetHists(ctx, "05_htlep150_Event2"));
 
-  h_topjet_event.reset(new EventHists(ctx, "06_topjet_Event"));
-  h_topjet_elec.reset(new ElectronHists(ctx, "06_topjet_Elec"));
-  h_topjet_muon.reset(new MuonHists(ctx, "06_topjet_Muon"));
-  h_topjet_jets.reset(new JetHists(ctx, "06_topjet_Jets"));
-  h_topjet_topjets.reset(new TopJetHists(ctx, "06_topjet_TopJets"));
-  h_topjet_event2.reset(new MTopJetHists(ctx, "06_topjet_Event2"));
+  // h_topjet_event.reset(new EventHists(ctx, "06_topjet_Event"));
+  // h_topjet_elec.reset(new ElectronHists(ctx, "06_topjet_Elec"));
+  // h_topjet_muon.reset(new MuonHists(ctx, "06_topjet_Muon"));
+  // h_topjet_jets.reset(new JetHists(ctx, "06_topjet_Jets"));
+  // h_topjet_topjets.reset(new TopJetHists(ctx, "06_topjet_TopJets"));
+  // h_topjet_event2.reset(new MTopJetHists(ctx, "06_topjet_Event2"));
 
-  h_topmass_event.reset(new EventHists(ctx, "07_topmass_Event"));
-  h_topmass_elec.reset(new ElectronHists(ctx, "07_topmass_Elec"));
-  h_topmass_muon.reset(new MuonHists(ctx, "07_topmass_Muon"));
-  h_topmass_jets.reset(new JetHists(ctx, "07_topmass_Jets"));
-  h_topmass_topjets.reset(new TopJetHists(ctx, "07_topmass_TopJets"));
-  h_topmass_event2.reset(new MTopJetHists(ctx, "07_topmass_Event2"));
+  // h_topmass_event.reset(new EventHists(ctx, "07_topmass_Event"));
+  // h_topmass_elec.reset(new ElectronHists(ctx, "07_topmass_Elec"));
+  // h_topmass_muon.reset(new MuonHists(ctx, "07_topmass_Muon"));
+  // h_topmass_jets.reset(new JetHists(ctx, "07_topmass_Jets"));
+  // h_topmass_topjets.reset(new TopJetHists(ctx, "07_topmass_TopJets"));
+  // h_topmass_event2.reset(new MTopJetHists(ctx, "07_topmass_Event2"));
 
-  // h_toplepdR_event.reset(new EventHists(ctx, "07_toplepdR_Event"));
-  // h_toplepdR_elec.reset(new ElectronHists(ctx, "07_toplepdR_Elec"));
-  // h_toplepdR_muon.reset(new MuonHists(ctx, "07_toplepdR_Muon"));
-  // h_toplepdR_jets.reset(new JetHists(ctx, "07_toplepdR_Jets"));
-  // h_toplepdR_topjets.reset(new TopJetHists(ctx, "07_toplepdR_TopJets"));
-  // h_toplepdR_event2.reset(new MTopJetHists(ctx, "07_toplepdR_Event2"));
+  // h_toplepcleaner_event.reset(new EventHists(ctx, "08b_toplepcleaner_Event"));
+  // h_toplepcleaner_elec.reset(new ElectronHists(ctx, "08b_toplepcleaner_Elec"));
+  // h_toplepcleaner_muon.reset(new MuonHists(ctx, "08b_toplepcleaner_Muon"));
+  // h_toplepcleaner_jets.reset(new JetHists(ctx, "08b_toplepcleaner_Jets"));
+  // h_toplepcleaner_topjets.reset(new TopJetHists(ctx, "08b_toplepcleaner_TopJets"));
+  // h_toplepcleaner_event2.reset(new MTopJetHists(ctx, "08b_toplepcleaner_Event2"));
 
-  // h_jetlepdR_event.reset(new EventHists(ctx, "08_jetlepdR_Event"));
-  // h_jetlepdR_elec.reset(new ElectronHists(ctx, "08_jetlepdR_Elec"));
-  // h_jetlepdR_muon.reset(new MuonHists(ctx, "08_jetlepdR_Muon"));
-  // h_jetlepdR_jets.reset(new JetHists(ctx, "08_jetlepdR_Jets"));
-  // h_jetlepdR_topjets.reset(new TopJetHists(ctx, "08_jetlepdR_TopJets"));
-  // h_jetlepdR_event2.reset(new MTopJetHists(ctx, "08_jetlepdR_Event2")); 
+  // h_toplepdR_event.reset(new EventHists(ctx, "08a_toplepdR_Event"));
+  // h_toplepdR_elec.reset(new ElectronHists(ctx, "08a_toplepdR_Elec"));
+  // h_toplepdR_muon.reset(new MuonHists(ctx, "08a_toplepdR_Muon"));
+  // h_toplepdR_jets.reset(new JetHists(ctx, "08a_toplepdR_Jets"));
+  // h_toplepdR_topjets.reset(new TopJetHists(ctx, "08a_toplepdR_TopJets"));
+  // h_toplepdR_event2.reset(new MTopJetHists(ctx, "08a_toplepdR_Event2"));
 
 ////
 
@@ -270,6 +273,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       ele.set_tag(Electron::twodcut_pTrel, pTrel);
     }
   }
+
 
 
   //// JET selection
@@ -366,50 +370,50 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // const bool pass_topjet2 = topjet2_sel->passes(event);
   // if(!pass_topjet2) return false;
 
-  /* 1st AK8 jet selection */
-  const bool pass_topjet1 = topjet1_sel->passes(event);
-  if(!pass_topjet1) return false;
+  // /* 1st AK8 jet selection */
+  // const bool pass_topjet1 = topjet1_sel->passes(event);
+  // if(!pass_topjet1) return false;
 
-  h_topjet_event->fill(event);
-  h_topjet_elec->fill(event);
-  h_topjet_muon->fill(event);
-  h_topjet_jets->fill(event);
-  h_topjet_topjets->fill(event);
-  h_topjet_event2->fill(event);
+  // h_topjet_event->fill(event);
+  // h_topjet_elec->fill(event);
+  // h_topjet_muon->fill(event);
+  // h_topjet_jets->fill(event);
+  // h_topjet_topjets->fill(event);
+  // h_topjet_event2->fill(event);
 
-  /* Top Jet Mass Cut M1 > M2 */
-  const bool pass_topmass = topmass_sel->passes(event);
-  if(!pass_topmass) return false;
+  // /* Top Jet Mass Cut M1 > M2 */
+  // const bool pass_topmass = topmass_sel->passes(event);
+  // if(!pass_topmass) return false;
 
-  h_topmass_event->fill(event);
-  h_topmass_elec->fill(event);
-  h_topmass_muon->fill(event);
-  h_topmass_jets->fill(event);
-  h_topmass_topjets->fill(event);
-  h_topmass_event2->fill(event);
+  // h_topmass_event->fill(event);
+  // h_topmass_elec->fill(event);
+  // h_topmass_muon->fill(event);
+  // h_topmass_jets->fill(event);
+  // h_topmass_topjets->fill(event);
+  // h_topmass_event2->fill(event);
 
   // /* delta R (lep, topjet2) < 0.8  */
   // const bool pass_deltaR = deltarcut_sel->passes(event);
-  // if(!pass_deltaR) return false;
+  // if(pass_deltaR){
+  //   h_toplepdR_event->fill(event);
+  //   h_toplepdR_elec->fill(event);
+  //   h_toplepdR_muon->fill(event);
+  //   h_toplepdR_jets->fill(event);
+  //   h_toplepdR_topjets->fill(event);
+  //   h_toplepdR_event2->fill(event);
+  // }
 
-  // h_toplepdR_event->fill(event);
-  // h_toplepdR_elec->fill(event);
-  // h_toplepdR_muon->fill(event);
-  // h_toplepdR_jets->fill(event);
-  // h_toplepdR_topjets->fill(event);
-  // h_toplepdR_event2->fill(event);
+  // topjetlepton_cleaner->process(event);
 
-  // /* delta R (lep, jet) < 0.4  */
-  // const bool pass_deltaRak4 = deltarak4cut_sel->passes(event);
-  // if(!pass_deltaRak4) return false;
+  // h_toplepcleaner_event->fill(event);
+  // h_toplepcleaner_elec->fill(event);
+  // h_toplepcleaner_muon->fill(event);
+  // h_toplepcleaner_jets->fill(event);
+  // h_toplepcleaner_topjets->fill(event);
+  // h_toplepcleaner_event2->fill(event);
 
-  // h_jetlepdR_event->fill(event);
-  // h_jetlepdR_elec->fill(event);
-  // h_jetlepdR_muon->fill(event);
-  // h_jetlepdR_jets->fill(event);
-  // h_jetlepdR_topjets->fill(event);
-  // h_jetlepdR_event2->fill(event);
-  
+
+
   ////
 return true;
 }
