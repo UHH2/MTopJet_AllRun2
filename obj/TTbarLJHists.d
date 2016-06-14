@@ -321,6 +321,8 @@ obj/TTbarLJHists.o: src/TTbarLJHists.cxx \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/ObjectIdUtils.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/JetIds.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetUtils.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/JetCorrections.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/JetMETObjects/interface/JetCorrectionUncertainty.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/utils.h \
- /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/Utils.h \
- /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/Utils.h

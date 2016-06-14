@@ -106,9 +106,9 @@
     <In FileName="&WJetsToLNu_HT0200to0400;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_HT0400to0600" Lumi="32842.6" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&WJetsToLNu_HT0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <In FileName="&WJetsToLNu_HT0400to0600;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-     <InputData Version="WJetsToLNu_HT0600to0800" Lumi="258411.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="WJetsToLNu_HT0600to0800" Lumi="258411.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&WJetsToLNu_HT0600to0800;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_HT0800to1200" Lumi="235611.1" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -155,7 +155,7 @@
     <In FileName="&QCD_Pt170to250_bcToE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="QCD_Pt250toInf_bcToE" Lumi="14072.90" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&QCD_Pt250toInf_bcToE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-   
+
 
     <!-- ********TTbar**************************************** -->
 
@@ -211,7 +211,7 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
 
-	<Item Name="additionalBranches" Value="ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
+	<Item Name="additionalBranches" Value="PFParticles ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
 
 
       <Item Name="METName"                 Value="slimmedMETs"/>

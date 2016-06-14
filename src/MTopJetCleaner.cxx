@@ -105,42 +105,9 @@
 
 // }
 
-// JetCorrector::JetCorrector(uhh2::Context & ctx, const std::vector<std::string> & filenames){
-//     corrector = build_corrector(filenames);
-//     direction = 0;
-//     jec_uncertainty = corrector_uncertainty(ctx, filenames, direction) ;
-// }
-    
-// bool JetCorrector::process(uhh2::Event & event){
-//     assert(event.jets);
-//     for(auto & jet : *event.jets){
-//         correct_jet(*corrector, jet, event, jec_uncertainty, direction);
-//     }
-//     return true;
-// }
-
-// // note: implement here because only here (and not in the header file), the destructor of FactorizedJetCorrector is known
-// JetCorrector::~JetCorrector(){}
 
 
-// TopJetCorrector::TopJetCorrector(uhh2::Context & ctx, const std::vector<std::string> & filenames){
-//     corrector = build_corrector(filenames);
-//     direction = 0;
-//     jec_uncertainty = corrector_uncertainty(ctx, filenames, direction) ;
-// }
-    
-// bool TopJetCorrector::process(uhh2::Event & event){
-//     assert(event.topjets);
-//     for(auto & jet : *event.topjets){
-//         correct_jet(*corrector, jet, event, jec_uncertainty, direction);
-//     }
-//     return true;
-// }
-
-// // note: implement here because only here (and not in the header file), the destructor of FactorizedJetCorrector is known
-// TopJetCorrector::~TopJetCorrector(){}
-
-
+// // ** JetLeptonCleaner
 // TopJetLeptonCleaner::TopJetLeptonCleaner(uhh2::Context & ctx, const std::vector<std::string> & filenames){
 //     corrector = build_corrector(filenames);
 //     direction = 0;
@@ -220,4 +187,4 @@
 
 // // see ~JetCorrector
 // TopJetLeptonCleaner::~TopJetLeptonCleaner(){}
-// 
+

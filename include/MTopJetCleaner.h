@@ -10,10 +10,12 @@
 /* #include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h" */
 /* #include "UHH2/JetMETObjects/interface/FactorizedJetCorrectorCalculator.h" */
 /* #include "UHH2/JetMETObjects/interface/JetCorrectorParameters.h" */
+/* #include "UHH2/JetMETObjects/interface/SimpleJetCorrector.h" */
 
 /* class FactorizedJetCorrector; */
 /* class FactorizedJetCorrectorCalculator; */
-
+/* class SimpleJetCorrector; */
+/* class JetCorrectorParameters; */
 
 /* class TopJetLeptonCleaner: public uhh2::AnalysisModule { */
 /* public: */

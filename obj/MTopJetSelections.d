@@ -73,6 +73,7 @@ obj/MTopJetSelections.o: src/MTopJetSelections.cxx \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/GenJetWithParts.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/GenParticle.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/GenTopJet.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/PFParticle.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/GenericEvent.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/boost/1.57.0-kpegke/include/boost/optional.hpp \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc493/external/boost/1.57.0-kpegke/include/boost/optional/optional.hpp \
@@ -306,6 +307,8 @@ obj/MTopJetSelections.o: src/MTopJetSelections.cxx \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/JetIds.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/TTbarGen.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetUtils.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/JetCorrections.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/JetMETObjects/interface/JetCorrectionUncertainty.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/utils.h \
- /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/ReconstructionHypothesisDiscriminators.h \
- /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/ReconstructionHypothesisDiscriminators.h

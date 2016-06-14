@@ -328,4 +328,7 @@ obj/SF_ttagging.o: src/SF_ttagging.cxx \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/AnalysisModule.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/fwd.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/obj.h \
- /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/registry.h
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/core/include/registry.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/JetCorrections.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/JetMETObjects/interface/JetCorrectionUncertainty.h

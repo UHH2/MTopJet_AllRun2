@@ -2,7 +2,7 @@
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
   <!ENTITY NEVT "-1">
-  <!ENTITY KEYW "v03">  <!-- v01 = no TopLep Cleaner, v02 = old deltaR Cleaner, v03 = new Cleaner -->
+  <!ENTITY KEYW "v01">  <!-- v01 = new TopLep Cleaner, v02 = old deltaR Cleaner -->
   <!ENTITY channel "muon">
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
@@ -106,7 +106,7 @@
     <In FileName="&WJetsToLNu_HT0200to0400;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_HT0400to0600" Lumi="32842.6" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&WJetsToLNu_HT0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <In FileName="&WJetsToLNu_HT0400to0600;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
      <InputData Version="WJetsToLNu_HT0600to0800" Lumi="258411.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&WJetsToLNu_HT0600to0800;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>

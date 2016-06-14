@@ -19,7 +19,7 @@ public:
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
-    TH1F *N_PrimVertices, *N_TrueInteractions, *Weights, *WeightsLogBins, *MET, *HT, *HTLep, *ST, *BTAG_L, *BTAG_M, *BTAG_T, *deltaR_lep_topjet1, *deltaR_lep_topjet2, *deltaR_lep_jet1, *deltaR_lep_jet2, *deltaPhi_lep_topjet1, *deltaPhi_lep_topjet2;
+    TH1F *N_PrimVertices, *N_TrueInteractions, *Weights, *WeightsLogBins, *MET, *HT, *HTLep, *ST, *BTAG_L, *BTAG_M, *BTAG_T, *deltaR_lep_topjet1, *deltaR_lep_topjet2, *deltaR_lep_jet1, *deltaR_lep_jet2, *deltaPhi_lep_topjet1, *deltaPhi_lep_topjet2, *TopNumber, *TopPT1, *TopPT2, *TopJetMass;
     TH2F *TopJetMass1_TopJetMass2;
 
     uhh2::Event::Handle<double> h_ht;
