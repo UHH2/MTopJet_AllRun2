@@ -71,7 +71,6 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
-
   // store Hist collection as member variables
   std::unique_ptr<Hists> 
   h_cleaner_event, h_cleaner_elec, h_cleaner_muon, h_cleaner_jets, h_cleaner_topjets, h_cleaner_MTopJetHists,
