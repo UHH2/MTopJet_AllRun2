@@ -20,6 +20,14 @@
 
 namespace uhh2 {
 
+
+  /* class TTbarGenSemilep : public Selection { */
+
+  /* public: */
+  /*   virtual bool passes (const Event&) override; */
+
+  /* }; */
+
   ////
 
   class TopJetMassCut : public Selection {

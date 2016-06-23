@@ -9,8 +9,10 @@
 
 #include <UHH2/core/include/LorentzVector.h>
 
+#include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/ReconstructionHypothesisDiscriminators.h>
 #include <UHH2/common/include/Utils.h>
+
 
 ////////////////////////////////////////////////////////
 // uhh2::TopJetMassCut::TopJetMassCut(const):

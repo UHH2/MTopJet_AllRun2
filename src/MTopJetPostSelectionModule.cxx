@@ -260,7 +260,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   //// Top Jet Selection
   topjetlepton_cleaner->process(event);
-  //topjetleptondeltaR_cleaner->process(event); 
+   //topjetleptondeltaR_cleaner->process(event); 
   topjet_cleaner->process(event);
   sort_by_pt<TopJet>(*event.topjets); // Sort TopJets by pT
 
@@ -297,24 +297,25 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     /* Top Jet Mass Cut M1 > M2 */
     const bool pass_topmass = topmass_sel->passes(event);
-    if(!pass_topmass) return false;
+    if(pass_topmass){
+      h_topmassB_event->fill(event);
+      h_topmassB_elec->fill(event);
+      h_topmassB_muon->fill(event);
+      h_topmassB_jets->fill(event);
+      h_topmassB_topjets->fill(event);
+      h_topmassB_MTopJetHists->fill(event);
 
-    h_topmassB_event->fill(event);
-    h_topmassB_elec->fill(event);
-    h_topmassB_muon->fill(event);
-    h_topmassB_jets->fill(event);
-    h_topmassB_topjets->fill(event);
-    h_topmassB_MTopJetHists->fill(event);
-
-    /* delta R (lep, topjet2) < 0.8  */
-    const bool pass_deltaR = deltarcut_sel->passes(event);
-    if(!pass_deltaR) return false;
-    h_toplepdRB_event->fill(event);
-    h_toplepdRB_elec->fill(event);
-    h_toplepdRB_muon->fill(event);
-    h_toplepdRB_jets->fill(event);
-    h_toplepdRB_topjets->fill(event);
-    h_toplepdRB_MTopJetHists->fill(event);
+      /* delta R (lep, topjet2) < 0.8  */
+      const bool pass_deltaR = deltarcut_sel->passes(event);
+      if(pass_deltaR){
+	h_toplepdRB_event->fill(event);
+	h_toplepdRB_elec->fill(event);
+	h_toplepdRB_muon->fill(event);
+	h_toplepdRB_jets->fill(event);
+	h_toplepdRB_topjets->fill(event);
+	h_toplepdRB_MTopJetHists->fill(event);
+      }
+    }
   }
   //--------------------------------------------------------------------
 
@@ -332,24 +333,25 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     /* Top Jet Mass Cut M1 > M2 */
     const bool pass_topmass = topmass_sel->passes(event);
-    if(!pass_topmass) return false;
+    if(pass_topmass){
+      h_topmassC_event->fill(event);
+      h_topmassC_elec->fill(event);
+      h_topmassC_muon->fill(event);
+      h_topmassC_jets->fill(event);
+      h_topmassC_topjets->fill(event);
+      h_topmassC_MTopJetHists->fill(event);
 
-    h_topmassC_event->fill(event);
-    h_topmassC_elec->fill(event);
-    h_topmassC_muon->fill(event);
-    h_topmassC_jets->fill(event);
-    h_topmassC_topjets->fill(event);
-    h_topmassC_MTopJetHists->fill(event);
-
-    /* delta R (lep, topjet2) < 0.8  */
-    const bool pass_deltaR = deltarcut_sel->passes(event);
-    if(!pass_deltaR) return false;
-    h_toplepdRC_event->fill(event);
-    h_toplepdRC_elec->fill(event);
-    h_toplepdRC_muon->fill(event);
-    h_toplepdRC_jets->fill(event);
-    h_toplepdRC_topjets->fill(event);
-    h_toplepdRC_MTopJetHists->fill(event);
+      /* delta R (lep, topjet2) < 0.8  */
+      const bool pass_deltaR = deltarcut_sel->passes(event);
+      if(pass_deltaR){
+	h_toplepdRC_event->fill(event);
+	h_toplepdRC_elec->fill(event);
+	h_toplepdRC_muon->fill(event);
+	h_toplepdRC_jets->fill(event);
+	h_toplepdRC_topjets->fill(event);
+	h_toplepdRC_MTopJetHists->fill(event);
+      }
+    }
   }
   //--------------------------------------------------------------------
 
@@ -357,7 +359,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /* 1st AK8 jet selection */
   const bool pass_topjetD = topjetD_sel->passes(event);
   if(pass_topjetD){
-
     h_topjetD_event->fill(event);
     h_topjetD_elec->fill(event);
     h_topjetD_muon->fill(event);
@@ -367,24 +368,25 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     /* Top Jet Mass Cut M1 > M2 */
     const bool pass_topmass = topmass_sel->passes(event);
-    if(!pass_topmass) return false;
+    if(pass_topmass){
+      h_topmassD_event->fill(event);
+      h_topmassD_elec->fill(event);
+      h_topmassD_muon->fill(event);
+      h_topmassD_jets->fill(event);
+      h_topmassD_topjets->fill(event);
+      h_topmassD_MTopJetHists->fill(event);
 
-    h_topmassD_event->fill(event);
-    h_topmassD_elec->fill(event);
-    h_topmassD_muon->fill(event);
-    h_topmassD_jets->fill(event);
-    h_topmassD_topjets->fill(event);
-    h_topmassD_MTopJetHists->fill(event);
-
-    /* delta R (lep, topjet2) < 0.8  */
-    const bool pass_deltaR = deltarcut_sel->passes(event);
-    if(!pass_deltaR) return false;
-    h_toplepdRD_event->fill(event);
-    h_toplepdRD_elec->fill(event);
-    h_toplepdRD_muon->fill(event);
-    h_toplepdRD_jets->fill(event);
-    h_toplepdRD_topjets->fill(event);
-    h_toplepdRD_MTopJetHists->fill(event);
+      /* delta R (lep, topjet2) < 0.8  */
+      const bool pass_deltaR = deltarcut_sel->passes(event);
+      if(pass_deltaR){
+	h_toplepdRD_event->fill(event);
+	h_toplepdRD_elec->fill(event);
+	h_toplepdRD_muon->fill(event);
+	h_toplepdRD_jets->fill(event);
+	h_toplepdRD_topjets->fill(event);
+	h_toplepdRD_MTopJetHists->fill(event);
+      }
+    }
   }
   //--------------------------------------------------------------------
 
@@ -400,7 +402,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_topmass_jets->fill(event);
   h_topmass_topjets->fill(event);
   h_topmass_MTopJetHists->fill(event);
-  // h_topmass_GenHists->fill(event);
 
   /* delta R (lep, topjet2) < 0.8  */
   const bool pass_deltaR = deltarcut_sel->passes(event);
@@ -411,7 +412,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_toplepdR_jets->fill(event);
   h_toplepdR_topjets->fill(event);
   h_toplepdR_MTopJetHists->fill(event);
-  // h_toplepdR_GenHists->fill(event);
 
 
   ////

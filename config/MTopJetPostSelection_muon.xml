@@ -66,6 +66,14 @@
 -->
 
 <JobConfiguration JobName="MTopJetPostSelectionJob" OutputLevel="INFO">
+  <Library Name="libfastjet" />
+  <Library Name="libfastjettools" />
+<!--  <Library Name="libsiscone" /> -->
+<!--  <Library Name="libsiscone_spherical" /> -->
+<!--  <Library Name="libfastjetplugins" /> -->
+<!--  <Library Name="libNsubjettiness" /> -->
+
+
   <Library Name="libSUHH2ZprimeSemiLeptonic"/>
   <Package Name="SUHH2ZprimeSemiLeptonic.par"/>
 

@@ -1,0 +1,24 @@
+#include "UHH2/MTopJet/include/MTopJetGenHists.h"
+#include "UHH2/core/include/Event.h"
+#include "UHH2/common/include/Utils.h"
+
+#include "UHH2/MTopJet/include/GenJetProps.h"
+#include "UHH2/MTopJet/include/Clustering.h"
+#include "UHH2/common/include/TTbarGen.h"
+
+#include <math.h>
+#include <vector>
+
+#include "TH1F.h"
+#include "TH2F.h"
+#include <iostream>
+
+class Clustering: public uhh2::Hists {
+ public:
+
+ private:
+    std::vector<fastjet::PseudoJet> _hadrons;
+    bool IsStableHadron(GenParticle* p);
+    fastjet::PseudoJet convert_particle(GenParticle* genparticle);
+
+}

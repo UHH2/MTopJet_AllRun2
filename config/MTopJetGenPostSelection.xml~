@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+<!ENTITY NEVT "-1">
+
+  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
+  <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/GenPost"> 
+  <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Gen"> 
+
+
+
+  <!ENTITY TTbar_PF_A SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_A2 SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_B SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_B2 SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_C SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_C2 SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_D SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_D2 SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_E SYSTEM "&INdir;/">
+  <!ENTITY TTbar_PF_E2 SYSTEM "&INdir;/">
+
+
+]>
+
+<!--
+   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="10" />
+   <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="workdir"/>
+-->
+
+<JobConfiguration JobName="MTopJetGenPostSelectionJob" OutputLevel="INFO">
+    <Library Name="libSUHH2ZprimeSemiLeptonic"/>  
+    <Package Name="SUHH2ZprimeSemiLeptonic.par"/> 
+    <Library Name="libfastjet" />
+    <Library Name="libfastjettools" />
+
+<!-- 
+ <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
+-->
+
+<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15"> 
+
+
+ 
+
+    <!-- ********TTbar**************************************** -->
+
+    <InputData Version="TTbar_PF_A" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_A;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_A2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_A2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_B" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_B;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_B2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_B2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_C" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_C;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_C2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_C2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_D" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_D;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_D2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_D2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_E" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_E;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_PF_E2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_E2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <UserConfig>
+        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+        <Item Name="GenParticleCollection"   Value="GenParticles"/>
+        <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+        <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+        <Item Name="TauCollection"           Value="slimmedTaus"/>
+
+        <Item Name="JetCollection"           Value="slimmedJets"/>
+        <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
+        <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
+	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
+
+	<Item Name="additionalBranches" Value="PFParticles ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
+
+
+	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
+        <Item Name="METName"                 Value="slimmedMETs"/>
+        <Item Name="lumi_file" Value="/afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/data/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_Silver.root"/>
+        <Item Name="use_sframe_weight" Value="true"/>
+
+        <Item Name="AnalysisModule" Value="MTopJetGenPostSelectionModule"/>
+      </UserConfig>
+
+    </Cycle>
+</JobConfiguration>

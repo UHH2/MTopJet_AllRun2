@@ -1,0 +1,20 @@
+#include "UHH2/MTopJet/include/Clustering.h"
+
+
+
+
+
+fastjet::PseudoJet Clustering::convert_particle(GenParticle* genparticle){
+  TLorentzVector particle;
+  particle.SetPtEtaPhiE(genparticle->pt(),genparticle->eta(),genparticle->phi(),genparticle->energy());
+  fastjet::PseudoJet gen_particle(particle.Px(),particle.Py(),particle.Pz(),particle.E());
+  return gen_particle;
+
+}
+
+bool Clustering::IsStableHadron(GenParticle* p)
+{
+	int st = p->status();
+	if (st==1) return true;
+	else return false;
+}

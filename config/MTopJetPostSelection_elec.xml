@@ -3,7 +3,7 @@
 
   <!ENTITY NEVT "-1">
   <!ENTITY KEYW "v01">  <!-- v01 = new TopLep Cleaner, v02 = old deltaR Cleaner -->
-  <!ENTITY channel "muon">
+  <!ENTITY channel "elec">
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
  <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/elec">
