@@ -2,8 +2,8 @@
 #include "UHH2/MTopJet/include/JetCluster.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
+#include "UHH2/core/include/PFParticle.h"
 
-#include "UHH2/MTopJet/include/GenJetProps.h"
 #include "UHH2/common/include/TTbarGen.h"
 
 #include <math.h>
@@ -18,104 +18,178 @@ using namespace uhh2;
 MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
 
-  // GenJet number, pt, Mass
-  GenPartNumber = book<TH1F>("Number Gen Parts", "number", 3, 0, 3);
-  GenNumber1_new = book<TH1F>("new Number Gen Jets 1", "number", 10, 0, 10);
-  GenNumber2_new = book<TH1F>("new Number Gen Jets 2", "number", 10, 0, 10);
-  GenNumber1_old = book<TH1F>("old Number Gen Jets 1", "number", 10, 0, 10);
-  GenNumber2_old = book<TH1F>("old Number Gen Jets 2", "number", 10, 0, 10);  
-  GenPT1_new = book<TH1F>("new ak4 Gen Jet p_{T}", "p_{T} [GeV/c]", 20, 0, 1000);
-  GenPT2_new = book<TH1F>("new ak8 Gen Jet p_{T}", "p_{T} [GeV/c]", 20, 0, 1000);
-  GenJetMass_new = book<TH1F>("new 1st Gen Jet Mass","M^{topjet1} [GeV/c^{2}]", 15, 0, 300);
-  GenPT1_old = book<TH1F>("old ak4 Gen Jet p_{T}", "p_{T} [GeV/c]", 20, 0, 1000);
-  GenPT2_old = book<TH1F>("old ak8 Gen Jet p_{T}", "p_{T} [GeV/c]", 20, 0, 1000);
-  GenJetMass_old = book<TH1F>("old 1st Gen Jet Mass","M^{topjet1} [GeV/c^{2}]", 15, 0, 300);   
+  
+  RecoPT_old = book<TH1F>("p_{T} old ak8 Jets", "p_{T} [GeV/c]", 20, 0, 1000);
+  RecoNumber_old = book<TH1F>("Number old ak8 Jets ", "number", 15, 0, 15);
+  RecoEta_old = book<TH1F>("#eta old ak8 Jets", "#eta", 20, -3, 3);
+  RecoJet1Mass_old = book<TH1F>("Jet Mass old ak8 Jet", "M_{jet}", 15, 0, 300);
 
+  RecoEvNumber = book<TH1F>("Number Reco Parts per Event", "number", 30, 0, 300);
 
+  RecoPT_ak08 = book<TH1F>("p_{T} AK8 Jets", "p_{T} [GeV/c]", 20, 0, 1000);
+  RecoNumber_ak08 = book<TH1F>("Number AK8 Jets", "number", 15, 0, 15);
+  RecoEta_ak08 = book<TH1F>("#eta AK8 Jets", "#eta", 20, -3, 3);
+  RecoJet1Mass_ak08 = book<TH1F>("Jet Mass AK8", "M_{jet}", 15, 0, 300);
+
+  GenEvNumber = book<TH1F>("Number Gen Parts per Event", "number", 30, 0, 300);
+
+  GenPT_ak08 = book<TH1F>("p_{T} AK8 GenJets", "p_{T} [GeV/c]", 20, 0, 1000);
+  GenNumber_ak08 = book<TH1F>("Number AK8 GenJets", "number", 15, 0, 15);
+  GenEta_ak08 = book<TH1F>("#eta AK8 GenJets", "#eta", 20, -3, 3);
+  GenJet1Mass_ak08 = book<TH1F>("GenJet Mass AK8", "M_{jet}", 15, 0, 300);
+
+  GenPT_ak10 = book<TH1F>("p_{T} AK10 GenJets", "p_{T} [GeV/c]", 20, 0, 1000);
+  GenNumber_ak10 = book<TH1F>("Number AK10 GenJets", "number", 15, 0, 15);
+  GenEta_ak10 = book<TH1F>("#eta AK10 GenJets", "#eta", 20, -3, 3);
+  GenJet1Mass_ak10 = book<TH1F>("GenJet Mass AK10", "M_{jet}", 15, 0, 300);
+
+  GenPT_ak12 = book<TH1F>("p_{T} AK12 GenJets", "p_{T} [GeV/c]", 20, 0, 1000);
+  GenNumber_ak12 = book<TH1F>("Number AK12 GenJets", "number", 15, 0, 15);
+  GenEta_ak12 = book<TH1F>("#eta AK12 GenJets", "#eta", 20, -3, 3);
+  GenJet1Mass_ak12 = book<TH1F>("GenJet Mass AK12", "M_{jet}", 15, 0, 300);
+
+  GenPT_ak14 = book<TH1F>("p_{T} AK14 GenJets", "p_{T} [GeV/c]", 20, 0, 1000);
+  GenNumber_ak14 = book<TH1F>("Number AK14 GenJets", "number", 15, 0, 15);
+  GenEta_ak14 = book<TH1F>("#eta AK14 GenJets", "#eta", 20, -3, 3);
+  GenJet1Mass_ak14 = book<TH1F>("GenJet Mass AK14", "M_{jet}", 15, 0, 300);
+
+   h_pfpart=ctx.get_handle<vector<PFParticle>>("PFParticles");
 }
 
 
 
-
 void MTopJetGenHists::fill(const Event & event){
-  // Cluster Jets
+
+  // Cluster Gen Jets
   std::vector<GenParticle>* genparts = event.genparticles;
   JetCluster* jetc=new JetCluster();
-  std::vector<fastjet::PseudoJet> fatjet1 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.4, 10);
-  std::vector<fastjet::PseudoJet> fatjet2 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.8, 10);
+  std::vector<fastjet::PseudoJet> gen_ak08, gen_ak10, gen_ak12, gen_ak14;
+  gen_ak08 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.8, 0);
+  gen_ak10 = jetc->get_genjets(genparts, JetCluster::e_akt, 1.0, 0);
+  gen_ak12 = jetc->get_genjets(genparts, JetCluster::e_akt, 1.2, 0);
+  gen_ak14 = jetc->get_genjets(genparts, JetCluster::e_akt, 1.4, 0);
+  ////
+
+  // Cluster Reco Jets
+  std::vector<PFParticle> pfparts = event.get(h_pfpart);
+  JetCluster* jetc_reco=new JetCluster();
+  std::vector<fastjet::PseudoJet> reco_ak08 = jetc_reco->get_recojets(&pfparts, JetCluster::e_akt, 0.8, 200);
+  ////
 
   // get weight
   double weight = event.weight;
+  ////
 
-  //Gen parts Number
-  float gennumber=0;
-  gennumber = genparts->size();
-  GenPartNumber->Fill(1, gennumber);
+  //Reco parts Number per Event
+  float reconumber = pfparts.size();
+  RecoEvNumber->Fill(reconumber, weight);
+  ////
 
-  //Gen Number
-  float number1;
-  number1 = fatjet1.size();
-  GenNumber1_new->Fill(number1,weight);
+  //// Number of Reco Jets
+  RecoNumber_old->Fill(event.topjets->size(), weight);
+  RecoNumber_ak08->Fill(reco_ak08.size(), weight);
+  ////
 
-  float number2;
-  number2 = fatjet2.size();
-  GenNumber2_new->Fill(number2,weight);
-
-  float number1_;
-  number1_ = event.genjets->size();
-  GenNumber1_old->Fill(number1_,weight);
-
-  // float number2_;
-  // number2_ = event.gentopjets->size();
-  // GenNumber2_old->Fill(number2_,weight);
-
-  //
-
-  //Gen pT
-  if((fatjet1.size())>0){
-    // assert(event.jets);
-    for(unsigned int i=0; i<fatjet1.size();i++){
-    fastjet::PseudoJet Gen = fatjet1[i];
-    float toppt1 = Gen.pt();
-    GenPT1_new->Fill(toppt1,weight);
+  // Reco PT & Eta
+  if((event.topjets->size())>0){
+    for(unsigned int i=0; i<event.topjets->size();i++){
+    const Particle* recjet = &event.topjets->at(i);
+    RecoPT_old->Fill(recjet->v4().pt(),weight);
+    RecoEta_old->Fill(recjet->v4().eta(),weight);
     }
-  }
-  if((fatjet2.size())>0){
-    // assert(event.jets);
-    for(unsigned int i=0; i<fatjet2.size();i++){
-    fastjet::PseudoJet Gen = fatjet2[i];
-    float toppt2 = Gen.pt();
-    GenPT2_new->Fill(toppt2,weight);
+  } 
+  if((reco_ak08.size())>0){
+    for(unsigned int i=0; i<reco_ak08.size();i++){
+    fastjet::PseudoJet recjet = reco_ak08[i];
+    RecoPT_ak08->Fill(recjet.pt(),weight);
+    RecoEta_ak08->Fill(recjet.eta(),weight);
+   }
+  } 
+ 
+  //Mass Reco Jet
+  if((event.topjets->size())>0){
+    const Particle* recjet = &event.topjets->at(0);
+    RecoJet1Mass_old->Fill(recjet->v4().M(),weight);
+  } 
+  if((reco_ak08.size())>0){
+    fastjet::PseudoJet recjet = reco_ak08[0];
+    TLorentzVector jet;
+    jet.SetPtEtaPhiE(recjet.pt(),recjet.eta(),recjet.phi(),recjet.E());
+    RecoJet1Mass_ak08->Fill(jet.M(),weight);
+  } 
+  ////
+
+  //Gen parts Number per Event
+  float gennumber = pfparts.size();
+  GenEvNumber->Fill(gennumber, weight);
+  ////
+
+  //// Number of Gen Jets
+  GenNumber_ak08->Fill(gen_ak08.size(), weight);
+  GenNumber_ak10->Fill(gen_ak10.size(), weight);
+  GenNumber_ak12->Fill(gen_ak12.size(), weight);
+  GenNumber_ak14->Fill(gen_ak14.size(), weight);
+  ////
+
+  // Gen PT & Eta
+  if((gen_ak08.size())>0){
+    for(unsigned int i=0; i<gen_ak08.size();i++){
+    fastjet::PseudoJet genjet = gen_ak08[i];
+    GenPT_ak08->Fill(genjet.pt(),weight);
+    GenEta_ak08->Fill(genjet.eta(),weight);
+   }
+  } 
+  if((gen_ak10.size())>0){
+    for(unsigned int i=0; i<gen_ak10.size();i++){
+    fastjet::PseudoJet genjet = gen_ak10[i];
+    GenPT_ak10->Fill(genjet.pt(),weight);
+    GenEta_ak10->Fill(genjet.eta(),weight);
     }
-  }
-
-  if((event.genjets->size())>0){
-    for(unsigned int i=0; i<event.genjets->size();i++){
-    const Particle* gen = &event.genjets->at(i);
-    float pt = gen->v4().pt();
-    GenPT1_old->Fill(pt,weight);
+  } 
+  if((gen_ak12.size())>0){
+    for(unsigned int i=0; i<gen_ak12.size();i++){
+    fastjet::PseudoJet genjet = gen_ak12[i];
+    GenPT_ak12->Fill(genjet.pt(),weight);
+    GenEta_ak12->Fill(genjet.eta(),weight);
+   }
+  } 
+  if((gen_ak14.size())>0){
+    for(unsigned int i=0; i<gen_ak14.size();i++){
+    fastjet::PseudoJet genjet = gen_ak14[i];
+    GenPT_ak14->Fill(genjet.pt(),weight);
+    GenEta_ak14->Fill(genjet.eta(),weight);
     }
-  }
+  } 
 
-  // if((event.gentopjets->size())>0){
-  //   for(unsigned int i=0; i<event.gentopjets->size();i++){
-  //   const Particle* gen = &event.gentopjets->at(i);
-  //   float pt2 = gen->v4().pt();
-  //   GenPT2_old->Fill(pt2,weight);
-  //   }
-  // }
 
-  
+  //Mass Gen Jet
+  if((gen_ak08.size())>0){
+    fastjet::PseudoJet genjet = gen_ak08[0];
+    TLorentzVector jet;
+    jet.SetPtEtaPhiE(genjet.pt(),genjet.eta(),genjet.phi(),genjet.E());
+    GenJet1Mass_ak08->Fill(jet.M(),weight);
+  } 
+  if((gen_ak10.size())>0){
+    fastjet::PseudoJet genjet = gen_ak10[0];
+    TLorentzVector jet;
+    jet.SetPtEtaPhiE(genjet.pt(),genjet.eta(),genjet.phi(),genjet.E());
+    GenJet1Mass_ak10->Fill(jet.M(),weight);
+  } 
+  if((gen_ak12.size())>0){
+    fastjet::PseudoJet genjet = gen_ak12[0];
+    TLorentzVector jet;
+    jet.SetPtEtaPhiE(genjet.pt(),genjet.eta(),genjet.phi(),genjet.E());
+    GenJet1Mass_ak12->Fill(jet.M(),weight);
+  } 
+  if((gen_ak14.size())>0){
+    fastjet::PseudoJet genjet = gen_ak14[0];
+    TLorentzVector jet;
+    jet.SetPtEtaPhiE(genjet.pt(),genjet.eta(),genjet.phi(),genjet.E());
+    GenJet1Mass_ak14->Fill(jet.M(),weight);
+  } 
+  ////
 
-  // GenJetMass
-  // if((fatjet.size())>0){
-  //   // assert(event.jets);
-  //   float mass1 = 0;
-  //   fastjet::PseudoJet Gen1 = fatjet[0];
-  //   mass1 = Gen1.v4();
-  //   GenJetMass->Fill(mass1, weight);
-  // }
-  
+
 }
 
 

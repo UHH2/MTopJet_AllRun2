@@ -6,8 +6,12 @@
   <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Gen"> 
   <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds"> 
 
+<!--
+  <!ENTITY TTbar_PF_semilep SYSTEM "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds/MC_TTbar_semilep.xml">
+-->
+  <!ENTITY TTbar_PF_test   "&INdir;/TTbar_semilep/MC_TTbar_4770_Ntuple.root">
 
-
+<!--
   <!ENTITY TTbar_PF_A SYSTEM "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds/MC_TTbar_A.xml">
   <!ENTITY TTbar_PF_A2 SYSTEM "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds/MC_TTbar_A2.xml">
   <!ENTITY TTbar_PF_B SYSTEM "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds/MC_TTbar_B.xml">
@@ -19,6 +23,11 @@
   <!ENTITY TTbar_PF_E SYSTEM "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds/MC_TTbar_E.xml">
   <!ENTITY TTbar_PF_E2 SYSTEM "/nfs/dust/cms/user/schwarzd/sframe-ntuples/RunII-ntuple-76v1/backgrounds/MC_TTbar_E2.xml">
   <!ENTITY TTbar_PF_test   "&INdir;/TTbar/MC_TTbar_0_Ntuple.root">
+  <!ENTITY TTbar_PF_test1   "&INdir;/TTbar/MC_TTbar_1_Ntuple.root">
+  <!ENTITY TTbar_PF_test2   "&INdir;/TTbar/MC_TTbar_2_Ntuple.root">
+  <!ENTITY TTbar_PF_test3   "&INdir;/TTbar/MC_TTbar_3_Ntuple.root">
+-->
+  <!ENTITY TTbar_PF_test4   "&INdir;/TTbar/MC_TTbar_4_Ntuple.root">
 
 
 ]>
@@ -34,20 +43,27 @@
     <Library Name="libfastjet" />
     <Library Name="libfastjettools" />
 
-<!-- 
+ 
  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
--->
 
+<!--
 <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15"> 
-
+-->
 
  
 
     <!-- ********TTbar**************************************** -->
 
+<!-- first count events for Lumi!!!!! -->
+<!--
+     <InputData Version="TTbar_PF_semilep" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_PF_semilep; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+-->
+
+<!--
     <InputData Version="TTbar_PF_A" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_PF_A; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<!--
+
     <InputData Version="TTbar_PF_A2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_PF_A2; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
@@ -75,13 +91,23 @@
     <InputData Version="TTbar_PF_E2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_PF_E2; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 -->
-<!--
+
    <InputData Version="TTbar_PF_test" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
    <In FileName="&TTbar_PF_test;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!--
+   <InputData Version="TTbar_PF_test1" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+   <In FileName="&TTbar_PF_test1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+   <InputData Version="TTbar_PF_test2" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+   <In FileName="&TTbar_PF_test2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+   <InputData Version="TTbar_PF_test3" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+   <In FileName="&TTbar_PF_test3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+   <InputData Version="TTbar_PF_test4" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+   <In FileName="&TTbar_PF_test4;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 -->
       <UserConfig>
-        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+
         <Item Name="GenParticleCollection"   Value="GenParticles"/>
+        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
         <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
         <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
         <Item Name="TauCollection"           Value="slimmedTaus"/>
@@ -95,6 +121,7 @@
 
 
 	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
+
         <Item Name="METName"                 Value="slimmedMETs"/>
         <Item Name="lumi_file" Value="/afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/data/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_Silver.root"/>
         <Item Name="use_sframe_weight" Value="true"/>

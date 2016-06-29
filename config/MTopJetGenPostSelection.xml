@@ -8,8 +8,12 @@
 
 
   <!ENTITY TTbar_PF_test  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_test.root">
-<!--
+
+  <!ENTITY TTbar_PF_test_merged  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_test_merged.root">
+
   <!ENTITY TTbar_PF_A  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_A.root">
+
+<!--
   <!ENTITY TTbar_PF_A2  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_A2.root">
   <!ENTITY TTbar_PF_B  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_B.root">
   <!ENTITY TTbar_PF_B2  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_B2.root">
@@ -44,9 +48,15 @@
 
     <!-- ********TTbar**************************************** -->
 
+    <InputData Version="TTbar_PF_test_merged" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_test_merged;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!--
     <InputData Version="TTbar_PF_test" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_PF_test;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<!--
+
+    <InputData Version="TTbar_PF_test" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_PF_test;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
     <InputData Version="TTbar_PF_A" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_PF_A;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 

@@ -14,3 +14,17 @@ bool uhh2::TTbarSemilep::passes(const uhh2::Event& event){
     }
     return semilep;
 }
+
+
+uhh2::TopHadPT::TopHadPT(uhh2::Context& ctx, float ptmin):
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")), ptmin_(ptmin) {}
+
+
+bool uhh2::TopHadPT::passes(const uhh2::Event& event){
+    const auto & ttbargen = event.get(h_ttbargen);
+    bool pass_pt = true;
+    GenParticle tophad = ttbargen.TopHad();
+    float toppt = tophad.pt();
+    if(toppt < ptmin_) pass_pt=false;
+    return pass_pt;
+}

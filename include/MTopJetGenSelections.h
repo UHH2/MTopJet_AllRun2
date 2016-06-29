@@ -29,4 +29,15 @@ namespace uhh2 {
 
   };
 
+  class TopHadPT : public Selection { 
+
+  public: 
+    explicit TopHadPT(Context&, float ptmin=300);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float ptmin_;
+
+  };
 }
