@@ -26,6 +26,8 @@ protected:
 
     TH1F *TopHadPT, *Number_Elec, *Number_Muon;
 
+    TH1F *deltaR_bot_jet1, *deltaR_q1_jet1, *deltaR_q2_jet1, *deltaR_bot_lep_jet1, *deltaR_lep1_jet1, *deltaR_lep2_jet1;
+
     uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
 

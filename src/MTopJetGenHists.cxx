@@ -50,6 +50,13 @@ MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirnam
 
   TopHadPT = book<TH1F>("p_{T} of hadronic Top", "p_{T}", 20, 0, 1000);
 
+  deltaR_lep1_jet1 = book<TH1F>("deltaR_lep1_jet1", "#Delta R(lep1,1st Jet)", 80, 0, 4.0);
+  deltaR_lep2_jet1 = book<TH1F>("deltaR_lep2_jet1", "#Delta R(lep2,1st Jet)", 80, 0, 4.0);
+  deltaR_bot_lep_jet1 = book<TH1F>("deltaR_bot_lep_jet1", "#Delta R(bot_lep,1st Jet)", 80, 0, 4.0);
+  deltaR_bot_jet1 = book<TH1F>("deltaR_bot_jet1", "#Delta R(bot,1st Jet)", 80, 0, 4.0);
+  deltaR_q1_jet1 = book<TH1F>("deltaR_q1_jet1", "#Delta R(q1,1st Jet)", 80, 0, 4.0);
+  deltaR_q2_jet1 = book<TH1F>("deltaR_q2_jet1", "#Delta R(q2,1st Jet)", 80, 0, 4.0);
+
   // handle for PF particles
   h_pfpart=ctx.get_handle<vector<PFParticle>>("PFParticles");
   // handle for TTbarGen class
@@ -66,9 +73,9 @@ void MTopJetGenHists::fill(const Event & event){
   std::vector<GenParticle>* genparts = event.genparticles;
   JetCluster* jetc=new JetCluster();
   std::vector<fastjet::PseudoJet> gen_ak06, gen_ak07, gen_ak08;
-  gen_ak06 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.6, pt_min);
+  //gen_ak06 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.6, pt_min);
   gen_ak07 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.7, pt_min);
-  gen_ak08 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.8, pt_min);
+  //gen_ak08 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.8, pt_min);
   ////
 
   // Cluster Reco Jets
@@ -82,25 +89,35 @@ void MTopJetGenHists::fill(const Event & event){
   const auto & ttbargen = event.get(h_ttbargen);
   ////
 
-  // matching: check if decay products of tophad are clustered in leading jet
+  // matching: check if decay products of tophad are clustered in leading jet, also get other gen particles to fill hists
   bool matched = false;
-  if(gen_ak06.size() > 0){
-    fastjet::PseudoJet genjet = gen_ak06[0];
+  // get stable particles from ttbar decay and sort them into leptonic and hadronic
+  if(gen_ak07.size() > 0){
+    fastjet::PseudoJet genjet = gen_ak07[0];
     //TLorentzVector jet;
     //jet.SetPtEtaPhiE(genjet.pt(),genjet.eta(),genjet.phi(),genjet.E());
-    GenParticle bot, q1, q2;
+    GenParticle bot, q1, q2, bot_lep, lep1, lep2;
     if(ttbargen.IsTopHadronicDecay()){
       bot = ttbargen.bTop();
       q1 = ttbargen.WMinusdecay1();
       q2 = ttbargen.WMinusdecay2();
+      bot_lep = ttbargen.bAntitop();
+      lep1 = ttbargen.Wdecay1();
+      lep2 = ttbargen.Wdecay2();
     }
     else if(ttbargen.IsAntiTopHadronicDecay()){
       bot = ttbargen.bAntitop();
       q1 = ttbargen.Wdecay1();
       q2 = ttbargen.Wdecay2();
+      bot_lep = ttbargen.bTop();
+      lep1 = ttbargen.WMinusdecay1();
+      lep2 = ttbargen.WMinusdecay2();
     }
-    if((deltaR(bot, genjet)<=0.6) && (deltaR(q1, genjet)<=0.6) && (deltaR(q2, genjet)<=0.6)) matched = true;
+    //check if particles from hadronic top are clustered into jet
+    if((deltaR(bot, genjet)<=0.7) && (deltaR(q1, genjet)<=0.7) && (deltaR(q2, genjet)<=0.7)) matched = true;
   }
+  ////
+
   //// Fill Hists here
 
   // get weight
@@ -212,6 +229,15 @@ void MTopJetGenHists::fill(const Event & event){
   float toppt = tophad.pt();
   TopHadPT->Fill(toppt, weight);
 
+  if(gen_ak07.size() > 0){
+    fastjet::PseudoJet genjet = gen_ak07[0];
+    deltaR_lep1_jet1->Fill(deltaR(genjet, lep1), weight);
+    deltaR_lep2_jet1->Fill(deltaR(genjet, lep2), weight);
+    deltaR_bot_lep_jet1->Fill(deltaR(genjet, bot_lep), weight);
+    deltaR_q1_jet1->Fill(deltaR(genjet, q1), weight);
+    deltaR_q2_jet1->Fill(deltaR(genjet, q2), weight);
+    deltaR_bot_jet1->Fill(deltaR(genjet, bot), weight);
+  }
   ////
 
 
