@@ -37,7 +37,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   // cleaners
   
   // selections
-  //std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
 
 
@@ -56,9 +56,9 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
 
   //// COMMON MODULES
 
-  //const std::string ttbar_gen_label("ttbargen");
+  const std::string ttbar_gen_label("ttbargen");
 
-  //ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
+  ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   ////
 
@@ -76,7 +76,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
 bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
   //  COMMON MODULES
-  // ttgenprod->process(event);
+  ttgenprod->process(event);
   h_GenHists->fill(event);
 
   return true;

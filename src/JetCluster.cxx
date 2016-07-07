@@ -12,10 +12,11 @@
 
 #include <iostream> 
 
-// Check if Gen particle is stable
+// Check if Gen particle is stable (and no lepton)
 bool JetCluster::IsStable(GenParticle* p)
 {
 	int st = p->status();
+	//if(abs(p->pdgId()) == 11 || abs(p->pdgId()) == 13) return false;
 	if (st==1) return true;
 	else return false;
 }

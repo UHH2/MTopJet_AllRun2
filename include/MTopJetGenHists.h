@@ -21,10 +21,13 @@ public:
 
 protected:
 
-    TH1F *GenEvNumber, *GenPT_old, *GenNumber_old, *GenEta_old, *GenJet1Mass_old, *GenPT_ak08, *GenNumber_ak08, *GenEta_ak08, *GenJet1Mass_ak08, *GenPT_ak10, *GenNumber_ak10, *GenEta_ak10, *GenJet1Mass_ak10, *GenPT_ak12, *GenNumber_ak12, *GenEta_ak12, *GenJet1Mass_ak12, *GenPT_ak14, *GenNumber_ak14, *GenEta_ak14, *GenJet1Mass_ak14;
+    TH1F *GenEvNumber, *GenEvNumberStable, *GenPT_old, *GenNumber_old, *GenEta_old, *GenJet1Mass_old, *GenPT_ak06, *GenNumber_ak06, *GenEta_ak06, *GenJet1Mass_ak06, *GenJet1Mass_ak07, *GenJet1Mass_ak08, *GenJet1Mass_ak06_unmatched, *GenJet1Mass_ak07_unmatched, *GenJet1Mass_ak08_unmatched, *GenJet1Mass_ak06_matched, *GenJet1Mass_ak07_matched, *GenJet1Mass_ak08_matched;
+    TH1F *RecoEvNumber, *RecoPT_old, *RecoNumber_old, *RecoEta_old, *RecoJet1Mass_old, *RecoPT_ak06, *RecoNumber_ak06, *RecoEta_ak06, *RecoJet1Mass_ak06;
 
-    TH1F *RecoEvNumber, *RecoPT_old, *RecoNumber_old, *RecoEta_old, *RecoJet1Mass_old, *RecoPT_ak08, *RecoNumber_ak08, *RecoEta_ak08, *RecoJet1Mass_ak08;
+    TH1F *TopHadPT, *Number_Elec, *Number_Muon;
+
     uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
 
 };
 

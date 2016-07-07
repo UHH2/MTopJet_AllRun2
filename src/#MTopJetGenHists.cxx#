@@ -66,9 +66,9 @@ void MTopJetGenHists::fill(const Event & event){
   std::vector<GenParticle>* genparts = event.genparticles;
   JetCluster* jetc=new JetCluster();
   std::vector<fastjet::PseudoJet> gen_ak06, gen_ak07, gen_ak08;
-  gen_ak06 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.6, pt_min);
+  //gen_ak06 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.6, pt_min);
   gen_ak07 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.7, pt_min);
-  gen_ak08 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.8, pt_min);
+  //gen_ak08 = jetc->get_genjets(genparts, JetCluster::e_akt, 0.8, pt_min);
   ////
 
   // Cluster Reco Jets
@@ -82,7 +82,7 @@ void MTopJetGenHists::fill(const Event & event){
   const auto & ttbargen = event.get(h_ttbargen);
   ////
 
-  // matching: check if decay products of tophad are clustered in leading jet
+  // matching: check if decay products of tophad are clustered in leading jet, also get other gen particles to fill hists
   bool matched = false;
   if(gen_ak06.size() > 0){
     fastjet::PseudoJet genjet = gen_ak06[0];
@@ -99,8 +99,10 @@ void MTopJetGenHists::fill(const Event & event){
       q1 = ttbargen.Wdecay1();
       q2 = ttbargen.Wdecay2();
     }
-    if((deltaR(bot, genjet)<=0.6) && (deltaR(q1, genjet)<=0.6) && (deltaR(q2, genjet)<=0.6)) matched = true;
+    if((deltaR(bot, genjet)<=0.7) && (deltaR(q1, genjet)<=0.7) && (deltaR(q2, genjet)<=0.7)) matched = true;
   }
+  ////
+
   //// Fill Hists here
 
   // get weight
