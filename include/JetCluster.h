@@ -20,6 +20,7 @@ class JetCluster{
 
   std::vector<fastjet::PseudoJet> _hadrons;
   bool IsStable(GenParticle* p);
+  bool IsLepton(GenParticle* p);
   fastjet::PseudoJet convert_particle(GenParticle* genparticle);
   fastjet::PseudoJet convert_recoparticle(PFParticle* pfparticle);
 
@@ -27,11 +28,15 @@ class JetCluster{
 
   enum E_algorithm { 
     e_ca, 
+    e_vrca, 
     e_akt,
+    e_vrakt,
     e_kt,
   };
 
   std::vector<fastjet::PseudoJet> get_genjets(std::vector<GenParticle>* genparts, enum JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
+  std::vector<fastjet::PseudoJet> get_hotvr_jets(std::vector<GenParticle>* genparts, enum  JetCluster::E_algorithm algorithm, double ptmin, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
+
   std::vector<fastjet::PseudoJet> particle_in;
   std::vector<fastjet::PseudoJet> get_recojets(std::vector<PFParticle>* pfparts, enum JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
   std::vector<fastjet::PseudoJet> particle_in_reco;
@@ -41,4 +46,8 @@ class JetCluster{
   std::vector<fastjet::PseudoJet> new_recojets;
   fastjet::JetDefinition *jetdef;
   fastjet::JetDefinition *jetdef_reco;
+
+  double _rho, _mu, _theta, _rmin, _rmax, _ptmin,_radius,_pt_cut;
+  string _clustering_algorithmus;
+
 };

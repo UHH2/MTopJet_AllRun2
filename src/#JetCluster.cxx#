@@ -50,9 +50,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_genjets(std::vector<GenParticle>
   }
 
   if(algorithm==e_ca) jetdef= new fastjet::JetDefinition(fastjet::cambridge_algorithm,jet_radius);
-  if(algorithm==e_vrca) jetdef= new fastjet::JetDefinition(fastjet::cambridge_algorithm,jet_radius);
   if(algorithm==e_akt)jetdef= new fastjet::JetDefinition(fastjet::antikt_algorithm,jet_radius);
-  if(algorithm==e_vrakt)jetdef= new fastjet::JetDefinition(fastjet::antikt_algorithm,jet_radius);
 
   clust_seq=new fastjet::ClusterSequence(particle_in, *jetdef);
 
@@ -65,6 +63,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_genjets(std::vector<GenParticle>
 
 // Get clustered HOTVR Jets from Gen Particles
 std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_jets(std::vector<GenParticle>* genparts,enum  JetCluster::E_algorithm algorithm, double ptmin, double rho, double min_r, double max_r, double mu, double theta, double pt_cut){ 
+
    for (unsigned int i=0; i<(genparts->size()); ++i){
       GenParticle* part = &(genparts->at(i));
       if(!IsLepton(part)){
