@@ -327,6 +327,10 @@ obj/MTopJetGenHists.o: src/MTopJetGenHists.cxx \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequence1GhostPassiveArea.hh \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequenceVoronoiArea.hh \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/AreaDefinition.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/HOTVR.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/HOTVRinfo.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/ClusteringVetoPlugin.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/VariableRPlugin.hh \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/FJet.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_3/external/slc6_amd64_gcc493/bin/../../../../../../lcg/root/6.02.12-kpegke4/include/TObjArray.h \

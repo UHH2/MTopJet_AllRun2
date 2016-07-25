@@ -33,7 +33,7 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="5" />
+   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="50" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/SFrame_Batch_workdir"/>
 -->
 
@@ -43,20 +43,19 @@
     <Library Name="libfastjet" />
     <Library Name="libfastjettools" />
 
-<!-- 
+
  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
--->
 
+<!--
 <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15"> 
-
+-->
 
  
 
     <!-- ********TTbar**************************************** -->
 
-<!-- first count events for Lumi!!!!! -->
 
-     <InputData Version="TTbar_PF_semilep" Lumi="117767.68" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+     <InputData Version="TTbar_PF_semilep" Lumi="117815.77" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_PF_semilep; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <!--

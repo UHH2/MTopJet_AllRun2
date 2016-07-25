@@ -44,7 +44,7 @@ class MTopJetGenSelectionModule : public ModuleBASE {
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_TTbarGen;
-  std::unique_ptr<Hists> h_GenHists;
+  // std::unique_ptr<Hists> h_GenHists;
 
 
 };
@@ -70,7 +70,7 @@ MTopJetGenSelectionModule::MTopJetGenSelectionModule(uhh2::Context& ctx){
 
   // set up Hists classes:
   h_TTbarGen.reset(new TTbarGenHists(ctx, "TTbarGen"));
-  h_GenHists.reset(new MTopJetGenHists(ctx, "GenHists"));
+  // h_GenHists.reset(new MTopJetGenHists(ctx, "GenHists"));
 
   // EVENT SELECTION
   // SemiLepDecay.reset(new TTbarSemilep(ctx)); // SemiLep but only muon and elec channel
@@ -85,7 +85,7 @@ bool MTopJetGenSelectionModule::process(uhh2::Event& event){
   // const bool pass_semilep = SemiLepDecay->passes(event);
   // if(!pass_semilep) return false;
   h_TTbarGen->fill(event);
-  h_GenHists->fill(event);
+  // h_GenHists->fill(event);
   return true;
 }
 
