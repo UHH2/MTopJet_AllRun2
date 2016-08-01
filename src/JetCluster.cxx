@@ -195,23 +195,39 @@ std::vector<Jet> JetCluster::convert_pseudojet_to_jet(std::vector<fastjet::Pseud
 }
 
 
-JetProducer::JetProducer(uhh2::Context & ctx, const std::string & name){
-  h_newjets = ctx.declare_event_output<std::vector<Jet>>(name);
-  // h_newjets = ctx.get_handle<std::vector<fastjet::PseudoJet>>(name);
-}
+JetProducer::JetProducer(uhh2::Context & ctx, const std::string & name, float ptmin, float jet_radius):
+  h_newgenjets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  ptmin_(ptmin),
+  jet_radius_(jet_radius) {}
 
 bool JetProducer::process(uhh2::Event & event){
   
   std::vector<GenParticle>* genparts = event.genparticles;
   JetCluster* jetc = new JetCluster();
   std::vector<fastjet::PseudoJet> gen;
-  double ptmin=150;
-  double jet_radius=1.2;
-  gen = jetc->get_genjets(genparts, JetCluster::e_akt, jet_radius, ptmin); 
+  gen = jetc->get_genjets(genparts, JetCluster::e_akt, jet_radius_, ptmin_); 
   // cout<<gen.size()<<endl;
 
-  event.set(h_newjets, jetc->convert_pseudojet_to_jet(gen));
+  event.set(h_newgenjets, jetc->convert_pseudojet_to_jet(gen));
 
   delete jetc;
+  return true;
+}
+
+RecoJetProducer::RecoJetProducer(uhh2::Context & ctx, const std::string & name, float ptmin, float jet_radius):
+  h_newrecojets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")),
+  ptmin_(ptmin),
+  jet_radius_(jet_radius) {}
+
+bool RecoJetProducer::process(uhh2::Event & event){
+
+  std::vector<PFParticle> pfparts = event.get(h_pfpart);
+  JetCluster* jetc_reco = new JetCluster();
+  std::vector<fastjet::PseudoJet> reco;
+  reco = jetc_reco->get_recojets(&pfparts, JetCluster::e_akt, jet_radius_, ptmin_); 
+  event.set(h_newrecojets, jetc_reco->convert_pseudojet_to_jet(reco));
+
+  delete jetc_reco;
   return true;
 }

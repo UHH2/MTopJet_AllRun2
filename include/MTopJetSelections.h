@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <iostream>
 
 
 
@@ -21,6 +22,64 @@
 namespace uhh2 {
 
 
+ class LeadingRecoJetPT : public Selection { 
+
+  public: 
+    explicit LeadingRecoJetPT(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float ptcut_;
+  };
+
+ class MassCutReco : public Selection { 
+
+  public: 
+    explicit MassCutReco(Context&, const std::string &);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+  };
+
+ class DeltaRCutReco : public Selection { 
+
+  public: 
+    explicit DeltaRCutReco(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float jetradius_;
+  };
+
+ class NRecoJets : public Selection { 
+
+  public: 
+    explicit NRecoJets(Context&, const std::string &, float min_pt = 0, float min = 0, float max = 9999);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float min_pt_;
+    float min_;
+    float max_;
+  };
+
+ class RecoJetLeptonCleaner : public uhh2::AnalysisModule { 
+
+  public: 
+    explicit RecoJetLeptonCleaner(Context&, const std::string &, float);
+    virtual bool process(Event& ) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float jetradius_; 
+  };
+ 
+
+  ////
   /* class TTbarGenSemilep : public Selection { */
 
   /* public: */

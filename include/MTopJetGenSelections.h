@@ -92,11 +92,12 @@ namespace uhh2 {
  class NGenJets : public Selection { 
 
   public: 
-    explicit NGenJets(Context&, const std::string &, float min = 0, float max = 9999);
+    explicit NGenJets(Context&, const std::string &, float min_pt = 0, float min = 0, float max = 9999);
     virtual bool passes(const Event&) override;
 
   private:
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float min_pt_;
     float min_;
     float max_;
   };
@@ -111,6 +112,19 @@ namespace uhh2 {
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
     float jetradius_; 
+  };
+
+
+ class MassCutGen1 : public Selection{ 
+
+  public: 
+   explicit MassCutGen1(Context&, const std::string &, float, float);
+    virtual bool passes(const Event& ) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float M_min_;
+    float M_max_; 
   };
 
 }

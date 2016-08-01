@@ -151,15 +151,22 @@ bool uhh2::DeltaRCut::passes(const uhh2::Event& event){
   return pass_deltaR;
 }
 
-uhh2::NGenJets::NGenJets(uhh2::Context& ctx, const std::string & name, float min, float max):
+uhh2::NGenJets::NGenJets(uhh2::Context& ctx, const std::string & name, float min_pt, float min, float max):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  min_pt_(min_pt),
   min_(min),
   max_(max) {}
 
 bool uhh2::NGenJets::passes(const uhh2::Event& event){
   std::vector<Jet> jets = event.get(h_jets);
   bool pass_NGen = false;
-  if(jets.size() >= min_ && jets.size() <= max_) pass_NGen = true;
+  int counter = 0;
+  for(unsigned int i = 0; i<jets.size(); ++i){
+    if(jets.at(i).pt() >= min_pt_){
+      ++counter;
+    }
+  }
+  if(counter >= min_ && counter <= max_) pass_NGen = true;
   return pass_NGen;
 }
 
@@ -172,6 +179,7 @@ GenJetLeptonCleaner::GenJetLeptonCleaner(uhh2::Context& ctx, const std::string &
 bool GenJetLeptonCleaner::process(uhh2::Event& event){
   std::vector<Jet> jets = event.get(h_jets);
   const auto & ttbargen = event.get(h_ttbargen);
+  std::vector<Jet> cleaned_jets;
   Jet jet;
   GenParticle lepton, lep1, lep2;
 
@@ -194,24 +202,44 @@ bool GenJetLeptonCleaner::process(uhh2::Event& event){
 
 
   // perform cleaning
+  TLorentzVector jet_v4, lepton_v4, jetlep_v4;
   for(unsigned int i = 0; i < jets.size(); ++i){
     jet = jets.at(i);
 
     if(deltaR(lepton, jet) < jetradius_){
 
-      std::cout<<"pt before: "<< jet.pt()<<std::endl;
+      // std::cout<<"pt before: "<< jet.pt()<<std::endl;
 
-      jet.set_pt(jet.pt() - lepton.pt());
-      jet.set_eta(jet.eta() - lepton.eta());
-      jet.set_phi(jet.phi() - lepton.phi());
-      jet.set_energy(jet.energy() - lepton.energy());
+     jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     jetlep_v4 = jet_v4 - lepton_v4;
 
-      std::cout<<"pt after: "<< jet.pt()<<std::endl;
+     jet.set_pt(jetlep_v4.Pt());
+     jet.set_eta(jetlep_v4.Eta());
+     jet.set_phi(jetlep_v4.Phi());
+     jet.set_energy(jetlep_v4.E());
+
+      // std::cout<<"pt after: "<< jet.pt()<<std::endl;
 
     }
+  cleaned_jets.push_back(jet);
+
   }
-  sort_by_pt<Jet>(jets); // Sort Jets by pT
-  event.set(h_jets, jets);
+  sort_by_pt<Jet>(cleaned_jets); // Sort Jets by pT
+  event.set(h_jets, cleaned_jets);
 
   return true;
+}
+
+
+uhh2::MassCutGen1::MassCutGen1(uhh2::Context& ctx, const std::string & name, float M_min, float M_max):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  M_min_(M_min),
+  M_max_(M_max) {}
+
+bool MassCutGen1::passes(const uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  TLorentzVector jet1_v4;
+  jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy());
+  return (M_min_ < jet1_v4.M() && jet1_v4.M() < M_max_);
 }

@@ -67,10 +67,25 @@ class JetCluster{
 class JetProducer: public uhh2::AnalysisModule{
 public:
 
-    explicit JetProducer(uhh2::Context & ctx, const std::string & name);
-    virtual bool process(uhh2::Event & event) override; 
+  explicit JetProducer(uhh2::Context & , const std::string & , float, float);
+  virtual bool process(uhh2::Event & ) override; 
     
 private:
-    uhh2::Event::Handle<std::vector<Jet>>h_newjets;
+  uhh2::Event::Handle<std::vector<Jet>>h_newgenjets;
+  float ptmin_;
+  float jet_radius_;
+};
 
+
+class RecoJetProducer: public uhh2::AnalysisModule{
+public:
+
+  explicit RecoJetProducer(uhh2::Context&, const std::string &, float, float);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_newrecojets;
+  uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+  float ptmin_;
+  float jet_radius_;
 };

@@ -22,8 +22,10 @@ public:
 
 protected:
 
-    TH1F *GenJet1Mass;
-    TH1F *GenJet1PT, *GenJet2PT, *LeptonPT;
+    TH1F *GenJetNumber;
+    TH1F *GenJet1Mass, *Mass1Mass2;
+    TH1F *GenJet1PT, *GenJet2PT, *GenJet1Jet2PT, *GenJet3PT, *LeptonPT, *GenJetPT;
+    TH1F *GenJet2Eta;
     TH1F *TopHadPT, *TopLepPT;
     TH1F *deltaR_bot_jet1, *deltaR_bot_lep_jet1,*deltaR_q1_jet1, *deltaR_q2_jet1, *deltaR_lep1_jet1, *deltaR_lep2_jet1,  *deltaR_lep1_jet2, *deltaR_lep2_jet2, *deltaR_tophad_jet1, *deltaR_toplep_jet1;
 

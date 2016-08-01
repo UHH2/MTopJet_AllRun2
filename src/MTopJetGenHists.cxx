@@ -17,14 +17,22 @@ using namespace uhh2;
 
 MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
   // book all histograms here
+  GenJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
-  GenJet1Mass = book<TH1F>("GenJet Mass", "M_{jet}", 50, 0, 500);
-  GenJet1PT = book<TH1F>("p_{T} of 1st Jet", "p_{T}", 50, 0, 1000);
-  GenJet2PT = book<TH1F>("p_{T} of 2nd Jet", "p_{T}", 50, 0, 1000);
-  LeptonPT = book<TH1F>("p_{T} of Lepton", "p_{T}", 50, 0, 1000);
+  GenJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
+ 
+  GenJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
+  GenJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
+  GenJet1Jet2PT = book<TH1F>("pt_jet1-pt_jet2", "p_{T,jet1} - p_{T,jet2}", 80, -400, 400);
+  GenJet3PT = book<TH1F>("pt_jet3", "p_{T}", 50, 0, 1000);
+  GenJetPT = book<TH1F>("pt_all_jets", "p_{T}", 50, 0, 1000);
+  LeptonPT = book<TH1F>("pt_lepton", "p_{T}", 50, 0, 1000);
 
-  TopHadPT = book<TH1F>("p_{T} of hadronic Top", "p_{T}", 20, 0, 1000);
-  TopLepPT = book<TH1F>("p_{T} of leptonic Top", "p_{T}", 20, 0, 1000);
+  TopHadPT = book<TH1F>("pt_tophad", "p_{T}", 20, 0, 1000);
+  TopLepPT = book<TH1F>("pt_toplep", "p_{T}", 20, 0, 1000);
+
+  GenJet2Eta = book<TH1F>("eta_jet2", "#eta", 24, -3, 3);
 
   deltaR_lep1_jet1 = book<TH1F>("deltaR_lep1_jet1", "#Delta R(lep1,1st Jet)", 80, 0, 4.0);
   deltaR_lep2_jet1 = book<TH1F>("deltaR_lep2_jet1", "#Delta R(lep2,1st Jet)", 80, 0, 4.0);
@@ -132,10 +140,11 @@ void MTopJetGenHists::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of 2 jets and lepton -------------------=-----------------
   //---------------------------------------------------------------------------------------
-   if(jets.size() == 2){
-    jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy()); //v4 of first jet
-    jet2_v4.SetPtEtaPhiE(jets.at(1).pt(),jets.at(1).eta(),jets.at(1).phi(),jets.at(1).energy()); //v4 of first jet
-    lepton1_v4.SetPtEtaPhiE(lepton.pt(),lepton.eta(),lepton.phi(),lepton.energy()); //v4 of lepton
+   if(jets.size() > 1){
+     jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
+     jet2_v4.SetPxPyPzE(jets.at(1).v4().Px(), jets.at(1).v4().Py(), jets.at(1).v4().Pz(), jets.at(1).v4().E()); //v4 of first jet
+     lepton1_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); //v4 of lepton
+     jet2_lep_v4 = jet2_v4 + lepton1_v4;
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -151,13 +160,26 @@ void MTopJetGenHists::fill(const Event & event){
   double weight = event.weight;
   ////
 
-  if((jets.size())==2){
+  GenJetNumber->Fill(jets.size(), weight);
+  LeptonPT->Fill(lepton1_v4.Pt(),weight);
+
+  float pt;
+  for(unsigned int i = 0; i<jets.size(); ++i){
+    pt = jets.at(i).pt();
+    GenJetPT->Fill(pt, weight);
+  }
+
+  if((jets.size()) > 1){
     GenJet1Mass->Fill(jet1_v4.M(),weight);
     GenJet1PT->Fill(jet1_v4.Pt(),weight);
     GenJet2PT->Fill(jet2_v4.Pt(),weight);
+    GenJet2Eta->Fill(jet2_v4.Eta(),weight);
+    Mass1Mass2->Fill(jet1_v4.M() - jet2_lep_v4.M(), weight);
+    GenJet1Jet2PT->Fill(jet1_v4.Pt() - jet2_v4.Pt(),weight);
   }
-  LeptonPT->Fill(lepton1_v4.Pt(),weight);
-
+  if((jets.size()) > 2){
+    GenJet3PT->Fill(jets.at(2).pt(),weight);
+  }
   // pT of had. top
   GenParticle tophad = ttbargen.TopHad();
   float tophadpt = tophad.pt();
@@ -169,7 +191,7 @@ void MTopJetGenHists::fill(const Event & event){
   TopLepPT->Fill(topleppt, weight);
 
   // delta R Hists
-  if(jets.size() == 2){
+  if(jets.size() > 1){
     deltaR_lep1_jet1->Fill(deltaR(jet1, lep1), weight);
     deltaR_lep2_jet1->Fill(deltaR(jet1, lep2), weight);
     deltaR_lep1_jet2->Fill(deltaR(jet2, lep1), weight);

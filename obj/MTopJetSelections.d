@@ -311,4 +311,5 @@ obj/MTopJetSelections.o: src/MTopJetSelections.cxx \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/JetCorrections.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/JetMETObjects/interface/JetCorrectionUncertainty.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/utils.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetGenSelections.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/ReconstructionHypothesisDiscriminators.h

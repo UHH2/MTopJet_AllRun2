@@ -359,4 +359,6 @@ obj/MTopJetGenPostSelectionModule.o: \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_3/external/slc6_amd64_gcc493/bin/../../../../../../lcg/root/6.02.12-kpegke4/include/TCollection.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_3/external/slc6_amd64_gcc493/bin/../../../../../../lcg/root/6.02.12-kpegke4/include/TIterator.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc493/cms/cmssw/CMSSW_7_6_3/external/slc6_amd64_gcc493/bin/../../../../../../lcg/root/6.02.12-kpegke4/include/TClonesArray.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetRecoHists.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetRecoGenHists.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetUtils.h

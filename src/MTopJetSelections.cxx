@@ -1,6 +1,7 @@
 #include <UHH2/MTopJet/include/MTopJetSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/utils.h>
+#include <UHH2/MTopJet/include/MTopJetGenSelections.h>
 
 #include <iostream>
 #include <fstream>
@@ -13,6 +14,143 @@
 #include <UHH2/common/include/ReconstructionHypothesisDiscriminators.h>
 #include <UHH2/common/include/Utils.h>
 
+
+uhh2::LeadingRecoJetPT::LeadingRecoJetPT(uhh2::Context& ctx, const std::string & name, float ptcut):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  ptcut_(ptcut) {}
+
+bool uhh2::LeadingRecoJetPT::passes(const uhh2::Event& event){
+  bool pass_jetpt = false;
+  std::vector<Jet> jets = event.get(h_jets);
+  Jet jet1;
+  if(jets.size()>0){
+    jet1 = jets.at(0);
+    float pt = jet1.pt();
+    if(pt > ptcut_) pass_jetpt = true;
+  }
+  return pass_jetpt;
+}
+////////////////////////////////////////////////////////
+
+uhh2::MassCutReco::MassCutReco(uhh2::Context& ctx, const std::string & name):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)) {}
+
+bool uhh2::MassCutReco::passes(const uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  Particle lepton;
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+  }
+  TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4;
+  bool pass_masscut = false;
+
+  if(jets.size()>1){
+ 
+    jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy()); //v4 of first jet
+    jet2_v4.SetPtEtaPhiE(jets.at(1).pt(),jets.at(1).eta(),jets.at(1).phi(),jets.at(1).energy()); //v4 of first jet
+    lepton1_v4.SetPtEtaPhiE(lepton.pt(),lepton.eta(),lepton.phi(),lepton.energy()); //v4 of lepton
+    jet2_lep_v4 = jet2_v4 + lepton1_v4; // v4 of (lepton+2nd jet)
+
+    if(jet1_v4.M() > jet2_lep_v4.M()) pass_masscut = true;
+  }
+  return pass_masscut;
+}
+////////////////////////////////////////////////////////
+
+uhh2::DeltaRCutReco::DeltaRCutReco(uhh2::Context& ctx, const std::string & name, float jetradius):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  jetradius_(jetradius) {}
+
+bool uhh2::DeltaRCutReco::passes(const uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  Jet jet2;
+  bool pass_deltaR = false;
+  Particle lepton;
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+  }
+  if(jets.size()>1){
+    jet2 = jets.at(1);
+    if(deltaR(lepton, jet2) < jetradius_) pass_deltaR = true;
+  }
+  return pass_deltaR;
+}
+////////////////////////////////////////////////////////
+
+uhh2::NRecoJets::NRecoJets(uhh2::Context& ctx, const std::string & name, float min_pt, float min, float max):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  min_pt_(min_pt),
+  min_(min),
+  max_(max) {}
+
+bool uhh2::NRecoJets::passes(const uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  bool pass_NGen = false;
+  int counter = 0;
+  for(unsigned int i = 0; i<jets.size(); ++i){
+    if(jets.at(i).pt() >= min_pt_){
+      ++counter;
+    }
+  }
+  if(counter >= min_ && counter <= max_) pass_NGen = true;
+  return pass_NGen;
+}
+
+////////////////////////////////////////////////////////
+
+RecoJetLeptonCleaner::RecoJetLeptonCleaner(uhh2::Context& ctx, const std::string & name, float jetradius):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  jetradius_(jetradius) {}
+
+bool RecoJetLeptonCleaner::process(uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  std::vector<Jet> cleaned_jets;
+  Jet jet;
+
+  Particle lepton;
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+  }
+
+
+  // perform cleaning
+  TLorentzVector jet_v4, lepton_v4, jetlep_v4;
+  for(unsigned int i = 0; i < jets.size(); ++i){
+    jet = jets.at(i);
+
+    if(deltaR(lepton, jet) < jetradius_){
+
+      // std::cout<<"pt before: "<< jet.pt()<<std::endl;
+
+     jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     jetlep_v4 = jet_v4 - lepton_v4;
+
+     jet.set_pt(jetlep_v4.Pt());
+     jet.set_eta(jetlep_v4.Eta());
+     jet.set_phi(jetlep_v4.Phi());
+     jet.set_energy(jetlep_v4.E());
+
+      // std::cout<<"pt after: "<< jet.pt()<<std::endl;
+
+    }
+  cleaned_jets.push_back(jet);
+
+  }
+  sort_by_pt<Jet>(cleaned_jets); // Sort Jets by pT
+  event.set(h_jets, cleaned_jets);
+
+  return true;
+}
 
 ////////////////////////////////////////////////////////
 // uhh2::TopJetMassCut::TopJetMassCut(const):
@@ -79,10 +217,10 @@ bool uhh2::deltaRCutAK4::passes(const uhh2::Event& event){
   }
   else{
     dR1 = deltaR(event.electrons->at(0), event.jets->at(0));
-    dR2 = deltaR(event.electrons->at(0), event.jets->at(0));
+    dR2 = deltaR(event.electrons->at(0), event.jets->at(1));
     if(dR1<dR2){
       dR=dR1;
-	}
+    }
     else dR=dR2;
   }
   return (dR < max_deltaR_ak4_);
