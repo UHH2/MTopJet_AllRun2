@@ -3,12 +3,11 @@
 #include "UHH2/common/include/TTbarGen.h"
 #include <fastjet/PseudoJet.hh> 
 #include <fastjet/JetDefinition.hh>
+#include "fastjet/AreaDefinition.hh"
 #include <fastjet/ClusterSequence.hh>
 #include <fastjet/ClusterSequenceArea.hh>
 #include <fastjet/GhostedAreaSpec.hh>
-#include <fastjet/contrib/HOTVR.hh>
-#include "fastjet/contrib/ClusteringVetoPlugin.hh"
-#include "fastjet/contrib/VariableRPlugin.hh"
+
 
 #include "UHH2/common/include/Utils.h"
 #include "UHH2/core/include/Jet.h"
@@ -16,8 +15,14 @@
 #include "UHH2/core/include/GenJetWithParts.h"
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/PFParticle.h"
-#include "UHH2/common/include/FJet.h"
 #include "UHH2/core/include/AnalysisModule.h"
+
+#include <vector>
+#include <iostream> 
+#include <math.h>
+
+using namespace std;
+using namespace fastjet;
 
 class JetCluster{
 
@@ -38,19 +43,22 @@ class JetCluster{
   };
 
   std::vector<fastjet::PseudoJet> get_genjets(std::vector<GenParticle>* genparts, enum JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
-  //  std::vector<fastjet::PseudoJet> get_hotvr_jets(std::vector<GenParticle>* genparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
-
-  std::vector<fastjet::PseudoJet> particle_in;
-  std::vector<fastjet::PseudoJet> particle_in2;
   std::vector<fastjet::PseudoJet> get_recojets(std::vector<PFParticle>* pfparts, enum JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
+  std::vector<fastjet::PseudoJet> get_hotvr_jets(std::vector<GenParticle>* genparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
+  std::vector<fastjet::PseudoJet> get_hotvr_recojets(std::vector<PFParticle>* pfparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
+
+
   std::vector<Jet> convert_pseudojet_to_jet(std::vector<fastjet::PseudoJet> fjet);
   std::vector<fastjet::PseudoJet> substract_lepton(GenParticle* genparts, std::vector<fastjet::PseudoJet> fjets, double jet_radius);
 
   void write_genjets(uhh2::Event & event, enum  JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
 
+  std::vector<fastjet::PseudoJet> particle_in;
+  std::vector<fastjet::PseudoJet> particle_in2;
+  std::vector<fastjet::PseudoJet> particle_in_reco2;
   std::vector<fastjet::PseudoJet> particle_in_reco;
   fastjet::ClusterSequence* clust_seq;
-  fastjet::ClusterSequence* clust_seq2;
+  fastjet::ClusterSequence* clust_seq_hotvr;
   fastjet::ClusterSequence* clust_seq_reco;
   std::vector<fastjet::PseudoJet> new_jets;
   std::vector<fastjet::PseudoJet> new_jets_cleaned;
@@ -88,4 +96,26 @@ private:
   uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
   float ptmin_;
   float jet_radius_;
+};
+
+class GenHOTVRJetProducer: public uhh2::AnalysisModule{
+public:
+
+  explicit GenHOTVRJetProducer(uhh2::Context&, const std::string &);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_newgenhotvrjets;
+};
+
+
+class RecoHOTVRJetProducer: public uhh2::AnalysisModule{
+public:
+
+  explicit RecoHOTVRJetProducer(uhh2::Context&, const std::string &);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_newrecohotvrjets;
+  uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
 };

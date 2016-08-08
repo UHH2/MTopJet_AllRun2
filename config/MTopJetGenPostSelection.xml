@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
-<!ENTITY NEVT "-1">
+<!ENTITY NEVT "5000">
 
   <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
   <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/GenPost"> 
@@ -8,7 +8,7 @@
 
 
   <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_semilep.root"> -->
-  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_ak06gen_ak08gen_ak10gen_ak12gen_ak08rec.root">
+  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_ak06gen_ak08gen_ak10gen_ak12gen_ak08rec_ak12rec_HOTVR.root">
 
 ]>
 
@@ -48,7 +48,7 @@
         <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
-	<Item Name="additionalBranches" Value="PFParticles ak06_gen ak08_gen ak10_gen ak12_gen ak08_rec"/>
+	<Item Name="additionalBranches" Value="PFParticles ak06_gen ak08_gen ak10_gen ak12_gen ak08_rec ak12_rec HOTVR"/>
 
 	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
         <Item Name="METName"                 Value="slimmedMETs"/>
