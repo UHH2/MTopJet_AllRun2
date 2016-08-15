@@ -46,6 +46,8 @@ class JetCluster{
   std::vector<fastjet::PseudoJet> get_recojets(std::vector<PFParticle>* pfparts, enum JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
   std::vector<fastjet::PseudoJet> get_hotvr_jets(std::vector<GenParticle>* genparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
   std::vector<fastjet::PseudoJet> get_hotvr_recojets(std::vector<PFParticle>* pfparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
+  std::vector<fastjet::PseudoJet> get_xcone_jets(std::vector<GenParticle>* genparts, int N, double R0, double beta, double ptmin);
+  std::vector<fastjet::PseudoJet> get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin);
 
 
   std::vector<Jet> convert_pseudojet_to_jet(std::vector<fastjet::PseudoJet> fjet);
@@ -60,6 +62,7 @@ class JetCluster{
   fastjet::ClusterSequence* clust_seq;
   fastjet::ClusterSequence* clust_seq_hotvr;
   fastjet::ClusterSequence* clust_seq_reco;
+  fastjet::ClusterSequence* clust_seq_xcone;
   std::vector<fastjet::PseudoJet> new_jets;
   std::vector<fastjet::PseudoJet> new_jets_cleaned;
   std::vector<fastjet::PseudoJet> new_recojets;
@@ -118,4 +121,34 @@ public:
 private:
   uhh2::Event::Handle<std::vector<Jet>>h_newrecohotvrjets;
   uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+};
+
+class GenXCONEJetProducer: public uhh2::AnalysisModule{
+public:
+
+  explicit GenXCONEJetProducer(uhh2::Context&, const std::string &, int, double, double, double);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_newgenxconejets;
+  int N_;
+  double R0_;
+  double beta_;
+  double ptmin_;
+};
+
+
+class RecoXCONEJetProducer: public uhh2::AnalysisModule{
+public:
+
+  explicit RecoXCONEJetProducer(uhh2::Context&, const std::string &, int, double, double, double);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_newrecoxconejets;
+  uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+  int N_;
+  double R0_;
+  double beta_;
+  double ptmin_;
 };

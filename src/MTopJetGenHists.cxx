@@ -36,14 +36,58 @@ MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirnam
 
   deltaR_lep1_jet1 = book<TH1F>("deltaR_lep1_jet1", "#Delta R(lep1,1st Jet)", 80, 0, 4.0);
   deltaR_lep2_jet1 = book<TH1F>("deltaR_lep2_jet1", "#Delta R(lep2,1st Jet)", 80, 0, 4.0);
-  deltaR_lep1_jet2 = book<TH1F>("deltaR_lep1_jet2", "#Delta R(lep1,2nd Jet)", 80, 0, 4.0);
-  deltaR_lep2_jet2 = book<TH1F>("deltaR_lep2_jet2", "#Delta R(lep2,2nd Jet)", 80, 0, 4.0);
-  deltaR_bot_lep_jet1 = book<TH1F>("deltaR_bot_lep_jet1", "#Delta R(bot_lep,1st Jet)", 80, 0, 4.0);
+  deltaR_botlep_jet1 = book<TH1F>("deltaR_botlep_jet1", "#Delta R(bot_lep,1st Jet)", 80, 0, 4.0);
   deltaR_bot_jet1 = book<TH1F>("deltaR_bot_jet1", "#Delta R(bot,1st Jet)", 80, 0, 4.0);
   deltaR_q1_jet1 = book<TH1F>("deltaR_q1_jet1", "#Delta R(q1,1st Jet)", 80, 0, 4.0);
   deltaR_q2_jet1 = book<TH1F>("deltaR_q2_jet1", "#Delta R(q2,1st Jet)", 80, 0, 4.0);
   deltaR_tophad_jet1 = book<TH1F>("deltaR_tophad_jet1", "#Delta R(had Top, 1st Jet)", 80, 0, 4.0);
   deltaR_toplep_jet1 = book<TH1F>("deltaR_toplep_jet1", "#Delta R(lep Top, 1st Jet)", 80, 0, 4.0);
+
+  deltaR_lep1_jet2 = book<TH1F>("deltaR_lep1_jet2", "#Delta R(lep1,2nd Jet)", 80, 0, 4.0);
+  deltaR_lep2_jet2 = book<TH1F>("deltaR_lep2_jet2", "#Delta R(lep2,2nd Jet)", 80, 0, 4.0);
+  deltaR_botlep_jet2 = book<TH1F>("deltaR_botlep_jet2", "#Delta R(bot_lep,2nd Jet)", 80, 0, 4.0);
+  deltaR_bot_jet2 = book<TH1F>("deltaR_bot_jet2", "#Delta R(bot,2nd Jet)", 80, 0, 4.0);
+  deltaR_q1_jet2 = book<TH1F>("deltaR_q1_jet2", "#Delta R(q1,2nd Jet)", 80, 0, 4.0);
+  deltaR_q2_jet2 = book<TH1F>("deltaR_q2_jet2", "#Delta R(q2,2nd Jet)", 80, 0, 4.0);
+  deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
+  deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
+
+  // deltaR_lep1_jet3 = book<TH1F>("deltaR_lep1_jet3", "#Delta R(lep1,3rd Jet)", 80, 0, 4.0);
+  // deltaR_lep2_jet3 = book<TH1F>("deltaR_lep2_jet3", "#Delta R(lep2,3rd Jet)", 80, 0, 4.0);
+  // deltaR_botlep_jet3 = book<TH1F>("deltaR_botlep_jet3", "#Delta R(bot_lep,3rd Jet)", 80, 0, 4.0);
+  // deltaR_bot_jet3 = book<TH1F>("deltaR_bot_jet3", "#Delta R(bot,3rd Jet)", 80, 0, 4.0);
+  // deltaR_q1_jet3 = book<TH1F>("deltaR_q1_jet3", "#Delta R(q1,3rd Jet)", 80, 0, 4.0);
+  // deltaR_q2_jet3 = book<TH1F>("deltaR_q2_jet3", "#Delta R(q2,3rd Jet)", 80, 0, 4.0);
+  // deltaR_tophad_jet3 = book<TH1F>("deltaR_tophad_jet3", "#Delta R(had Top, 3rd Jet)", 80, 0, 4.0);
+  // deltaR_toplep_jet3 = book<TH1F>("deltaR_toplep_jet3", "#Delta R(lep Top, 3rd Jet)", 80, 0, 4.0);
+
+  // deltaR_lep1_jet4 = book<TH1F>("deltaR_lep1_jet4", "#Delta R(lep1,4th Jet)", 80, 0, 4.0);
+  // deltaR_lep2_jet4 = book<TH1F>("deltaR_lep2_jet4", "#Delta R(lep2,4th Jet)", 80, 0, 4.0);
+  // deltaR_botlep_jet4 = book<TH1F>("deltaR_botlep_jet4", "#Delta R(bot_lep,4th Jet)", 80, 0, 4.0);
+  // deltaR_bot_jet4 = book<TH1F>("deltaR_bot_jet4", "#Delta R(bot,4th Jet)", 80, 0, 4.0);
+  // deltaR_q1_jet4 = book<TH1F>("deltaR_q1_jet4", "#Delta R(q1,4th Jet)", 80, 0, 4.0);
+  // deltaR_q2_jet4 = book<TH1F>("deltaR_q2_jet4", "#Delta R(q2,4th Jet)", 80, 0, 4.0);
+  // deltaR_tophad_jet4 = book<TH1F>("deltaR_tophad_jet4", "#Delta R(had Top, 4th Jet)", 80, 0, 4.0);
+  // deltaR_toplep_jet4 = book<TH1F>("deltaR_toplep_jet4", "#Delta R(lep Top, 4th Jet)", 80, 0, 4.0);
+
+  // deltaR_lep1_jet5 = book<TH1F>("deltaR_lep1_jet5", "#Delta R(lep1,5th Jet)", 80, 0, 4.0);
+  // deltaR_lep2_jet5 = book<TH1F>("deltaR_lep2_jet5", "#Delta R(lep2,5th Jet)", 80, 0, 4.0);
+  // deltaR_botlep_jet5 = book<TH1F>("deltaR_botlep_jet5", "#Delta R(bot_lep,5th Jet)", 80, 0, 4.0);
+  // deltaR_bot_jet5 = book<TH1F>("deltaR_bot_jet5", "#Delta R(bot,5th Jet)", 80, 0, 4.0);
+  // deltaR_q1_jet5 = book<TH1F>("deltaR_q1_jet5", "#Delta R(q1,5th Jet)", 80, 0, 4.0);
+  // deltaR_q2_jet5 = book<TH1F>("deltaR_q2_jet5", "#Delta R(q2,5th Jet)", 80, 0, 4.0);
+  // deltaR_tophad_jet5 = book<TH1F>("deltaR_tophad_jet5", "#Delta R(had Top, 5th Jet)", 80, 0, 4.0);
+  // deltaR_toplep_jet5 = book<TH1F>("deltaR_toplep_jet5", "#Delta R(lep Top, 5th Jet)", 80, 0, 4.0);
+
+  // deltaR_lep1_jet6 = book<TH1F>("deltaR_lep1_jet6", "#Delta R(lep1,6th Jet)", 80, 0, 4.0);
+  // deltaR_lep2_jet6 = book<TH1F>("deltaR_lep2_jet6", "#Delta R(lep2,6th Jet)", 80, 0, 4.0);
+  // deltaR_botlep_jet6 = book<TH1F>("deltaR_botlep_jet6", "#Delta R(bot_lep,6th Jet)", 80, 0, 4.0);
+  // deltaR_bot_jet6 = book<TH1F>("deltaR_bot_jet6", "#Delta R(bot,6th Jet)", 80, 0, 4.0);
+  // deltaR_q1_jet6 = book<TH1F>("deltaR_q1_jet6", "#Delta R(q1,6th Jet)", 80, 0, 4.0);
+  // deltaR_q2_jet6 = book<TH1F>("deltaR_q2_jet6", "#Delta R(q2,6th Jet)", 80, 0, 4.0);
+  // deltaR_tophad_jet6 = book<TH1F>("deltaR_tophad_jet6", "#Delta R(had Top, 6th Jet)", 80, 0, 4.0);
+  // deltaR_toplep_jet6 = book<TH1F>("deltaR_toplep_jet6", "#Delta R(lep Top, 6th Jet)", 80, 0, 4.0);
+
 
   // handle for PF particles
   // h_pfpart=ctx.get_handle<vector<PFParticle>>("PFParticles");
@@ -91,9 +135,13 @@ void MTopJetGenHists::fill(const Event & event){
  // define all objects needed
   std::vector<Jet> jets = event.get(h_jets);
   TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4;
-  Jet jet1,jet2;
+  Jet jet1,jet2,jet3,jet4,jet5,jet6;
   if(jets.size()>0) jet1 = jets.at(0);
   if(jets.size()>1) jet2 = jets.at(1);
+  // if(jets.size()>2) jet3 = jets.at(2);
+  // if(jets.size()>3) jet4 = jets.at(3);
+  // if(jets.size()>4) jet5 = jets.at(4);
+  // if(jets.size()>5) jet6 = jets.at(5);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 
@@ -184,25 +232,78 @@ void MTopJetGenHists::fill(const Event & event){
   GenParticle tophad = ttbargen.TopHad();
   float tophadpt = tophad.pt();
   TopHadPT->Fill(tophadpt, weight);
-
+  
   // pT of lep. top
   GenParticle toplep = ttbargen.TopLep();
   float topleppt = toplep.pt();
   TopLepPT->Fill(topleppt, weight);
 
   // delta R Hists
-  if(jets.size() > 1){
+  if(jets.size() > 0){
     deltaR_lep1_jet1->Fill(deltaR(jet1, lep1), weight);
     deltaR_lep2_jet1->Fill(deltaR(jet1, lep2), weight);
-    deltaR_lep1_jet2->Fill(deltaR(jet2, lep1), weight);
-    deltaR_lep2_jet2->Fill(deltaR(jet2, lep2), weight);
-    deltaR_bot_lep_jet1->Fill(deltaR(jet1, bot_lep), weight);
+    deltaR_botlep_jet1->Fill(deltaR(jet1, bot_lep), weight);
     deltaR_q1_jet1->Fill(deltaR(jet1, q1), weight);
     deltaR_q2_jet1->Fill(deltaR(jet1, q2), weight);
     deltaR_bot_jet1->Fill(deltaR(jet1, bot), weight);
     deltaR_tophad_jet1->Fill(deltaR(jet1, tophad), weight);
     deltaR_toplep_jet1->Fill(deltaR(jet1, toplep), weight);
   }
+
+  if(jets.size() > 1){
+    deltaR_lep1_jet2->Fill(deltaR(jet2, lep1), weight);
+    deltaR_lep2_jet2->Fill(deltaR(jet2, lep2), weight);
+    deltaR_botlep_jet2->Fill(deltaR(jet2, bot_lep), weight);
+    deltaR_q1_jet2->Fill(deltaR(jet2, q1), weight);
+    deltaR_q2_jet2->Fill(deltaR(jet2, q2), weight);
+    deltaR_bot_jet2->Fill(deltaR(jet2, bot), weight);
+    deltaR_tophad_jet2->Fill(deltaR(jet2, tophad), weight);
+    deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
+  }
+  
+  // if(jets.size() > 2){
+  //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);
+  //   deltaR_lep2_jet3->Fill(deltaR(jet3, lep2), weight);
+  //   deltaR_botlep_jet3->Fill(deltaR(jet3, bot_lep), weight);
+  //   deltaR_q1_jet3->Fill(deltaR(jet3, q1), weight);
+  //   deltaR_q2_jet3->Fill(deltaR(jet3, q2), weight);
+  //   deltaR_bot_jet3->Fill(deltaR(jet3, bot), weight);
+  //   deltaR_tophad_jet3->Fill(deltaR(jet3, tophad), weight);
+  //   deltaR_toplep_jet3->Fill(deltaR(jet3, toplep), weight);
+  // }
+
+  // if(jets.size() > 3){
+  //   deltaR_lep1_jet4->Fill(deltaR(jet4, lep1), weight);
+  //   deltaR_lep2_jet4->Fill(deltaR(jet4, lep2), weight);
+  //   deltaR_botlep_jet4->Fill(deltaR(jet4, bot_lep), weight);
+  //   deltaR_q1_jet4->Fill(deltaR(jet4, q1), weight);
+  //   deltaR_q2_jet4->Fill(deltaR(jet4, q2), weight);
+  //   deltaR_bot_jet4->Fill(deltaR(jet4, bot), weight);
+  //   deltaR_tophad_jet4->Fill(deltaR(jet4, tophad), weight);
+  //   deltaR_toplep_jet4->Fill(deltaR(jet4, toplep), weight);
+  // }
+
+  // if(jets.size() > 4){
+  //   deltaR_lep1_jet5->Fill(deltaR(jet5, lep1), weight);
+  //   deltaR_lep2_jet5->Fill(deltaR(jet5, lep2), weight);
+  //   deltaR_botlep_jet5->Fill(deltaR(jet5, bot_lep), weight);
+  //   deltaR_q1_jet5->Fill(deltaR(jet5, q1), weight);
+  //   deltaR_q2_jet5->Fill(deltaR(jet5, q2), weight);
+  //   deltaR_bot_jet5->Fill(deltaR(jet5, bot), weight);
+  //   deltaR_tophad_jet5->Fill(deltaR(jet5, tophad), weight);
+  //   deltaR_toplep_jet5->Fill(deltaR(jet5, toplep), weight);
+  // }
+
+  // if(jets.size() > 5){
+  //   deltaR_lep1_jet6->Fill(deltaR(jet6, lep1), weight);
+  //   deltaR_lep2_jet6->Fill(deltaR(jet6, lep2), weight);
+  //   deltaR_botlep_jet6->Fill(deltaR(jet6, bot_lep), weight);
+  //   deltaR_q1_jet6->Fill(deltaR(jet6, q1), weight);
+  //   deltaR_q2_jet6->Fill(deltaR(jet6, q2), weight);
+  //   deltaR_bot_jet6->Fill(deltaR(jet6, bot), weight);
+  //   deltaR_tophad_jet6->Fill(deltaR(jet6, tophad), weight);
+  //   deltaR_toplep_jet6->Fill(deltaR(jet6, toplep), weight);
+  // }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 

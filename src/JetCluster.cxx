@@ -1,5 +1,6 @@
 #include "UHH2/MTopJet/include/JetCluster.h"
 #include "fastjet/contrib/HOTVR.hh"
+#include "fastjet/contrib/XConePlugin.hh"
 // #include "fastjet/contrib/ClusteringVetoPlugin.hh"
 
 using namespace std;
@@ -110,6 +111,42 @@ std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_recojets(std::vector<PFPar
   rejected_recojets=plugin_hotvr.get_rejected_cluster();
   soft_recojets=plugin_hotvr.get_soft_cluster();
   return hotvr_recojets;
+}
+
+// ------------------------------------ Get clustered XCone Jets from Gen Particles ---------------------------------------------------------------------------------
+std::vector<fastjet::PseudoJet> JetCluster::get_xcone_jets(std::vector<GenParticle>* genparts, int N, double R0, double beta, double ptmin){ 
+
+  std::vector<fastjet::PseudoJet> xcone_jets; 
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle* part = &(genparts->at(i));
+    if(IsStable(part)){
+      particle_in2.push_back(convert_particle(part));
+    }
+  }
+  XConePlugin plugin_xcone(N, R0, beta);
+  fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
+  clust_seq_xcone=new fastjet::ClusterSequence(particle_in2, jet_def_xcone);
+  xcone_jets = sorted_by_pt(clust_seq_xcone->inclusive_jets(ptmin));
+
+
+
+  return xcone_jets;
+}
+// ------------------------------------ Get clustered XCone Jets from PFParticles ---------------------------------------------------------------------------------
+std::vector<fastjet::PseudoJet> JetCluster::get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin){ 
+ 
+ std::vector<fastjet::PseudoJet> xcone_recojets; 
+ for (unsigned int i=0; i<(pfparts->size()); ++i){
+      PFParticle* part = &(pfparts->at(i));
+      particle_in_reco2.push_back(convert_recoparticle(part));
+  }
+  XConePlugin plugin_xcone(N, R0, beta);
+  fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
+  clust_seq_xcone=new fastjet::ClusterSequence(particle_in_reco2, jet_def_xcone);
+  xcone_recojets = sorted_by_pt(clust_seq_xcone->inclusive_jets(ptmin));
+
+  return xcone_recojets;
+  
 }
 // --------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -249,6 +286,32 @@ bool RecoJetProducer::process(uhh2::Event & event){
   delete jetc_reco;
   return true;
 }
+// ------------------------------------ HOTVR Reco Jets -----------------------------------------------------------------------------
+RecoHOTVRJetProducer::RecoHOTVRJetProducer(uhh2::Context & ctx, const std::string & name):
+  h_newrecohotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")) {}
+
+bool RecoHOTVRJetProducer::process(uhh2::Event & event){
+  // standard values for HOTVR:
+  double mu(30.),     // massjump threshold
+    theta(0.7),       // massjump parameter
+    max_r(1.5),       // maximum allowed distance R
+    min_r(0.1),       // minimum allowed distance R
+    rho(600),         // cone shrinking parameter
+    pt_cut(30.);      // minimum pT of subjets
+
+  std::vector<PFParticle> pfparts = event.get(h_pfpart);
+  JetCluster* jetc_reco = new JetCluster();
+  std::vector<fastjet::PseudoJet> reco;
+
+  reco = jetc_reco->get_hotvr_recojets(&pfparts, JetCluster::e_ca, rho, min_r, max_r, mu, theta, pt_cut);
+
+  event.set(h_newrecohotvrjets, jetc_reco->convert_pseudojet_to_jet(reco));
+
+  delete jetc_reco;
+  return true;
+}
+
 
 // ------------------------------------ HOTVR Gen Jets -----------------------------------------------------------------------------
 GenHOTVRJetProducer::GenHOTVRJetProducer(uhh2::Context & ctx, const std::string & name):
@@ -274,29 +337,48 @@ bool GenHOTVRJetProducer::process(uhh2::Event & event){
   return true;
 }
 
-// ------------------------------------ HOTVR Reco Jets ----------------------------------------------------------------------------
-RecoHOTVRJetProducer::RecoHOTVRJetProducer(uhh2::Context & ctx, const std::string & name):
-  h_newrecohotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)),
-  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")) {}
+// ------------------------------------ XCone Reco Jets ----------------------------------------------------------------------------
+RecoXCONEJetProducer::RecoXCONEJetProducer(uhh2::Context & ctx, const std::string & name, int N, double R0, double beta, double ptmin):
+  h_newrecoxconejets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")),
+  N_(N),
+  R0_(R0),
+  beta_(beta),
+  ptmin_(ptmin) {}
 
-bool RecoHOTVRJetProducer::process(uhh2::Event & event){
+bool RecoXCONEJetProducer::process(uhh2::Event & event){
 
-  // standard values for HOTVR:
-  double mu(30.),     // massjump threshold
-    theta(0.7),       // massjump parameter
-    max_r(1.5),       // maximum allowed distance R
-    min_r(0.1),       // minimum allowed distance R
-    rho(600),         // cone shrinking parameter
-    pt_cut(30.);      // minimum pT of subjets
 
   std::vector<PFParticle> pfparts = event.get(h_pfpart);
   JetCluster* jetc_reco = new JetCluster();
   std::vector<fastjet::PseudoJet> reco;
-  reco = jetc_reco->get_hotvr_recojets(&pfparts, JetCluster::e_ca, rho, min_r, max_r, mu, theta, pt_cut);
+  reco = jetc_reco->get_xcone_recojets(&pfparts, N_, R0_, beta_, ptmin_);
 
-  event.set(h_newrecohotvrjets, jetc_reco->convert_pseudojet_to_jet(reco));
+  event.set(h_newrecoxconejets, jetc_reco->convert_pseudojet_to_jet(reco));
 
   delete jetc_reco;
+  return true;
+}
+
+// ------------------------------------ XCone Gen Jets -----------------------------------------------------------------------------
+GenXCONEJetProducer::GenXCONEJetProducer(uhh2::Context & ctx, const std::string & name, int N, double R0, double beta, double ptmin):
+  h_newgenxconejets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  N_(N),
+  R0_(R0),
+  beta_(beta),
+  ptmin_(ptmin) {}
+
+bool GenXCONEJetProducer::process(uhh2::Event & event){
+
+
+  std::vector<GenParticle>* genparts = event.genparticles;
+  JetCluster* jetc = new JetCluster();
+  std::vector<fastjet::PseudoJet> gen;
+  gen = jetc->get_xcone_jets(genparts, N_, R0_, beta_, ptmin_);
+
+  event.set(h_newgenxconejets, jetc->convert_pseudojet_to_jet(gen));
+
+  delete jetc;
   return true;
 }
 // --------------------------------------------------------------------------------------------------------------------------------

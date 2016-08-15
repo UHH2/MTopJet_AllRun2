@@ -327,4 +327,12 @@ obj/JetCluster.o: src/JetCluster.cxx \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequenceVoronoiArea.hh \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/Utils.h \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/HOTVR.hh \
- /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/HOTVRinfo.hh
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/HOTVRinfo.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/XConePlugin.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/NjettinessPlugin.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/Njettiness.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/MeasureDefinition.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/TauComponents.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/WrappedStructure.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/AxesDefinition.hh \
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/contrib/ExtraRecombiners.hh

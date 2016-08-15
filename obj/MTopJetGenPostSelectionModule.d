@@ -317,6 +317,8 @@ obj/MTopJetGenPostSelectionModule.o: \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/TTbarGen.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/AdditionalSelections.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/TTbarGenHists.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/ElectronHists.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/MuonHists.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/ModuleBASE.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetSelections.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/include/ReconstructionHypothesis.h \

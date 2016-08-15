@@ -19,6 +19,8 @@
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
 #include <UHH2/common/include/TTbarGenHists.h>
+#include <UHH2/common/include/ElectronHists.h>
+#include <UHH2/common/include/MuonHists.h>
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/MTopJetSelections.h>
@@ -70,7 +72,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_GenHists0a, h_GenHists0b, h_GenHists1, h_GenHists2, h_GenHists3, h_GenHists4, h_GenHists1_m, h_GenHists2_m, h_GenHists3_m, h_GenHists4_m, h_GenHists1_u, h_GenHists2_u, h_GenHists3_u, h_GenHists4_u;
   std::unique_ptr<Hists> h_RecHists0a, h_RecHists0b, h_RecHists0c, h_RecHists0d, h_RecHists1, h_RecHists2, h_RecHists3, h_RecHists4;
   std::unique_ptr<Hists> h_RecGenHists0, h_RecGenHists1, h_RecGenHists2, h_RecGenHists3, h_RecGenHists4, h_RecGenHists5, h_RecGenHists6, h_RecGenHists7;
-
+  std::unique_ptr<Hists> h_Elec, h_Muon;
 };
 
 MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx){
@@ -79,10 +81,11 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   // const bool isMC = (ctx.get("dataset_type") == "MC");
   
   // set up which jet to use/ possible are: ak06_gen, ak08_gen, ak10_gen, ak12_gen, ak08_rec, ak12_rec, HOTVR, HOTVR_rec
-  const std::string jet_label_gen("ak12_gen");
-  const std::string jet_label_rec("ak12_rec");
+  const std::string jet_label_gen("xcone");
+  const std::string jet_label_rec("xcone_rec");
   const std::string jet_label_hotvr("HOTVR_rec");
-  float jet_radius = 1.2;
+  const std::string jet_label_xcone("xcone");
+  float jet_radius = 0.8;
 
   ////
 
@@ -93,7 +96,8 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
 
   // To produce Jets:
   //jetprod.reset(new RecoJetProducer(ctx, jet_label_rec, 150, jet_radius)); // set to akt
-  jetprod.reset(new RecoHOTVRJetProducer(ctx, jet_label_hotvr));
+  // jetprod.reset(new RecoHOTVRJetProducer(ctx, jet_label_hotvr));
+  jetprod.reset(new RecoXCONEJetProducer(ctx, jet_label_xcone, 2, jet_radius, 2.0, 150));  //(context, jet_label, N, R, beta, ptmin)
 
 
   
@@ -135,6 +139,9 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   h_RecHists3.reset(new MTopJetRecoHists(ctx, "03_RecHists_deltaR", jet_label_rec));
   h_RecHists4.reset(new MTopJetRecoHists(ctx, "04_RecHists_masscut", jet_label_rec));
 
+  h_Elec.reset(new ElectronHists(ctx, "ElecHist"));
+  h_Muon.reset(new MuonHists(ctx, "MuonHist"));
+
   //GEN+RECO (resolution)
   h_RecGenHists0.reset(new MTopJetRecoGenHists(ctx, "RecGenHists_all", jet_label_rec, jet_label_gen));
   h_RecGenHists1.reset(new MTopJetRecoGenHists(ctx, "RecGenHists_000to050", jet_label_rec, jet_label_gen));
@@ -165,8 +172,8 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   ////
 
   // Selection for Mass binning
-  massbin1.reset(new MassCutGen1(ctx, jet_label_gen, 0, 50));
-  massbin2.reset(new MassCutGen1(ctx, jet_label_gen, 50, 100));
+  massbin1.reset(new MassCutGen1(ctx, jet_label_gen,   0,  50));
+  massbin2.reset(new MassCutGen1(ctx, jet_label_gen,  50, 100));
   massbin3.reset(new MassCutGen1(ctx, jet_label_gen, 100, 150));
   massbin4.reset(new MassCutGen1(ctx, jet_label_gen, 150, 200));
   massbin5.reset(new MassCutGen1(ctx, jet_label_gen, 200, 250));
@@ -178,9 +185,9 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
   //  COMMON MODULES
   // set to true / false to run analysis
-  bool produce_jet = true;
+  bool produce_jet = false;
   // bool do_gensel = true;
-  // bool do_recsel = false;
+  bool do_recsel = true;
 
   ttgenprod->process(event);
  
@@ -255,61 +262,85 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   }
   // ---------------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------------
-
-  h_RecGenHists0->fill(event);
-  if(massbin1->passes(event)) h_RecGenHists1->fill(event);
-  if(massbin2->passes(event)) h_RecGenHists2->fill(event);
-  if(massbin3->passes(event)) h_RecGenHists3->fill(event);
-  if(massbin4->passes(event)) h_RecGenHists4->fill(event);
-  if(massbin5->passes(event)) h_RecGenHists5->fill(event);
-  if(massbin6->passes(event)) h_RecGenHists6->fill(event);
-  if(massbin7->passes(event)) h_RecGenHists7->fill(event);
-
+  if(!(produce_jet)){
+    h_RecGenHists0->fill(event);
+    if(massbin1->passes(event)) h_RecGenHists1->fill(event);
+    if(massbin2->passes(event)) h_RecGenHists2->fill(event);
+    if(massbin3->passes(event)) h_RecGenHists3->fill(event);
+    if(massbin4->passes(event)) h_RecGenHists4->fill(event);
+    if(massbin5->passes(event)) h_RecGenHists5->fill(event);
+    if(massbin6->passes(event)) h_RecGenHists6->fill(event);
+    if(massbin7->passes(event)) h_RecGenHists7->fill(event);
+  }
   // ---------------------------------------------------------------------------------------
   // ---------------------------- apply Reco Selection -------------------------------------
   // ---------------------------------------------------------------------------------------
-  // h_RecHists0a->fill(event);
-  // // Cleaner
-  // if(do_recsel){
-  //   muoSR_cleaner->process(event);
-  //   sort_by_pt<Muon>(*event.muons);
+  h_RecHists0a->fill(event);
+  // Cleaner
+  if(!(produce_jet) && do_recsel){
+    muoSR_cleaner->process(event);
+    sort_by_pt<Muon>(*event.muons);
 
-  //   eleSR_cleaner->process(event);
-  //   sort_by_pt<Electron>(*event.electrons);
+    eleSR_cleaner->process(event);
+    sort_by_pt<Electron>(*event.electrons);
 
-  //   cleaner_rec->process(event);
+    cleaner_rec->process(event);
+  }
+  h_RecHists0b->fill(event);
+
+  //select one elec/muon
+  if(!(produce_jet) && do_recsel){
+    const bool pass_lep1 = (((event.muons->size() == 1)&&(event.electrons->size() == 0)) ||((event.muons->size() == 0)&&(event.electrons->size() == 1)));
+    if(!pass_lep1) return false;
+  }
+  h_RecHists0c->fill(event);
+  // reduction of background (MET, 2D, Ht_lep)
+  if(!(produce_jet) && do_recsel && !(met_sel->passes(event))) return false;
+  if(!(produce_jet) && do_recsel && !(htlep_sel->passes(event))) return false;
+
+  // /* lepton-2Dcut variables */
+  // const bool pass_twodcut = twodcut_sel->passes(event); {
+
+  //   for(auto& muo : *event.muons){
+
+  //     float    dRmin, pTrel;
+  //     std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
+
+  //     muo.set_tag(Muon::twodcut_dRmin, dRmin);
+  //     muo.set_tag(Muon::twodcut_pTrel, pTrel);
+  //   }
+
+  //   for(auto& ele : *event.electrons){
+
+  //     float    dRmin, pTrel;
+  //     std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+
+  //     ele.set_tag(Electron::twodcut_dRmin, dRmin);
+  //     ele.set_tag(Electron::twodcut_pTrel, pTrel);
+  //   }
   // }
-  // h_RecHists0b->fill(event);
 
-  // //select one elec/muon
-  // if(do_recsel){
-  //   const bool pass_lep1 = (((event.muons->size() == 1)&&(event.electrons->size() == 0)) ||((event.muons->size() == 0)&&(event.electrons->size() == 1)));
-  //   if(!pass_lep1) return false;
-  // }
-  // h_RecHists0c->fill(event);
+  // if(!(produce_jet) && do_recsel && !(pass_twodcut)) return false;
 
-  // // reduction of background (MET, 2D, Ht_lep)
-  // if(do_recsel && !(met_sel->passes(event))) return false;
-  // if(do_recsel && !(twodcut_sel->passes(event))) return false;
-  // if(do_recsel && !(htlep_sel->passes(event))) return false;
-  // h_RecHists0d->fill(event);
+  h_RecHists0d->fill(event);
 
-  // // ==2 Jets with pT > 150
-  // if(do_recsel && !(n_recjets->passes(event))) return false;
-  // h_RecHists1->fill(event);
-  // h_RecGenHists1->fill(event);
 
-  // // pT cut on leading Jet
-  // if(do_recsel && !(topjetpt_rec->passes(event))) return false;
-  // h_RecHists2->fill(event);
+  // ==2 Jets with pT > 150
+  if(!(produce_jet) && do_recsel && !(n_recjets->passes(event))) return false;
+  h_RecHists1->fill(event);
+  h_RecGenHists1->fill(event);
 
-  // // deltaR(lepton, 2nd jet) < jet radius
-  // if(do_recsel && !(deltaR_rec->passes(event))) return false;
-  // h_RecHists3->fill(event);
+  // pT cut on leading Jet
+  if(!(produce_jet) && do_recsel && !(topjetpt_rec->passes(event))) return false;
+  h_RecHists2->fill(event);
 
-  // // m(1st jet) > m(2nd jet + lepton)
-  // if(do_recsel && !(masscut_rec->passes(event))) return false;
-  // h_RecHists4->fill(event);
+  // deltaR(lepton, 2nd jet) < jet radius
+  if(!(produce_jet) && do_recsel && !(deltaR_rec->passes(event))) return false;
+  h_RecHists3->fill(event);
+
+  // m(1st jet) > m(2nd jet + lepton)
+  if(!(produce_jet) && do_recsel && !(masscut_rec->passes(event))) return false;
+  h_RecHists4->fill(event);
   // ---------------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------------
 

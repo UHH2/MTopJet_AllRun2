@@ -30,8 +30,6 @@ MTopJetRecoHists::MTopJetRecoHists(uhh2::Context & ctx, const std::string & dirn
   RecoJet2Eta = book<TH1F>("eta_jet2", "#eta", 24, -3, 3);
 
 
-
-
   // handle for clustered jets
   h_jets=ctx.get_handle<std::vector<Jet>>(jetname);
 
