@@ -231,14 +231,14 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   matching.reset(new Matching(ctx, jet_label_gen, jet_radius));
   
   // GEN Top
-  n_genjets_top.reset(new NGenTopJets(ctx, 150, 2, 2));  // ==2 jets with pt > 150
+  n_genjets_top.reset(new NGenTopJets(ctx, 200, 2, 2));  // ==2 jets with pt > 200 (topjets are produced >~ 180)
   topjetpt_top.reset(new LeadingTopJetPT(ctx, 400)); // leading jet pt > 400
   deltaR_top.reset(new DeltaRCut_top(ctx, 0.8)); 
   masscut_top.reset(new MassCut_top(ctx));
   matching_top.reset(new Matching_top(ctx, 0.8));  ////
 
   // RECO
-  n_recjets.reset(new NRecoJets(ctx, jet_label_rec, 200, 2, 2));  // ==2 jets with pt > 200 (topjets are produced >~ 180)
+  n_recjets.reset(new NRecoJets(ctx, jet_label_rec, 150, 2, 2));  // ==2 jets with pt > 150
   topjetpt_rec.reset(new LeadingRecoJetPT(ctx, jet_label_rec, 400)); // leading jet pt > 400
   met_sel.reset(new METCut  (20, uhh2::infinity));
   htlep_sel.reset(new HTlepCut(100, uhh2::infinity));
@@ -312,14 +312,15 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
     if(topjetER_smearer.get()) topjetER_smearer->process(event);
     topjet_cleaner->process(event);
     cleaner_toprec->process(event);
+    topjet_cleaner->process(event);
     sort_by_pt<TopJet>(*event.topjets);
-  }
+}
 
   h_GenHists0b->fill(event);
   h_GenHists0b_top->fill(event);
   h_RecHists0b->fill(event);
 
-  // ==2 Jets with pT > 150
+  // ==2 Jets with pT > 150/200
   if(!(produce_jet) && do_gensel && !(n_genjets->passes(event))) return false;
   if(!(produce_jet) && do_gensel_top && !(n_genjets_top->passes(event))) return false;
   h_GenHists1->fill(event);
