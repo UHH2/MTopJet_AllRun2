@@ -111,7 +111,8 @@
         <Item Name="JetCollection"           Value="slimmedJets"/>
         <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
-	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
+	<!-- <Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8_SoftDrop"/> -->
+	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop"/>
 
 	<Item Name="additionalBranches" Value="PFParticles ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
 

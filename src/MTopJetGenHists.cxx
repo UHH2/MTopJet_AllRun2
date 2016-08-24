@@ -89,14 +89,10 @@ MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirnam
   // deltaR_toplep_jet6 = book<TH1F>("deltaR_toplep_jet6", "#Delta R(lep Top, 6th Jet)", 80, 0, 4.0);
 
 
-  // handle for PF particles
-  // h_pfpart=ctx.get_handle<vector<PFParticle>>("PFParticles");
-
   // handle for TTbarGen class
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
   // handle for clustered jets
   h_jets=ctx.get_handle<std::vector<Jet>>(jetname);
-
 }
 
 
@@ -132,9 +128,9 @@ void MTopJetGenHists::fill(const Event & event){
   //--------------------------------- define needed objects-----------------------------------
   //---------------------------------------------------------------------------------------
   const auto & ttbargen = event.get(h_ttbargen);
- // define all objects needed
+  // define all objects needed
   std::vector<Jet> jets = event.get(h_jets);
-  TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4;
+  TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4, topjet1_v4, topjet2_v4;
   Jet jet1,jet2,jet3,jet4,jet5,jet6;
   if(jets.size()>0) jet1 = jets.at(0);
   if(jets.size()>1) jet2 = jets.at(1);
@@ -193,7 +189,7 @@ void MTopJetGenHists::fill(const Event & event){
      jet2_v4.SetPxPyPzE(jets.at(1).v4().Px(), jets.at(1).v4().Py(), jets.at(1).v4().Pz(), jets.at(1).v4().E()); //v4 of first jet
      lepton1_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); //v4 of lepton
      jet2_lep_v4 = jet2_v4 + lepton1_v4;
-  }
+   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
  

@@ -55,6 +55,19 @@ namespace uhh2 {
     float jetradius_;
   };
 
+   class Matching_top : public Selection { 
+
+  public: 
+    explicit Matching_top(Context&, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float jetradius_;
+  };
+
+   
  class LeadingJetPT : public Selection { 
 
   public: 
@@ -66,6 +79,17 @@ namespace uhh2 {
     float ptcut_;
   };
 
+ class LeadingTopJetPT : public Selection { 
+
+  public: 
+    explicit LeadingTopJetPT(Context&, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+    float ptcut_;
+  };
+ 
  class MassCut : public Selection { 
 
   public: 
@@ -77,6 +101,17 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
+  class MassCut_top : public Selection { 
+
+  public: 
+    explicit MassCut_top(Context&);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+  
  class DeltaRCut : public Selection { 
 
   public: 
@@ -89,6 +124,18 @@ namespace uhh2 {
     float jetradius_;
   };
 
+ class DeltaRCut_top : public Selection { 
+
+  public: 
+    explicit DeltaRCut_top(Context&, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float jetradius_;
+  };
+ 
  class NGenJets : public Selection { 
 
   public: 
@@ -102,6 +149,19 @@ namespace uhh2 {
     float max_;
   };
 
+  class NGenTopJets : public Selection { 
+
+  public: 
+    explicit NGenTopJets(Context&, float min_pt = 0, float min = 0, float max = 9999);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+    float min_pt_;
+    float min_;
+    float max_;
+  };
+  
  class GenJetLeptonCleaner : public uhh2::AnalysisModule { 
 
   public: 
@@ -114,7 +174,19 @@ namespace uhh2 {
     float jetradius_; 
   };
 
+ class GenTopJetLeptonCleaner : public uhh2::AnalysisModule { 
 
+  public: 
+    explicit GenTopJetLeptonCleaner(Context&, float);
+    virtual bool process(Event& ) override;
+
+  private:
+     uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+     uhh2::Event::Handle<TTbarGen> h_ttbargen;
+     float jetradius_; 
+  };
+
+ 
  class MassCutGen1 : public Selection{ 
 
   public: 
@@ -123,6 +195,18 @@ namespace uhh2 {
 
   private:
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    float M_min_;
+    float M_max_; 
+  };
+
+  class MassCutGen1_top : public Selection{ 
+
+  public: 
+    explicit MassCutGen1_top(Context&, float, float);
+    virtual bool passes(const Event& ) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
     float M_min_;
     float M_max_; 
   };

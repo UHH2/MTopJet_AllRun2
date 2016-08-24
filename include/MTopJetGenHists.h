@@ -4,7 +4,7 @@
 #include "UHH2/core/include/PFParticle.h"
 #include "UHH2/common/include/TTbarGen.h"
 #include "UHH2/MTopJet/include/JetCluster.h"
- 
+
 
 /**  \brief Example class for booking and filling histograms
  * 
@@ -33,11 +33,9 @@ protected:
     /* TH1F *deltaR_bot_jet4, *deltaR_botlep_jet4,*deltaR_q1_jet4, *deltaR_q2_jet4, *deltaR_lep1_jet4, *deltaR_lep2_jet4, *deltaR_tophad_jet4, *deltaR_toplep_jet4; */
     /* TH1F *deltaR_bot_jet5, *deltaR_botlep_jet5,*deltaR_q1_jet5, *deltaR_q2_jet5, *deltaR_lep1_jet5, *deltaR_lep2_jet5, *deltaR_tophad_jet5, *deltaR_toplep_jet5; */
     /* TH1F *deltaR_bot_jet6, *deltaR_botlep_jet6,*deltaR_q1_jet6, *deltaR_q2_jet6, *deltaR_lep1_jet6, *deltaR_lep2_jet6, *deltaR_tophad_jet6, *deltaR_toplep_jet6; */
-
-    uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+    
     uhh2::Event::Handle<TTbarGen>h_ttbargen;
     uhh2::Event::Handle<std::vector<Jet>>h_jets;
-
 };
 
 

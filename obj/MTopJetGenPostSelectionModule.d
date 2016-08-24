@@ -353,4 +353,7 @@ obj/MTopJetGenPostSelectionModule.o: \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequenceVoronoiArea.hh \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetRecoHists.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetRecoGenHists.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/GenHists_topjet.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/RecoHists_topjet.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/RecoGenHists_topjet.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetUtils.h

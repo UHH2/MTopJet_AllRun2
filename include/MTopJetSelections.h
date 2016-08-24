@@ -78,7 +78,17 @@ namespace uhh2 {
     float jetradius_; 
   };
  
+ class RecoTopJetLeptonCleaner : public uhh2::AnalysisModule { 
 
+  public: 
+    explicit RecoTopJetLeptonCleaner(Context&, float);
+    virtual bool process(Event& ) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<TopJet>> h_topjets;
+    float jetradius_; 
+  };
+ 
   ////
   /* class TTbarGenSemilep : public Selection { */
 

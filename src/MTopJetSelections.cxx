@@ -153,6 +153,56 @@ bool RecoJetLeptonCleaner::process(uhh2::Event& event){
 }
 
 ////////////////////////////////////////////////////////
+
+RecoTopJetLeptonCleaner::RecoTopJetLeptonCleaner(uhh2::Context& ctx, float jetradius):
+  h_topjets(ctx.get_handle<std::vector<TopJet>>("topjets")),
+  jetradius_(jetradius) {}
+
+bool RecoTopJetLeptonCleaner::process(uhh2::Event& event){
+  std::vector<TopJet> jets = event.get(h_topjets);
+  std::vector<TopJet> cleaned_jets;
+  TopJet jet;
+
+  Particle lepton;
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+  }
+
+
+  // perform cleaning
+  TLorentzVector jet_v4, lepton_v4, jetlep_v4;
+  for(unsigned int i = 0; i < jets.size(); ++i){
+    jet = jets.at(i);
+
+    if(deltaR(lepton, jet) < jetradius_){
+
+      // std::cout<<"pt before: "<< jet.pt()<<std::endl;
+
+     jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     jetlep_v4 = jet_v4 - lepton_v4;
+
+     jet.set_pt(jetlep_v4.Pt());
+     jet.set_eta(jetlep_v4.Eta());
+     jet.set_phi(jetlep_v4.Phi());
+     jet.set_energy(jetlep_v4.E());
+
+      // std::cout<<"pt after: "<< jet.pt()<<std::endl;
+
+    }
+  cleaned_jets.push_back(jet);
+
+  }
+  sort_by_pt<TopJet>(cleaned_jets); // Sort Jets by pT
+  event.set(h_topjets, cleaned_jets);
+
+  return true;
+}
+
+////////////////////////////////////////////////////////
 // uhh2::TopJetMassCut::TopJetMassCut(const):
 //   {}
 

@@ -8,8 +8,8 @@
 
 
   <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_semilep.root"> -->
-  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_ak06gen_ak08gen_ak10gen_ak12gen_ak08rec_ak12rec_HOTVR_HOTVRrec_XCone_XConerec.root">
-
+  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_ak06gen_ak08gen_ak10gen_ak12gen_ak08rec_ak12rec_HOTVR_HOTVRrec_XCone_XConerec.root"> -->
+  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_topjet_topjetgen_ak08gen_ak08rec.root">
 ]>
 
 <!--
@@ -47,8 +47,10 @@
         <Item Name="JetCollection"           Value="slimmedJets"/>
         <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
-	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
-	<Item Name="additionalBranches" Value="PFParticles ak06_gen ak08_gen ak10_gen ak12_gen ak08_rec ak12_rec HOTVR HOTVR_rec xcone xcone_rec"/>
+	<!-- <Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/> -->
+	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
+
+	<Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec"/>
 
 	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
         <Item Name="METName"                 Value="slimmedMETs"/>
