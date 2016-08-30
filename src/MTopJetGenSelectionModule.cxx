@@ -21,9 +21,9 @@
 #include <UHH2/common/include/TTbarGenHists.h>
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
-#include <UHH2/MTopJet/include/MTopJetSelections.h>
-#include <UHH2/MTopJet/include/MTopJetGenSelections.h>
-#include <UHH2/MTopJet/include/MTopJetGenHists.h>
+#include <UHH2/MTopJet/include/RecoSelections.h>
+#include <UHH2/MTopJet/include/GenSelections.h>
+#include <UHH2/MTopJet/include/GenHists.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 class MTopJetGenSelectionModule : public ModuleBASE {
 
@@ -70,7 +70,7 @@ MTopJetGenSelectionModule::MTopJetGenSelectionModule(uhh2::Context& ctx){
 
   // set up Hists classes:
   h_TTbarGen.reset(new TTbarGenHists(ctx, "TTbarGen"));
-  // h_GenHists.reset(new MTopJetGenHists(ctx, "GenHists"));
+  // h_GenHists.reset(new GenHists(ctx, "GenHists"));
 
   // EVENT SELECTION
   // SemiLepDecay.reset(new TTbarSemilep(ctx)); // SemiLep but only muon and elec channel
