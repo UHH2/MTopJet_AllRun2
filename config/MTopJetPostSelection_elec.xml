@@ -2,12 +2,12 @@
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
   <!ENTITY NEVT "-1">
-  <!ENTITY KEYW "v01">  <!-- v01 = new TopLep Cleaner, v02 = old deltaR Cleaner -->
+
   <!ENTITY channel "elec">
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
  <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/elec">
- <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/elec/&KEYW;"> 
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/elec/"> 
 
  <!ENTITY SingleEG                      "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleEG.root">
 
@@ -65,7 +65,7 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="3"/>
+   <ConfigParse NEventsBreak="10000" LastBreak="0" FileSplit="0"/>
    <ConfigSGE RAM="5" DISK="5" Mail="XXXX@desy.de" Notification="as" Workdir="workdir"/>
 -->
 
@@ -220,7 +220,6 @@
       <Item Name="METName"                 Value="slimmedMETs"/>
 
       <Item Name="use_sframe_weight" Value="true"/>
-      <Item Name="keyword" Value="&KEYW;"/>
       <Item Name="channel" Value="&channel;"/>
 
 

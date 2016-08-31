@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
-  <!ENTITY NEVT "-1">
-  <!ENTITY KEYW "v01">  <!-- v01 = new TopLep Cleaner, v02 = old deltaR Cleaner -->
+  <!ENTITY NEVT "10000">
+
   <!ENTITY channel "muon">
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
  <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon">
- <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/&KEYW;"> 
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/"> 
 
  <!ENTITY SingleMUON                      "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMUON.root">
 
@@ -61,7 +61,7 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="3"/>
+   <ConfigParse NEventsBreak="10000" LastBreak="0" FileSplit="0"/>
    <ConfigSGE RAM="5" DISK="5" Mail="XXXX@desy.de" Notification="as" Workdir="workdir"/>
 -->
 
@@ -77,11 +77,11 @@
   <Library Name="libSUHH2ZprimeSemiLeptonic"/>
   <Package Name="SUHH2ZprimeSemiLeptonic.par"/>
 
-<!--
-  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
--->
 
-  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" > 
+  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
+
+
+  <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
 
 
 
@@ -225,12 +225,11 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
 
-	<Item Name="additionalBranches" Value="PFParticles ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
+	<Item Name="additionalBranches" Value=" "/>
  
       <Item Name="METName"                 Value="slimmedMETs"/>
 
       <Item Name="use_sframe_weight" Value="true"/>
-      <Item Name="keyword" Value="&KEYW;"/>
       <Item Name="channel" Value="&channel;"/>
 
 
