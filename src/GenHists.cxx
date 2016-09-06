@@ -52,6 +52,9 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
   deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
 
+  Reff_HOTVR = book<TH1F>("Reff_HOTVR", "R_{eff}", 40, 0, 2.0);
+  Mass_Reff_HOTVR = book<TH2F>("Mass_Reff_HOTVR", "x=M_Jet1 y=R_eff", 50, 0, 500., 40, 0, 2.0);
+
   // deltaR_lep1_jet3 = book<TH1F>("deltaR_lep1_jet3", "#Delta R(lep1,3rd Jet)", 80, 0, 4.0);
   // deltaR_lep2_jet3 = book<TH1F>("deltaR_lep2_jet3", "#Delta R(lep2,3rd Jet)", 80, 0, 4.0);
   // deltaR_botlep_jet3 = book<TH1F>("deltaR_botlep_jet3", "#Delta R(bot_lep,3rd Jet)", 80, 0, 4.0);
@@ -257,6 +260,15 @@ void GenHists::fill(const Event & event){
     deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
   }
   
+  if(jets.size() > 0){
+  double pt = jet1_v4.Pt();
+  double reff = 0;
+  if(pt < 400) reff = 0.1;
+  else if(pt >= 400 && pt <= 6000) reff = 600/pt;
+  else if(pt <= 6000) reff = 1.5;
+  Reff_HOTVR->Fill(reff, weight);
+  Mass_Reff_HOTVR->Fill(jet1_v4.M(), reff, weight);
+  }
   // if(jets.size() > 2){
   //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);
   //   deltaR_lep2_jet3->Fill(deltaR(jet3, lep2), weight);

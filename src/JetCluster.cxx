@@ -288,9 +288,10 @@ bool RecoJetProducer::process(uhh2::Event & event){
   return true;
 }
 // ------------------------------------ HOTVR Reco Jets -----------------------------------------------------------------------------
-RecoHOTVRJetProducer::RecoHOTVRJetProducer(uhh2::Context & ctx, const std::string & name):
+RecoHOTVRJetProducer::RecoHOTVRJetProducer(uhh2::Context & ctx, const std::string & name, double rho):
   h_newrecohotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)),
-  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")) {}
+  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")),
+  rho_(rho) {}
 
 bool RecoHOTVRJetProducer::process(uhh2::Event & event){
   // standard values for HOTVR:
@@ -298,14 +299,14 @@ bool RecoHOTVRJetProducer::process(uhh2::Event & event){
     theta(0.7),       // massjump parameter
     max_r(1.5),       // maximum allowed distance R
     min_r(0.1),       // minimum allowed distance R
-    rho(600),         // cone shrinking parameter
+    // rho(600),         // cone shrinking parameter
     pt_cut(30.);      // minimum pT of subjets
 
   std::vector<PFParticle> pfparts = event.get(h_pfpart);
   JetCluster* jetc_reco = new JetCluster();
   std::vector<fastjet::PseudoJet> reco;
 
-  reco = jetc_reco->get_hotvr_recojets(&pfparts, JetCluster::e_ca, rho, min_r, max_r, mu, theta, pt_cut);
+  reco = jetc_reco->get_hotvr_recojets(&pfparts, JetCluster::e_ca, rho_, min_r, max_r, mu, theta, pt_cut);
 
   event.set(h_newrecohotvrjets, jetc_reco->convert_pseudojet_to_jet(reco));
 
@@ -315,8 +316,9 @@ bool RecoHOTVRJetProducer::process(uhh2::Event & event){
 
 
 // ------------------------------------ HOTVR Gen Jets -----------------------------------------------------------------------------
-GenHOTVRJetProducer::GenHOTVRJetProducer(uhh2::Context & ctx, const std::string & name):
-  h_newgenhotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)) {}
+GenHOTVRJetProducer::GenHOTVRJetProducer(uhh2::Context & ctx, const std::string & name, double rho):
+  h_newgenhotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  rho_(rho) {}
 
 bool GenHOTVRJetProducer::process(uhh2::Event & event){
   // standard values for HOTVR:
@@ -324,13 +326,13 @@ bool GenHOTVRJetProducer::process(uhh2::Event & event){
     theta(0.7),       // massjump parameter
     max_r(1.5),       // maximum allowed distance R
     min_r(0.1),       // minimum allowed distance R
-    rho(600),         // cone shrinking parameter
+    // rho(600),         // cone shrinking parameter
     pt_cut(30.);      // minimum pT of subjets
 
   std::vector<GenParticle>* genparts = event.genparticles;
   JetCluster* jetc = new JetCluster();
   std::vector<fastjet::PseudoJet> gen;
-  gen = jetc->get_hotvr_jets(genparts, JetCluster::e_ca, rho, min_r, max_r, mu, theta, pt_cut);
+  gen = jetc->get_hotvr_jets(genparts, JetCluster::e_ca, rho_, min_r, max_r, mu, theta, pt_cut);
 
   event.set(h_newgenhotvrjets, jetc->convert_pseudojet_to_jet(gen));
 

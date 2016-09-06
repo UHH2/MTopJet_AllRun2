@@ -223,7 +223,7 @@
         <Item Name="JetCollection"           Value="slimmedJets"/>
         <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
-	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
+	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
 	<Item Name="additionalBranches" Value=" "/>
  

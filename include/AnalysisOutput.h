@@ -21,8 +21,9 @@ public:
   virtual bool process(uhh2::Event & ) override; 
     
 private:
-  uhh2::Event::Handle<double>h_Mass;
-  uhh2::Event::Handle<int>h_Number;
+  uhh2::Event::Handle<double>h_weight;
+  uhh2::Event::Handle<double>h_top1_mass;
+  uhh2::Event::Handle<int>h_top_number;
 
 };
 

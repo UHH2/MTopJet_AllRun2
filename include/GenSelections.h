@@ -55,6 +55,18 @@ namespace uhh2 {
     float jetradius_;
   };
 
+   class Matching_HOTVR : public Selection { 
+
+  public: 
+    explicit Matching_HOTVR(Context&, const std::string &, double);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float rho_;
+  };
+
    class Matching_top : public Selection { 
 
   public: 
@@ -123,6 +135,19 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
     float jetradius_;
   };
+
+ class DeltaRCut_HOTVR : public Selection { 
+
+  public: 
+    explicit DeltaRCut_HOTVR(Context&, const std::string &, double);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float rho_;
+  };
+
 
  class DeltaRCut_top : public Selection { 
 

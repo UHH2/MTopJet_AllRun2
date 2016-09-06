@@ -72,7 +72,8 @@
 <JobConfiguration JobName="MTopJetPostSelectionJob" OutputLevel="INFO">
   <Library Name="libSUHH2ZprimeSemiLeptonic"/>
   <Package Name="SUHH2ZprimeSemiLeptonic.par"/>
-
+    <Library Name="libfastjet" />
+    <Library Name="libfastjettools" />
 <!--
   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
 -->
@@ -213,7 +214,7 @@
         <Item Name="JetCollection"           Value="slimmedJets"/>
         <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
-	<Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/>
+	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
 	<Item Name="additionalBranches" Value="PFParticles ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
  

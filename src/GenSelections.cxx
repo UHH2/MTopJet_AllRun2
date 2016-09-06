@@ -62,6 +62,45 @@ bool uhh2::Matching::passes(const uhh2::Event& event){
       return matched;
 }
 
+uhh2::Matching_HOTVR::Matching_HOTVR(uhh2::Context& ctx, const std::string & name, double rho):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+  rho_(rho) {}
+
+
+bool uhh2::Matching_HOTVR::passes(const uhh2::Event& event){
+    const auto & ttbargen = event.get(h_ttbargen);
+    std::vector<Jet> jets = event.get(h_jets);
+    Jet jet1;
+    TLorentzVector jet1_v4;
+    if(jets.size()>0) jet1 = jets.at(0);
+    bool matched = false;
+    // get stable particles from ttbar decay and sort them into leptonic and hadronic
+    GenParticle bot, q1, q2; 
+    if(jets.size() > 0){
+      if(ttbargen.IsTopHadronicDecay()){
+	bot = ttbargen.bTop();
+	q1 = ttbargen.Wdecay1();
+	q2 = ttbargen.Wdecay2();
+      }
+      else if(ttbargen.IsAntiTopHadronicDecay()){
+	bot = ttbargen.bAntitop();
+	q1 = ttbargen.WMinusdecay1();
+	q2 = ttbargen.WMinusdecay2();
+      }
+    }
+
+    jet1_v4.SetPxPyPzE(jet1.v4().Px(), jet1.v4().Py(), jet1.v4().Pz(), jet1.v4().E());
+    double pt = jet1_v4.Pt();
+    double Reff = rho_/pt;
+    if(Reff > 1.5) Reff = 1.5;
+    if(Reff < 0.1) Reff = 0.1;
+
+    //check if particles from hadronic top are clustered into jet
+    if((deltaR(bot, jet1)<=Reff) && (deltaR(q1, jet1)<=Reff) && (deltaR(q2, jet1)<=Reff)) matched = true;
+    return matched;
+}
+
 uhh2::Matching_top::Matching_top(uhh2::Context& ctx, float jetradius):
   h_gentopjets(ctx.get_handle<std::vector<GenTopJet>>("gentopjets")),
   h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
@@ -233,6 +272,47 @@ bool uhh2::DeltaRCut::passes(const uhh2::Event& event){
     }
     
     if(deltaR(lepton, jet2) < jetradius_) pass_deltaR = true;
+  }
+  return pass_deltaR;
+}
+
+uhh2::DeltaRCut_HOTVR::DeltaRCut_HOTVR(uhh2::Context& ctx, const std::string & name, double rho):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+  rho_(rho) {}
+
+bool uhh2::DeltaRCut_HOTVR::passes(const uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  const auto & ttbargen = event.get(h_ttbargen);
+  Jet jet2;
+  TLorentzVector jet2_v4;
+  GenParticle lepton, lep1, lep2;
+  bool pass_deltaR = false;
+  if(jets.size()>1){
+    jet2 = jets.at(1);
+    if(ttbargen.IsTopHadronicDecay()){
+      lep1 = ttbargen.WMinusdecay1();
+      lep2 = ttbargen.WMinusdecay2();
+    }
+    else if(ttbargen.IsAntiTopHadronicDecay()){
+      lep1 = ttbargen.Wdecay1();
+      lep2 = ttbargen.Wdecay2();
+    }
+    //check which lep is neutrino and which is elec/muon
+    if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+      lepton = lep1;
+    }
+    else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+      lepton = lep2;
+    }
+
+    jet2_v4.SetPxPyPzE(jet2.v4().Px(), jet2.v4().Py(), jet2.v4().Pz(), jet2.v4().E());
+    double pt = jet2_v4.Pt();
+    double Reff = rho_/pt;
+    if(Reff > 1.5) Reff = 1.5;
+    if(Reff < 0.1) Reff = 0.1;
+
+    if(deltaR(lepton, jet2) < Reff) pass_deltaR = true;
   }
   return pass_deltaR;
 }

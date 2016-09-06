@@ -169,8 +169,8 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   topjet_corrector.reset(new TopJetCorrector(ctx, JEC_AK8));
   topjet_subjet_corrector.reset(new SubJetCorrector(ctx, JEC_AK4));
   if(isMC){
-    ctx.declare_event_input<std::vector<Particle> >(ctx.get("TopJetCollectionGEN"), "topjetsGEN");
-    topjetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "topjetsGEN", false));
+    ctx.declare_event_input<std::vector<Particle> >(ctx.get("GenTopJetCollection"), "gentopjets");
+    topjetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "gentopjets", false));
   }
   // topjetlepton_cleaner.reset(new TopJetLeptonDeltaRCleaner(.8));   // TopJetLeptonDeltaRCleaner removes all AK8 Jets from AK8 Jet Collection, where a Lepton is clustered into the AK8 jet -> test different cleaner in further selection
   topjet_cleaner.reset(new TopJetCleaner(ctx, TopJetId(PtEtaCut(200., 2.4)))); // All AK8 Jets have pt>200 (already implied in ntuples)

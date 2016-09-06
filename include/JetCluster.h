@@ -104,23 +104,25 @@ private:
 class GenHOTVRJetProducer: public uhh2::AnalysisModule{
 public:
 
-  explicit GenHOTVRJetProducer(uhh2::Context&, const std::string &);
+  explicit GenHOTVRJetProducer(uhh2::Context&, const std::string &, double);
   virtual bool process(uhh2::Event & ) override; 
     
 private:
   uhh2::Event::Handle<std::vector<Jet>>h_newgenhotvrjets;
+  double rho_;
 };
 
 
 class RecoHOTVRJetProducer: public uhh2::AnalysisModule{
 public:
 
-  explicit RecoHOTVRJetProducer(uhh2::Context&, const std::string &);
+  explicit RecoHOTVRJetProducer(uhh2::Context&, const std::string &, double);
   virtual bool process(uhh2::Event & ) override; 
     
 private:
   uhh2::Event::Handle<std::vector<Jet>>h_newrecohotvrjets;
   uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+  double rho_;
 };
 
 class GenXCONEJetProducer: public uhh2::AnalysisModule{

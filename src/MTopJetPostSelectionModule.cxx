@@ -44,6 +44,12 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   // Event Output
   std::unique_ptr<uhh2::AnalysisModule> output; 
+  Event::Handle<bool> h_reco_sel;
+  Event::Handle<bool> h_2Jet_sel;
+  Event::Handle<bool> h_JetPt_sel;
+  Event::Handle<bool> h_DeltaR_sel;
+  Event::Handle<bool> h_Mass_sel;
+  Event::Handle<int> h_cutflow;
 
   // cleaners
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
@@ -98,7 +104,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   //// Event Output
   output.reset(new WriteOutput(ctx));
-
+  h_reco_sel = ctx.declare_event_output<bool> ("pass_RecoSel");
+  h_2Jet_sel = ctx.declare_event_output<bool> ("pass_2JetSel");
+  h_JetPt_sel = ctx.declare_event_output<bool> ("pass_JetPTSel");
+  h_DeltaR_sel = ctx.declare_event_output<bool> ("pass_DeltaRSel");
+  h_Mass_sel = ctx.declare_event_output<bool> ("pass_MassSel");
+  h_cutflow = ctx.declare_event_output<int> ("cutflow");
   //// COMMON MODULES
 
 
@@ -238,11 +249,41 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_cleaner_MTopJetHists->fill(event);
   h_cleaner_RecoHists_topjet->fill(event);
 
+  //--------- Set bools for every selection step --------------------
+  bool pass_rec = false;
+  const bool pass_topjet = topjet_sel->passes(event);
+  const bool pass_topjetA = topjetA_sel->passes(event);
+  const bool pass_deltaR = deltarcut_sel->passes(event);
+  const bool pass_topmass = topmass_sel->passes(event);
+  if(pass_topjet && pass_topjetA && pass_deltaR && pass_topmass) pass_rec = true;
+  int cut_index = 0;
+  if(pass_topjet){
+    cut_index++;
+    if(pass_topjetA){
+      cut_index++;
+      if(pass_deltaR){
+	cut_index++;
+	if(pass_topmass){
+	  cut_index++;
+	}
+      }
+    }
+  }
+  event.set(h_reco_sel, pass_rec);
+  event.set(h_2Jet_sel, pass_topjet);
+  event.set(h_JetPt_sel, pass_topjetA);
+  event.set(h_DeltaR_sel, pass_deltaR);
+  event.set(h_Mass_sel, pass_topmass);
+  event.set(h_cutflow, cut_index);
+
+  //------------------------------------------------------------------
+
+  //==================================================================
+  //================= Apply Selection ================================
+  //==================================================================
 
   /* 2nd AK8 jet selection */
-  const bool pass_topjet = topjet_sel->passes(event);
   if(!pass_topjet) return false;
-
   h_2ndJet_event->fill(event);
   h_2ndJet_elec->fill(event);
   h_2ndJet_muon->fill(event);
@@ -250,49 +291,46 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_2ndJet_topjets->fill(event);
   h_2ndJet_MTopJetHists->fill(event);
   h_2ndJet_RecoHists_topjet->fill(event);
-
-
+  
   //--------- Selection with 1 TopJet pT > 400 --------------------
   /* 1st AK8 jet selection */
-  const bool pass_topjetA = topjetA_sel->passes(event);
-  if(!pass_topjetA) return false;
-
-  h_topjetA_event->fill(event);
-  h_topjetA_elec->fill(event);
-  h_topjetA_muon->fill(event);
-  h_topjetA_jets->fill(event);
-  h_topjetA_topjets->fill(event);
-  h_topjetA_MTopJetHists->fill(event);
-  h_topjetA_RecoHists_topjet->fill(event);
-
-  /* delta R (lep, topjet2) < 0.8  */
-  const bool pass_deltaR = deltarcut_sel->passes(event);
-  if(!pass_deltaR) return false;
-
-  h_toplepdRA_event->fill(event);
-  h_toplepdRA_elec->fill(event);
-  h_toplepdRA_muon->fill(event);
-  h_toplepdRA_jets->fill(event);
-  h_toplepdRA_topjets->fill(event);
-  h_toplepdRA_MTopJetHists->fill(event);
-  h_toplepdRA_RecoHists_topjet->fill(event);
-
-  /* Top Jet Mass Cut M1 > M2 */
-  const bool pass_topmass = topmass_sel->passes(event);
-  if(!pass_topmass) return false;
-
-  h_topmassA_event->fill(event);
-  h_topmassA_elec->fill(event);
-  h_topmassA_muon->fill(event);
-  h_topmassA_jets->fill(event);
-  h_topmassA_topjets->fill(event);
-  h_topmassA_MTopJetHists->fill(event);
-  h_topmassA_RecoHists_topjet->fill(event);
+  if(pass_topjetA){
+    h_topjetA_event->fill(event);
+    h_topjetA_elec->fill(event);
+    h_topjetA_muon->fill(event);
+    h_topjetA_jets->fill(event);
+    h_topjetA_topjets->fill(event);
+    h_topjetA_MTopJetHists->fill(event);
+    h_topjetA_RecoHists_topjet->fill(event);
+    
+    /* delta R (lep, topjet2) < 0.8  */
+    if(pass_deltaR){
+      h_toplepdRA_event->fill(event);
+      h_toplepdRA_elec->fill(event);
+      h_toplepdRA_muon->fill(event);
+      h_toplepdRA_jets->fill(event);
+      h_toplepdRA_topjets->fill(event);
+      h_toplepdRA_MTopJetHists->fill(event);
+      h_toplepdRA_RecoHists_topjet->fill(event);
+      
+      /* Top Jet Mass Cut M1 > M2 */
+      if(pass_topmass){
+	h_topmassA_event->fill(event);
+	h_topmassA_elec->fill(event);
+	h_topmassA_muon->fill(event);
+	h_topmassA_jets->fill(event);
+	h_topmassA_topjets->fill(event);
+	h_topmassA_MTopJetHists->fill(event);
+	h_topmassA_RecoHists_topjet->fill(event);
+      }
+    }
+  }
+  
 
   //--------------------------------------------------------------------
 
-  output->process(event);
 
+  output->process(event);
 
 return true;
 }
