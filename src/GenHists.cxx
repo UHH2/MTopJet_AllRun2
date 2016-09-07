@@ -52,8 +52,12 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
   deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
 
-  Reff_HOTVR = book<TH1F>("Reff_HOTVR", "R_{eff}", 40, 0, 2.0);
-  Mass_Reff_HOTVR = book<TH2F>("Mass_Reff_HOTVR", "x=M_Jet1 y=R_eff", 50, 0, 500., 40, 0, 2.0);
+  deltaR_q1_q2 = book<TH1F>("deltaR_q1_q2", "#Delta R(q1, q2)", 80, 0, 4.0);
+  deltaR_bot_q1 = book<TH1F>("deltaR_bot_q1", "#Delta R(bot, q1)", 80, 0, 4.0);
+  deltaR_bot_q2 = book<TH1F>("deltaR_bot_q2", "#Delta R(bot, q2)", 80, 0, 4.0);
+  deltaR_q1_q2_toppt = book<TH2F>("deltaR_q1_q2_toppt", "x=p_T_tophad y=#Delta R(q1, q2)", 20, 0 , 1000, 40, 0, 4.0);
+  deltaR_bot_q1_toppt = book<TH2F>("deltaR_bot_q1_toppt", "x=p_T_tophad y=#Delta R(bot, q1)", 20, 0 , 1000,  40, 0, 4.0);
+  deltaR_bot_q2_toppt = book<TH2F>("deltaR_bot_q2_toppt", "x=p_T_tophad y=#Delta R(bot, q2)", 20, 0 , 1000,  40, 0, 4.0);
 
   // deltaR_lep1_jet3 = book<TH1F>("deltaR_lep1_jet3", "#Delta R(lep1,3rd Jet)", 80, 0, 4.0);
   // deltaR_lep2_jet3 = book<TH1F>("deltaR_lep2_jet3", "#Delta R(lep2,3rd Jet)", 80, 0, 4.0);
@@ -229,12 +233,12 @@ void GenHists::fill(const Event & event){
   }
   // pT of had. top
   GenParticle tophad = ttbargen.TopHad();
-  float tophadpt = tophad.pt();
+  double tophadpt = tophad.pt();
   TopHadPT->Fill(tophadpt, weight);
   
   // pT of lep. top
   GenParticle toplep = ttbargen.TopLep();
-  float topleppt = toplep.pt();
+  double topleppt = toplep.pt();
   TopLepPT->Fill(topleppt, weight);
 
   // delta R Hists
@@ -259,16 +263,16 @@ void GenHists::fill(const Event & event){
     deltaR_tophad_jet2->Fill(deltaR(jet2, tophad), weight);
     deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
   }
+
+  deltaR_q1_q2->Fill(deltaR(q1,q2), weight);
+  deltaR_bot_q1->Fill(deltaR(bot,q1), weight);
+  deltaR_bot_q2->Fill(deltaR(bot,q2), weight); 
   
-  if(jets.size() > 0){
-  double pt = jet1_v4.Pt();
-  double reff = 0;
-  if(pt < 400) reff = 0.1;
-  else if(pt >= 400 && pt <= 6000) reff = 600/pt;
-  else if(pt <= 6000) reff = 1.5;
-  Reff_HOTVR->Fill(reff, weight);
-  Mass_Reff_HOTVR->Fill(jet1_v4.M(), reff, weight);
-  }
+  deltaR_q1_q2_toppt->Fill(tophadpt, deltaR(q1,q2), weight);
+  deltaR_bot_q1_toppt->Fill(tophadpt, deltaR(bot,q1), weight);
+  deltaR_bot_q2_toppt->Fill(tophadpt, deltaR(bot,q2), weight);
+
+
   // if(jets.size() > 2){
   //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);
   //   deltaR_lep2_jet3->Fill(deltaR(jet3, lep2), weight);

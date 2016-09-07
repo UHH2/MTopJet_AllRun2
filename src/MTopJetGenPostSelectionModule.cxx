@@ -26,6 +26,7 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/GenSelections.h>
 #include <UHH2/MTopJet/include/GenHists.h>
+#include <UHH2/MTopJet/include/HOTVRHists.h>
 #include <UHH2/MTopJet/include/RecoHists.h>
 #include <UHH2/MTopJet/include/RecoGenHists.h>
 #include <UHH2/MTopJet/include/GenHists_topjet.h>
@@ -57,7 +58,8 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::AnalysisModule> cleaner_rec;
   std::unique_ptr<uhh2::AnalysisModule> cleaner_toprec;
 
-  std::unique_ptr<uhh2::AnalysisModule> jetprod; // to produce Jets
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen; // to produce Jets
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_rec; // to produce Jets
   std::unique_ptr<uhh2::Selection> matching;
   std::unique_ptr<uhh2::Selection> matching_HOTVR;
   std::unique_ptr<uhh2::Selection> topjetpt;
@@ -97,6 +99,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_GenHists0a, h_GenHists0b, h_GenHists1, h_GenHists2, h_GenHists3, h_GenHists4, h_GenHists1_m, h_GenHists2_m, h_GenHists3_m, h_GenHists4_m, h_GenHists4_m_HOTVR, h_GenHists1_u, h_GenHists2_u, h_GenHists3_u, h_GenHists4_u, h_GenHists4_u_HOTVR, h_GenHists5_LowMass, h_GenHists5_PeakMass, h_GenHists5_HighMass;
+  std::unique_ptr<Hists> h_HOTVRHists4, h_HOTVRHists4_u_HOTVR, h_HOTVRHists4_m_HOTVR, h_HOTVRHists5_LowMass, h_HOTVRHists5_PeakMass, h_HOTVRHists5_HighMass;
   std::unique_ptr<Hists> h_GenHists0a_top, h_GenHists0b_top, h_GenHists1_top, h_GenHists2_top, h_GenHists3_top, h_GenHists4_top, h_GenHists1_m_top, h_GenHists2_m_top, h_GenHists3_m_top, h_GenHists4_m_top, h_GenHists1_u_top, h_GenHists2_u_top, h_GenHists3_u_top, h_GenHists4_u_top;
   std::unique_ptr<Hists> h_RecHists0a, h_RecHists0b, h_RecHists0c, h_RecHists0d, h_RecHists1, h_RecHists2, h_RecHists3, h_RecHists4;
   std::unique_ptr<Hists> h_RecHists0a_top, h_RecHists0b_top, h_RecHists0c_top, h_RecHists0d_top, h_RecHists1_top, h_RecHists2_top, h_RecHists3_top, h_RecHists4_top;
@@ -111,12 +114,13 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   const bool isMC = (ctx.get("dataset_type") == "MC");
   
   // set up which jet to use/ possible are: ak06_gen, ak08_gen, ak10_gen, ak12_gen, ak08_rec, ak12_rec, HOTVR, HOTVR_rec, slimmedJetsAK8_SoftDrop, slimmedGenJetsAK8
-  const std::string jet_label_gen("HOTVR_gen");
-  const std::string jet_label_rec("HOTVR_rec");
-  const std::string jet_label_hotvr("HOTVR_rec");
+  const std::string jet_label_gen("HOTVRrho300_gen");
+  const std::string jet_label_rec("HOTVRrho300_rec");
+  const std::string jet_label_hotvr_gen("HOTVRrho300_gen");
+  const std::string jet_label_hotvr_rec("HOTVRrho300_rec");
   const std::string jet_label_xcone("xconeN3R4_rec");
-  float jet_radius = 1.5;
-  double rho = 600;
+  float jet_radius = 0.8;
+  double rho = 300;
   ////
 
   //// COMMON MODULES
@@ -126,7 +130,8 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
 
   // To produce Jets:
   // jetprod.reset(new RecoJetProducer(ctx, jet_label_rec, 150, jet_radius)); // set to akt algorithm
-  jetprod.reset(new RecoHOTVRJetProducer(ctx, jet_label_hotvr, rho));
+  jetprod_gen.reset(new GenHOTVRJetProducer(ctx, jet_label_hotvr_gen, rho));
+  jetprod_rec.reset(new RecoHOTVRJetProducer(ctx, jet_label_hotvr_rec, rho));
   // jetprod.reset(new RecoXCONEJetProducer(ctx, jet_label_xcone, 3, jet_radius, 2.0, 30));  //(context, jet_label, N, R, beta, ptmin)
 
 
@@ -184,6 +189,15 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   h_GenHists5_PeakMass.reset(new GenHists(ctx, "05_GenHists_PeakMass", jet_label_gen));
   h_GenHists5_HighMass.reset(new GenHists(ctx, "05_GenHists_HighMass", jet_label_gen));
 
+  // additional HOTVR Hists (Reff)
+  h_HOTVRHists4.reset(new HOTVRHists(ctx, "04_HOTVRHists_masscut", jet_label_gen, rho));
+  h_HOTVRHists4_m_HOTVR.reset(new HOTVRHists(ctx, "04_HOTVRHists_masscut_matched_HOTVR", jet_label_gen, rho));
+  h_HOTVRHists4_u_HOTVR.reset(new HOTVRHists(ctx, "04_HOTVRHists_masscut_unmatched_HOTVR", jet_label_gen, rho));
+  h_HOTVRHists5_LowMass.reset(new HOTVRHists(ctx, "05_HOTVRHists_LowMass", jet_label_gen, rho));
+  h_HOTVRHists5_PeakMass.reset(new HOTVRHists(ctx, "05_HOTVRHists_PeakMass", jet_label_gen, rho));
+  h_HOTVRHists5_HighMass.reset(new HOTVRHists(ctx, "05_HOTVRHists_HighMass", jet_label_gen, rho));
+
+  // Topjet GenHists
   h_GenHists0a_top.reset(new GenHists_topjet(ctx, "00a_GenHists_top_before_Cleaner"));
   h_GenHists0b_top.reset(new GenHists_topjet(ctx, "00b_GenHists_top_after_Cleaner"));
   h_GenHists1_top.reset(new GenHists_topjet(ctx, "01_GenHists_top_JetN"));
@@ -209,6 +223,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   h_RecHists3.reset(new RecoHists(ctx, "03_RecHists_deltaR", jet_label_rec));
   h_RecHists4.reset(new RecoHists(ctx, "04_RecHists_masscut", jet_label_rec));
 
+  //Topjet Reco
   h_RecHists0a_top.reset(new RecoHists_topjet(ctx, "00a_RecHists_top_before_Cleaner"));
   h_RecHists0b_top.reset(new RecoHists_topjet(ctx, "00b_RecHists_top_after_Cleaner"));
   h_RecHists0c_top.reset(new RecoHists_topjet(ctx, "00c_RecHists_top_LepSel"));
@@ -218,6 +233,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   h_RecHists3_top.reset(new RecoHists_topjet(ctx, "03_RecHists_top_deltaR"));
   h_RecHists4_top.reset(new RecoHists_topjet(ctx, "04_RecHists_top_masscut"));
 
+  // Reco Lepton
   h_Elec.reset(new ElectronHists(ctx, "ElecHist"));
   h_Muon.reset(new MuonHists(ctx, "MuonHist"));
   h_Elec2.reset(new ElectronHists(ctx, "ElecHist_after"));
@@ -307,7 +323,8 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
  
 
   if(produce_jet){
-    jetprod->process(event); // to produce jets
+    jetprod_gen->process(event); // to produce jets
+    jetprod_rec->process(event); // to produce jets
     return true;
   }
 
@@ -415,6 +432,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   if(!(produce_jet) && do_gensel  && !(masscut->passes(event))) return false;
   if(!(produce_jet) && do_gensel_top  && !(masscut_top->passes(event))) return false;
   h_GenHists4->fill(event);
+  h_HOTVRHists4->fill(event);
   h_GenHists4_top->fill(event);
   // apply matching
   if(!(produce_jet) && do_gensel  && matching->passes(event)){
@@ -431,9 +449,11 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   }
   if(!(produce_jet) && do_gensel  && matching_HOTVR->passes(event)){
     h_GenHists4_m_HOTVR->fill(event);
+    h_HOTVRHists4_m_HOTVR->fill(event);
   }
   if(!(produce_jet) && do_gensel  && !(matching_HOTVR->passes(event))){
     h_GenHists4_u_HOTVR->fill(event);
+    h_HOTVRHists4_u_HOTVR->fill(event);
   }
   // ===================================================================================
 
@@ -452,9 +472,18 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
     if(massbin5->passes(event)) h_RecGenHists5->fill(event);
     if(massbin6->passes(event)) h_RecGenHists6->fill(event);
     if(massbin7->passes(event)) h_RecGenHists7->fill(event);
-    if(massbin_HOTVR_low->passes(event)) h_GenHists5_LowMass->fill(event);
-    if(massbin_HOTVR_peak->passes(event)) h_GenHists5_PeakMass->fill(event);
-    if(massbin_HOTVR_high->passes(event)) h_GenHists5_HighMass->fill(event);
+    if(massbin_HOTVR_low->passes(event)){
+      h_GenHists5_LowMass->fill(event);
+      h_HOTVRHists5_LowMass->fill(event);
+    }
+    if(massbin_HOTVR_peak->passes(event)){
+      h_GenHists5_PeakMass->fill(event);
+      h_HOTVRHists5_PeakMass->fill(event);
+    }
+    if(massbin_HOTVR_high->passes(event)){
+      h_GenHists5_HighMass->fill(event);
+      h_HOTVRHists5_HighMass->fill(event);
+    }
   }
   if(!(produce_jet) && do_gensel_top){
     h_RecGenHists0_top->fill(event);
