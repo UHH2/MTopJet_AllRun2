@@ -52,12 +52,17 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
   deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
 
-  deltaR_q1_q2 = book<TH1F>("deltaR_q1_q2", "#Delta R(q1, q2)", 80, 0, 4.0);
-  deltaR_bot_q1 = book<TH1F>("deltaR_bot_q1", "#Delta R(bot, q1)", 80, 0, 4.0);
-  deltaR_bot_q2 = book<TH1F>("deltaR_bot_q2", "#Delta R(bot, q2)", 80, 0, 4.0);
-  deltaR_q1_q2_toppt = book<TH2F>("deltaR_q1_q2_toppt", "x=p_T_tophad y=#Delta R(q1, q2)", 20, 0 , 1000, 40, 0, 4.0);
-  deltaR_bot_q1_toppt = book<TH2F>("deltaR_bot_q1_toppt", "x=p_T_tophad y=#Delta R(bot, q1)", 20, 0 , 1000,  40, 0, 4.0);
-  deltaR_bot_q2_toppt = book<TH2F>("deltaR_bot_q2_toppt", "x=p_T_tophad y=#Delta R(bot, q2)", 20, 0 , 1000,  40, 0, 4.0);
+  dR_GenParts_highest = book<TH1F>("dR_GenParts_largest_for_partons", "highest #Delta R between top had products", 80, 0, 4.0);
+  dR_GenParts_lowest = book<TH1F>("dR_GenParts_lowest_for_partons", "lowest #Delta R between top had products", 80, 0, 4.0);
+  dR_GenParts_highest_toppt = book<TH2F>("dR_GenParts_largest_for_partons_toppt", "x=p_T_tophad y=#Delta R(high)", 20, 0 , 1000, 40, 0, 4.0);
+  dR_GenParts_lowest_toppt = book<TH2F>("dR_GenParts_lowest_for_partons_toppt", "x=p_T_tophad y=#Delta R(low)", 20, 0 , 1000, 40, 0, 4.0);
+
+  dR_GenParts_q1_q2 = book<TH1F>("dR_GenParts_q1_q2", "#Delta R(q1, q2)", 80, 0, 4.0);
+  dR_GenParts_bot_q1 = book<TH1F>("dR_GenParts_bot_q1", "#Delta R(bot, q1)", 80, 0, 4.0);
+  dR_GenParts_bot_q2 = book<TH1F>("dR_GenParts_bot_q2", "#Delta R(bot, q2)", 80, 0, 4.0);
+  dR_GenParts_q1_q2_toppt = book<TH2F>("dR_GenParts_q1_q2_toppt", "x=p_T_tophad y=#Delta R(q1, q2)", 20, 0 , 1000, 40, 0, 4.0);
+  dR_GenParts_bot_q1_toppt = book<TH2F>("dR_GenParts_bot_q1_toppt", "x=p_T_tophad y=#Delta R(bot, q1)", 20, 0 , 1000,  40, 0, 4.0);
+  dR_GenParts_bot_q2_toppt = book<TH2F>("dR_GenParts_bot_q2_toppt", "x=p_T_tophad y=#Delta R(bot, q2)", 20, 0 , 1000,  40, 0, 4.0);
 
   // deltaR_lep1_jet3 = book<TH1F>("deltaR_lep1_jet3", "#Delta R(lep1,3rd Jet)", 80, 0, 4.0);
   // deltaR_lep2_jet3 = book<TH1F>("deltaR_lep2_jet3", "#Delta R(lep2,3rd Jet)", 80, 0, 4.0);
@@ -264,14 +269,26 @@ void GenHists::fill(const Event & event){
     deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
   }
 
-  deltaR_q1_q2->Fill(deltaR(q1,q2), weight);
-  deltaR_bot_q1->Fill(deltaR(bot,q1), weight);
-  deltaR_bot_q2->Fill(deltaR(bot,q2), weight); 
+  dR_GenParts_q1_q2->Fill(deltaR(q1,q2), weight);
+  dR_GenParts_bot_q1->Fill(deltaR(bot,q1), weight);
+  dR_GenParts_bot_q2->Fill(deltaR(bot,q2), weight); 
   
-  deltaR_q1_q2_toppt->Fill(tophadpt, deltaR(q1,q2), weight);
-  deltaR_bot_q1_toppt->Fill(tophadpt, deltaR(bot,q1), weight);
-  deltaR_bot_q2_toppt->Fill(tophadpt, deltaR(bot,q2), weight);
+  dR_GenParts_q1_q2_toppt->Fill(tophadpt, deltaR(q1,q2), weight);
+  dR_GenParts_bot_q1_toppt->Fill(tophadpt, deltaR(bot,q1), weight);
+  dR_GenParts_bot_q2_toppt->Fill(tophadpt, deltaR(bot,q2), weight);
 
+  double dR_high, dR_low;
+  dR_low = deltaR(q1,q2);
+  if(deltaR(bot,q1) < dR_low) dR_low = deltaR(bot,q1); 
+  if(deltaR(bot,q2) < dR_low) dR_low = deltaR(bot,q2); 
+  dR_high = deltaR(q1,q2);
+  if(deltaR(bot,q1) > dR_high) dR_high = deltaR(bot,q1); 
+  if(deltaR(bot,q2) > dR_high) dR_high = deltaR(bot,q2); 
+
+  dR_GenParts_highest->Fill(dR_high, weight);
+  dR_GenParts_lowest->Fill(dR_low, weight);
+  dR_GenParts_highest_toppt->Fill(tophadpt, dR_high, weight);
+  dR_GenParts_lowest_toppt->Fill(tophadpt, dR_low, weight);
 
   // if(jets.size() > 2){
   //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);

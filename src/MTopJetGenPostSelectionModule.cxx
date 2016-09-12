@@ -30,6 +30,7 @@
 #include <UHH2/MTopJet/include/RecoHists.h>
 #include <UHH2/MTopJet/include/RecoGenHists.h>
 #include <UHH2/MTopJet/include/GenHists_topjet.h>
+#include <UHH2/MTopJet/include/GenHists_ak04.h>
 #include <UHH2/MTopJet/include/RecoHists_topjet.h>
 #include <UHH2/MTopJet/include/RecoGenHists_topjet.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
@@ -106,6 +107,8 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_RecGenHists0, h_RecGenHists1, h_RecGenHists2, h_RecGenHists3, h_RecGenHists4, h_RecGenHists5, h_RecGenHists6, h_RecGenHists7;
   std::unique_ptr<Hists> h_RecGenHists0_top, h_RecGenHists1_top, h_RecGenHists2_top, h_RecGenHists3_top, h_RecGenHists4_top, h_RecGenHists5_top, h_RecGenHists6_top, h_RecGenHists7_top;
   std::unique_ptr<Hists> h_Elec, h_Muon, h_Elec2, h_Muon2;
+  std::unique_ptr<Hists> h_GenHists4_ak04;
+
 };
 
 MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx){
@@ -114,12 +117,12 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   const bool isMC = (ctx.get("dataset_type") == "MC");
   
   // set up which jet to use/ possible are: ak06_gen, ak08_gen, ak10_gen, ak12_gen, ak08_rec, ak12_rec, HOTVR, HOTVR_rec, slimmedJetsAK8_SoftDrop, slimmedGenJetsAK8
-  const std::string jet_label_gen("HOTVRrho300_gen");
-  const std::string jet_label_rec("HOTVRrho300_rec");
+  const std::string jet_label_gen("xconeN2R4_gen");
+  const std::string jet_label_rec("xconeN2R4_rec");
   const std::string jet_label_hotvr_gen("HOTVRrho300_gen");
   const std::string jet_label_hotvr_rec("HOTVRrho300_rec");
   const std::string jet_label_xcone("xconeN3R4_rec");
-  float jet_radius = 0.8;
+  float jet_radius = 0.4;
   double rho = 300;
   ////
 
@@ -212,6 +215,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   h_GenHists4_top.reset(new GenHists_topjet(ctx, "04_GenHists_top_masscut"));
   h_GenHists4_m_top.reset(new GenHists_topjet(ctx, "04_GenHists_top_masscut_matched"));
   h_GenHists4_u_top.reset(new GenHists_topjet(ctx, "04_GenHists_top_masscut_unmatched"));
+  h_GenHists4_ak04.reset(new GenHists_topjet(ctx, "04_GenHists_ak04_masscut"));
 
   //RECO
   h_RecHists0a.reset(new RecoHists(ctx, "00a_RecHists_before_Cleaner", jet_label_rec));
@@ -434,6 +438,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   h_GenHists4->fill(event);
   h_HOTVRHists4->fill(event);
   h_GenHists4_top->fill(event);
+  h_GenHists4_ak04->fill(event);
   // apply matching
   if(!(produce_jet) && do_gensel  && matching->passes(event)){
     h_GenHists4_m->fill(event);

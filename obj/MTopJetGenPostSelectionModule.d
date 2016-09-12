@@ -355,6 +355,7 @@ obj/MTopJetGenPostSelectionModule.o: \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/RecoHists.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/RecoGenHists.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/GenHists_topjet.h \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/GenHists_ak04.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/RecoHists_topjet.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/RecoGenHists_topjet.h \
  /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/MTopJetUtils.h
