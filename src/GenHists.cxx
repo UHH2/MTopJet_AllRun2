@@ -26,6 +26,8 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   GenJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
   GenJet1Jet2PT = book<TH1F>("pt_jet1-pt_jet2", "p_{T,jet1} - p_{T,jet2}", 80, -400, 400);
   GenJet3PT = book<TH1F>("pt_jet3", "p_{T}", 50, 0, 1000);
+  GenJet4PT = book<TH1F>("pt_jet4", "p_{T}", 50, 0, 1000);
+  GenJet5PT = book<TH1F>("pt_jet5", "p_{T}", 50, 0, 1000);
   GenJetPT = book<TH1F>("pt_all_jets", "p_{T}", 50, 0, 1000);
   LeptonPT = book<TH1F>("pt_lepton", "p_{T}", 50, 0, 1000);
 
@@ -63,6 +65,11 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   dR_GenParts_q1_q2_toppt = book<TH2F>("dR_GenParts_q1_q2_toppt", "x=p_T_tophad y=#Delta R(q1, q2)", 20, 0 , 1000, 40, 0, 4.0);
   dR_GenParts_bot_q1_toppt = book<TH2F>("dR_GenParts_bot_q1_toppt", "x=p_T_tophad y=#Delta R(bot, q1)", 20, 0 , 1000,  40, 0, 4.0);
   dR_GenParts_bot_q2_toppt = book<TH2F>("dR_GenParts_bot_q2_toppt", "x=p_T_tophad y=#Delta R(bot, q2)", 20, 0 , 1000,  40, 0, 4.0);
+
+  Eta_Phi_jet1 = book<TH2F>("Eta_Phi_jet1", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
+  Eta_Phi_bot = book<TH2F>("Eta_Phi_bot", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
+  Eta_Phi_q1 = book<TH2F>("Eta_Phi_q1", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
+  Eta_Phi_q2 = book<TH2F>("Eta_Phi_q2", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
 
   // deltaR_lep1_jet3 = book<TH1F>("deltaR_lep1_jet3", "#Delta R(lep1,3rd Jet)", 80, 0, 4.0);
   // deltaR_lep2_jet3 = book<TH1F>("deltaR_lep2_jet3", "#Delta R(lep2,3rd Jet)", 80, 0, 4.0);
@@ -236,6 +243,12 @@ void GenHists::fill(const Event & event){
   if((jets.size()) > 2){
     GenJet3PT->Fill(jets.at(2).pt(),weight);
   }
+  if((jets.size()) > 3){
+    GenJet4PT->Fill(jets.at(3).pt(),weight);
+  }
+  if((jets.size()) > 4){
+    GenJet5PT->Fill(jets.at(4).pt(),weight);
+  }
   // pT of had. top
   GenParticle tophad = ttbargen.TopHad();
   double tophadpt = tophad.pt();
@@ -290,6 +303,13 @@ void GenHists::fill(const Event & event){
   dR_GenParts_highest_toppt->Fill(tophadpt, dR_high, weight);
   dR_GenParts_lowest_toppt->Fill(tophadpt, dR_low, weight);
 
+
+  if(jets.size() > 0){
+    Eta_Phi_jet1->Fill(jet1_v4.Eta(), jet1_v4.Phi(), weight);
+    Eta_Phi_bot->Fill(bot.eta(), bot.phi(), weight);
+    Eta_Phi_q1->Fill(q1.eta(), q1.phi(), weight);
+    Eta_Phi_q2->Fill(q2.eta(), q2.phi(), weight);
+  }
   // if(jets.size() > 2){
   //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);
   //   deltaR_lep2_jet3->Fill(deltaR(jet3, lep2), weight);

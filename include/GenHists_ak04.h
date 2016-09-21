@@ -35,7 +35,7 @@ protected:
     /* TH1F *deltaR_bot_jet6, *deltaR_botlep_jet6,*deltaR_q1_jet6, *deltaR_q2_jet6, *deltaR_lep1_jet6, *deltaR_lep2_jet6, *deltaR_tophad_jet6, *deltaR_toplep_jet6; */
     
     uhh2::Event::Handle<TTbarGen>h_ttbargen;
-    uhh2::Event::Handle<std::vector<Jet>>h_genjets;
+    uhh2::Event::Handle<std::vector<Particle>>h_genjets;
 };
 
 

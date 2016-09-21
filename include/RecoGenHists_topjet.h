@@ -23,7 +23,7 @@ public:
 protected:
 
     TH1F *MassReso, *PtReso;
-    TH1F *DeltaR_Rec1_Gen1, *DeltaR_Rec2_Gen2;
+    TH1F *DeltaR_Rec1_Gen1, *DeltaR_Rec2_Gen2, *GenJetMass;
     TH1F *pt_rec1_gen1_beforeMatching, *pt_rec2_gen2_beforeMatching, *pt_rec1_gen1_afterMatching, *pt_rec2_gen2_afterMatching;
 
     uhh2::Event::Handle<std::vector<TopJet>>h_recjets;

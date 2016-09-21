@@ -518,7 +518,7 @@ uhh2::MassCutGen1::MassCutGen1(uhh2::Context& ctx, const std::string & name, flo
 bool MassCutGen1::passes(const uhh2::Event& event){
   std::vector<Jet> jets = event.get(h_jets);
   TLorentzVector jet1_v4;
-  jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy());
+  jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
   return (M_min_ < jet1_v4.M() && jet1_v4.M() < M_max_);
 }
 
@@ -531,6 +531,6 @@ uhh2::MassCutGen1_top::MassCutGen1_top(uhh2::Context& ctx, float M_min, float M_
 bool MassCutGen1_top::passes(const uhh2::Event& event){
   std::vector<GenTopJet> jets = event.get(h_gentopjets);
   TLorentzVector jet1_v4;
-  jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy());
+  jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
   return (M_min_ < jet1_v4.M() && jet1_v4.M() < M_max_);
 }

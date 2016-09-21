@@ -9,7 +9,7 @@
 
   <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_semilep.root"> -->
   <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_ak06gen_ak08gen_ak10gen_ak12gen_ak08rec_ak12rec_HOTVR_HOTVRrec_XCone_XConerec.root"> -->
-  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_topjet_topjetgen_ak08gen_ak08rec_xconeN2R4gen_xconeN2R4rec_xconeN3R4gen_xconeN3R4rec_HOTVRgen_HOTVRrec_HOTVRrho500gen_HOTVRrho500rec_HOTVRrho400gen_HOTVRrho400rec_HOTVRrho300gen_HOTVRrho300rec.root">
+  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_topjet_ak08_xconeN2R4_xconeN3R4_HOTVR_HOTVRrho500_HOTVRrho400_HOTVRrho300_xconeN5R4_xconeN5R4merged.root">
 ]>
 
 <!--
@@ -50,7 +50,7 @@
 	<!-- <Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/> -->
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec xconeN2R4_gen xconeN2R4_rec xconeN3R4_gen xconeN3R4_rec HOTVR_gen HOTVR_rec HOTVRrho500_gen HOTVRrho500_rec HOTVRrho400_gen HOTVRrho400_rec HOTVRrho300_gen HOTVRrho300_rec"/>
+	<Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec xconeN2R4_gen xconeN2R4_rec xconeN3R4_gen xconeN3R4_rec HOTVR_gen HOTVR_rec HOTVRrho500_gen HOTVRrho500_rec HOTVRrho400_gen HOTVRrho400_rec HOTVRrho300_gen HOTVRrho300_rec xconeN5R4_gen xconeN5R4_rec xconeN5R4_gen_merged xconeN5R4_rec_merged"/>
 
 	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
         <Item Name="METName"                 Value="slimmedMETs"/>

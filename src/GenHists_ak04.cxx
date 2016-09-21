@@ -94,7 +94,7 @@ GenHists_ak04::GenHists_ak04(uhh2::Context & ctx, const std::string & dirname): 
   // handle for TTbarGen class
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
   // handle for clustered jets
-  h_genjets=ctx.get_handle<std::vector<Jet>>("genjets");
+  h_genjets=ctx.get_handle<std::vector<Particle>>("genjets");
 }
 
 
@@ -131,9 +131,9 @@ void GenHists_ak04::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   const auto & ttbargen = event.get(h_ttbargen);
   // define all objects needed
-  std::vector<Jet> jets = event.get(h_genjets);
+  std::vector<Particle> jets = event.get(h_genjets);
   TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4, topjet1_v4, topjet2_v4;
-  Jet jet1,jet2,jet3,jet4,jet5,jet6;
+  Particle jet1,jet2,jet3,jet4,jet5,jet6;
   if(jets.size()>0) jet1 = jets.at(0);
   if(jets.size()>1) jet2 = jets.at(1);
   // if(jets.size()>2) jet3 = jets.at(2);

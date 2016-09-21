@@ -25,6 +25,7 @@ RecoGenHists_topjet::RecoGenHists_topjet(uhh2::Context & ctx, const std::string 
   pt_rec2_gen2_beforeMatching = book<TH1F>("pt_rec2_gen2_beforeMatching", "p^{rec}_{T, jet2} - p^{gen}_{T, jet2}", 30, -300, 300);
   pt_rec1_gen1_afterMatching = book<TH1F>("pt_rec1_gen1_afterMatching", "p^{rec}_{T, jet1} - p^{gen}_{T, jet1}", 30, -300, 300);
   pt_rec2_gen2_afterMatching = book<TH1F>("pt_rec2_gen2_afterMatching", "p^{rec}_{T, jet2} - p^{gen}_{T, jet2}", 30, -300, 300);
+  GenJetMass = book<TH1F>("GenJetMass", "M^{gen}_{jet1}", 50, 0, 500);
 
   // handle for clustered jets
   h_recjets=ctx.get_handle<std::vector<TopJet>>("topjets");
@@ -90,6 +91,7 @@ void RecoGenHists_topjet::fill(const Event & event){
       pt_rec2_gen2_beforeMatching->Fill( rec_jet2_v4.Pt() - gen_jet2_v4.Pt(), weight);
     }
     if(deltaR(rec_jet1, gen_jet1) < 1){
+      GenJetMass->Fill(gen_jet1_v4.M(), weight);
       MassReso->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
       PtReso->Fill( (rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
       pt_rec1_gen1_afterMatching->Fill( rec_jet1_v4.Pt() - gen_jet1_v4.Pt(), weight);

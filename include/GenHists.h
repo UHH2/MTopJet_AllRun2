@@ -24,7 +24,7 @@ protected:
 
     TH1F *GenJetNumber;
     TH1F *GenJet1Mass, *Mass1Mass2;
-    TH1F *GenJet1PT, *GenJet2PT, *GenJet1Jet2PT, *GenJet3PT, *LeptonPT, *GenJetPT;
+    TH1F *GenJet1PT, *GenJet2PT, *GenJet3PT, *GenJet4PT, *GenJet5PT, *GenJet1Jet2PT, *LeptonPT, *GenJetPT;
     TH1F *GenJet2Eta;
     TH1F *TopHadPT, *TopLepPT;
     TH1F *deltaR_bot_jet1, *deltaR_botlep_jet1,*deltaR_q1_jet1, *deltaR_q2_jet1, *deltaR_lep1_jet1, *deltaR_lep2_jet1, *deltaR_tophad_jet1, *deltaR_toplep_jet1;
@@ -35,7 +35,8 @@ protected:
     /* TH1F *deltaR_bot_jet4, *deltaR_botlep_jet4,*deltaR_q1_jet4, *deltaR_q2_jet4, *deltaR_lep1_jet4, *deltaR_lep2_jet4, *deltaR_tophad_jet4, *deltaR_toplep_jet4; */
     /* TH1F *deltaR_bot_jet5, *deltaR_botlep_jet5,*deltaR_q1_jet5, *deltaR_q2_jet5, *deltaR_lep1_jet5, *deltaR_lep2_jet5, *deltaR_tophad_jet5, *deltaR_toplep_jet5; */
     /* TH1F *deltaR_bot_jet6, *deltaR_botlep_jet6,*deltaR_q1_jet6, *deltaR_q2_jet6, *deltaR_lep1_jet6, *deltaR_lep2_jet6, *deltaR_tophad_jet6, *deltaR_toplep_jet6; */
-    
+    TH2F *Eta_Phi_jet1, *Eta_Phi_bot, *Eta_Phi_q1, *Eta_Phi_q2;
+
     uhh2::Event::Handle<TTbarGen>h_ttbargen;
     uhh2::Event::Handle<std::vector<Jet>>h_jets;
 };

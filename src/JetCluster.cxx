@@ -384,5 +384,156 @@ bool GenXCONEJetProducer::process(uhh2::Event & event){
   delete jetc;
   return true;
 }
+
+// ------------------------------------ merging XCone Gen Jets -------------------------------------------------------------------
+MergeXConeGen::MergeXConeGen(uhh2::Context & ctx, const std::string & in_jet, const std::string & out_jet):
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+  h_injets(ctx.get_handle<std::vector<Jet>>(in_jet)),
+  h_newjets(ctx.declare_event_output<std::vector<Jet>>(out_jet)) {}
+
+bool MergeXConeGen::process(uhh2::Event & event){
+
+  // get Lepton from TTbar
+  const auto & ttbargen = event.get(h_ttbargen);
+  GenParticle lep1, lep2, lepton;
+  if(ttbargen.IsTopHadronicDecay()){
+    lep1 = ttbargen.WMinusdecay1();
+    lep2 = ttbargen.WMinusdecay2();
+  }
+  else if(ttbargen.IsAntiTopHadronicDecay()){
+    lep1 = ttbargen.Wdecay1();
+    lep2 = ttbargen.Wdecay2();
+  }
+  if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+    lepton = lep1;
+  }
+  else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+    lepton = lep2;
+  }
+
+  // get distance to jets
+  std::vector<Jet> jets = event.get(h_injets);
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, combinedjet1_v4, combinedjet2_v4;
+  Jet jet1;
+  jet1 = jets.at(0);
+  float dR1, dR2, dR3, dR4;
+  if(jets.size() > 3){
+    jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
+    jet2_v4.SetPxPyPzE(jets.at(1).v4().Px(), jets.at(1).v4().Py(), jets.at(1).v4().Pz(), jets.at(1).v4().E()); 
+    jet3_v4.SetPxPyPzE(jets.at(2).v4().Px(), jets.at(2).v4().Py(), jets.at(2).v4().Pz(), jets.at(2).v4().E()); 
+    jet4_v4.SetPxPyPzE(jets.at(3).v4().Px(), jets.at(3).v4().Py(), jets.at(3).v4().Pz(), jets.at(3).v4().E()); 
+  
+    // claculate distance to Lepton
+    dR1 = uhh2::deltaR(jet1, lepton);
+    dR2 = uhh2::deltaR(jets.at(1), lepton);
+    dR3 = uhh2::deltaR(jets.at(2), lepton);
+    dR4 = uhh2::deltaR(jets.at(3), lepton);
+    if(dR1 < dR2 && dR1 < dR3 && dR1 < dR4){
+      combinedjet1_v4 = jet2_v4 + jet3_v4 + jet4_v4;
+      combinedjet2_v4 = jet1_v4;
+    }
+    if(dR2 < dR1 && dR2 < dR3 && dR2 < dR4){
+      combinedjet1_v4 = jet1_v4 + jet3_v4 + jet4_v4;
+      combinedjet2_v4 = jet2_v4;
+    }    
+    if(dR3 < dR1 && dR3 < dR2 && dR3 < dR4){
+      combinedjet1_v4 = jet1_v4 + jet2_v4 + jet4_v4;
+      combinedjet2_v4 = jet3_v4;
+    }
+    if(dR4 < dR1 && dR4 < dR2 && dR4 < dR3){
+      combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+      combinedjet2_v4 = jet4_v4;
+    }
+  }
+
+  std::vector<Jet> new_jets;
+  Jet new_jet1, new_jet2;
+  // TLorentzVector jet;
+  new_jet1.set_pt(combinedjet1_v4.Pt());
+  new_jet1.set_eta(combinedjet1_v4.Eta());
+  new_jet1.set_phi(combinedjet1_v4.Phi());
+  new_jet1.set_energy(combinedjet1_v4.E());
+  new_jet2.set_pt(combinedjet2_v4.Pt());
+  new_jet2.set_eta(combinedjet2_v4.Eta());
+  new_jet2.set_phi(combinedjet2_v4.Phi());
+  new_jet2.set_energy(combinedjet2_v4.E());
+
+  new_jets.push_back(new_jet1);
+  new_jets.push_back(new_jet2);
+  event.set(h_newjets, new_jets);
+
+  return true;
+}
+
+// ------------------------------------ merging XCone Reco Jets -------------------------------------------------------------------
+MergeXConeReco::MergeXConeReco(uhh2::Context & ctx, const std::string & in_jet, const std::string & out_jet):
+  h_injets(ctx.get_handle<std::vector<Jet>>(in_jet)),
+  h_newjets(ctx.declare_event_output<std::vector<Jet>>(out_jet)) {}
+
+bool MergeXConeReco::process(uhh2::Event & event){
+
+  // get Reco Lepton
+  Particle lepton;
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+  }
+
+  // get distance to jets
+  std::vector<Jet> jets = event.get(h_injets);
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, combinedjet1_v4, combinedjet2_v4;
+  Jet jet1;
+  jet1 = jets.at(0);
+  float dR1, dR2, dR3, dR4;
+  if(jets.size() > 3){
+    jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
+    jet2_v4.SetPxPyPzE(jets.at(1).v4().Px(), jets.at(1).v4().Py(), jets.at(1).v4().Pz(), jets.at(1).v4().E()); 
+    jet3_v4.SetPxPyPzE(jets.at(2).v4().Px(), jets.at(2).v4().Py(), jets.at(2).v4().Pz(), jets.at(2).v4().E()); 
+    jet4_v4.SetPxPyPzE(jets.at(3).v4().Px(), jets.at(3).v4().Py(), jets.at(3).v4().Pz(), jets.at(3).v4().E()); 
+  
+    // claculate distance to Lepton
+    dR1 = uhh2::deltaR(jet1, lepton);
+    dR2 = uhh2::deltaR(jets.at(1), lepton);
+    dR3 = uhh2::deltaR(jets.at(2), lepton);
+    dR4 = uhh2::deltaR(jets.at(3), lepton);
+    if(dR1 < dR2 && dR1 < dR3 && dR1 < dR4){
+      combinedjet1_v4 = jet2_v4 + jet3_v4 + jet4_v4;
+      combinedjet2_v4 = jet1_v4;
+    }
+    if(dR2 < dR1 && dR2 < dR3 && dR2 < dR4){
+      combinedjet1_v4 = jet1_v4 + jet3_v4 + jet4_v4;
+      combinedjet2_v4 = jet2_v4;
+    }    
+    if(dR3 < dR1 && dR3 < dR2 && dR3 < dR4){
+      combinedjet1_v4 = jet1_v4 + jet2_v4 + jet4_v4;
+      combinedjet2_v4 = jet3_v4;
+    }
+    if(dR4 < dR1 && dR4 < dR2 && dR4 < dR3){
+      combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+      combinedjet2_v4 = jet4_v4;
+    }
+  }
+
+  std::vector<Jet> new_jets;
+  Jet new_jet1, new_jet2;
+  // TLorentzVector jet;
+  new_jet1.set_pt(combinedjet1_v4.Pt());
+  new_jet1.set_eta(combinedjet1_v4.Eta());
+  new_jet1.set_phi(combinedjet1_v4.Phi());
+  new_jet1.set_energy(combinedjet1_v4.E());
+  new_jet2.set_pt(combinedjet2_v4.Pt());
+  new_jet2.set_eta(combinedjet2_v4.Eta());
+  new_jet2.set_phi(combinedjet2_v4.Phi());
+  new_jet2.set_energy(combinedjet2_v4.E());
+
+  new_jets.push_back(new_jet1);
+  new_jets.push_back(new_jet2);
+  event.set(h_newjets, new_jets);
+
+  return true;
+}
+
 // --------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------

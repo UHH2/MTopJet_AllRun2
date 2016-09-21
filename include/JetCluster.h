@@ -7,7 +7,7 @@
 #include <fastjet/ClusterSequence.hh>
 #include <fastjet/ClusterSequenceArea.hh>
 #include <fastjet/GhostedAreaSpec.hh>
-
+#include "UHH2/core/include/PFParticle.h"
 
 #include "UHH2/common/include/Utils.h"
 #include "UHH2/core/include/Jet.h"
@@ -153,4 +153,27 @@ private:
   double R0_;
   double beta_;
   double ptmin_;
+};
+
+class MergeXConeGen: public uhh2::AnalysisModule{
+public:
+
+  explicit MergeXConeGen(uhh2::Context&, const std::string &, const std::string &);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<TTbarGen>h_ttbargen;
+  uhh2::Event::Handle<std::vector<Jet>>h_injets;
+  uhh2::Event::Handle<std::vector<Jet>>h_newjets;
+};
+
+class MergeXConeReco: public uhh2::AnalysisModule{
+public:
+
+  explicit MergeXConeReco(uhh2::Context&, const std::string &, const std::string &);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_injets;
+  uhh2::Event::Handle<std::vector<Jet>>h_newjets;
 };
