@@ -117,8 +117,8 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   const bool isMC = (ctx.get("dataset_type") == "MC");
   
   // set up which jet to use, possible are: ak06_gen, ak08_gen, ak10_gen, ak12_gen, ak08_rec, ak12_rec, HOTVR, HOTVR_rec, ...
-  const std::string jet_label_gen("xconeN5R4_gen_merged");
-  const std::string jet_label_rec("xconeN5R4_rec_merged");
+  const std::string jet_label_gen("ak08_gen");
+  const std::string jet_label_rec("ak08_rec");
   const std::string jet_label_hotvr_gen("HOTVRrho300_gen");
   const std::string jet_label_hotvr_rec("HOTVRrho300_rec");
   const std::string jet_label_xcone_rec("xconeN5R4_rec_merged");
@@ -277,7 +277,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
  
   // GEN Top
   n_genjets_top.reset(new NGenTopJets(ctx, 200, 2, 2));  // ==2 jets with pt > 200 (topjets are produced >~ 180)
-  topjetpt_top.reset(new LeadingTopJetPT(ctx, 400)); // leading jet pt > 400
+  topjetpt_top.reset(new LeadingTopJetPT(ctx, 450)); // leading jet pt > 400
   deltaR_top.reset(new DeltaRCut_top(ctx, 0.8)); 
   masscut_top.reset(new MassCut_top(ctx));
   matching_top.reset(new Matching_top(ctx, 0.8));  ////
@@ -320,8 +320,8 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   //  COMMON MODULES
   // ================ set to true / false to run analysis =============================
   bool produce_jet = false;
-  bool do_gensel = true;
-  bool do_gensel_top = false;
+  bool do_gensel = false;
+  bool do_gensel_top = true;
   bool do_recsel = false;
   // ==================================================================================
 
@@ -353,7 +353,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // Cleaner
   if(!(produce_jet)){
     cleaner_gen->process(event);
-    // cleaner_topgen->process(event);
+    cleaner_topgen->process(event);
  
     // Cleaner for reco objects
     muoSR_cleaner->process(event);

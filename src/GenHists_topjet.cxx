@@ -22,7 +22,15 @@ GenHists_topjet::GenHists_topjet(uhh2::Context & ctx, const std::string & dirnam
   GenJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
   GenJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  GenJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
+  GenJet2Mass_scale = book<TH1F>("M_jet2_scale", "M_{jet}", 150, -5, 10);
+  GenJet2LepMass = book<TH1F>("M_jet2_lep", "M_{jet2 + lepton}", 50, 0, 500);
+  GenJet2LepMass_scale = book<TH1F>("M_jet2_lep_scale", "M_{jet2 + lepton}", 150, -5, 10);
+  GenJet2MassBool = book<TH1F>("Mass_jet2_0", "is M_{jet2} == 0", 2, 0, 1);
+  GenJet2LepMassBool = book<TH1F>("Mass_jet2_lep_0", "is M_{jet2 + lep} == 0", 2, 0, 1);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
+
+  GenJet1MassJet2LepMass = book<TH2F>("M_jet1_jet2", "x=M_{jet1} y=M_{jet2_lep}", 25, 0, 500, 25, 0, 500);
  
   GenJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   GenJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
@@ -217,11 +225,16 @@ void GenHists_topjet::fill(const Event & event){
 
   if((jets.size()) > 1){
     GenJet1Mass->Fill(jet1_v4.M(),weight);
+    GenJet2Mass->Fill(jet2_v4.M(),weight);
+    GenJet2Mass_scale->Fill(jet2_v4.M(),weight);
+    GenJet2LepMass->Fill(jet2_lep_v4.M(),weight);
+    GenJet2LepMass_scale->Fill(jet2_lep_v4.M(),weight);
     GenJet1PT->Fill(jet1_v4.Pt(),weight);
     GenJet2PT->Fill(jet2_v4.Pt(),weight);
     GenJet2Eta->Fill(jet2_v4.Eta(),weight);
     Mass1Mass2->Fill(jet1_v4.M() - jet2_lep_v4.M(), weight);
     GenJet1Jet2PT->Fill(jet1_v4.Pt() - jet2_v4.Pt(),weight);
+    GenJet1MassJet2LepMass->Fill(jet1_v4.M(), jet2_lep_v4.M(), weight);
   }
   if((jets.size()) > 2){
     GenJet3PT->Fill(jets.at(2).pt(),weight);
@@ -235,6 +248,19 @@ void GenHists_topjet::fill(const Event & event){
   GenParticle toplep = ttbargen.TopLep();
   float topleppt = toplep.pt();
   TopLepPT->Fill(topleppt, weight);
+
+  // check M(jet2) == 0
+  if(jets.size() > 1){
+    float mass0, mass0b;
+    if(jet2_v4.M() == 0) mass0 = 0.9;
+    else mass0 = 0.1;
+    if(jet2_lep_v4.M() == 0) mass0b = 0.9;
+    else mass0b = 0.1;
+    GenJet2MassBool->Fill(mass0, weight);
+    GenJet2LepMassBool->Fill(mass0b, weight);
+  }
+
+  
 
   // delta R Hists
   if(jets.size() > 0){

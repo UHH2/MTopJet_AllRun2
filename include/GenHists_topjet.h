@@ -23,7 +23,8 @@ public:
 protected:
 
     TH1F *GenJetNumber;
-    TH1F *GenJet1Mass, *Mass1Mass2;
+    TH1F *GenJet1Mass, *GenJet2Mass, *GenJet2MassBool, *GenJet2LepMassBool, *GenJet2LepMass, *GenJet2Mass_scale, *GenJet2LepMass_scale, *Mass1Mass2;
+    TH2F *GenJet1MassJet2LepMass;
     TH1F *GenJet1PT, *GenJet2PT, *GenJet1Jet2PT, *GenJet3PT, *LeptonPT, *GenJetPT;
     TH1F *GenJet2Eta;
     TH1F *TopHadPT, *TopLepPT;

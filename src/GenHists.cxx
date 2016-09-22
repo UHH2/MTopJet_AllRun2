@@ -20,6 +20,8 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   GenJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
   GenJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  GenJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
+  GenJet2LepMass = book<TH1F>("GenJet2LepMass", "M_{jet2 + lepton}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
   GenJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
@@ -234,6 +236,8 @@ void GenHists::fill(const Event & event){
 
   if((jets.size()) > 1){
     GenJet1Mass->Fill(jet1_v4.M(),weight);
+    GenJet2Mass->Fill(jet2_v4.M(),weight);
+    GenJet2LepMass->Fill(jet2_lep_v4.M(),weight);
     GenJet1PT->Fill(jet1_v4.Pt(),weight);
     GenJet2PT->Fill(jet2_v4.Pt(),weight);
     GenJet2Eta->Fill(jet2_v4.Eta(),weight);

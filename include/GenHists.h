@@ -3,7 +3,7 @@
 #include "UHH2/core/include/Event.h"
 #include "UHH2/core/include/PFParticle.h"
 #include "UHH2/common/include/TTbarGen.h"
-#include "UHH2/MTopJet/include/JetCluster.h"
+/* #include "UHH2/MTopJet/include/JetCluster.h" */
 
 
 /**  \brief Example class for booking and filling histograms
@@ -23,7 +23,7 @@ public:
 protected:
 
     TH1F *GenJetNumber;
-    TH1F *GenJet1Mass, *Mass1Mass2;
+    TH1F *GenJet1Mass, *GenJet2Mass, *GenJet2LepMass, *Mass1Mass2;
     TH1F *GenJet1PT, *GenJet2PT, *GenJet3PT, *GenJet4PT, *GenJet5PT, *GenJet1Jet2PT, *LeptonPT, *GenJetPT;
     TH1F *GenJet2Eta;
     TH1F *TopHadPT, *TopLepPT;
