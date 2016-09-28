@@ -132,6 +132,50 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone_jets(std::vector<GenPartic
 
   return xcone_jets;
 }
+// ------------------------------------ Get clustered XCone 2x3 Jets from Gen Particles ---------------------------------------------------------------------------------
+std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(std::vector<GenParticle>* genparts, double ptmin, double ptmin_sub1, double ptmin_sub2, int choose_jet){ 
+
+  std::vector<fastjet::PseudoJet> fatjets, subjets1, subjets2, returnjets; 
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle* part = &(genparts->at(i));
+    if(IsStable(part)){
+      particle_in2.push_back(convert_particle(part));
+    }
+  }
+  XConePlugin plugin_xcone(2, 100, 2.0);
+  fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
+  clust_seq_xcone=new fastjet::ClusterSequence(particle_in2, jet_def_xcone);
+
+  fatjets = sorted_by_pt(clust_seq_xcone->inclusive_jets(ptmin));
+
+  std::vector<int> particle_list;
+  particle_list.clear();
+  particle_list = clust_seq_xcone->particle_jet_indices(fatjets);
+
+  for (unsigned int ipart=0; ipart<particle_in2.size(); ++ipart){
+    if (particle_list[ipart]==0){
+      particle_in_subjet1.push_back(particle_in2.at(ipart));
+    }
+    if (particle_list[ipart]==1){
+      particle_in_subjet2.push_back(particle_in2.at(ipart));
+    }
+  }
+
+  XConePlugin plugin_xcone_sub1(3, 0.4, 2.0);
+  fastjet::JetDefinition jet_def_sub1(&plugin_xcone_sub1);
+  clust_seq_sub1=new fastjet::ClusterSequence(particle_in_subjet1, jet_def_sub1);
+  subjets1 = sorted_by_pt(clust_seq_sub1->inclusive_jets(ptmin_sub1));
+  // XConePlugin plugin_xcone_sub2(3, 0.4, 2.0);
+  // fastjet::JetDefinition jet_def_sub2(&plugin_xcone_sub2);
+  // clust_seq_sub2=new fastjet::ClusterSequence(particle_in_subjet2, jet_def_sub2);
+  // subjets2 = sorted_by_pt(clust_seq_sub2->inclusive_jets(ptmin_sub2));
+
+  if(choose_jet == 0) returnjets = fatjets;
+  if(choose_jet == 1) returnjets = subjets1;
+  if(choose_jet == 2) returnjets = subjets2;
+
+  return returnjets;
+}
 // ------------------------------------ Get clustered XCone Jets from PFParticles ---------------------------------------------------------------------------------
 std::vector<fastjet::PseudoJet> JetCluster::get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin){ 
  
@@ -731,5 +775,45 @@ bool MergeXConeN6Gen::process(uhh2::Event & event){
 
   return true;
 }
+
+
+// ------------------------------------ XCone Gen Jets -----------------------------------------------------------------------------
+GenXCONE23JetProducer::GenXCONE23JetProducer(uhh2::Context & ctx, const std::string & name, double ptmin, double ptmin_sub1, double ptmin_sub2, int choose_jet):
+  h_newgenxcone23jets(ctx.declare_event_output<std::vector<Jet>>(name)),
+  ptmin_(ptmin),
+  ptmin_sub1_(ptmin_sub1),
+  ptmin_sub2_(ptmin_sub2),
+  choose_jet_(choose_jet) {}
+
+bool GenXCONE23JetProducer::process(uhh2::Event & event){
+
+
+  std::vector<GenParticle>* genparts = event.genparticles;
+  JetCluster* jetc = new JetCluster();
+  std::vector<fastjet::PseudoJet> gen;
+  gen = jetc->get_xcone23_jets(genparts, ptmin_, ptmin_sub1_, ptmin_sub2_, choose_jet_);
+  std::vector<Jet> subjets, combined_jets;
+  subjets = jetc->convert_pseudojet_to_jet(gen);
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, combinedjet1_v4;
+  if(subjets.size() > 2){
+    jet1_v4.SetPxPyPzE(subjets.at(0).v4().Px(), subjets.at(0).v4().Py(), subjets.at(0).v4().Pz(), subjets.at(0).v4().E());
+    jet2_v4.SetPxPyPzE(subjets.at(1).v4().Px(), subjets.at(1).v4().Py(), subjets.at(1).v4().Pz(), subjets.at(1).v4().E()); 
+    jet3_v4.SetPxPyPzE(subjets.at(2).v4().Px(), subjets.at(2).v4().Py(), subjets.at(2).v4().Pz(), subjets.at(2).v4().E()); 
+  }
+
+  Jet new_jet;
+  combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+  new_jet.set_pt(combinedjet1_v4.Pt());
+  new_jet.set_eta(combinedjet1_v4.Eta());
+  new_jet.set_phi(combinedjet1_v4.Phi());
+  new_jet.set_energy(combinedjet1_v4.E());
+
+  combined_jets.push_back(new_jet);
+  event.set(h_newgenxcone23jets, combined_jets);
+
+  delete jetc;
+  return true;
+}
+
 // --------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------

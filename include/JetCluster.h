@@ -47,6 +47,7 @@ class JetCluster{
   std::vector<fastjet::PseudoJet> get_hotvr_jets(std::vector<GenParticle>* genparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
   std::vector<fastjet::PseudoJet> get_hotvr_recojets(std::vector<PFParticle>* pfparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
   std::vector<fastjet::PseudoJet> get_xcone_jets(std::vector<GenParticle>* genparts, int N, double R0, double beta, double ptmin);
+  std::vector<fastjet::PseudoJet> get_xcone23_jets(std::vector<GenParticle>* genparts, double ptmin, double ptmin_sub1, double ptmin_sub2, int choose_jet);
   std::vector<fastjet::PseudoJet> get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin);
 
 
@@ -56,6 +57,8 @@ class JetCluster{
   void write_genjets(uhh2::Event & event, enum  JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
 
   std::vector<fastjet::PseudoJet> particle_in;
+  std::vector<fastjet::PseudoJet> particle_in_subjet1;
+  std::vector<fastjet::PseudoJet> particle_in_subjet2;
   std::vector<fastjet::PseudoJet> particle_in2;
   std::vector<fastjet::PseudoJet> particle_in_reco2;
   std::vector<fastjet::PseudoJet> particle_in_reco;
@@ -63,6 +66,8 @@ class JetCluster{
   fastjet::ClusterSequence* clust_seq_hotvr;
   fastjet::ClusterSequence* clust_seq_reco;
   fastjet::ClusterSequence* clust_seq_xcone;
+  fastjet::ClusterSequence* clust_seq_sub1;
+  fastjet::ClusterSequence* clust_seq_sub2;
   std::vector<fastjet::PseudoJet> new_jets;
   std::vector<fastjet::PseudoJet> new_jets_cleaned;
   std::vector<fastjet::PseudoJet> new_recojets;
@@ -188,4 +193,18 @@ private:
   uhh2::Event::Handle<TTbarGen>h_ttbargen;
   uhh2::Event::Handle<std::vector<Jet>>h_injets;
   uhh2::Event::Handle<std::vector<Jet>>h_newjets;
+};
+
+class GenXCONE23JetProducer: public uhh2::AnalysisModule{
+public:
+
+  explicit GenXCONE23JetProducer(uhh2::Context&, const std::string &, double, double, double, int);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_newgenxcone23jets;
+  double ptmin_;
+  double ptmin_sub1_;
+  double ptmin_sub2_;
+  int choose_jet_;
 };

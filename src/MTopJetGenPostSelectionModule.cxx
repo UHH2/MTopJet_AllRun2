@@ -119,12 +119,12 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   const bool isMC = (ctx.get("dataset_type") == "MC");
   
   // set up which jet to use, possible are: ak06_gen, ak08_gen, ak10_gen, ak12_gen, ak08_rec, ak12_rec, HOTVR, HOTVR_rec, ...
-  const std::string jet_label_gen("xconeN5R4_gen_merged");
+  const std::string jet_label_gen("xcone23_gen");
   const std::string jet_label_rec("xconeN5R4_rec_merged");
   const std::string jet_label_hotvr_gen("HOTVRrho300_gen");
   const std::string jet_label_hotvr_rec("HOTVRrho300_rec");
-  const std::string jet_label_xcone_rec("xconeN6R4_rec_merged");
-  const std::string jet_label_xcone_gen("xconeN6R4_gen_merged");
+  const std::string jet_label_xcone_rec("xconeN6R4_rec");
+  const std::string jet_label_xcone_gen("xconeN6R4_gen");
   float jet_radius = 0.4;
   float jet_radius_dR_Cut = 2.;
   double rho = 300;
@@ -139,11 +139,12 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   // jetprod.reset(new RecoJetProducer(ctx, jet_label_rec, 150, jet_radius)); // set to akt algorithm
   // jetprod_gen.reset(new GenHOTVRJetProducer(ctx, jet_label_hotvr_gen, rho));
   // jetprod_rec.reset(new RecoHOTVRJetProducer(ctx, jet_label_hotvr_rec, rho));
-  jetprod_rec.reset(new RecoXCONEJetProducer(ctx, jet_label_xcone_rec, 6, jet_radius, 2.0, 30));  //(context, jet_label, N, R, beta, ptmin)
-  jetprod_gen.reset(new GenXCONEJetProducer(ctx, jet_label_xcone_gen, 6, jet_radius, 2.0, 30));  //(context, jet_label, N, R, beta, ptmin)
+  // jetprod_rec.reset(new RecoXCONEJetProducer(ctx, jet_label_xcone_rec, 6, jet_radius, 2.0, 30));  //(context, jet_label, N, R, beta, ptmin)
+  // jetprod_gen.reset(new GenXCONEJetProducer(ctx, jet_label_xcone_gen, 6, jet_radius, 2.0, 30));  //(context, jet_label, N, R, beta, ptmin)
   // jetprod_gen.reset(new MergeXConeGen(ctx, jet_label_xcone_gen, "xconeN5R4_gen_merged"));  
   // jetprod_rec.reset(new MergeXConeReco(ctx, jet_label_xcone_rec, "xconeN5R4_rec_merged")); 
-  
+  // jetprod_gen.reset(new MergeXConeN6Gen(ctx, jet_label_xcone_gen, "xconeN6R4_gen_merged"));  
+  jetprod_gen.reset(new GenXCONE23JetProducer(ctx, "xcone23_gen", 30, 30, 30, 1));  
 
 
   
@@ -337,17 +338,17 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
   ttgenprod->process(event);
  
-  // cleaner_gen->process(event); //lepton cleaner needed for XCone merge
   muoSR_cleaner->process(event);
   sort_by_pt<Muon>(*event.muons);
 
   eleSR_cleaner->process(event);
   sort_by_pt<Electron>(*event.electrons);
+  // cleaner_gen->process(event); //lepton cleaner needed for XCone merge
   // -------------------------------------
 
   if(produce_jet){
     jetprod_gen->process(event); // to produce jets
-    jetprod_rec->process(event); // to produce jets
+    // jetprod_rec->process(event); // to produce jets
     return true;
   }
 
