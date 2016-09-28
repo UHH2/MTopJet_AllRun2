@@ -23,7 +23,9 @@ public:
 protected:
 
     TH1F *Combined_Mass1, *Combined_PT1, *Combined_Mass2, *Combined_PT2;
+    TH1F *Subjet1_Mass, *Subjet2_Mass, *Subjet3_Mass, *Subjet1_PT, *Subjet2_PT, *Subjet3_PT;
     TH1F *deltaR_lep_jet1, *deltaR_lep_jet2, *deltaR_lep_jet3, *deltaR_lep_jet4, *deltaR_lep_combinedjet1, *deltaR_lep_combinedjet2, *deltaR_combinedjet1_combinedjet2;
+    TH1F *quark_next_to_lep;
 
 
     uhh2::Event::Handle<TTbarGen>h_ttbargen;

@@ -21,7 +21,6 @@ public:
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
-
     TH1F *GenJetNumber;
     TH1F *GenJet1Mass, *GenJet2Mass, *GenJet2LepMass, *Mass1Mass2;
     TH1F *GenJet1PT, *GenJet2PT, *GenJet3PT, *GenJet4PT, *GenJet5PT, *GenJet1Jet2PT, *LeptonPT, *GenJetPT;

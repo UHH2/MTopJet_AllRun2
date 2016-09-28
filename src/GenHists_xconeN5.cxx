@@ -17,10 +17,16 @@ using namespace uhh2;
 
 GenHists_xconeN5::GenHists_xconeN5(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
   // book all histograms here
-  Combined_Mass1 = book<TH1F>("Combined_Mass1", "M_{jet}", 50, 0, 500);
+  Combined_Mass1 = book<TH1F>("Combined_Mass1", "M_{jet}", 150, 0, 1500);
   Combined_PT1 = book<TH1F>("Combined_PT1", "p_{T}", 50, 0, 1000);
   Combined_Mass2 = book<TH1F>("Combined_Mass2", "M_{jet}", 50, 0, 500);
   Combined_PT2 = book<TH1F>("Combined_PT2", "p_{T}", 50, 0, 1000);
+  Subjet1_Mass = book<TH1F>("Subjet1_Mass", "M_{subjet1}", 60, 0, 300);
+  Subjet2_Mass = book<TH1F>("Subjet2_Mass", "M_{subjet2}", 60, 0, 300);
+  Subjet3_Mass = book<TH1F>("Subjet3_Mass", "M_{subjet3}", 60, 0, 300);
+  Subjet1_PT = book<TH1F>("Subjet1_PT", "p_{T, subjet1}", 50, 0, 500);
+  Subjet2_PT = book<TH1F>("Subjet2_PT", "p_{T, subjet2}", 50, 0, 500);
+  Subjet3_PT = book<TH1F>("Subjet3_PT", "p_{T, subjet3}", 50, 0, 500);
   deltaR_lep_jet1 = book<TH1F>("deltaR_lep_jet1", "#Delta R (lep, jet1)", 80, 0, 4);
   deltaR_lep_jet2 = book<TH1F>("deltaR_lep_jet2", "#Delta R (lep, jet2)", 80, 0, 4);
   deltaR_lep_jet3 = book<TH1F>("deltaR_lep_jet3", "#Delta R (lep, jet3)", 80, 0, 4);
@@ -28,6 +34,7 @@ GenHists_xconeN5::GenHists_xconeN5(uhh2::Context & ctx, const std::string & dirn
   deltaR_lep_combinedjet1 = book<TH1F>("deltaR_lep_combinedjet1", "#Delta R (lep, combined jet1)", 80, 0, 4);
   deltaR_lep_combinedjet2 = book<TH1F>("deltaR_lep_combinedjet2", "#Delta R (lep, combined jet2)", 80, 0, 4);
   deltaR_combinedjet1_combinedjet2 = book<TH1F>("deltaR_combinedjet1_combinedjet2", "#Delta R (combined jet1, combined jet2)", 80, 0, 4);
+  quark_next_to_lep = book<TH1F>("quark_next_to_lep", "quark next to lep", 5,-0.5, 4.5);
 
 
   // handle for TTbarGen class
@@ -47,7 +54,7 @@ void GenHists_xconeN5::fill(const Event & event){
   const auto & ttbargen = event.get(h_ttbargen);
   // define all objects needed
   std::vector<Jet> jets = event.get(h_jets);
-  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, combinedjet1_v4, combinedjet2_v4;
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, combinedjet1_v4, combinedjet2_v4, subjet1_v4, subjet2_v4, subjet3_v4;
   Jet jet1,jet2,jet3,jet4;
   if(jets.size()>0) jet1 = jets.at(0);
   if(jets.size()>1) jet2 = jets.at(1);
@@ -94,6 +101,22 @@ void GenHists_xconeN5::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   
+  //---------------------------------------------------------------------------------------
+  //-------------------------- get nearest quark to lepton --------------------------------
+  //---------------------------------------------------------------------------------------
+  float dR_lep_botlep, dR_lep_bot, dR_lep_q1, dR_lep_q2;
+  dR_lep_botlep = deltaR(lepton, bot_lep);
+  dR_lep_bot = deltaR(lepton, bot);
+  dR_lep_q1 = deltaR(lepton, q1);
+  dR_lep_q2 = deltaR(lepton, q2);
+  int next_quark = 0;
+  if(dR_lep_botlep < dR_lep_bot && dR_lep_botlep < dR_lep_q1 && dR_lep_botlep < dR_lep_q1) next_quark = 1;
+  if(dR_lep_bot < dR_lep_botlep && dR_lep_bot < dR_lep_q1 && dR_lep_bot < dR_lep_q1) next_quark = 2;
+  if(dR_lep_q1 < dR_lep_botlep && dR_lep_q1 < dR_lep_bot && dR_lep_q1 < dR_lep_q2) next_quark = 3;
+  if(dR_lep_q2 < dR_lep_botlep && dR_lep_q2 < dR_lep_bot && dR_lep_q2 < dR_lep_q1) next_quark = 4;
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+
 
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of 4 jets and combine 3 jets to topjet -------------------
@@ -111,18 +134,30 @@ void GenHists_xconeN5::fill(const Event & event){
     dR3 = deltaR(jet3, lepton);
     dR4 = deltaR(jet4, lepton);
     if(dR1 < dR2 && dR1 < dR3 && dR1 < dR4){
+      subjet1_v4 = jet2_v4;
+      subjet2_v4 = jet3_v4;
+      subjet3_v4 = jet4_v4;
       combinedjet1_v4 = jet2_v4 + jet3_v4 + jet4_v4;
       combinedjet2_v4 = jet1_v4;
     }
     if(dR2 < dR1 && dR2 < dR3 && dR2 < dR4){
+      subjet1_v4 = jet1_v4;
+      subjet2_v4 = jet3_v4;
+      subjet3_v4 = jet4_v4;
       combinedjet1_v4 = jet1_v4 + jet3_v4 + jet4_v4;
       combinedjet2_v4 = jet2_v4;
     }    
     if(dR3 < dR1 && dR3 < dR2 && dR3 < dR4){
+      subjet1_v4 = jet1_v4;
+      subjet2_v4 = jet2_v4;
+      subjet3_v4 = jet4_v4;
       combinedjet1_v4 = jet1_v4 + jet2_v4 + jet4_v4;
       combinedjet2_v4 = jet3_v4;
     }
     if(dR4 < dR1 && dR4 < dR2 && dR4 < dR3){
+      subjet1_v4 = jet1_v4;
+      subjet2_v4 = jet2_v4;
+      subjet3_v4 = jet3_v4;
       combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
       combinedjet2_v4 = jet4_v4;
     }
@@ -141,9 +176,15 @@ void GenHists_xconeN5::fill(const Event & event){
 
   if((jets.size()) > 3){
     Combined_Mass1->Fill(combinedjet1_v4.M(),weight);
-    Combined_PT1->Fill(combinedjet1_v4.M(),weight);
+    Combined_PT1->Fill(combinedjet1_v4.Pt(),weight);
     Combined_Mass2->Fill(combinedjet2_v4.M(),weight);
-    Combined_PT2->Fill(combinedjet2_v4.M(),weight);
+    Combined_PT2->Fill(combinedjet2_v4.Pt(),weight);
+    Subjet1_Mass->Fill(subjet1_v4.M(), weight);
+    Subjet2_Mass->Fill(subjet2_v4.M(), weight);
+    Subjet3_Mass->Fill(subjet3_v4.M(), weight);
+    Subjet1_PT->Fill(subjet1_v4.Pt(), weight);
+    Subjet2_PT->Fill(subjet2_v4.Pt(), weight);
+    Subjet3_PT->Fill(subjet3_v4.Pt(), weight);
     deltaR_lep_jet1->Fill(dR1, weight);
     deltaR_lep_jet2->Fill(dR2, weight);
     deltaR_lep_jet3->Fill(dR3, weight);
@@ -159,6 +200,7 @@ void GenHists_xconeN5::fill(const Event & event){
     deltaR_lep_combinedjet2->Fill(dR_lep_comb2, weight);
     deltaR_combinedjet1_combinedjet2->Fill(dR_comb1_comb2, weight);
   }
+  quark_next_to_lep->Fill(next_quark, weight);
 
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------

@@ -101,6 +101,127 @@ bool uhh2::Matching_HOTVR::passes(const uhh2::Event& event){
     return matched;
 }
 
+uhh2::Matching_XCone::Matching_XCone(uhh2::Context& ctx, const std::string & name):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
+
+
+bool uhh2::Matching_XCone::passes(const uhh2::Event& event){
+    const auto & ttbargen = event.get(h_ttbargen);
+    std::vector<Jet> jets = event.get(h_jets);
+    Jet jet1, jet2, jet3, jet4;
+    if(jets.size()>0) jet1 = jets.at(0);
+    if(jets.size()>1) jet2 = jets.at(1);
+    if(jets.size()>2) jet3 = jets.at(2);
+    if(jets.size()>3) jet4 = jets.at(3);
+    bool matched = false;
+    bool matched_q1 = false;
+    bool matched_q2 = false;
+    bool matched_bot = false;
+    // get stable particles from ttbar decay and sort them into leptonic and hadronic
+    GenParticle bot, q1, q2, lep1, lep2, lepton; 
+    if(jets.size() > 0){
+      if(ttbargen.IsTopHadronicDecay()){
+	bot = ttbargen.bTop();
+	q1 = ttbargen.Wdecay1();
+	q2 = ttbargen.Wdecay2();
+	lep1 = ttbargen.WMinusdecay1();
+	lep2 = ttbargen.WMinusdecay2();
+      }
+      else if(ttbargen.IsAntiTopHadronicDecay()){
+	bot = ttbargen.bAntitop();
+	q1 = ttbargen.WMinusdecay1();
+	q2 = ttbargen.WMinusdecay2();
+	lep1 = ttbargen.Wdecay1();
+	lep2 = ttbargen.Wdecay2();
+      }
+      if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+	lepton = lep1;
+      }
+      else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+	lepton = lep2;
+      }
+    }
+
+    // claculate distance to Lepton
+    double dR1, dR2, dR3, dR4;
+    dR1 = deltaR(jet1, lepton);
+    dR2 = deltaR(jet2, lepton);
+    dR3 = deltaR(jet3, lepton);
+    dR4 = deltaR(jet4, lepton);
+    if(dR1 < dR2 && dR1 < dR3 && dR1 < dR4){
+      if(deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4 || deltaR(q1, jet4) < 0.4) matched_q1 = true;
+      if(deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4 || deltaR(q2, jet4) < 0.4) matched_q2 = true;
+      if(deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4 || deltaR(bot, jet4) < 0.4) matched_bot = true;
+    }
+    if(dR2 < dR1 && dR2 < dR3 && dR2 < dR4){
+      if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet3) < 0.4 || deltaR(q1, jet4) < 0.4) matched_q1 = true;
+      if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet3) < 0.4 || deltaR(q2, jet4) < 0.4) matched_q2 = true;
+      if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet3) < 0.4 || deltaR(bot, jet4) < 0.4) matched_bot = true;
+    }    
+    if(dR3 < dR1 && dR3 < dR2 && dR3 < dR4){
+      if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet4) < 0.4) matched_q1 = true;
+      if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet4) < 0.4) matched_q2 = true;
+      if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet4) < 0.4) matched_bot = true;
+    }
+    if(dR4 < dR1 && dR4 < dR2 && dR4 < dR3){
+      if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
+      if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
+      if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
+    }
+
+    if(matched_q1 && matched_q2 && matched_bot) matched = true;
+    return matched;
+}
+
+uhh2::Matching_XCone_botlep_lep::Matching_XCone_botlep_lep(uhh2::Context& ctx, const std::string & name):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
+
+
+bool uhh2::Matching_XCone_botlep_lep::passes(const uhh2::Event& event){
+    const auto & ttbargen = event.get(h_ttbargen);
+    bool botlep_lep = false;
+    // get stable particles from ttbar decay and sort them into leptonic and hadronic
+    GenParticle bot, bot_lep, lep1, lep2, lepton, q1, q2; 
+    if(ttbargen.IsTopHadronicDecay()){
+      bot = ttbargen.bTop();
+      bot_lep = ttbargen.bAntitop();
+      lep1 = ttbargen.WMinusdecay1();
+      lep2 = ttbargen.WMinusdecay2();
+      q1 = ttbargen.Wdecay1();
+      q2 = ttbargen.Wdecay2();
+    }
+    else if(ttbargen.IsAntiTopHadronicDecay()){
+      bot = ttbargen.bAntitop();
+      bot_lep = ttbargen.bTop();
+      lep1 = ttbargen.Wdecay1();
+      lep2 = ttbargen.Wdecay2();
+      q1 = ttbargen.WMinusdecay1();
+      q2 = ttbargen.WMinusdecay2();
+    }
+    if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+      lepton = lep1;
+    }
+    else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+      lepton = lep2;
+    }
+    
+
+    // claculate distance to Lepton
+    double dR_lep_bot, dR_lep_botlep, dR_lep_q1, dR_lep_q2;
+    dR_lep_bot = deltaR(bot, lepton);
+    dR_lep_botlep = deltaR(bot_lep, lepton);
+    dR_lep_q1 = deltaR(q1, lepton);
+    dR_lep_q2 = deltaR(q2, lepton);
+    if(dR_lep_botlep < dR_lep_bot && dR_lep_botlep < dR_lep_q1 && dR_lep_botlep < dR_lep_q1) botlep_lep = true;
+    if(dR_lep_bot < dR_lep_botlep && dR_lep_bot < dR_lep_q1 && dR_lep_bot < dR_lep_q1) botlep_lep = false;
+    if(dR_lep_q1 < dR_lep_botlep && dR_lep_q1 < dR_lep_bot && dR_lep_q1 < dR_lep_q2) botlep_lep = false;
+    if(dR_lep_q2 < dR_lep_botlep && dR_lep_q2 < dR_lep_bot && dR_lep_q2 < dR_lep_q1) botlep_lep = false;
+
+    return botlep_lep;
+}
+
 uhh2::Matching_top::Matching_top(uhh2::Context& ctx, float jetradius):
   h_gentopjets(ctx.get_handle<std::vector<GenTopJet>>("gentopjets")),
   h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),

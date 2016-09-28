@@ -177,3 +177,15 @@ private:
   uhh2::Event::Handle<std::vector<Jet>>h_injets;
   uhh2::Event::Handle<std::vector<Jet>>h_newjets;
 };
+
+class MergeXConeN6Gen: public uhh2::AnalysisModule{
+public:
+
+  explicit MergeXConeN6Gen(uhh2::Context&, const std::string &, const std::string &);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<TTbarGen>h_ttbargen;
+  uhh2::Event::Handle<std::vector<Jet>>h_injets;
+  uhh2::Event::Handle<std::vector<Jet>>h_newjets;
+};

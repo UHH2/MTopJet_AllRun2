@@ -535,5 +535,201 @@ bool MergeXConeReco::process(uhh2::Event & event){
   return true;
 }
 
+// ------------------------------------ merging XCone Gen Jets N=6  -------------------------------------------------------------------
+MergeXConeN6Gen::MergeXConeN6Gen(uhh2::Context & ctx, const std::string & in_jet, const std::string & out_jet):
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+  h_injets(ctx.get_handle<std::vector<Jet>>(in_jet)),
+  h_newjets(ctx.declare_event_output<std::vector<Jet>>(out_jet)) {}
+
+bool MergeXConeN6Gen::process(uhh2::Event & event){
+
+  // get Lepton from TTbar
+  const auto & ttbargen = event.get(h_ttbargen);
+  GenParticle lep1, lep2, lepton;
+  if(ttbargen.IsTopHadronicDecay()){
+    lep1 = ttbargen.WMinusdecay1();
+    lep2 = ttbargen.WMinusdecay2();
+  }
+  else if(ttbargen.IsAntiTopHadronicDecay()){
+    lep1 = ttbargen.Wdecay1();
+    lep2 = ttbargen.Wdecay2();
+  }
+  if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+    lepton = lep1;
+  }
+  else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+    lepton = lep2;
+  }
+
+  // get distance to jets
+  std::vector<Jet> jets = event.get(h_injets);
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, jet5_v4, combinedjet1_v4, combinedjet2_v4, combinedjet3_v4;
+  Jet jet1;
+  jet1 = jets.at(0);
+  float dR1, dR2, dR3, dR4, dR5;
+  if(jets.size() > 4){
+    jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
+    jet2_v4.SetPxPyPzE(jets.at(1).v4().Px(), jets.at(1).v4().Py(), jets.at(1).v4().Pz(), jets.at(1).v4().E()); 
+    jet3_v4.SetPxPyPzE(jets.at(2).v4().Px(), jets.at(2).v4().Py(), jets.at(2).v4().Pz(), jets.at(2).v4().E()); 
+    jet4_v4.SetPxPyPzE(jets.at(3).v4().Px(), jets.at(3).v4().Py(), jets.at(3).v4().Pz(), jets.at(3).v4().E()); 
+    jet5_v4.SetPxPyPzE(jets.at(4).v4().Px(), jets.at(4).v4().Py(), jets.at(4).v4().Pz(), jets.at(4).v4().E()); 
+
+    // claculate distance to Lepton
+    dR1 = uhh2::deltaR(jet1, lepton);
+    dR2 = uhh2::deltaR(jets.at(1), lepton);
+    dR3 = uhh2::deltaR(jets.at(2), lepton);
+    dR4 = uhh2::deltaR(jets.at(3), lepton);
+    dR5 = uhh2::deltaR(jets.at(4), lepton);
+
+    // calculate distance between jets;
+    float dR12, dR13, dR14, dR15, dR23, dR24, dR25, dR34, dR35, dR45;
+    dR12 = uhh2::deltaR(jets.at(0), jets.at(1));
+    dR13 = uhh2::deltaR(jets.at(0), jets.at(2));
+    dR14 = uhh2::deltaR(jets.at(0), jets.at(3));
+    dR15 = uhh2::deltaR(jets.at(0), jets.at(4));
+    dR23 = uhh2::deltaR(jets.at(1), jets.at(2));
+    dR24 = uhh2::deltaR(jets.at(1), jets.at(3));
+    dR25 = uhh2::deltaR(jets.at(1), jets.at(4));
+    dR34 = uhh2::deltaR(jets.at(2), jets.at(3));
+    dR35 = uhh2::deltaR(jets.at(2), jets.at(4));
+    dR45 = uhh2::deltaR(jets.at(3), jets.at(4));
+
+
+    // first get nearest jet to lep -> combined jet 2 / if one jet has big distance to all other 3 jets (3 dRs of this jet > other dRs) -> combine other 3 jets / else combine 4 jets
+    if(dR1 < dR2 && dR1 < dR3 && dR1 < dR4 && dR1 < dR5){
+      combinedjet2_v4 = jet1_v4;
+      if((dR23 > dR34 && dR23 > dR35 && dR23 > dR45) && (dR24 > dR34 && dR24 > dR35 && dR24 > dR45) && (dR25 > dR34 && dR25 > dR35 && dR25 > dR45)){
+	combinedjet1_v4 = jet3_v4 + jet4_v4 + jet5_v4;
+	combinedjet3_v4 = jet2_v4;
+      }
+      else if((dR23 > dR24 && dR23 > dR25 && dR23 > dR45) && (dR34 > dR24 && dR34 > dR25 && dR34 > dR45) && (dR35 > dR24 && dR35 > dR25 && dR35 > dR45)){
+	combinedjet1_v4 = jet2_v4 + jet4_v4 + jet5_v4;
+	combinedjet3_v4 = jet3_v4;
+      }	
+      else if((dR24 > dR23 && dR24 > dR25 && dR24 > dR35) && (dR34 > dR23 && dR34 > dR25 && dR34 > dR35) && (dR45 > dR23 && dR45 > dR25 && dR45 > dR35)){
+	combinedjet1_v4 = jet2_v4 + jet3_v4 + jet5_v4;
+	combinedjet3_v4 = jet4_v4;
+      }
+      else if((dR25 > dR23 && dR25 > dR24 && dR25 > dR34) && (dR35 > dR23 && dR35 > dR24 && dR35 > dR34) && (dR45 > dR23 && dR45 > dR24 && dR45 > dR34)){
+	combinedjet1_v4 = jet2_v4 + jet3_v4 + jet4_v4;
+	combinedjet3_v4 = jet5_v4;
+      }
+      else{
+	combinedjet1_v4 = jet2_v4 + jet3_v4 + jet4_v4 + jet5_v4;
+      }
+    }
+
+    if(dR2 < dR1 && dR2 < dR3 && dR2 < dR4 && dR2 < dR5){
+      combinedjet2_v4 = jet2_v4;
+      if((dR13 > dR34 && dR13 > dR35 && dR13 > dR45) && (dR14 > dR34 && dR14 > dR35 && dR14 > dR45) && (dR15 > dR34 && dR15 > dR35 && dR15 > dR45)){
+	combinedjet1_v4 = jet3_v4 + jet4_v4 + jet5_v4;
+	combinedjet3_v4 = jet1_v4;
+      }
+      else if((dR13 > dR14 && dR13 > dR15 && dR13 > dR45) && (dR34 > dR14 && dR34 > dR15 && dR34 > dR45) && (dR35 > dR14 && dR35 > dR15 && dR35 > dR45)){
+	combinedjet1_v4 = jet1_v4 + jet4_v4 + jet5_v4;
+	combinedjet3_v4 = jet3_v4;
+      }	
+      else if((dR14 > dR13 && dR14 > dR15 && dR14 > dR35) && (dR34 > dR13 && dR34 > dR15 && dR34 > dR35) && (dR45 > dR13 && dR45 > dR15 && dR45 > dR35)){
+	combinedjet1_v4 = jet1_v4 + jet3_v4 + jet5_v4;
+	combinedjet3_v4 = jet4_v4;
+      }
+      else if((dR15 > dR13 && dR15 > dR14 && dR15 > dR34) && (dR35 > dR13 && dR35 > dR14 && dR35 > dR34) && (dR45 > dR13 && dR45 > dR14 && dR45 > dR34)){
+	combinedjet1_v4 = jet1_v4 + jet3_v4 + jet4_v4;
+	combinedjet3_v4 = jet5_v4;
+      }
+      else{
+	combinedjet1_v4 = jet1_v4 + jet3_v4 + jet4_v4 + jet5_v4;
+      }
+    }    
+    if(dR3 < dR1 && dR3 < dR2 && dR3 < dR4 && dR3 < dR5){
+      combinedjet2_v4 = jet3_v4;
+      if((dR12 > dR24 && dR12 > dR25 && dR12 > dR45) && (dR14 > dR24 && dR14 > dR25 && dR14 > dR45) && (dR15 > dR24 && dR15 > dR25 && dR15 > dR45)){
+	combinedjet1_v4 = jet2_v4 + jet4_v4 + jet5_v4;
+	combinedjet3_v4 = jet1_v4;
+      }
+      else if((dR12 > dR14 && dR12 > dR15 && dR12 > dR45) && (dR24 > dR14 && dR24 > dR15 && dR24 > dR45) && (dR25 > dR14 && dR25 > dR15 && dR25 > dR45)){
+	combinedjet1_v4 = jet1_v4 + jet4_v4 + jet5_v4;
+	combinedjet3_v4 = jet2_v4;
+      }	
+      else if((dR14 > dR12 && dR14 > dR15 && dR14 > dR25) && (dR24 > dR12 && dR24 > dR15 && dR24 > dR25) && (dR45 > dR12 && dR45 > dR15 && dR45 > dR25)){
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet5_v4;
+	combinedjet3_v4 = jet4_v4;
+      }
+      else if((dR15 > dR12 && dR15 > dR14 && dR15 > dR24) && (dR25 > dR12 && dR25 > dR14 && dR25 > dR24) && (dR45 > dR12 && dR45 > dR14 && dR45 > dR24)){
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet4_v4;
+	combinedjet3_v4 = jet5_v4;
+      }
+      else{
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet4_v4 + jet5_v4;
+      }
+    }
+    if(dR4 < dR1 && dR4 < dR2 && dR4 < dR3 && dR4 < dR5){
+      combinedjet2_v4 = jet4_v4;
+      if((dR12 > dR23 && dR12 > dR25 && dR12 > dR35) && (dR13 > dR23 && dR13 > dR25 && dR13 > dR35) && (dR15 > dR23 && dR15 > dR25 && dR15 > dR35)){
+	combinedjet1_v4 = jet2_v4 + jet3_v4 + jet5_v4;
+	combinedjet3_v4 = jet1_v4;
+      }
+      else if((dR12 > dR13 && dR12 > dR15 && dR12 > dR35) && (dR23 > dR13 && dR23 > dR15 && dR23 > dR35) && (dR25 > dR13 && dR25 > dR15 && dR25 > dR35)){
+	combinedjet1_v4 = jet1_v4 + jet3_v4 + jet5_v4;
+	combinedjet3_v4 = jet2_v4;
+      }	
+      else if((dR13 > dR12 && dR13 > dR15 && dR13 > dR25) && (dR23 > dR12 && dR23 > dR15 && dR23 > dR25) && (dR35 > dR12 && dR35 > dR15 && dR35 > dR25)){
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet5_v4;
+	combinedjet3_v4 = jet3_v4;
+      }
+      else if((dR15 > dR12 && dR15 > dR13 && dR15 > dR23) && (dR25 > dR12 && dR25 > dR13 && dR25 > dR23) && (dR35 > dR12 && dR35 > dR13 && dR35 > dR23)){
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+	combinedjet3_v4 = jet5_v4;
+      }
+      else{
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4 + jet5_v4;
+      }
+    }
+    if(dR5 < dR1 && dR5 < dR2 && dR5 < dR3 && dR5 < dR4){
+      combinedjet2_v4 = jet5_v4;
+      if((dR12 > dR23 && dR12 > dR24 && dR12 > dR34) && (dR13 > dR23 && dR13 > dR24 && dR13 > dR34) && (dR14 > dR23 && dR14 > dR24 && dR14 > dR34)){
+	combinedjet1_v4 = jet2_v4 + jet3_v4 + jet4_v4;
+	combinedjet3_v4 = jet1_v4;
+      }
+      else if((dR12 > dR13 && dR12 > dR14 && dR12 > dR34) && (dR23 > dR13 && dR23 > dR14 && dR23 > dR34) && (dR24 > dR13 && dR24 > dR14 && dR24 > dR34)){
+	combinedjet1_v4 = jet1_v4 + jet3_v4 + jet4_v4;
+	combinedjet3_v4 = jet2_v4;
+      }	
+      else if((dR13 > dR12 && dR13 > dR14 && dR13 > dR24) && (dR23 > dR12 && dR23 > dR14 && dR23 > dR24) && (dR34 > dR12 && dR34 > dR14 && dR34 > dR24)){
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet4_v4;
+	combinedjet3_v4 = jet3_v4;
+      }
+      else if((dR14 > dR12 && dR14 > dR13 && dR14 > dR23) && (dR24 > dR12 && dR24 > dR13 && dR24 > dR23) && (dR34 > dR12 && dR34 > dR13 && dR34 > dR23)){
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+	combinedjet3_v4 = jet4_v4;
+      }
+     else{
+	combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4 + jet4_v4;
+      }
+    }
+  }
+
+  std::vector<Jet> new_jets;
+  Jet new_jet1, new_jet2, new_jet3;
+  // TLorentzVector jet;
+  new_jet1.set_pt(combinedjet1_v4.Pt());
+  new_jet1.set_eta(combinedjet1_v4.Eta());
+  new_jet1.set_phi(combinedjet1_v4.Phi());
+  new_jet1.set_energy(combinedjet1_v4.E());
+  new_jet2.set_pt(combinedjet2_v4.Pt());
+  new_jet2.set_eta(combinedjet2_v4.Eta());
+  new_jet2.set_phi(combinedjet2_v4.Phi());
+  new_jet2.set_energy(combinedjet2_v4.E());
+  new_jet3.set_pt(combinedjet3_v4.Pt());
+  new_jet3.set_eta(combinedjet3_v4.Eta());
+  new_jet3.set_phi(combinedjet3_v4.Phi());
+  new_jet3.set_energy(combinedjet3_v4.E());
+  new_jets.push_back(new_jet1);
+  new_jets.push_back(new_jet2);
+  new_jets.push_back(new_jet3);
+  event.set(h_newjets, new_jets);
+
+  return true;
+}
 // --------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------

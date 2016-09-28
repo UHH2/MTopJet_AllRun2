@@ -67,6 +67,28 @@ namespace uhh2 {
     float rho_;
   };
 
+  class Matching_XCone : public Selection { 
+
+  public: 
+    explicit Matching_XCone(Context&, const std::string &);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+
+  class Matching_XCone_botlep_lep : public Selection { 
+
+  public: 
+    explicit Matching_XCone_botlep_lep(Context&, const std::string &);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+
    class Matching_top : public Selection { 
 
   public: 
