@@ -29,12 +29,12 @@ class JetCluster{
  private:
 
   std::vector<fastjet::PseudoJet> _hadrons;
-  bool IsStable(GenParticle* p);
   bool IsLepton(GenParticle* p);
-  fastjet::PseudoJet convert_particle(GenParticle* genparticle);
   fastjet::PseudoJet convert_recoparticle(PFParticle* pfparticle);
 
  public:
+  bool IsStable(GenParticle* p);
+  fastjet::PseudoJet convert_particle(GenParticle* genparticle);
 
   enum E_algorithm { 
     e_ca, 
@@ -47,12 +47,13 @@ class JetCluster{
   std::vector<fastjet::PseudoJet> get_hotvr_jets(std::vector<GenParticle>* genparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
   std::vector<fastjet::PseudoJet> get_hotvr_recojets(std::vector<PFParticle>* pfparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
   std::vector<fastjet::PseudoJet> get_xcone_jets(std::vector<GenParticle>* genparts, int N, double R0, double beta, double ptmin);
-  std::vector<fastjet::PseudoJet> get_xcone23_jets(std::vector<GenParticle>* genparts, double ptmin, double ptmin_sub1, double ptmin_sub2, int choose_jet);
+  std::vector<fastjet::PseudoJet> get_xcone23_jets(uhh2::Event & event, uhh2::Event::Handle<std::vector<int>> h_list, std::vector<GenParticle>* genparts, double ptmin, double ptmin_sub, int choose_jet);
   std::vector<fastjet::PseudoJet> get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin);
 
 
   std::vector<Jet> convert_pseudojet_to_jet(std::vector<fastjet::PseudoJet> fjet);
-  std::vector<fastjet::PseudoJet> substract_lepton(GenParticle* genparts, std::vector<fastjet::PseudoJet> fjets, double jet_radius);
+  fastjet::PseudoJet substract_lepton(GenParticle*, fastjet::PseudoJet);
+  std::vector<fastjet::PseudoJet> add_ghosts(std::vector<fastjet::PseudoJet> gen_in);
 
   void write_genjets(uhh2::Event & event, enum  JetCluster::E_algorithm algorithm, double jet_radius, double ptmin);
 
@@ -60,6 +61,7 @@ class JetCluster{
   std::vector<fastjet::PseudoJet> particle_in_subjet1;
   std::vector<fastjet::PseudoJet> particle_in_subjet2;
   std::vector<fastjet::PseudoJet> particle_in2;
+  std::vector<fastjet::PseudoJet> particle_in_noGhost;
   std::vector<fastjet::PseudoJet> particle_in_reco2;
   std::vector<fastjet::PseudoJet> particle_in_reco;
   fastjet::ClusterSequence* clust_seq;
@@ -198,13 +200,17 @@ private:
 class GenXCONE23JetProducer: public uhh2::AnalysisModule{
 public:
 
-  explicit GenXCONE23JetProducer(uhh2::Context&, const std::string &, double, double, double, int);
+  explicit GenXCONE23JetProducer(uhh2::Context&, const std::string &, const std::string &, double, double, double);
   virtual bool process(uhh2::Event & ) override; 
     
 private:
-  uhh2::Event::Handle<std::vector<Jet>>h_newgenxcone23jets;
+  uhh2::Event::Handle<std::vector<Jet>>h_xcone23seedjets;
+  uhh2::Event::Handle<std::vector<Jet>>h_xcone23fatjets;
+  uhh2::Event::Handle<std::vector<Jet>>h_xcone23subjets;
+  uhh2::Event::Handle<std::vector<int>>h_particle_fatjet;
+  uhh2::Event::Handle<std::vector<int>>h_particle_subjets1;
+  uhh2::Event::Handle<std::vector<int>>h_particle_subjets2;
   double ptmin_;
   double ptmin_sub1_;
   double ptmin_sub2_;
-  int choose_jet_;
 };

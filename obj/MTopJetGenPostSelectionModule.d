@@ -359,4 +359,5 @@ obj/MTopJetGenPostSelectionModule.o: \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequenceActiveAreaExplicitGhosts.hh \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequencePassiveArea.hh \
  /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequence1GhostPassiveArea.hh \
- /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequenceVoronoiArea.hh
+ /nfs/dust/cms/user/schwarzd/fastjet/include/fastjet/ClusterSequenceVoronoiArea.hh \
+ /afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/MTopJet/include/ClusteringHists.h
