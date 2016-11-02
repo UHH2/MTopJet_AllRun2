@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
-<!ENTITY NEVT "20">
+<!ENTITY NEVT "150">
 
   <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
   <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/GenPost"> 
   <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Gen"> 
 
 
-  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_PF_semilep.root"> -->
-  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_ak06gen_ak08gen_ak10gen_ak12gen_ak08rec_ak12rec_HOTVR_HOTVRrec_XCone_XConerec.root"> -->
-  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_topjet_ak08_xconeN2R4_xconeN3R4_HOTVR_HOTVRrho500_HOTVRrho400_HOTVRrho300_xconeN5R4_xconeN5R4merged_xconeN6R4gen_xconeN6R4merged_xcone23.root"> -->
-  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_JetDisplay.root">
+  <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_topjet_ak08_xconeN2R4_xconeN3R4_HOTVR_HOTVRrho500_HOTVRrho400_HOTVRrho300_xconeN5R4_xconeN5R4merged_xconeN6R4gen_xconeN6R4merged_xcone23.root">
+  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_JetDisplay.root"> -->
+  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_JetDisplay_test2.root"> -->
+
 ]>
 
 <!--
@@ -51,9 +51,13 @@
 	<!-- <Item Name="TopJetCollectionGEN"     Value="slimmedGenJetsAK8"/> -->
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec xconeN2R4_gen xconeN2R4_rec xconeN3R4_gen xconeN3R4_rec HOTVR_gen HOTVR_rec HOTVRrho500_gen HOTVRrho500_rec HOTVRrho400_gen HOTVRrho400_rec HOTVRrho300_gen HOTVRrho300_rec xconeN5R4_gen xconeN5R4_rec xconeN5R4_gen_merged xconeN5R4_rec_merged xconeN6R4_gen xconeN6R4_gen_merged xcone23_gen_fatjets xcone23_gen_seedjet xcone23_gen_subjets particle_fatjet_list particle_subjets1_list particle_subjets2_list"/> 
+	<Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec xconeN2R4_gen xconeN2R4_rec xconeN3R4_gen xconeN3R4_rec HOTVR_gen HOTVR_rec HOTVRrho500_gen HOTVRrho500_rec HOTVRrho400_gen HOTVRrho400_rec HOTVRrho300_gen HOTVRrho300_rec xconeN5R4_gen xconeN5R4_rec xconeN5R4_gen_merged xconeN5R4_rec_merged xconeN6R4_gen xconeN6R4_gen_merged"/>
 
-<!-- xcone23_gen_fatjets xcone23_gen_seedjet xcone23_gen_subjets -->
+	<!-- <Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec xconeN2R4_gen xconeN2R4_rec xconeN3R4_gen xconeN3R4_rec HOTVR_gen HOTVR_rec HOTVRrho500_gen HOTVRrho500_rec HOTVRrho400_gen HOTVRrho400_rec HOTVRrho300_gen HOTVRrho300_rec xconeN5R4_gen xconeN5R4_rec xconeN5R4_gen_merged xconeN5R4_rec_merged xconeN6R4_gen xconeN6R4_gen_merged xcone23_gen_fatjets xcone23_gen_seedjet xcone23_gen_subjets"/> -->
+
+	<!-- <Item Name="additionalBranches" Value="PFParticles ak08_gen ak08_rec xconeN2R4_gen xconeN2R4_rec xconeN3R4_gen xconeN3R4_rec HOTVR_gen HOTVR_rec HOTVRrho500_gen HOTVRrho500_rec HOTVRrho400_gen HOTVRrho400_rec HOTVRrho300_gen HOTVRrho300_rec xconeN5R4_gen xconeN5R4_rec xconeN5R4_gen_merged xconeN5R4_rec_merged xconeN6R4_gen xconeN6R4_gen_merged xcone23_gen_fatjets xcone23_gen_seedjet xcone23_gen_subjets particle_fatjet_list particle_subjets1_list particle_subjets2_list particle_fatjet1 particle_fatjet2 particle_subjet1_1 particle_subjet1_2 particle_subjet1_3 particle_subjet2_1 particle_subjet2_2 particle_fatjet0 particle_subjet1_0 particle_subjet2_0 particle_all"/> -->
+
+
 
 	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
         <Item Name="METName"                 Value="slimmedMETs"/>

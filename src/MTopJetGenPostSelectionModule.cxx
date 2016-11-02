@@ -112,7 +112,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_Elec, h_Muon, h_Elec2, h_Muon2;
   std::unique_ptr<Hists> h_GenHists4_ak04;
   std::unique_ptr<Hists> h_GenHists4_xconeN5, h_GenHists5_xconeN5_LowMass, h_GenHists5_xconeN5_PeakMass, h_GenHists5_xconeN5_HighMass;
-  std::unique_ptr<Hists> Cluster01, Cluster02, Cluster03, Cluster04, Cluster05, Cluster06, Cluster07,  Cluster08, Cluster09, Cluster10;
+  std::unique_ptr<Hists> Cluster01, Cluster02, Cluster03, Cluster04, Cluster05, Cluster06, Cluster07,  Cluster08, Cluster09, Cluster10, Cluster11, Cluster12, Cluster13, Cluster14, Cluster15, Cluster16, Cluster17,  Cluster18, Cluster19, Cluster20;
 };
 
 MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx){
@@ -146,7 +146,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   // jetprod_gen.reset(new MergeXConeGen(ctx, jet_label_xcone_gen, "xconeN5R4_gen_merged"));  
   // jetprod_rec.reset(new MergeXConeReco(ctx, jet_label_xcone_rec, "xconeN5R4_rec_merged")); 
   // jetprod_gen.reset(new MergeXConeN6Gen(ctx, jet_label_xcone_gen, "xconeN6R4_gen_merged"));  
-  jetprod_gen.reset(new GenXCONE23JetProducer(ctx, "xcone23_gen_fatjets", "xcone23_gen_subjets", 0, 30, 30));  
+  jetprod_gen.reset(new GenXCONE23JetProducer(ctx, "xcone23_gen_fatjets", "xcone23_gen_subjets", 0, 0, 0));  
 
 
   
@@ -276,17 +276,27 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   h_RecGenHists5_top.reset(new RecoGenHists_topjet(ctx, "RecGenHists_top_250to300"));
   h_RecGenHists6_top.reset(new RecoGenHists_topjet(ctx, "RecGenHists_top_300to500"));
 
-  // Clustering Hists
-  Cluster01.reset(new ClusteringHists(ctx, "JetDisplay_event01"));
-  Cluster02.reset(new ClusteringHists(ctx, "JetDisplay_event02"));
-  Cluster03.reset(new ClusteringHists(ctx, "JetDisplay_event03"));
-  Cluster04.reset(new ClusteringHists(ctx, "JetDisplay_event04"));
-  Cluster05.reset(new ClusteringHists(ctx, "JetDisplay_event05"));
-  Cluster06.reset(new ClusteringHists(ctx, "JetDisplay_event06"));
-  Cluster07.reset(new ClusteringHists(ctx, "JetDisplay_event07"));
-  Cluster08.reset(new ClusteringHists(ctx, "JetDisplay_event08"));
-  Cluster09.reset(new ClusteringHists(ctx, "JetDisplay_event09"));
-  Cluster10.reset(new ClusteringHists(ctx, "JetDisplay_event10"));
+  // // Clustering Hists
+  // Cluster01.reset(new ClusteringHists(ctx, "JetDisplay_event01"));
+  // Cluster02.reset(new ClusteringHists(ctx, "JetDisplay_event02"));
+  // Cluster03.reset(new ClusteringHists(ctx, "JetDisplay_event03"));
+  // Cluster04.reset(new ClusteringHists(ctx, "JetDisplay_event04"));
+  // Cluster05.reset(new ClusteringHists(ctx, "JetDisplay_event05"));
+  // Cluster06.reset(new ClusteringHists(ctx, "JetDisplay_event06"));
+  // Cluster07.reset(new ClusteringHists(ctx, "JetDisplay_event07"));
+  // Cluster08.reset(new ClusteringHists(ctx, "JetDisplay_event08"));
+  // Cluster09.reset(new ClusteringHists(ctx, "JetDisplay_event09"));
+  // Cluster10.reset(new ClusteringHists(ctx, "JetDisplay_event10"));
+  // Cluster11.reset(new ClusteringHists(ctx, "JetDisplay_event11"));
+  // Cluster12.reset(new ClusteringHists(ctx, "JetDisplay_event12"));
+  // Cluster13.reset(new ClusteringHists(ctx, "JetDisplay_event13"));
+  // Cluster14.reset(new ClusteringHists(ctx, "JetDisplay_event14"));
+  // Cluster15.reset(new ClusteringHists(ctx, "JetDisplay_event15"));
+  // Cluster16.reset(new ClusteringHists(ctx, "JetDisplay_event16"));
+  // Cluster17.reset(new ClusteringHists(ctx, "JetDisplay_event17"));
+  // Cluster18.reset(new ClusteringHists(ctx, "JetDisplay_event18"));
+  // Cluster19.reset(new ClusteringHists(ctx, "JetDisplay_event19"));
+  // Cluster20.reset(new ClusteringHists(ctx, "JetDisplay_event20"));
 
   //// EVENT SELECTION
   // GEN
@@ -345,28 +355,106 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // cout<<event.event<<endl;
   //  COMMON MODULES
   // ================ set to true / false to run analysis =============================
-  bool produce_jet = false;
+  bool produce_jet = true;
   bool do_gensel = false;
   bool do_gensel_top = false;
   bool do_recsel = false;
   bool do_cluster_hist = true;
   // ==================================================================================
   
+  cout<<"-------------------------------------------"<<endl; 
+  cout<<"processing event Number: "<<event.event<<endl; 
+
   ttgenprod->process(event);
 
-  if(do_cluster_hist){
-    if(event.event == 38649894) Cluster01->fill(event);
-    if(event.event == 38649951) Cluster02->fill(event);
-    if(event.event == 38650262) Cluster03->fill(event);
-    if(event.event == 38650325) Cluster04->fill(event);
-    if(event.event == 38650347) Cluster05->fill(event);
-    if(event.event == 38650370) Cluster06->fill(event);
-    if(event.event == 38650446) Cluster07->fill(event);
-    if(event.event == 38650652) Cluster08->fill(event);
-    if(event.event == 38657890) Cluster09->fill(event);
-    if(event.event == 38657926) Cluster10->fill(event);
-    return false;
-  }
+  // if(do_cluster_hist){
+  //   // in Mass Peak
+  //   if(event.event == 40780514){
+  //     cout<<"Jet Display Event 01"<<endl;
+  //     Cluster01->fill(event);
+  //   }
+  //   if(event.event == 41171186){
+  //     cout<<"Jet Display Event 02"<<endl;
+  //     Cluster02->fill(event);
+  //   }
+  //   if(event.event == 51074160){
+  //     cout<<"Jet Display Event 03"<<endl;
+  //     Cluster03->fill(event);
+  //   }
+  //   if(event.event == 51074213){
+  //     cout<<"Jet Display Event 04"<<endl;
+  //     Cluster04->fill(event);
+  //   }
+  //   if(event.event == 99193068){
+  //     cout<<"Jet Display Event 05"<<endl;
+  //     Cluster05->fill(event);
+  //   }
+  //   // tail
+  //   if(event.event == 38649894){
+  //     cout<<"Jet Display Event 06"<<endl;
+  //    Cluster06->fill(event);
+  //   }
+  //   if(event.event == 40780644){
+  //     cout<<"Jet Display Event 07"<<endl;
+  //     Cluster07->fill(event);
+  //   }
+  //   if(event.event == 40783315){
+  //     cout<<"Jet Display Event 08"<<endl;
+  //     Cluster08->fill(event);
+  //   }
+  //   if(event.event == 59809559){
+  //     cout<<"Jet Display Event 09"<<endl;
+  //     Cluster09->fill(event);
+  //   }
+  //   if(event.event == 99192780){
+  //     cout<<"Jet Display Event 10"<<endl;
+  //     Cluster10->fill(event);
+  //   }
+  //   if(event.event == 60640923){
+  //     cout<<"Jet Display Event 11"<<endl;
+  //     Cluster11->fill(event);
+  //   }
+  //   if(event.event == 60638281){
+  //     cout<<"Jet Display Event 12"<<endl;
+  //     Cluster12->fill(event);
+  //   }
+
+  //   // low mass 
+  //   if(event.event == 51074193){ 
+  //     cout<<"Jet Display Event 13"<<endl;
+  //     Cluster13->fill(event);
+  //   }
+  //   if(event.event == 99192718){ 
+  //     cout<<"Jet Display Event 14"<<endl;
+  //     Cluster14->fill(event);
+  //   }
+  //   if(event.event == 38658057){
+  //     cout<<"Jet Display Event 15"<<endl;
+  //     Cluster15->fill(event);
+  //   }
+  //   if(event.event == 41189702){
+  //     cout<<"Jet Display Event 16"<<endl;
+  //     Cluster16->fill(event);
+  //   }
+  //   if(event.event == 41171268){
+  //     cout<<"Jet Display Event 17"<<endl;
+  //     Cluster17->fill(event);
+  //   }
+  //   // mass = 0 
+  //   if(event.event == 40783466){
+  //     cout<<"Jet Display Event 18"<<endl;
+  //     Cluster18->fill(event);
+  //   }
+  //   if(event.event == 40795634){
+  //     cout<<"Jet Display Event 19"<<endl;
+  //     Cluster19->fill(event);
+  //   }
+  //   if(event.event == 41171331){
+  //     cout<<"Jet Display Event 20"<<endl;
+  //     Cluster20->fill(event);
+  //   }
+  //   return false;
+  // }
 
   muoSR_cleaner->process(event);
   sort_by_pt<Muon>(*event.muons);
@@ -381,6 +469,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
     // jetprod_rec->process(event); // to produce jets
     return true;
   }
+  cout<<"-------------------------------------------"<<endl; 
 
   h_GenHists0a->fill(event);
   h_GenHists0a_top->fill(event);
@@ -479,6 +568,9 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   if(!(produce_jet) && do_gensel_top  && !(matching_top->passes(event))){
     h_GenHists3_u_top->fill(event);
   }
+
+  // cout<<"processing event Number: "<<event.event<<endl; 
+
   // ===================================================================================
 
  
@@ -640,7 +732,6 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   h_RecHists4_top->fill(event);
   // ---------------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------------
-
 
   return true; //false to delete all collections and keep hists
 }
