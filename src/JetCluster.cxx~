@@ -153,7 +153,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 	particle_in_noGhost.push_back(convert_particle(part));
 	if(IsLepton(part)){
 	  lepton = genparts->at(i);
-	  cout<<"Found Lepton! (Status 1)"<<endl;
+	  // cout<<"Found Lepton! (Status 1)"<<endl;
 	}
       }
       // also include Lepton if status is 23
@@ -162,7 +162,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 	  genparts2.push_back(genparts->at(i));
 	  particle_in_noGhost.push_back(convert_particle(part));
 	  lepton = genparts->at(i);
-	  cout<<"Found Lepton! (Status 23)"<<endl;
+	  // cout<<"Found Lepton! (Status 23)"<<endl;
 	}
       }
     }
@@ -171,13 +171,13 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 
 
   // ===== add ghost particles =================================================================================
-  bool ghosts = true;
+  bool ghosts = false;
   if(ghosts) particle_in2 = add_ghosts(particle_in_noGhost);
   else particle_in2 = particle_in_noGhost;
   //============================================================================================================
 
   // ===== Run first clustering step (N=2, R=inf) ==============================================================
-  XConePlugin plugin_xcone(2, 2.0, 2.0);
+  XConePlugin plugin_xcone(2, 2.5, 2.0);
   fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
   clust_seq_xcone=new fastjet::ClusterSequence(particle_in2, jet_def_xcone);
 
@@ -207,12 +207,15 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
       if(ipart < genparts2.size()) genparts_sub2.push_back(genparts2.at(ipart)); // get GenParticles (without Ghosts) of Jet 2
       particle_in_subjet2.push_back(particle_in2.at(ipart)); // get vector as PseudoJet (with Ghosts)
     }
+    if (particle_list[ipart]== -1){
+      particle_in_subjet0.push_back(particle_in2.at(ipart)); // get vector as PseudoJet (with Ghosts)
+    }
   }
   // ============================================================================================================
 
 
-  if(lep_in_jet1) cout<<"Lepton is in Jet 1"<<endl;
-  if(lep_in_jet2) cout<<"Lepton is in Jet 2"<<endl;
+  // if(lep_in_jet1) cout<<"Lepton is in Jet 1"<<endl;
+  // if(lep_in_jet2) cout<<"Lepton is in Jet 2"<<endl;
 
   // if lepton is not clustered into one of the jets get nearest jet to lepton and tag this jet as "leptonic" (should not happen!)
   if(!(lep_in_jet1 || lep_in_jet2)){
@@ -220,10 +223,10 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
     double dR2 = uhh2::deltaR(lepton, fatjets.at(1));
     if(dR1 < dR2) lep_in_jet1 = true;
     else if(dR2 < dR1) lep_in_jet2 = true;
-    if(lep_in_jet1) cout<<"next to Jet 1"<<endl;
-    if(lep_in_jet2) cout<<"next to Jet 2"<<endl;
+    // if(lep_in_jet1) cout<<"next to Jet 1"<<endl;
+    // if(lep_in_jet2) cout<<"next to Jet 2"<<endl;
   }
-  cout<<"-----------------"<<endl;
+  // cout<<"-----------------"<<endl;
 
   // ===== now cluster subjets. the fat jet with (or next to) the lepton gets 2 subjets, the other one gets 3 subjets
   if(lep_in_jet2){
@@ -260,32 +263,74 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   std::vector<int> particle_list1, particle_list2;
   GenParticle* lep;
   int jetnr;
-  if(choose_jet == 1){
-    particle_list1.clear();
-    particle_list1 = clust_seq_sub1->particle_jet_indices(subjets1);
-    for(unsigned int i=0; i<genparts_sub1.size(); ++i){
-      if(abs(genparts_sub1.at(i).pdgId()) == 11 || abs(genparts_sub1.at(i).pdgId()) == 13){
-	lep = &(genparts_sub1.at(i));
-	jetnr = particle_list1[i];
-	if(jetnr != -1) subjets1.at(jetnr) = substract_lepton(lep, subjets1.at(jetnr));
+  if(lep_in_jet2){
+    if(choose_jet == 1){
+      particle_list1.clear();
+      particle_list1 = clust_seq_sub1->particle_jet_indices(subjets1);
+      for(unsigned int i=0; i<genparts_sub1.size(); ++i){
+	if(abs(genparts_sub1.at(i).pdgId()) == 11 || abs(genparts_sub1.at(i).pdgId()) == 13){
+	  lep = &(genparts_sub1.at(i));
+	  jetnr = particle_list1[i];
+	  // cout<<"found lepton in fatjet 1, subjet "<< jetnr +1 <<endl;
+	  if(jetnr != -1){
+	    // cout<<"before (px, py, pz, E)   = ("<< subjets1.at(jetnr).px() <<", "<< subjets1.at(jetnr).py() <<", "<< subjets1.at(jetnr).pz() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	    // cout<<"before (pt, eta, phi, E) = ("<< subjets1.at(jetnr).pt() <<", "<< subjets1.at(jetnr).eta() <<", "<< subjets1.at(jetnr).phi() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	    subjets1.at(jetnr) = substract_lepton(lep, subjets1.at(jetnr));
+	    // cout<<"after (px, py, pz, E)   = ("<< subjets1.at(jetnr).px() <<", "<< subjets1.at(jetnr).py() <<", "<< subjets1.at(jetnr).pz() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	    // cout<<"after (pt, eta, phi, E) = ("<< subjets1.at(jetnr).pt() <<", "<< subjets1.at(jetnr).eta() <<", "<< subjets1.at(jetnr).phi() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	  }
+	}
+      }
+    }
+    if(choose_jet == 2){
+      particle_list2.clear();
+      particle_list2 = clust_seq_sub2->particle_jet_indices(subjets2);
+      for(unsigned int j=0; j<genparts_sub2.size(); ++j){
+	if(abs(genparts_sub2.at(j).pdgId()) == 11 || abs(genparts_sub2.at(j).pdgId()) == 13){
+	  lep = &(genparts_sub2.at(j));
+	  jetnr = particle_list2[j];
+	  // cout<<"found lepton in fatjet 2, subjet "<< jetnr +1 <<endl;
+	  if(jetnr != -1) subjets2.at(jetnr) = substract_lepton(lep, subjets2.at(jetnr));
+	}
       }
     }
   }
-  if(choose_jet == 2){
-    particle_list2.clear();
-    particle_list2 = clust_seq_sub2->particle_jet_indices(subjets2);
-    for(unsigned int j=0; j<genparts_sub2.size(); ++j){
-      if(abs(genparts_sub2.at(j).pdgId()) == 11 || abs(genparts_sub2.at(j).pdgId()) == 13){
-	lep = &(genparts_sub2.at(j));
-	jetnr = particle_list2[j];
-	if(jetnr != -1) subjets2.at(jetnr) = substract_lepton(lep, subjets2.at(jetnr));
+  if(lep_in_jet1){
+    if(choose_jet == 1){
+      particle_list1.clear();
+      particle_list1 = clust_seq_sub1->particle_jet_indices(subjets1);
+      for(unsigned int i=0; i<genparts_sub2.size(); ++i){
+	if(abs(genparts_sub2.at(i).pdgId()) == 11 || abs(genparts_sub2.at(i).pdgId()) == 13){
+	  lep = &(genparts_sub2.at(i));
+	  jetnr = particle_list1[i];
+	  // cout<<"found lepton in fatjet 1, subjet "<< jetnr +1 <<endl;
+	  if(jetnr != -1){
+	    // cout<<"before (px, py, pz, E)   = ("<< subjets1.at(jetnr).px() <<", "<< subjets1.at(jetnr).py() <<", "<< subjets1.at(jetnr).pz() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	    // cout<<"before (pt, eta, phi, E) = ("<< subjets1.at(jetnr).pt() <<", "<< subjets1.at(jetnr).eta() <<", "<< subjets1.at(jetnr).phi() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	    subjets1.at(jetnr) = substract_lepton(lep, subjets1.at(jetnr));
+	    // cout<<"after (px, py, pz, E)   = ("<< subjets1.at(jetnr).px() <<", "<< subjets1.at(jetnr).py() <<", "<< subjets1.at(jetnr).pz() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	    // cout<<"after (pt, eta, phi, E) = ("<< subjets1.at(jetnr).pt() <<", "<< subjets1.at(jetnr).eta() <<", "<< subjets1.at(jetnr).phi() <<", "<< subjets1.at(jetnr).E() <<")"<<endl;
+	  }
+	}
+      }
+    }
+    if(choose_jet == 2){
+      particle_list2.clear();
+      particle_list2 = clust_seq_sub2->particle_jet_indices(subjets2);
+      for(unsigned int j=0; j<genparts_sub1.size(); ++j){
+	if(abs(genparts_sub1.at(j).pdgId()) == 11 || abs(genparts_sub1.at(j).pdgId()) == 13){
+	  lep = &(genparts_sub1.at(j));
+	  jetnr = particle_list2[j];
+	  // cout<<"found lepton in fatjet 2, subjet "<< jetnr +1 <<endl;
+	  if(jetnr != -1) subjets2.at(jetnr) = substract_lepton(lep, subjets2.at(jetnr));
+	}
       }
     }
   }
   // ============================================================================================================
 
   // ===== Create Particle Lists for ============================================================================
-  std::vector<PseudoJet> pf_subjet1_1, pf_subjet1_2, pf_subjet1_3, pf_subjet2_1, pf_subjet2_2;
+  std::vector<PseudoJet> pf_subjet1_1, pf_subjet1_2, pf_subjet1_3, pf_subjet2_1, pf_subjet2_2, pf_subjet1_0, pf_subjet2_0;
   if(lep_in_jet2 && choose_jet == 1){
     for(unsigned int i=0; i<particle_list1.size(); ++i){
       if(particle_list1[i] == 0){
@@ -296,6 +341,9 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
       }
       if(particle_list1[i] == 2){
 	pf_subjet1_3.push_back(particle_in_subjet1[i]);
+      } 
+      if(particle_list1[i] == -1){
+	pf_subjet1_0.push_back(particle_in_subjet1[i]);
       } 
     }
   }
@@ -310,6 +358,9 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
       if(particle_list1[i] == 2){
 	pf_subjet1_3.push_back(particle_in_subjet2[i]);
       } 
+      if(particle_list1[i] == -1){
+	pf_subjet1_0.push_back(particle_in_subjet2[i]);
+      } 
     }
   }
     if(lep_in_jet2 && choose_jet == 2){
@@ -319,6 +370,9 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
       }
       if(particle_list2[i] == 1){
 	pf_subjet2_2.push_back(particle_in_subjet2[i]);
+      }
+      if(particle_list2[i] == -1){
+	pf_subjet2_0.push_back(particle_in_subjet2[i]);
       }
     }
   }
@@ -330,30 +384,54 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
       if(particle_list2[i] == 1){
 	pf_subjet2_2.push_back(particle_in_subjet1[i]);
       }
+      if(particle_list2[i] == -1){
+	pf_subjet2_0.push_back(particle_in_subjet1[i]);
+      }
     }
   }
-  // ============================================================================================================
-
-  if(choose_jet == 0){
-    event.set(h_list, particle_list);
-    event.set(h_particle_fatjet1, convert_pseudojet_to_jet(particle_in_subjet1));
-    event.set(h_particle_fatjet2, convert_pseudojet_to_jet(particle_in_subjet2));
-  }
-  if(choose_jet == 1){
-    event.set(h_list, particle_list1);
-    event.set(h_particle_subjet1_1, convert_pseudojet_to_jet(pf_subjet1_1));
-    event.set(h_particle_subjet1_2, convert_pseudojet_to_jet(pf_subjet1_2));
-    event.set(h_particle_subjet1_3, convert_pseudojet_to_jet(pf_subjet1_3));
-
-  }
-  if(choose_jet == 2){
-    event.set(h_list, particle_list2);
-    event.set(h_particle_subjet2_1, convert_pseudojet_to_jet(pf_subjet2_1));
-    event.set(h_particle_subjet2_2, convert_pseudojet_to_jet(pf_subjet2_2));
+  // =========================== Write Lists with particles for each jet +=======================================
+  bool return_particle_list = true;
+  if(return_particle_list){
+    if(choose_jet == 0){
+      event.set(h_list, particle_list);
+      event.set(h_particle_fatjet1, convert_pseudojet_to_jet(particle_in_subjet1));
+      event.set(h_particle_fatjet2, convert_pseudojet_to_jet(particle_in_subjet2));
+      event.set(h_particle_fatjet0, convert_pseudojet_to_jet(particle_in_subjet0));
+      event.set(h_particle_all, convert_pseudojet_to_jet(particle_in2));
+    }
+    if(choose_jet == 1){
+      event.set(h_list, particle_list1);
+      event.set(h_particle_subjet1_1, convert_pseudojet_to_jet(pf_subjet1_1));
+      event.set(h_particle_subjet1_2, convert_pseudojet_to_jet(pf_subjet1_2));
+      event.set(h_particle_subjet1_3, convert_pseudojet_to_jet(pf_subjet1_3));
+      event.set(h_particle_subjet1_0, convert_pseudojet_to_jet(pf_subjet1_0));
+    }
+    if(choose_jet == 2){
+      event.set(h_list, particle_list2);
+      event.set(h_particle_subjet2_1, convert_pseudojet_to_jet(pf_subjet2_1));
+      event.set(h_particle_subjet2_2, convert_pseudojet_to_jet(pf_subjet2_2));
+      event.set(h_particle_subjet2_0, convert_pseudojet_to_jet(pf_subjet2_0));
+    }
   }
   if(choose_jet == 0) returnjets = fatjets;
   if(choose_jet == 1) returnjets = subjets1;
   if(choose_jet == 2) returnjets = subjets2;
+  // ============================================================================================================
+
+  // =========================== Delete all objects =============================================================
+  particle_in_subjet0.clear();
+  particle_in_subjet1.clear();
+  particle_in_subjet2.clear();
+  pf_subjet1_0.clear();
+  pf_subjet1_1.clear();
+  pf_subjet1_2.clear();
+  pf_subjet1_3.clear();
+  pf_subjet2_0.clear();
+  pf_subjet2_1.clear();
+  pf_subjet2_2.clear();
+  particle_list1.clear();
+  particle_list2.clear();
+  // ============================================================================================================
 
   return returnjets;
 }
@@ -443,6 +521,8 @@ fastjet::PseudoJet JetCluster::substract_lepton(GenParticle* lepton2, fastjet::P
   fastjet::PseudoJet new_fjet;
   fastjet::PseudoJet lepton = convert_particle(lepton2);
   double px, py, pz, E;
+  // cout<<"lepton (px, py, pz, E)   = ("<< lepton.px() <<", "<< lepton.py() <<", "<< lepton.pz() <<", "<< lepton.E() <<")"<<endl;
+  // cout<<"lepton (pt, eta, phi, E) = ("<< lepton.pt() <<", "<< lepton.eta() <<", "<< lepton.phi() <<", "<< lepton.E() <<")"<<endl;
   px = fjet.px()-lepton.px();
   py = fjet.py()-lepton.py();
   pz = fjet.pz()-lepton.pz();
@@ -456,23 +536,20 @@ fastjet::PseudoJet JetCluster::substract_lepton(GenParticle* lepton2, fastjet::P
 // ------------------------------------ Add Ghost GenParticles to Pseudo Jet of GenParticles ---------------------------------------------
 std::vector<fastjet::PseudoJet> JetCluster::add_ghosts(std::vector<fastjet::PseudoJet> gen_in){
   //fastjet::PseudoJet ghost;
-  double pt, y, phi, E, p, px, py, pz;
+  double pt, eta, phi, E, p;
   TLorentzVector ghost_v4;
   for(unsigned int i=0; i < 50; ++i){
-    for(unsigned int j=0; j < 50; ++j){
+    for(unsigned int i_=0; i_ < 80; ++i_ ){
       phi = -M_PI + (i+0.5)*(2*M_PI/50);
-      y = -4 + (j+0.5)*(2*4/50);
+      eta = -4 + (i_ + 0.5)*(0.1);
       // create random energy
       std::mt19937 rng( std::random_device{}() ); 
       std::uniform_real_distribution<> dist(0.1, 1);
       double randnr = dist(rng);
       E = randnr*0.0001;
       p = sqrt(E*E);
-      pt = p/cosh(y);
-      // px = pt * cos(phi);
-      // py = pt * sin(phi);
-      // pz = pt * sinh(y);
-      ghost_v4.SetPtEtaPhiE(pt, y, phi, E);
+      pt = p/cosh(eta);
+      ghost_v4.SetPtEtaPhiE(pt, eta, phi, E);
       fastjet::PseudoJet ghost( ghost_v4.Px(), ghost_v4.Py(), ghost_v4.Pz(), ghost_v4.E() );
       gen_in.push_back(ghost);
     }
@@ -1025,6 +1102,13 @@ bool GenXCONE23JetProducer::process(uhh2::Event & event){
     else jet5_v4.SetPxPyPzE(0, 0, 0, 0);
   }
   Jet seed1, seed2, new_jet1, new_jet2, subjet1, subjet2, subjet3, subjet4, subjet5;
+  // cout<<"subjet1_1 (px, py, pz, E) = ("<< jet1_v4.Px() <<", "<< jet1_v4.Py() <<", "<< jet1_v4.Pz() <<", "<< jet1_v4.E() <<")"<<endl;
+  // cout<<"subjet1_1 Mass = "<< jet1_v4.M() << endl;
+  // cout<<"subjet1_2 (px, py, pz, E) = ("<< jet2_v4.Px() <<", "<< jet2_v4.Py() <<", "<< jet2_v4.Pz() <<", "<< jet2_v4.E() <<")"<<endl;
+  // cout<<"subjet1_2 Mass = "<< jet2_v4.M() << endl;
+  // cout<<"subjet1_3 (px, py, pz, E) = ("<< jet3_v4.Px() <<", "<< jet3_v4.Py() <<", "<< jet3_v4.Pz() <<", "<< jet3_v4.E() <<")"<<endl;
+  // cout<<"subjet1_3 Mass = "<< jet3_v4.M() << endl;
+
   combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
   combinedjet2_v4 = jet4_v4 + jet5_v4;
 
@@ -1033,6 +1117,9 @@ bool GenXCONE23JetProducer::process(uhh2::Event & event){
   new_jet1.set_eta(combinedjet1_v4.Eta());
   new_jet1.set_phi(combinedjet1_v4.Phi());
   new_jet1.set_energy(combinedjet1_v4.E());
+  // cout<<"combined jet (px, py, pz, E) = ("<< new_jet1.v4().Px() <<", "<< new_jet1.v4().Py() <<", "<< new_jet1.v4().Pz() <<", "<< new_jet1.v4().E() <<")"<<endl;
+  // cout<<"combined jet Mass = "<< new_jet1.v4().M() <<endl;
+  // cout<<"combined jet PT   = "<< new_jet1.v4().Pt() <<endl;
 
   new_jet2.set_pt(combinedjet2_v4.Pt());
   new_jet2.set_eta(combinedjet2_v4.Eta());

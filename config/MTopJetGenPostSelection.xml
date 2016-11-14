@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
-<!ENTITY NEVT "150">
+<!ENTITY NEVT "-1">
 
   <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
   <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/GenPost"> 
@@ -8,13 +8,14 @@
 
 
   <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_topjet_ak08_xconeN2R4_xconeN3R4_HOTVR_HOTVRrho500_HOTVRrho400_HOTVRrho300_xconeN5R4_xconeN5R4merged_xconeN6R4gen_xconeN6R4merged_xcone23.root">
+  <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_XCone23_R20.root"> -->
   <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_JetDisplay.root"> -->
   <!-- <!ENTITY TTbar_PF_semilep  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_JetDisplay_test2.root"> -->
 
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="2000" LastBreak="0" FileSplit="0" />
+   <ConfigParse NEventsBreak="2500" LastBreak="0" FileSplit="0" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/SFrame_Batch_workdir"/>
 -->
 
@@ -27,9 +28,8 @@
 
  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
 
-<!--
-<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15"> 
--->
+
+<!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15">  -->
  
 
     <!-- ********TTbar**************************************** -->
