@@ -35,6 +35,8 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
 
   TopHadPT = book<TH1F>("pt_tophad", "p_{T}", 20, 0, 1000);
   TopLepPT = book<TH1F>("pt_toplep", "p_{T}", 20, 0, 1000);
+  BotHadPT = book<TH1F>("pt_bothad", "p_{T}", 40, 0, 800);
+  BotLepPT = book<TH1F>("pt_botlep", "p_{T}", 40, 0, 800);
 
   GenJet2Eta = book<TH1F>("eta_jet2", "#eta", 24, -3, 3);
 
@@ -55,6 +57,9 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   deltaR_q2_jet2 = book<TH1F>("deltaR_q2_jet2", "#Delta R(q2,2nd Jet)", 80, 0, 4.0);
   deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
   deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
+ 
+  deltaPhi_lep1_jet1 = book<TH1F>("deltaPhi_lep1_jet1", "#Delta #Phi(lep1,1st Jet)", 80, 0, 4.0);
+  deltaPhi_lep1_jet2 = book<TH1F>("deltaPhi_lep1_jet2", "#Delta #Phi(lep1,2nd Jet)", 80, 0, 4.0);
 
   dR_GenParts_highest = book<TH1F>("dR_GenParts_largest_for_partons", "highest #Delta R between top had products", 80, 0, 4.0);
   dR_GenParts_lowest = book<TH1F>("dR_GenParts_lowest_for_partons", "lowest #Delta R between top had products", 80, 0, 4.0);
@@ -263,6 +268,10 @@ void GenHists::fill(const Event & event){
   double topleppt = toplep.pt();
   TopLepPT->Fill(topleppt, weight);
 
+  // pT of bottoms
+  BotHadPT->Fill(bot.pt(), weight);
+  BotLepPT->Fill(bot_lep.pt(), weight);
+
   // delta R Hists
   if(jets.size() > 0){
     deltaR_lep1_jet1->Fill(deltaR(jet1, lep1), weight);
@@ -273,6 +282,7 @@ void GenHists::fill(const Event & event){
     deltaR_bot_jet1->Fill(deltaR(jet1, bot), weight);
     deltaR_tophad_jet1->Fill(deltaR(jet1, tophad), weight);
     deltaR_toplep_jet1->Fill(deltaR(jet1, toplep), weight);
+    deltaPhi_lep1_jet1->Fill(abs(jet1.phi()-lep1.phi()), weight);
   }
 
   if(jets.size() > 1){
@@ -284,6 +294,8 @@ void GenHists::fill(const Event & event){
     deltaR_bot_jet2->Fill(deltaR(jet2, bot), weight);
     deltaR_tophad_jet2->Fill(deltaR(jet2, tophad), weight);
     deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
+    deltaPhi_lep1_jet2->Fill(abs(jet2.phi()-lep1.phi()), weight);
+
   }
 
   dR_GenParts_q1_q2->Fill(deltaR(q1,q2), weight);

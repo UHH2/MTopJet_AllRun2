@@ -401,6 +401,40 @@ bool uhh2::MassCut_top::passes(const uhh2::Event& event){
   return pass_masscut;
 }
 
+uhh2::DeltaPhiCut::DeltaPhiCut(uhh2::Context& ctx, const std::string & name, float jetradius):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+  jetradius_(jetradius) {}
+
+bool uhh2::DeltaPhiCut::passes(const uhh2::Event& event){
+  std::vector<Jet> jets = event.get(h_jets);
+  const auto & ttbargen = event.get(h_ttbargen);
+  Jet jet2;
+  GenParticle lepton, lep1, lep2;
+  bool pass_deltaR = false;
+  if(jets.size()>1){
+    jet2 = jets.at(1);
+    if(ttbargen.IsTopHadronicDecay()){
+      lep1 = ttbargen.WMinusdecay1();
+      lep2 = ttbargen.WMinusdecay2();
+    }
+    else if(ttbargen.IsAntiTopHadronicDecay()){
+      lep1 = ttbargen.Wdecay1();
+      lep2 = ttbargen.Wdecay2();
+    }
+    //check which lep is neutrino and which is elec/muon
+    if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+      lepton = lep1;
+    }
+    else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+      lepton = lep2;
+    }
+    
+    if(abs(lepton.phi() - jet2.phi()) < jetradius_) pass_deltaR = true;
+  }
+  return pass_deltaR;
+}
+
 uhh2::DeltaRCut::DeltaRCut(uhh2::Context& ctx, const std::string & name, float jetradius):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),
   h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),

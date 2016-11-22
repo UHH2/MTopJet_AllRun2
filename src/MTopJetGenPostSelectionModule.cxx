@@ -36,7 +36,7 @@
 #include <UHH2/MTopJet/include/RecoGenHists_topjet.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/JetCluster.h>
-// #include <UHH2/MTopJet/include/ClusteringHists.h>
+#include <UHH2/MTopJet/include/ClusteringHists.h>
 
 class MTopJetGenPostSelectionModule : public ModuleBASE {
 
@@ -72,6 +72,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> masscut;
   std::unique_ptr<uhh2::Selection> n_genjets;
   std::unique_ptr<uhh2::Selection> deltaR;
+  std::unique_ptr<uhh2::Selection> deltaPhi;
   std::unique_ptr<uhh2::Selection> deltaR_HOTVR;
   std::unique_ptr<uhh2::Selection> matching_top;
   std::unique_ptr<uhh2::Selection> topjetpt_top;
@@ -303,6 +304,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   n_genjets.reset(new NGenJets(ctx, jet_label_gen, 50, 2, 2));  // ==2 jets with pt > 150
   topjetpt.reset(new LeadingJetPT(ctx, jet_label_gen, 400)); // leading jet pt > 400
   deltaR.reset(new DeltaRCut(ctx, jet_label_gen, jet_radius_dR_Cut)); 
+  deltaPhi.reset(new DeltaPhiCut(ctx, jet_label_gen, 1.0)); 
   deltaR_HOTVR.reset(new DeltaRCut_HOTVR(ctx, jet_label_gen, rho)); 
   masscut.reset(new MassCut(ctx, jet_label_gen));
   matching.reset(new Matching(ctx, jet_label_gen, jet_radius));
@@ -334,9 +336,9 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   massbin4.reset(new MassCutGen1(ctx, jet_label_gen, 200, 250));
   massbin5.reset(new MassCutGen1(ctx, jet_label_gen, 250, 300));
   massbin6.reset(new MassCutGen1(ctx, jet_label_gen, 300, 500));
-  massbin_HOTVR_low.reset(new MassCutGen1(ctx, jet_label_gen, 0, 160));
-  massbin_HOTVR_peak.reset(new MassCutGen1(ctx, jet_label_gen, 160, 250));
-  massbin_HOTVR_high.reset(new MassCutGen1(ctx, jet_label_gen, 250, 5000));
+  massbin_HOTVR_low.reset(new MassCutGen1(ctx, jet_label_gen, 0, 100));
+  massbin_HOTVR_peak.reset(new MassCutGen1(ctx, jet_label_gen, 100, 200));
+  massbin_HOTVR_high.reset(new MassCutGen1(ctx, jet_label_gen, 200, 5000));
   massbin1_top.reset(new MassCutGen1_top(ctx,  50, 100));
   massbin2_top.reset(new MassCutGen1_top(ctx, 100, 150));
   massbin3_top.reset(new MassCutGen1_top(ctx, 150, 200));
@@ -355,8 +357,8 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // cout<<event.event<<endl;
   //  COMMON MODULES
   // ================ set to true / false to run analysis =============================
-  bool produce_jet = true;
-  bool do_gensel = false;
+  bool produce_jet = false;
+  bool do_gensel = true;
   bool do_gensel_top = false;
   bool do_recsel = false;
   bool do_cluster_hist = true;
@@ -551,7 +553,8 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
 
   // ================ deltaR(lepton, 2nd jet) < jet radius =============================
-  if(!(produce_jet) && do_gensel  && !(deltaR->passes(event))) return false;
+  // if(!(produce_jet) && do_gensel  && !(deltaR->passes(event))) return false;
+  // if(!(produce_jet) && do_gensel  && !(deltaPhi->passes(event))) return false;
   if(!(produce_jet) && do_gensel_top  && !(deltaR_top->passes(event))) return false;
   h_GenHists3->fill(event);
   h_GenHists3_top->fill(event);
@@ -575,7 +578,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
  
   // ================ m(1st jet) > m(2nd jet + lepton)================================== 
-  //if(!(produce_jet) && do_gensel  && !(masscut->passes(event))) return false;
+  if(!(produce_jet) && do_gensel  && !(masscut->passes(event))) return false;
   if(!(produce_jet) && do_gensel_top  && !(masscut_top->passes(event))) return false;
   h_GenHists4->fill(event);
   h_HOTVRHists4->fill(event);

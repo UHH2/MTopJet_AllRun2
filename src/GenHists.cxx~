@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/MTopJetGenHists.h"
+#include "UHH2/MTopJet/include/GenHists.h"
 #include "UHH2/MTopJet/include/JetCluster.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
@@ -15,17 +15,21 @@
 
 using namespace uhh2;
 
-MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
+GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
   // book all histograms here
   GenJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
   GenJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  GenJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
+  GenJet2LepMass = book<TH1F>("GenJet2LepMass", "M_{jet2 + lepton}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
   GenJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   GenJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
   GenJet1Jet2PT = book<TH1F>("pt_jet1-pt_jet2", "p_{T,jet1} - p_{T,jet2}", 80, -400, 400);
   GenJet3PT = book<TH1F>("pt_jet3", "p_{T}", 50, 0, 1000);
+  GenJet4PT = book<TH1F>("pt_jet4", "p_{T}", 50, 0, 1000);
+  GenJet5PT = book<TH1F>("pt_jet5", "p_{T}", 50, 0, 1000);
   GenJetPT = book<TH1F>("pt_all_jets", "p_{T}", 50, 0, 1000);
   LeptonPT = book<TH1F>("pt_lepton", "p_{T}", 50, 0, 1000);
 
@@ -51,6 +55,26 @@ MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirnam
   deltaR_q2_jet2 = book<TH1F>("deltaR_q2_jet2", "#Delta R(q2,2nd Jet)", 80, 0, 4.0);
   deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
   deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
+ 
+  deltaPhi_lep1_jet1 = book<TH1F>("deltaPhi_lep1_jet1", "#Delta #Phi(lep1,1st Jet)", 80, 0, 4.0);
+  deltaPhi_lep1_jet2 = book<TH1F>("deltaPhi_lep1_jet2", "#Delta #Phi(lep1,2nd Jet)", 80, 0, 4.0);
+
+  dR_GenParts_highest = book<TH1F>("dR_GenParts_largest_for_partons", "highest #Delta R between top had products", 80, 0, 4.0);
+  dR_GenParts_lowest = book<TH1F>("dR_GenParts_lowest_for_partons", "lowest #Delta R between top had products", 80, 0, 4.0);
+  dR_GenParts_highest_toppt = book<TH2F>("dR_GenParts_largest_for_partons_toppt", "x=p_T_tophad y=#Delta R(high)", 20, 0 , 1000, 40, 0, 4.0);
+  dR_GenParts_lowest_toppt = book<TH2F>("dR_GenParts_lowest_for_partons_toppt", "x=p_T_tophad y=#Delta R(low)", 20, 0 , 1000, 40, 0, 4.0);
+
+  dR_GenParts_q1_q2 = book<TH1F>("dR_GenParts_q1_q2", "#Delta R(q1, q2)", 80, 0, 4.0);
+  dR_GenParts_bot_q1 = book<TH1F>("dR_GenParts_bot_q1", "#Delta R(bot, q1)", 80, 0, 4.0);
+  dR_GenParts_bot_q2 = book<TH1F>("dR_GenParts_bot_q2", "#Delta R(bot, q2)", 80, 0, 4.0);
+  dR_GenParts_q1_q2_toppt = book<TH2F>("dR_GenParts_q1_q2_toppt", "x=p_T_tophad y=#Delta R(q1, q2)", 20, 0 , 1000, 40, 0, 4.0);
+  dR_GenParts_bot_q1_toppt = book<TH2F>("dR_GenParts_bot_q1_toppt", "x=p_T_tophad y=#Delta R(bot, q1)", 20, 0 , 1000,  40, 0, 4.0);
+  dR_GenParts_bot_q2_toppt = book<TH2F>("dR_GenParts_bot_q2_toppt", "x=p_T_tophad y=#Delta R(bot, q2)", 20, 0 , 1000,  40, 0, 4.0);
+
+  Eta_Phi_jet1 = book<TH2F>("Eta_Phi_jet1", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
+  Eta_Phi_bot = book<TH2F>("Eta_Phi_bot", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
+  Eta_Phi_q1 = book<TH2F>("Eta_Phi_q1", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
+  Eta_Phi_q2 = book<TH2F>("Eta_Phi_q2", "x=#eta y=#Phi", 30, -3 , 3,  40, -4, 4);
 
   // deltaR_lep1_jet3 = book<TH1F>("deltaR_lep1_jet3", "#Delta R(lep1,3rd Jet)", 80, 0, 4.0);
   // deltaR_lep2_jet3 = book<TH1F>("deltaR_lep2_jet3", "#Delta R(lep2,3rd Jet)", 80, 0, 4.0);
@@ -97,7 +121,7 @@ MTopJetGenHists::MTopJetGenHists(uhh2::Context & ctx, const std::string & dirnam
 
 
 
-void MTopJetGenHists::fill(const Event & event){
+void GenHists::fill(const Event & event){
 
   //---------------------------------------------------------------------------------------
   //--------------------------------- get first 13 gen parts -------------------------------
@@ -215,6 +239,8 @@ void MTopJetGenHists::fill(const Event & event){
 
   if((jets.size()) > 1){
     GenJet1Mass->Fill(jet1_v4.M(),weight);
+    GenJet2Mass->Fill(jet2_v4.M(),weight);
+    GenJet2LepMass->Fill(jet2_lep_v4.M(),weight);
     GenJet1PT->Fill(jet1_v4.Pt(),weight);
     GenJet2PT->Fill(jet2_v4.Pt(),weight);
     GenJet2Eta->Fill(jet2_v4.Eta(),weight);
@@ -224,14 +250,20 @@ void MTopJetGenHists::fill(const Event & event){
   if((jets.size()) > 2){
     GenJet3PT->Fill(jets.at(2).pt(),weight);
   }
+  if((jets.size()) > 3){
+    GenJet4PT->Fill(jets.at(3).pt(),weight);
+  }
+  if((jets.size()) > 4){
+    GenJet5PT->Fill(jets.at(4).pt(),weight);
+  }
   // pT of had. top
   GenParticle tophad = ttbargen.TopHad();
-  float tophadpt = tophad.pt();
+  double tophadpt = tophad.pt();
   TopHadPT->Fill(tophadpt, weight);
   
   // pT of lep. top
   GenParticle toplep = ttbargen.TopLep();
-  float topleppt = toplep.pt();
+  double topleppt = toplep.pt();
   TopLepPT->Fill(topleppt, weight);
 
   // delta R Hists
@@ -244,6 +276,7 @@ void MTopJetGenHists::fill(const Event & event){
     deltaR_bot_jet1->Fill(deltaR(jet1, bot), weight);
     deltaR_tophad_jet1->Fill(deltaR(jet1, tophad), weight);
     deltaR_toplep_jet1->Fill(deltaR(jet1, toplep), weight);
+    deltaPhi_lep1_jet1->Fill(abs(jet1.phi()-lep1.phi()), weight);
   }
 
   if(jets.size() > 1){
@@ -255,8 +288,38 @@ void MTopJetGenHists::fill(const Event & event){
     deltaR_bot_jet2->Fill(deltaR(jet2, bot), weight);
     deltaR_tophad_jet2->Fill(deltaR(jet2, tophad), weight);
     deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
+    deltaPhi_lep1_jet2->Fill(abs(jet2.phi()-lep1.phi()), weight);
+
   }
+
+  dR_GenParts_q1_q2->Fill(deltaR(q1,q2), weight);
+  dR_GenParts_bot_q1->Fill(deltaR(bot,q1), weight);
+  dR_GenParts_bot_q2->Fill(deltaR(bot,q2), weight); 
   
+  dR_GenParts_q1_q2_toppt->Fill(tophadpt, deltaR(q1,q2), weight);
+  dR_GenParts_bot_q1_toppt->Fill(tophadpt, deltaR(bot,q1), weight);
+  dR_GenParts_bot_q2_toppt->Fill(tophadpt, deltaR(bot,q2), weight);
+
+  double dR_high, dR_low;
+  dR_low = deltaR(q1,q2);
+  if(deltaR(bot,q1) < dR_low) dR_low = deltaR(bot,q1); 
+  if(deltaR(bot,q2) < dR_low) dR_low = deltaR(bot,q2); 
+  dR_high = deltaR(q1,q2);
+  if(deltaR(bot,q1) > dR_high) dR_high = deltaR(bot,q1); 
+  if(deltaR(bot,q2) > dR_high) dR_high = deltaR(bot,q2); 
+
+  dR_GenParts_highest->Fill(dR_high, weight);
+  dR_GenParts_lowest->Fill(dR_low, weight);
+  dR_GenParts_highest_toppt->Fill(tophadpt, dR_high, weight);
+  dR_GenParts_lowest_toppt->Fill(tophadpt, dR_low, weight);
+
+
+  if(jets.size() > 0){
+    Eta_Phi_jet1->Fill(jet1_v4.Eta(), jet1_v4.Phi(), weight);
+    Eta_Phi_bot->Fill(bot.eta(), bot.phi(), weight);
+    Eta_Phi_q1->Fill(q1.eta(), q1.phi(), weight);
+    Eta_Phi_q2->Fill(q2.eta(), q2.phi(), weight);
+  }
   // if(jets.size() > 2){
   //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);
   //   deltaR_lep2_jet3->Fill(deltaR(jet3, lep2), weight);

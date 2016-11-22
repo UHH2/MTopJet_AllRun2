@@ -157,6 +157,18 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
   
+ class DeltaPhiCut : public Selection { 
+
+  public: 
+   explicit DeltaPhiCut(Context&, const std::string &, float);
+   virtual bool passes(const Event&) override;
+
+  private:
+   uhh2::Event::Handle<std::vector<Jet>> h_jets;
+   uhh2::Event::Handle<TTbarGen> h_ttbargen;
+   float jetradius_;
+  };
+ 
  class DeltaRCut : public Selection { 
 
   public: 

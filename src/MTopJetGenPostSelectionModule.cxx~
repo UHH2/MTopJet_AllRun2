@@ -355,8 +355,8 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // cout<<event.event<<endl;
   //  COMMON MODULES
   // ================ set to true / false to run analysis =============================
-  bool produce_jet = true;
-  bool do_gensel = false;
+  bool produce_jet = false;
+  bool do_gensel = true;
   bool do_gensel_top = false;
   bool do_recsel = false;
   bool do_cluster_hist = true;
@@ -440,7 +440,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   //     cout<<"Jet Display Event 17"<<endl;
   //     Cluster17->fill(event);
   //   }
-  //   // mass = 0 
+  //   // 
   //   if(event.event == 40783466){
   //     cout<<"Jet Display Event 18"<<endl;
   //     Cluster18->fill(event);
@@ -551,7 +551,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
 
   // ================ deltaR(lepton, 2nd jet) < jet radius =============================
-  if(!(produce_jet) && do_gensel  && !(deltaR->passes(event))) return false;
+  // if(!(produce_jet) && do_gensel  && !(deltaR->passes(event))) return false;
   if(!(produce_jet) && do_gensel_top  && !(deltaR_top->passes(event))) return false;
   h_GenHists3->fill(event);
   h_GenHists3_top->fill(event);
@@ -575,7 +575,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
  
   // ================ m(1st jet) > m(2nd jet + lepton)================================== 
-  //if(!(produce_jet) && do_gensel  && !(masscut->passes(event))) return false;
+  if(!(produce_jet) && do_gensel  && !(masscut->passes(event))) return false;
   if(!(produce_jet) && do_gensel_top  && !(masscut_top->passes(event))) return false;
   h_GenHists4->fill(event);
   h_HOTVRHists4->fill(event);

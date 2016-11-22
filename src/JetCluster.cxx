@@ -47,7 +47,8 @@ std::vector<fastjet::PseudoJet> JetCluster::get_genjets(std::vector<GenParticle>
 	  if(IsLepton(part)){
 	      lepton = convert_particle(part);
 	  }
-	}
+      }
+      delete part;
   }
 
   if(algorithm==e_ca) jetdef= new fastjet::JetDefinition(fastjet::cambridge_algorithm,jet_radius);
@@ -177,18 +178,18 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   //============================================================================================================
 
   // ===== Run first clustering step (N=2, R=inf) ==============================================================
-  XConePlugin plugin_xcone(2, 2.5, 2.0);
+  XConePlugin plugin_xcone(2, 1.2, 2.0);
   fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
   clust_seq_xcone=new fastjet::ClusterSequence(particle_in2, jet_def_xcone);
 
   fatjets = sorted_by_pt(clust_seq_xcone->inclusive_jets(ptmin));
   //============================================================================================================
 
-  // ===== get list: if particle i ist clustered in jet j, the i-th entry of the list == j, also write list ====
+  // ===== get and wirte list: if particle i ist clustered in jet j, the i-th entry of the list == j, ==========
   std::vector<int> particle_list;
-
   particle_list.clear();
   particle_list = clust_seq_xcone->particle_jet_indices(fatjets);
+
   // get one set of particles for each jet. Also check if lepton is clustered into jet
   bool lep_in_jet1 = false;
   bool lep_in_jet2 = false;
@@ -419,6 +420,12 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   // ============================================================================================================
 
   // =========================== Delete all objects =============================================================
+  subjets1.clear();
+  subjets2.clear();
+  fatjets.clear();
+  genparts2.clear();
+  genparts_sub1.clear();
+  genparts_sub2.clear();
   particle_in_subjet0.clear();
   particle_in_subjet1.clear();
   particle_in_subjet2.clear();
@@ -431,10 +438,13 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   pf_subjet2_2.clear();
   particle_list1.clear();
   particle_list2.clear();
+  particle_in_noGhost.clear();
+  particle_in2.clear();
   // ============================================================================================================
 
   return returnjets;
 }
+
 
 // ------------------------------------ Get clustered XCone Jets from PFParticles ---------------------------------------------------------------------------------
 std::vector<fastjet::PseudoJet> JetCluster::get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin){ 
