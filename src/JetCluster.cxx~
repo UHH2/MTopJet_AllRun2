@@ -187,9 +187,9 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 
   // ===== get and wirte list: if particle i ist clustered in jet j, the i-th entry of the list == j, ==========
   std::vector<int> particle_list;
-
   particle_list.clear();
   particle_list = clust_seq_xcone->particle_jet_indices(fatjets);
+
   // get one set of particles for each jet. Also check if lepton is clustered into jet
   bool lep_in_jet1 = false;
   bool lep_in_jet2 = false;
@@ -444,6 +444,130 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 
   return returnjets;
 }
+
+
+// ------------------------------------ Get clustered XCone 2+3 Jets from PF Particles ---------------------------------------------------------------------------------
+std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_recojets(uhh2::Context & ctx, uhh2::Event & event, std::vector<PFParticle>* pfparts, bool store_all_jets){ 
+
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone23fatjets = ctx.declare_event_output<std::vector<Jet>>("reco_xcone23fatjets");
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone23subjets_had = ctx.declare_event_output<std::vector<Jet>>("reco_xcone23subjets_had");
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone23subjets_lep = ctx.declare_event_output<std::vector<Jet>>("reco_xcone23subjets_lep");
+
+  // ===== Create List of particles as input for clustering sequence ==========================================
+  // also get lepton with highest pt and store position in pfparticle list
+  std::vector<fastjet::PseudoJet> particle_in;
+  double pt_lep_max = 0;
+  unsigned int i_lep = 0;
+  cout<<"------------------------------"<<endl;
+  for(unsigned int i=0; i<(pfparts->size()); ++i){
+    PFParticle* part = &(pfparts->at(i));
+    particle_in.push_back(convert_recoparticle(part));
+    if(abs(part->particleID()) == 2 || abs(part->particleID()) == 3){
+      cout<<"p_T max is now = "<<pt_lep_max<<endl;
+      cout<<"Found Lepton with p_T = "<<part->v4().pt()<<endl;
+      if(part->v4().pt() > pt_lep_max){
+	pt_lep_max = part->v4().pt();
+	i_lep = i;
+      }
+    }
+  }
+  cout<<"------------------------------"<<endl;
+  //============================================================================================================
+
+
+  // ===== Run first clustering step (N=2, R=inf) ==============================================================
+  std::vector<fastjet::PseudoJet> fatjets;
+  XConePlugin plugin_xcone(2, 1.2, 2.0);
+  fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
+  clust_seq_xcone=new fastjet::ClusterSequence(particle_in, jet_def_xcone);
+  fatjets = sorted_by_pt(clust_seq_xcone->inclusive_jets(0));
+  //============================================================================================================
+
+
+  // ===== get and wirte list: if particle i ist clustered in jet j, the i-th entry of the list == j, ==========
+  std::vector<int> list_fat;
+  list_fat.clear();
+  list_fat = clust_seq_xcone->particle_jet_indices(fatjets);
+  std::vector<fastjet::PseudoJet> particle_in_fat1, particle_in_fat2;
+  bool lep_in_jet1 = false;
+  bool lep_in_jet2 = false;
+  
+  // get one set of particles for each jet. Also check if lepton is clustered into jet
+  for (unsigned int ipart=0; ipart < particle_in.size(); ++ipart){
+    if (list_fat[ipart]==0){
+      particle_in_fat1.push_back(particle_in.at(ipart)); // get vector as PseudoJet for fatjet 1
+      if(ipart == i_lep) lep_in_jet1 = true;
+    }
+    if (list_fat[ipart]==1){
+      particle_in_fat2.push_back(particle_in.at(ipart)); // get vector as PseudoJet for fatjet 2
+      if(ipart == i_lep) lep_in_jet2 = true;
+   }
+  }
+  // ============================================================================================================
+
+  // ===== now cluster subjets. the fat jet with (or next to) the lepton gets 2 subjets, the other one gets 3 subjets
+  std::vector<fastjet::PseudoJet> subjets_had, subjets_lep;
+
+
+  if(lep_in_jet2){
+    // first fatjet is hadron jet  
+    XConePlugin plugin_xcone_sub1(3, 0.4, 2.0);
+    fastjet::JetDefinition jet_def_sub1(&plugin_xcone_sub1);
+    clust_seq_sub1=new fastjet::ClusterSequence(particle_in_fat1, jet_def_sub1);
+    subjets_had = sorted_by_pt(clust_seq_sub1->inclusive_jets(0));
+
+    // second fatjet is lepton jet
+    XConePlugin plugin_xcone_sub2(2, 0.4, 2.0);
+    fastjet::JetDefinition jet_def_sub2(&plugin_xcone_sub2);
+    clust_seq_sub2=new fastjet::ClusterSequence(particle_in_fat2, jet_def_sub2);
+    subjets_lep = sorted_by_pt(clust_seq_sub2->inclusive_jets(0));
+  }
+  else if(lep_in_jet1){
+    // second fatjet is hadron jet  
+    XConePlugin plugin_xcone_sub1(3, 0.4, 2.0);
+    fastjet::JetDefinition jet_def_sub1(&plugin_xcone_sub1);
+    clust_seq_sub1=new fastjet::ClusterSequence(particle_in_fat2, jet_def_sub1);
+    subjets_had = sorted_by_pt(clust_seq_sub1->inclusive_jets(0));
+
+    // first fatjet is lepton jet
+    XConePlugin plugin_xcone_sub2(2, 0.4, 2.0);
+    fastjet::JetDefinition jet_def_sub2(&plugin_xcone_sub2);
+    clust_seq_sub2=new fastjet::ClusterSequence(particle_in_fat1, jet_def_sub2);
+    subjets_lep = sorted_by_pt(clust_seq_sub2->inclusive_jets(0));
+  }
+  // ============================================================================================================
+
+  
+  // =========================== Substract Lepton ===============================================================
+  // raus? anders?
+  // ============================================================================================================
+
+  
+  cout<<"fatjets: "<<fatjets.size()<<endl;
+  cout<<"subjets had: "<<subjets_had.size()<<endl;
+  cout<<"subjets lep: "<<subjets_lep.size()<<endl;
+  // =========================== Write vectors with jets  =======================================================
+  if(store_all_jets){
+    // event.set(h_reco_xcone23fatjets, convert_pseudojet_to_jet(fatjets));
+    // event.set(h_reco_xcone23subjets_had, convert_pseudojet_to_jet(subjets_had));
+    // event.set(h_reco_xcone23subjets_lep, convert_pseudojet_to_jet(subjets_lep));
+  }
+
+  // ============================================================================================================
+
+  
+  // =========================== Delete all objects =============================================================
+  // subjets_had.clear();
+  subjets_lep.clear();
+  fatjets.clear();
+  particle_in.clear();
+  particle_in_fat1.clear();
+  particle_in_fat2.clear();
+  // ============================================================================================================
+
+  return subjets_had;
+}
+
 
 // ------------------------------------ Get clustered XCone Jets from PFParticles ---------------------------------------------------------------------------------
 std::vector<fastjet::PseudoJet> JetCluster::get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin){ 
@@ -1176,5 +1300,27 @@ bool GenXCONE23JetProducer::process(uhh2::Event & event){
   return true;
 }
 
+// ------------------------------------ XCone Reco Jets -----------------------------------------------------------------------------
+
+RecoXCONE23JetProducer::RecoXCONE23JetProducer(uhh2::Context & ctx, bool all_jets):
+  h_reco_xcone23subjets_had(ctx.declare_event_output<std::vector<Jet>>("reco_xcone23subjets_had")),
+  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")),
+  all_jets_(all_jets),
+  ctx_(ctx){}
+
+bool RecoXCONE23JetProducer::process(uhh2::Event & event){
+
+  std::vector<PFParticle> pfparts = event.get(h_pfpart);
+  JetCluster* jetc_reco = new JetCluster();
+  std::vector<fastjet::PseudoJet> reco;
+  reco = jetc_reco->get_xcone23_recojets(ctx_, event, &pfparts, all_jets_);
+  cout<<"test1"<<endl;
+  //event.set(h_reco_xcone23subjets_had, jetc_reco->convert_pseudojet_to_jet(reco));
+  cout<<"test2"<<endl;
+
+  // delete jetc_reco;
+  // reco.clear();
+  return true;
+}
 // --------------------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------------------

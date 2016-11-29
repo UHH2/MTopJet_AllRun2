@@ -49,6 +49,10 @@ class JetCluster{
   std::vector<fastjet::PseudoJet> get_hotvr_recojets(std::vector<PFParticle>* pfparts, enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut);
   std::vector<fastjet::PseudoJet> get_xcone_jets(std::vector<GenParticle>* genparts, int N, double R0, double beta, double ptmin);
   std::vector<fastjet::PseudoJet> get_xcone23_jets(uhh2::Event & event, uhh2::Event::Handle<vector<int>> h_list, uhh2::Event::Handle<vector<Jet>> h_particle_fatjet1, uhh2::Event::Handle<vector<Jet>> h_particle_fatjet2, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_1, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_2, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_3, uhh2::Event::Handle<vector<Jet>> h_particle_subjet2_1, uhh2::Event::Handle<vector<Jet>> h_particle_subjet2_2, uhh2::Event::Handle<vector<Jet>> h_particle_fatjet_0, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_0, uhh2::Event::Handle<vector<Jet>> h_particle_subjet2_0, uhh2::Event::Handle<vector<Jet>> h_particle_all, std::vector<GenParticle>* genparts, double ptmin, double ptmin_sub, int choose_jet);
+ 
+  std::vector<fastjet::PseudoJet> get_xcone33_genjets(uhh2::Event & event, std::vector<GenParticle>* genparts, uhh2::Event::Handle<vector<Jet>>, uhh2::Event::Handle<vector<Jet>>, uhh2::Event::Handle<vector<Jet>>);
+  std::vector<fastjet::PseudoJet> get_xcone33_recojets(uhh2::Event & event, std::vector<PFParticle>* pfparts, uhh2::Event::Handle<vector<Jet>>, uhh2::Event::Handle<vector<Jet>>, uhh2::Event::Handle<vector<Jet>>);
+
   std::vector<fastjet::PseudoJet> get_xcone_recojets(std::vector<PFParticle>* pfparts, int N, double R0, double beta, double ptmin);
 
 
@@ -229,4 +233,59 @@ private:
   double ptmin_;
   double ptmin_sub1_;
   double ptmin_sub2_;
+};
+
+class GenXCONE33JetProducer: public uhh2::AnalysisModule{
+
+public:
+
+  explicit GenXCONE33JetProducer(uhh2::Context&);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33fatjets;
+  uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33subjets_1;
+  uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33subjets_2;
+};
+
+class RecoXCONE33JetProducer: public uhh2::AnalysisModule{
+
+public:
+
+  explicit RecoXCONE33JetProducer(uhh2::Context&);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33fatjets;
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33subjets_1;
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33subjets_2;
+  uhh2::Event::Handle<std::vector<PFParticle>> h_pfpart;
+};
+
+
+class XCone33Merge_gen: public uhh2::AnalysisModule{
+
+public:
+
+  explicit XCone33Merge_gen(uhh2::Context&);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33jets;
+  uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33subjets_1;
+  uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33subjets_2;
+  uhh2::Event::Handle<TTbarGen>h_ttbargen;
+};
+
+class XCone33Merge_reco: public uhh2::AnalysisModule{
+
+public:
+
+  explicit XCone33Merge_reco(uhh2::Context&);
+  virtual bool process(uhh2::Event & ) override; 
+    
+private:
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33jets;
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33subjets_1;
+  uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33subjets_2;
 };

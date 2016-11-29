@@ -170,14 +170,13 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   }
   //============================================================================================================
 
-
   // ===== add ghost particles =================================================================================
   bool ghosts = false;
   if(ghosts) particle_in2 = add_ghosts(particle_in_noGhost);
   else particle_in2 = particle_in_noGhost;
   //============================================================================================================
 
-  // ===== Run first clustering step (N=2, R=inf) ==============================================================
+  // ===== Run first clustering step (N=1.2, R=inf) ============================================================
   XConePlugin plugin_xcone(2, 1.2, 2.0);
   fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
   clust_seq_xcone=new fastjet::ClusterSequence(particle_in2, jet_def_xcone);
@@ -246,13 +245,13 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   }
   if(lep_in_jet1){
     if(choose_jet == 1){
-      XConePlugin plugin_xcone_sub1(3, 0.4, 2.0);
+      XConePlugin plugin_xcone_sub1(2, 0.4, 2.0);
       fastjet::JetDefinition jet_def_sub1(&plugin_xcone_sub1);
       clust_seq_sub1=new fastjet::ClusterSequence(particle_in_subjet2, jet_def_sub1);
       subjets1 = sorted_by_pt(clust_seq_sub1->inclusive_jets(ptmin_sub));
     }
     if(choose_jet == 2){
-      XConePlugin plugin_xcone_sub2(2, 0.4, 2.0);
+      XConePlugin plugin_xcone_sub2(3, 0.4, 2.0);
       fastjet::JetDefinition jet_def_sub2(&plugin_xcone_sub2);
       clust_seq_sub2=new fastjet::ClusterSequence(particle_in_subjet1, jet_def_sub2);
       subjets2 = sorted_by_pt(clust_seq_sub2->inclusive_jets(ptmin_sub));
@@ -444,6 +443,173 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 
   return returnjets;
 }
+
+// ------------------------------------ Get clustered XCone 3+3 Jets from Gen Particles ---------------------------------------------------------------------------------
+std::vector<fastjet::PseudoJet> JetCluster::get_xcone33_genjets(uhh2::Event & event,  std::vector<GenParticle>* genparts, uhh2::Event::Handle<vector<Jet>> h_gen_xcone33fatjets, uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33subjets_1, uhh2::Event::Handle<std::vector<Jet>>h_gen_xcone33subjets_2){ 
+
+
+  // ===== Create List of particles as input for clustering sequence ==========================================
+  std::vector<fastjet::PseudoJet> particle_in;
+
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle* part = &(genparts->at(i));
+    if(!IsNeutrino(part)){ // do not cluster neutrinos
+      if(IsStable(part)){
+	particle_in.push_back(convert_particle(part));
+      }
+      // also include Lepton if status is 23
+      if(!IsStable(part)){
+	if(IsLepton(part) && genparts->at(i).status() == 23){
+	  particle_in.push_back(convert_particle(part));
+	}
+      }
+    }
+  }
+  //============================================================================================================
+
+
+  // ===== Run first clustering step (N=1.2, R=inf) ============================================================
+  std::vector<fastjet::PseudoJet> fatjets;
+  XConePlugin plugin_xcone(2, 1.2, 2.0);
+  fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
+  clust_seq_xcone=new fastjet::ClusterSequence(particle_in, jet_def_xcone);
+  fatjets = sorted_by_pt(clust_seq_xcone->inclusive_jets(0));
+  //============================================================================================================
+
+
+  // ===== get and wirte list: if particle i ist clustered in jet j, the i-th entry of the list == j, ==========
+  std::vector<int> list_fat;
+  list_fat.clear();
+  list_fat = clust_seq_xcone->particle_jet_indices(fatjets);
+  std::vector<fastjet::PseudoJet> particle_in_fat1, particle_in_fat2;
+
+  // get one set of particles for each jet
+  for (unsigned int ipart=0; ipart < particle_in.size(); ++ipart){
+    if (list_fat[ipart]==0){
+      particle_in_fat1.push_back(particle_in.at(ipart)); // get vector as PseudoJet for fatjet 1
+    }
+    if (list_fat[ipart]==1){
+      particle_in_fat2.push_back(particle_in.at(ipart)); // get vector as PseudoJet for fatjet 2
+   }
+  }
+  // ============================================================================================================
+  // ===== now cluster subjets. the fat jet with (or next to) the lepton gets 2 subjets, the other one gets 3 subjets
+  std::vector<fastjet::PseudoJet> subjets_1, subjets_2;
+
+
+  // first fatjet is hadron jet  
+  XConePlugin plugin_xcone_sub1(3, 0.4, 2.0);
+  fastjet::JetDefinition jet_def_sub1(&plugin_xcone_sub1);
+  clust_seq_sub1=new fastjet::ClusterSequence(particle_in_fat1, jet_def_sub1);
+  subjets_1 = sorted_by_pt(clust_seq_sub1->inclusive_jets(0));
+
+  // second fatjet is lepton jet
+  XConePlugin plugin_xcone_sub2(3, 0.4, 2.0);
+  fastjet::JetDefinition jet_def_sub2(&plugin_xcone_sub2);
+  clust_seq_sub2=new fastjet::ClusterSequence(particle_in_fat2, jet_def_sub2);
+  subjets_2 = sorted_by_pt(clust_seq_sub2->inclusive_jets(0));
+
+  // ============================================================================================================
+
+  // =========================== Write vectors with jets  =======================================================
+  event.set(h_gen_xcone33fatjets, convert_pseudojet_to_jet(fatjets));
+  event.set(h_gen_xcone33subjets_1, convert_pseudojet_to_jet(subjets_1));
+  event.set(h_gen_xcone33subjets_2, convert_pseudojet_to_jet(subjets_2));
+  // ============================================================================================================
+
+  
+  // =========================== Delete all objects =============================================================
+  subjets_1.clear();
+  subjets_2.clear();
+  fatjets.clear();
+  particle_in.clear();
+  particle_in_fat1.clear();
+  particle_in_fat2.clear();
+  // ============================================================================================================
+  
+  return subjets_1;
+  
+}
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+// ------------------------------------ Get clustered XCone 3+3 Jets from PF Particles ---------------------------------------------------------------------------------
+std::vector<fastjet::PseudoJet> JetCluster::get_xcone33_recojets(uhh2::Event & event, std::vector<PFParticle>* pfparts, uhh2::Event::Handle<vector<Jet>> h_reco_xcone33fatjets, uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33subjets_1, uhh2::Event::Handle<std::vector<Jet>>h_reco_xcone33subjets_2){ 
+
+
+  // ===== Create List of particles as input for clustering sequence ==========================================
+  std::vector<fastjet::PseudoJet> particle_in;
+  for(unsigned int i=0; i<(pfparts->size()); ++i){
+    PFParticle* part = &(pfparts->at(i));
+    particle_in.push_back(convert_recoparticle(part));
+  }
+
+  //============================================================================================================
+
+
+  // ===== Run first clustering step (N=1.2, R=inf) ============================================================
+  std::vector<fastjet::PseudoJet> fatjets;
+  XConePlugin plugin_xcone(2, 1.2, 2.0);
+  fastjet::JetDefinition jet_def_xcone(&plugin_xcone);
+  clust_seq_xcone=new fastjet::ClusterSequence(particle_in, jet_def_xcone);
+  fatjets = sorted_by_pt(clust_seq_xcone->inclusive_jets(0));
+  //============================================================================================================
+
+
+  // ===== get and wirte list: if particle i ist clustered in jet j, the i-th entry of the list == j, ==========
+  std::vector<int> list_fat;
+  list_fat.clear();
+  list_fat = clust_seq_xcone->particle_jet_indices(fatjets);
+  std::vector<fastjet::PseudoJet> particle_in_fat1, particle_in_fat2;
+
+  // get one set of particles for each jet
+  for (unsigned int ipart=0; ipart < particle_in.size(); ++ipart){
+    if (list_fat[ipart]==0){
+      particle_in_fat1.push_back(particle_in.at(ipart)); // get vector as PseudoJet for fatjet 1
+    }
+    if (list_fat[ipart]==1){
+      particle_in_fat2.push_back(particle_in.at(ipart)); // get vector as PseudoJet for fatjet 2
+   }
+  }
+  // ============================================================================================================
+  // ===== now cluster subjets. the fat jet with (or next to) the lepton gets 2 subjets, the other one gets 3 subjets
+  std::vector<fastjet::PseudoJet> subjets_1, subjets_2;
+
+
+  // first fatjet is hadron jet  
+  XConePlugin plugin_xcone_sub1(3, 0.4, 2.0);
+  fastjet::JetDefinition jet_def_sub1(&plugin_xcone_sub1);
+  clust_seq_sub1=new fastjet::ClusterSequence(particle_in_fat1, jet_def_sub1);
+  subjets_1 = sorted_by_pt(clust_seq_sub1->inclusive_jets(0));
+
+  // second fatjet is lepton jet
+  XConePlugin plugin_xcone_sub2(3, 0.4, 2.0);
+  fastjet::JetDefinition jet_def_sub2(&plugin_xcone_sub2);
+  clust_seq_sub2=new fastjet::ClusterSequence(particle_in_fat2, jet_def_sub2);
+  subjets_2 = sorted_by_pt(clust_seq_sub2->inclusive_jets(0));
+
+  // ============================================================================================================
+
+  // =========================== Write vectors with jets  =======================================================
+  event.set(h_reco_xcone33fatjets, convert_pseudojet_to_jet(fatjets));
+  event.set(h_reco_xcone33subjets_1, convert_pseudojet_to_jet(subjets_1));
+  event.set(h_reco_xcone33subjets_2, convert_pseudojet_to_jet(subjets_2));
+  // ============================================================================================================
+
+  
+  // =========================== Delete all objects =============================================================
+  subjets_1.clear();
+  subjets_2.clear();
+  fatjets.clear();
+  particle_in.clear();
+  particle_in_fat1.clear();
+  particle_in_fat2.clear();
+  // ============================================================================================================
+  
+  return subjets_1;
+  
+}
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 // ------------------------------------ Get clustered XCone Jets from PFParticles ---------------------------------------------------------------------------------
@@ -860,7 +1026,7 @@ bool MergeXConeReco::process(uhh2::Event & event){
   return true;
 }
 
-// ------------------------------------ merging XCone Gen Jets N=6  -------------------------------------------------------------------
+// ------------------------------------ merging XCone Gen Jets N=5  -------------------------------------------------------------------
 MergeXConeN6Gen::MergeXConeN6Gen(uhh2::Context & ctx, const std::string & in_jet, const std::string & out_jet):
   h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
   h_injets(ctx.get_handle<std::vector<Jet>>(in_jet)),
@@ -1176,6 +1342,213 @@ bool GenXCONE23JetProducer::process(uhh2::Event & event){
   delete jetc2;
   return true;
 }
+// ------------------------------------ XCone 3+3 Gen Jets -----------------------------------------------------------------------------
 
+GenXCONE33JetProducer::GenXCONE33JetProducer(uhh2::Context & ctx):
+  h_gen_xcone33fatjets(ctx.declare_event_output<std::vector<Jet>>("gen_xcone33fatjets")),
+  h_gen_xcone33subjets_1(ctx.declare_event_output<std::vector<Jet>>("gen_xcone33subjets_1")),
+  h_gen_xcone33subjets_2(ctx.declare_event_output<std::vector<Jet>>("gen_xcone33subjets_2"))
+{}
+
+bool GenXCONE33JetProducer::process(uhh2::Event & event){
+
+  std::vector<GenParticle>* genparts = event.genparticles;
+  JetCluster* jetc_gen = new JetCluster();
+  std::vector<fastjet::PseudoJet> gen;
+  gen = jetc_gen->get_xcone33_genjets(event, genparts, h_gen_xcone33fatjets, h_gen_xcone33subjets_1, h_gen_xcone33subjets_2 );
+
+  delete jetc_gen;
+  gen.clear();
+  return true;
+}
 // --------------------------------------------------------------------------------------------------------------------------------
+
+
+// ------------------------------------ XCone 3+3 Reco Jets -----------------------------------------------------------------------------
+
+RecoXCONE33JetProducer::RecoXCONE33JetProducer(uhh2::Context & ctx):
+  h_reco_xcone33fatjets(ctx.declare_event_output<std::vector<Jet>>("reco_xcone33fatjets")),
+  h_reco_xcone33subjets_1(ctx.declare_event_output<std::vector<Jet>>("reco_xcone33subjets_1")),
+  h_reco_xcone33subjets_2(ctx.declare_event_output<std::vector<Jet>>("reco_xcone33subjets_2")),
+  h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")) 
+{}
+
+bool RecoXCONE33JetProducer::process(uhh2::Event & event){
+
+  std::vector<PFParticle> pfparts = event.get(h_pfpart);
+  JetCluster* jetc_reco = new JetCluster();
+  std::vector<fastjet::PseudoJet> reco;
+  reco = jetc_reco->get_xcone33_recojets(event, &pfparts, h_reco_xcone33fatjets, h_reco_xcone33subjets_1, h_reco_xcone33subjets_2 );
+
+  delete jetc_reco;
+  reco.clear();
+  return true;
+}
+// --------------------------------------------------------------------------------------------------------------------------------
+
+
+
+// ------------------------------------ Merge XCone 3+3 Gen Jets -----------------------------------------------------------------------------
+
+XCone33Merge_gen::XCone33Merge_gen(uhh2::Context & ctx):
+  h_gen_xcone33jets(ctx.declare_event_output<std::vector<Jet>>("gen_xcone33jets")),
+  h_gen_xcone33subjets_1(ctx.get_handle<std::vector<Jet>>("gen_xcone33subjets_1")),
+  h_gen_xcone33subjets_2(ctx.get_handle<std::vector<Jet>>("gen_xcone33subjets_2")),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen"))
+{}
+
+bool XCone33Merge_gen::process(uhh2::Event & event){
+  std::vector<Jet> subjets_1 = event.get(h_gen_xcone33subjets_1);
+  std::vector<Jet> subjets_2 = event.get(h_gen_xcone33subjets_2);
+  std::vector<Jet> jets;
+
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, jet5_v4, jet6_v4, combinedjet1_v4, combinedjet2_v4;
+  if(subjets_1.size() > 2){
+    if(subjets_1.at(0).pt() > 20) jet1_v4.SetPxPyPzE(subjets_1.at(0).v4().Px(), subjets_1.at(0).v4().Py(), subjets_1.at(0).v4().Pz(), subjets_1.at(0).v4().E());
+    else jet1_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_1.at(1).pt() > 20) jet2_v4.SetPxPyPzE(subjets_1.at(1).v4().Px(), subjets_1.at(1).v4().Py(), subjets_1.at(1).v4().Pz(), subjets_1.at(1).v4().E()); 
+    else jet2_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_1.at(2).pt() > 20) jet3_v4.SetPxPyPzE(subjets_1.at(2).v4().Px(), subjets_1.at(2).v4().Py(), subjets_1.at(2).v4().Pz(), subjets_1.at(2).v4().E()); 
+    else jet3_v4.SetPxPyPzE(0, 0, 0, 0);
+  }
+  if(subjets_2.size() > 2){
+    if(subjets_2.at(0).pt() > 20) jet4_v4.SetPxPyPzE(subjets_2.at(0).v4().Px(), subjets_2.at(0).v4().Py(), subjets_2.at(0).v4().Pz(), subjets_2.at(0).v4().E());
+    else jet4_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_2.at(1).pt() > 20) jet5_v4.SetPxPyPzE(subjets_2.at(1).v4().Px(), subjets_2.at(1).v4().Py(), subjets_2.at(1).v4().Pz(), subjets_2.at(1).v4().E()); 
+    else jet5_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_2.at(2).pt() > 20) jet6_v4.SetPxPyPzE(subjets_2.at(2).v4().Px(), subjets_2.at(2).v4().Py(), subjets_2.at(2).v4().Pz(), subjets_2.at(2).v4().E()); 
+    else jet6_v4.SetPxPyPzE(0, 0, 0, 0);
+  }
+
+  combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+  combinedjet2_v4 = jet4_v4 + jet5_v4 + jet6_v4;
+
+  Jet jet1, jet2;
+
+  jet1.set_pt(combinedjet1_v4.Pt());
+  jet1.set_eta(combinedjet1_v4.Eta());
+  jet1.set_phi(combinedjet1_v4.Phi());
+  jet1.set_energy(combinedjet1_v4.E());
+
+  jet2.set_pt(combinedjet2_v4.Pt());
+  jet2.set_eta(combinedjet2_v4.Eta());
+  jet2.set_phi(combinedjet2_v4.Phi());
+  jet2.set_energy(combinedjet2_v4.E());
+
+  // get Lepton from TTbar
+  const auto & ttbargen = event.get(h_ttbargen);
+  GenParticle lep1, lep2, lepton;
+  if(ttbargen.IsTopHadronicDecay()){
+    lep1 = ttbargen.WMinusdecay1();
+    lep2 = ttbargen.WMinusdecay2();
+  }
+  else if(ttbargen.IsAntiTopHadronicDecay()){
+    lep1 = ttbargen.Wdecay1();
+    lep2 = ttbargen.Wdecay2();
+  }
+  if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
+    lepton = lep1;
+  }
+  else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
+    lepton = lep2;
+  }
+
+  double dR1 = uhh2::deltaR(lepton, jet1);
+  double dR2 = uhh2::deltaR(lepton, jet2);
+
+  if(dR2 < dR1){
+    jets.push_back(jet1);
+    jets.push_back(jet2);
+  }
+  else if(dR2 > dR1){
+    jets.push_back(jet2);
+    jets.push_back(jet1);
+  }
+
+  event.set(h_gen_xcone33jets, jets);
+  return true;
+}
+// --------------------------------------------------------------------------------------------------------------------------------
+
+// ------------------------------------ Merge XCone 3+3 Reco Jets -----------------------------------------------------------------------------
+
+XCone33Merge_reco::XCone33Merge_reco(uhh2::Context & ctx):
+  h_reco_xcone33jets(ctx.declare_event_output<std::vector<Jet>>("reco_xcone33jets")),
+  h_reco_xcone33subjets_1(ctx.get_handle<std::vector<Jet>>("reco_xcone33subjets_1")),
+  h_reco_xcone33subjets_2(ctx.get_handle<std::vector<Jet>>("reco_xcone33subjets_2"))
+{}
+
+bool XCone33Merge_reco::process(uhh2::Event & event){
+  std::vector<Jet> subjets_1 = event.get(h_reco_xcone33subjets_1);
+  std::vector<Jet> subjets_2 = event.get(h_reco_xcone33subjets_2);
+  std::vector<Jet> jets;
+
+  TLorentzVector jet1_v4, jet2_v4, jet3_v4, jet4_v4, jet5_v4, jet6_v4, combinedjet1_v4, combinedjet2_v4;
+  if(subjets_1.size() > 2){
+    if(subjets_1.at(0).pt() > 20) jet1_v4.SetPxPyPzE(subjets_1.at(0).v4().Px(), subjets_1.at(0).v4().Py(), subjets_1.at(0).v4().Pz(), subjets_1.at(0).v4().E());
+    else jet1_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_1.at(1).pt() > 20) jet2_v4.SetPxPyPzE(subjets_1.at(1).v4().Px(), subjets_1.at(1).v4().Py(), subjets_1.at(1).v4().Pz(), subjets_1.at(1).v4().E()); 
+    else jet2_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_1.at(2).pt() > 20) jet3_v4.SetPxPyPzE(subjets_1.at(2).v4().Px(), subjets_1.at(2).v4().Py(), subjets_1.at(2).v4().Pz(), subjets_1.at(2).v4().E()); 
+    else jet3_v4.SetPxPyPzE(0, 0, 0, 0);
+  }
+  if(subjets_2.size() > 2){
+    if(subjets_2.at(0).pt() > 20) jet4_v4.SetPxPyPzE(subjets_2.at(0).v4().Px(), subjets_2.at(0).v4().Py(), subjets_2.at(0).v4().Pz(), subjets_2.at(0).v4().E());
+    else jet4_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_2.at(1).pt() > 20) jet5_v4.SetPxPyPzE(subjets_2.at(1).v4().Px(), subjets_2.at(1).v4().Py(), subjets_2.at(1).v4().Pz(), subjets_2.at(1).v4().E()); 
+    else jet5_v4.SetPxPyPzE(0, 0, 0, 0);
+    if(subjets_2.at(2).pt() > 20) jet6_v4.SetPxPyPzE(subjets_2.at(2).v4().Px(), subjets_2.at(2).v4().Py(), subjets_2.at(2).v4().Pz(), subjets_2.at(2).v4().E()); 
+    else jet6_v4.SetPxPyPzE(0, 0, 0, 0);
+  }
+
+  combinedjet1_v4 = jet1_v4 + jet2_v4 + jet3_v4;
+  combinedjet2_v4 = jet4_v4 + jet5_v4 + jet6_v4;
+
+  Jet jet1, jet2, dummy;
+
+  jet1.set_pt(combinedjet1_v4.Pt());
+  jet1.set_eta(combinedjet1_v4.Eta());
+  jet1.set_phi(combinedjet1_v4.Phi());
+  jet1.set_energy(combinedjet1_v4.E());
+
+  jet2.set_pt(combinedjet2_v4.Pt());
+  jet2.set_eta(combinedjet2_v4.Eta());
+  jet2.set_phi(combinedjet2_v4.Phi());
+  jet2.set_energy(combinedjet2_v4.E());
+
+  // get Lepton from TTbar
+  Particle lepton;
+  bool no_lep = false;
+  if(event.electrons->size() == 1 && event.muons->size() == 0) lepton = event.electrons->at(0);
+  else if(event.electrons->size() == 0 && event.muons->size() == 1) lepton = event.muons->at(0);
+  else no_lep = true;
+
+  if(!no_lep){
+    double dR1 = uhh2::deltaR(lepton, jet1);
+    double dR2 = uhh2::deltaR(lepton, jet2);
+
+    if(dR2 < dR1){
+      jets.push_back(jet1);
+      jets.push_back(jet2);
+    }
+    else if(dR2 > dR1){
+      jets.push_back(jet2);
+      jets.push_back(jet1);
+    }
+  }
+  else if(no_lep){
+    dummy.set_pt(0);
+    dummy.set_eta(0);
+    dummy.set_phi(0);
+    dummy.set_energy(0);
+
+    jets.push_back(dummy);
+  }
+
+  event.set(h_reco_xcone33jets, jets);
+  return true;
+
+}
+// --------------------------------------------------------------------------------------------------------------------------------
+
 // --------------------------------------------------------------------------------------------------------------------------------

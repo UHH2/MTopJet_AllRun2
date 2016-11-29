@@ -16,6 +16,7 @@ RecoHists::RecoHists(uhh2::Context & ctx, const std::string & dirname, const std
   RecoJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
   RecoJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  RecoJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
   RecoJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
@@ -89,6 +90,7 @@ void RecoHists::fill(const Event & event){
 
   if((jets.size()) > 1){
     RecoJet1Mass->Fill(jet1_v4.M(),weight);
+    RecoJet2Mass->Fill(jet2_v4.M(),weight);
     RecoJet1PT->Fill(jet1_v4.Pt(),weight);
     RecoJet2PT->Fill(jet2_v4.Pt(),weight);
     RecoJet2Eta->Fill(jet2_v4.Eta(),weight);
