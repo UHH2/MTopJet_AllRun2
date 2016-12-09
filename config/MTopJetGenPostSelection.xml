@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
-<!ENTITY NEVT "20">
+<!ENTITY NEVT "-1">
 
   <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
   <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/GenPost"> 
@@ -25,7 +25,7 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="3000" LastBreak="0" FileSplit="0" />
+   <ConfigParse NEventsBreak="5000" LastBreak="0" FileSplit="0" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/SFrame_Batch_workdir"/>
 -->
 

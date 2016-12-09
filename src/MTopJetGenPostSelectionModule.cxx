@@ -24,6 +24,7 @@
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
+#include <UHH2/MTopJet/include/RecoSelections_topjet.h>
 #include <UHH2/MTopJet/include/GenSelections.h>
 #include <UHH2/MTopJet/include/GenHists.h>
 #include <UHH2/MTopJet/include/HOTVRHists.h>
@@ -68,6 +69,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> matching_botlep_lep;
   std::unique_ptr<uhh2::Selection> matching_HOTVR;
   std::unique_ptr<uhh2::Selection> matching_XCone;
+  // gen sel
   std::unique_ptr<uhh2::Selection> topjetpt;
   std::unique_ptr<uhh2::Selection> masscut;
   std::unique_ptr<uhh2::Selection> n_genjets;
@@ -79,6 +81,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> masscut_top;
   std::unique_ptr<uhh2::Selection> n_genjets_top;
   std::unique_ptr<uhh2::Selection> deltaR_top;
+  // reco sel for XCone, HOTVR, ...
   std::unique_ptr<uhh2::Selection> n_recjets;
   std::unique_ptr<uhh2::Selection> topjetpt_rec;
   std::unique_ptr<uhh2::Selection> met_sel;
@@ -86,6 +89,12 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> twodcut_sel;
   std::unique_ptr<uhh2::Selection> deltaR_rec;
   std::unique_ptr<uhh2::Selection> masscut_rec;
+  // reco sel for topjets
+  std::unique_ptr<uhh2::Selection> n_recjets_top;
+  std::unique_ptr<uhh2::Selection> topjetpt_rec_top;
+  std::unique_ptr<uhh2::Selection> deltaR_rec_top;
+  std::unique_ptr<uhh2::Selection> masscut_rec_top;
+  // seperate Mass bins for resolution studies
   std::unique_ptr<uhh2::Selection> massbin1;
   std::unique_ptr<uhh2::Selection> massbin2;
   std::unique_ptr<uhh2::Selection> massbin3;
@@ -306,6 +315,14 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   masscut_rec.reset(new MassCutReco(ctx, jet_label_rec));
   ////
 
+  // RECO Top
+  n_recjets_top.reset(new NRecoJets_topjet(ctx, 150, 2, 2));  // ==2 jets with pt > 150
+  topjetpt_rec_top.reset(new LeadingRecoJetPT_topjet(ctx, 400)); // leading jet pt > 400
+  deltaR_rec_top.reset(new DeltaRCutReco_topjet(ctx, 1.5)); 
+  masscut_rec_top.reset(new MassCutReco_topjet(ctx));
+  ////
+
+
   // Selection for Mass binning
   massbin1.reset(new MassCutGen1(ctx, jet_label_gen,   0, 100));
   massbin2.reset(new MassCutGen1(ctx, jet_label_gen, 100, 150));
@@ -332,9 +349,10 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   //  COMMON MODULES
   // ================ set to true / false to run analysis =============================
   bool produce_jet = false;
-  bool do_gensel = true;
+  bool do_gensel = false;
   bool do_gensel_top = false;
-  bool do_recsel = true;
+  bool do_recsel = false;
+  bool do_recsel_top = true;
   bool do_cluster_hist = false;
   // ==================================================================================
   
@@ -528,6 +546,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
     const bool pass_lep1 = (((event.muons->size() == 1)&&(event.electrons->size() == 0)) ||((event.muons->size() == 0)&&(event.electrons->size() == 1)));
     if(!pass_lep1) return false;
   }
+
   h_RecHists0c->fill(event);
   h_RecHists0c_top->fill(event);
   h_Elec2->fill(event);
@@ -578,21 +597,25 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
   // ==2 Jets with pT > 150
   if(!(produce_jet) && do_recsel && !(n_recjets->passes(event))) return false;
+  if(!(produce_jet) && do_recsel_top && !(n_recjets_top->passes(event))) return false;
   h_RecHists1->fill(event);
   h_RecHists1_top->fill(event);
 
   // pT cut on leading Jet
   if(!(produce_jet) && do_recsel && !(topjetpt_rec->passes(event))) return false;
+  if(!(produce_jet) && do_recsel_top && !(topjetpt_rec_top->passes(event))) return false;
   h_RecHists2->fill(event);
   h_RecHists2_top->fill(event);
 
   // deltaR(lepton, 2nd jet) < jet radius
   // if(!(produce_jet) && do_recsel && !(deltaR_rec->passes(event))) return false;
+  if(!(produce_jet) && do_recsel_top && !(deltaR_rec_top->passes(event))) return false;
   h_RecHists3->fill(event);
   h_RecHists3_top->fill(event);
 
   // m(1st jet) > m(2nd jet + lepton)
   if(!(produce_jet) && do_recsel && !(masscut_rec->passes(event))) return false;
+  if(!(produce_jet) && do_recsel_top && !(masscut_rec_top->passes(event))) return false;
   h_RecHists4->fill(event);
   h_RecHists4_top->fill(event);
   // ---------------------------------------------------------------------------------------

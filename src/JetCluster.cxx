@@ -140,7 +140,8 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone_jets(std::vector<GenPartic
 std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event, uhh2::Event::Handle<vector<int>> h_list, uhh2::Event::Handle<vector<Jet>> h_particle_fatjet1, uhh2::Event::Handle<vector<Jet>> h_particle_fatjet2, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_1, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_2, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_3, uhh2::Event::Handle<vector<Jet>> h_particle_subjet2_1, uhh2::Event::Handle<vector<Jet>> h_particle_subjet2_2, uhh2::Event::Handle<vector<Jet>> h_particle_fatjet0, uhh2::Event::Handle<vector<Jet>> h_particle_subjet1_0, uhh2::Event::Handle<vector<Jet>> h_particle_subjet2_0, uhh2::Event::Handle<vector<Jet>> h_particle_all, std::vector<GenParticle>* genparts, double ptmin, double ptmin_sub, int choose_jet){ 
 
   std::vector<fastjet::PseudoJet> fatjets, subjets1, subjets2, returnjets; 
-  std::vector<GenParticle> genparts2, genparts_sub1, genparts_sub2;
+  std::vector<GenParticle> genparts_sub1, genparts_sub2;
+  // std::vector<GenParticle> genparts2;
   GenParticle lepton;
   particle_in_noGhost.clear();
   particle_in2.clear();
@@ -150,7 +151,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
     GenParticle* part = &(genparts->at(i));
     if(!IsNeutrino(part)){ // do not cluster neutrinos
       if(IsStable(part)){
-	genparts2.push_back(genparts->at(i));
+	// genparts2.push_back(genparts->at(i));
 	particle_in_noGhost.push_back(convert_particle(part));
 	if(IsLepton(part)){
 	  lepton = genparts->at(i);
@@ -160,7 +161,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
       // also include Lepton if status is 23
       if(!IsStable(part)){
 	if(IsLepton(part) && genparts->at(i).status() == 23){
-	  genparts2.push_back(genparts->at(i));
+	  // genparts2.push_back(genparts->at(i));
 	  particle_in_noGhost.push_back(convert_particle(part));
 	  lepton = genparts->at(i);
 	  // cout<<"Found Lepton! (Status 23)"<<endl;
@@ -191,20 +192,28 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
 
   // get one set of particles for each jet. Also check if lepton is clustered into jet
   bool lep_in_jet1 = false;
-  bool lep_in_jet2 = false;
+  bool lep_in_jet2 = true;
+  double dR1, dR2;
+  dR1 = sqrt( (fatjets.at(0).eta() - lepton.eta()) * (fatjets.at(0).eta() - lepton.eta()) +  (fatjets.at(0).phi() - lepton.phi()) * (fatjets.at(0).phi() - lepton.phi()) );
+  dR2 = sqrt( (fatjets.at(1).eta() - lepton.eta()) * (fatjets.at(1).eta() - lepton.eta()) +  (fatjets.at(1).phi() - lepton.phi()) * (fatjets.at(1).phi() - lepton.phi()) );
+  if(dR1 < dR2){
+    lep_in_jet1 = true;
+    lep_in_jet2 = false;
+  }
+
   for (unsigned int ipart=0; ipart<particle_in2.size(); ++ipart){
     if (particle_list[ipart]==0){
-      if(ipart < genparts2.size() && (abs(genparts2.at(ipart).pdgId()) == 11 || abs(genparts2.at(ipart).pdgId()) == 13)){
-	lep_in_jet1 = true;
-      }
-      if(ipart < genparts2.size()) genparts_sub1.push_back(genparts2.at(ipart)); // get GenParticles (without Ghosts) of Jet 1
+      // if(ipart < genparts2.size() && (abs(genparts2.at(ipart).pdgId()) == 11 || abs(genparts2.at(ipart).pdgId()) == 13)){
+	// lep_in_jet1 = true;
+      // }
+      // if(ipart < genparts2.size()) genparts_sub1.push_back(genparts2.at(ipart)); // get GenParticles (without Ghosts) of Jet 1
       particle_in_subjet1.push_back(particle_in2.at(ipart)); // get vector as PseudoJet (with Ghosts)
     }
     if (particle_list[ipart]==1){
-      if(ipart < genparts2.size() && (abs(genparts2.at(ipart).pdgId()) == 11 || abs(genparts2.at(ipart).pdgId()) == 13)){
-	lep_in_jet2 = true;
-      }
-      if(ipart < genparts2.size()) genparts_sub2.push_back(genparts2.at(ipart)); // get GenParticles (without Ghosts) of Jet 2
+      // if(ipart < genparts2.size() && (abs(genparts2.at(ipart).pdgId()) == 11 || abs(genparts2.at(ipart).pdgId()) == 13)){
+	// lep_in_jet2 = true;
+      // }
+      // if(ipart < genparts2.size()) genparts_sub2.push_back(genparts2.at(ipart)); // get GenParticles (without Ghosts) of Jet 2
       particle_in_subjet2.push_back(particle_in2.at(ipart)); // get vector as PseudoJet (with Ghosts)
     }
     if (particle_list[ipart]== -1){
@@ -422,7 +431,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_xcone23_jets(uhh2::Event & event
   subjets1.clear();
   subjets2.clear();
   fatjets.clear();
-  genparts2.clear();
+  // genparts2.clear();
   genparts_sub1.clear();
   genparts_sub2.clear();
   particle_in_subjet0.clear();
