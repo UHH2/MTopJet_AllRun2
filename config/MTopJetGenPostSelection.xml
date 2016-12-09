@@ -30,8 +30,8 @@
 -->
 
 <JobConfiguration JobName="MTopJetGenPostSelectionJob" OutputLevel="INFO">
-    <Library Name="libSUHH2ZprimeSemiLeptonic"/>  
-    <Package Name="SUHH2ZprimeSemiLeptonic.par"/> 
+    <Library Name="libSUHH2MTopJet"/>  
+    <Package Name="SUHH2MTopJet.par"/> 
     <Library Name="libfastjet" />
     <Library Name="libfastjettools" />
 

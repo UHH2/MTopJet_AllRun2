@@ -74,8 +74,8 @@
 <!--  <Library Name="libNsubjettiness" /> -->
 
 
-  <Library Name="libSUHH2ZprimeSemiLeptonic"/>
-  <Package Name="SUHH2ZprimeSemiLeptonic.par"/>
+  <Library Name="libSUHH2MTopJet"/>
+  <Package Name="SUHH2MTopJet.par"/>
 
 
   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">
