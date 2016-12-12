@@ -117,8 +117,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   ElectronId eleID;
 
-  //    eleID  = ElectronID_Spring15_25ns_tight_noIso;
-  eleID = ElectronID_MVAnotrig_Spring15_25ns_loose; //TEST 
+  eleID  = ElectronID_Spring15_25ns_tight_noIso;
 
   //// COMMON MODULES
 

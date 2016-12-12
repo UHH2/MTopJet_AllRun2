@@ -63,7 +63,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_genjets(std::vector<GenParticle>
 
 
 // ------------------------------------ Get clustered HOTVR Jets from Gen Particles ---------------------------------------------------------------------------------
-std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_jets(std::vector<GenParticle>* genparts,enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut){ 
+/* std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_jets(std::vector<GenParticle>* genparts,enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut){ 
 
    for (unsigned int i=0; i<(genparts->size()); ++i){
       GenParticle* part = &(genparts->at(i));
@@ -78,7 +78,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_jets(std::vector<GenPartic
   if(algorithm==e_kt) clustertype=HOTVR::ClusterType::KTLIKE;
   HOTVR plugin_hotvr(mu, theta, min_r, max_r, rho, pt_cut, clustertype);  //call HOTVR algorithm
   fastjet::JetDefinition jet_def_hotvr(&plugin_hotvr);
-  clust_seq_hotvr=new fastjet::ClusterSequence(particle_in2, jet_def_hotvr);
+ clust_seq_hotvr=new fastjet::ClusterSequence(particle_in2, jet_def_hotvr);
 
   std::vector<fastjet::PseudoJet> hotvr_jets,rejected_jets,soft_jets ; //vector of hotvr_jets, jets that were rejcted durning the clustering procedure and soft jets
 
@@ -88,9 +88,10 @@ std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_jets(std::vector<GenPartic
   soft_jets=plugin_hotvr.get_soft_cluster();
   return hotvr_jets;
 }
-
+*/
 
 // ------------------------------------ Get clustered HOTVR Jets from PFParticles ---------------------------------------------------------------------------------
+/* 
 std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_recojets(std::vector<PFParticle>* pfparts,enum  JetCluster::E_algorithm algorithm, double rho, double min_r, double max_r, double mu, double theta, double pt_cut){ 
 
  for (unsigned int i=0; i<(pfparts->size()); ++i){
@@ -114,7 +115,7 @@ std::vector<fastjet::PseudoJet> JetCluster::get_hotvr_recojets(std::vector<PFPar
   soft_recojets=plugin_hotvr.get_soft_cluster();
   return hotvr_recojets;
 }
-
+*/
 // ------------------------------------ Get clustered XCone Jets from Gen Particles ---------------------------------------------------------------------------------
 std::vector<fastjet::PseudoJet> JetCluster::get_xcone_jets(std::vector<GenParticle>* genparts, int N, double R0, double beta, double ptmin){ 
 
@@ -788,6 +789,7 @@ bool RecoJetProducer::process(uhh2::Event & event){
   return true;
 }
 // ------------------------------------ HOTVR Reco Jets -----------------------------------------------------------------------------
+/*
 RecoHOTVRJetProducer::RecoHOTVRJetProducer(uhh2::Context & ctx, const std::string & name, double rho):
   h_newrecohotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)),
   h_pfpart(ctx.get_handle<vector<PFParticle>>("PFParticles")),
@@ -813,9 +815,10 @@ bool RecoHOTVRJetProducer::process(uhh2::Event & event){
   delete jetc_reco;
   return true;
 }
-
+*/
 
 // ------------------------------------ HOTVR Gen Jets -----------------------------------------------------------------------------
+/*
 GenHOTVRJetProducer::GenHOTVRJetProducer(uhh2::Context & ctx, const std::string & name, double rho):
   h_newgenhotvrjets(ctx.declare_event_output<std::vector<Jet>>(name)),
   rho_(rho) {}
@@ -839,7 +842,7 @@ bool GenHOTVRJetProducer::process(uhh2::Event & event){
   delete jetc;
   return true;
 }
-
+*/
 // ------------------------------------ XCone Reco Jets ----------------------------------------------------------------------------
 RecoXCONEJetProducer::RecoXCONEJetProducer(uhh2::Context & ctx, const std::string & name, int N, double R0, double beta, double ptmin):
   h_newrecoxconejets(ctx.declare_event_output<std::vector<Jet>>(name)),

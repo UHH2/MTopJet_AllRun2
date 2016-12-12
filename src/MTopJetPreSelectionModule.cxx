@@ -87,8 +87,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   float jet1_pt(-1.), jet2_pt(-1.), MET(-1.), HT_lep(-1.);
   bool use_miniiso(false);
 
-  //    eleID  = ElectronID_Spring15_25ns_tight_noIso;
-  eleID = ElectronID_MVAnotrig_Spring15_25ns_loose; //TEST 
+  eleID  = ElectronID_Spring15_25ns_tight_noIso;
   use_miniiso = false;
 
   jet1_pt =  50.;
