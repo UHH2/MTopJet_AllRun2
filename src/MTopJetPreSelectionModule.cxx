@@ -132,7 +132,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   const ElectronId eleSR(AndId<Electron>(PtEtaSCCut(50., 2.5), eleID));
 
   if(use_miniiso){
-
     const     MuonId muoMINIIso(    Muon_MINIIso(0.05, "delta-beta"));
     const ElectronId eleMINIIso(Electron_MINIIso(0.05, "delta-beta"));
 
@@ -140,7 +139,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
     eleSR_cleaner.reset(new ElectronCleaner(AndId<Electron>(eleSR, eleMINIIso)));
   }
   else{
-
     muoSR_cleaner.reset(new     MuonCleaner(muoSR));
     eleSR_cleaner.reset(new ElectronCleaner(eleSR));
   }

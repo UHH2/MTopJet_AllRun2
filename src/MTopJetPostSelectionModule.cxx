@@ -135,7 +135,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   topjet_sel.reset(new NTopJetSelection(2, 2, TopJetId(PtEtaCut(200, 2.4))));
   topjetA_sel.reset(new NTopJetSelection(1, 2, TopJetId(PtEtaCut(400, 2.4))));
-  // topjetB_sel.reset(new NTopJetSelection(1, 2, TopJetId(PtEtaCut(500, 2.4))));
  
   topmass_sel.reset(new TopJetMassCut());
   
@@ -190,35 +189,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_topmassA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "03A_topmass_RecoJetHists_topjet"));
 
  
-  // // Selection B (1st topjet pt > 500)
-  // h_topjetB_event.reset(new EventHists(ctx, "01B_topjet_Event"));
-  // h_topjetB_elec.reset(new ElectronHists(ctx, "01B_topjet_Elec"));
-  // h_topjetB_muon.reset(new MuonHists(ctx, "01B_topjet_Muon"));
-  // h_topjetB_jets.reset(new JetHists(ctx, "01B_topjet_Jets"));
-  // h_topjetB_topjets.reset(new TopJetHists(ctx, "01B_topjet_TopJets"));
-  // h_topjetB_MTopJetHists.reset(new MTopJetHists(ctx, "01B_topjet_MTopJetHists"));
-  // h_topjetB_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "01B_topjet_MTopJetHists_RecoJetHists_topjet"));
-
-  // h_toplepdRB_event.reset(new EventHists(ctx, "02B_toplepdR_Event"));
-  // h_toplepdRB_elec.reset(new ElectronHists(ctx, "02B_toplepdR_Elec"));
-  // h_toplepdRB_muon.reset(new MuonHists(ctx, "02B_toplepdR_Muon"));
-  // h_toplepdRB_jets.reset(new JetHists(ctx, "02B_toplepdR_Jets"));
-  // h_toplepdRB_topjets.reset(new TopJetHists(ctx, "02B_toplepdR_TopJets"));
-  // h_toplepdRB_MTopJetHists.reset(new MTopJetHists(ctx, "02B_toplepdR_MTopJetHists"));
-  // h_toplepdRB_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "02B_toplepdR_RecoJetHists_topjet"));
-
-  // h_topmassB_event.reset(new EventHists(ctx, "03B_topmass_Event"));
-  // h_topmassB_elec.reset(new ElectronHists(ctx, "03B_topmass_Elec"));
-  // h_topmassB_muon.reset(new MuonHists(ctx, "03B_topmass_Muon"));
-  // h_topmassB_jets.reset(new JetHists(ctx, "03B_topmass_Jets"));
-  // h_topmassB_topjets.reset(new TopJetHists(ctx, "03B_topmass_TopJets"));
-  // h_topmassB_MTopJetHists.reset(new MTopJetHists(ctx, "03B_topmass_MTopJetHists"));
-  // h_topmassB_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "03B_topmass_RecoJetHists_topjet"));
-
-
-  
-
-
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){

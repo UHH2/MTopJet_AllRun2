@@ -351,8 +351,8 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   bool produce_jet = false;
   bool do_gensel = false;
   bool do_gensel_top = false;
-  bool do_recsel = false;
-  bool do_recsel_top = true;
+  bool do_recsel = true;
+  bool do_recsel_top = false;
   bool do_cluster_hist = false;
   // ==================================================================================
   

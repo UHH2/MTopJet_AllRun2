@@ -156,16 +156,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   if     (channel_ == elec) triangc_sel.reset(new TriangularCuts(M_PI/2., (M_PI/2.)/75.));
   else if(channel_ == muon) triangc_sel.reset(new uhh2::AndSelection(ctx));
-
-  // topjet2_sel.reset(new NTopJetSelection(2, 2, TopJetId(PtEtaCut(200, 2.4))));
-  // topjet1_sel.reset(new NTopJetSelection(1, 2, TopJetId(PtEtaCut(400, 2.4))));
-  
-  // topmass_sel.reset(new TopJetMassCut());
-  
-  // deltarak4cut_sel.reset(new deltaRCutAK4(.4));
-  // deltarcut_sel.reset(new deltaRCut(.8));
-
   ////
+
 
   //// set up Hists classes:
   h_PreSel_event.reset(new EventHists(ctx, "01_PreSel_Event"));
@@ -209,35 +201,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_htlep150_jets.reset(new JetHists(ctx, "05_htlep150_Jets"));
   h_htlep150_topjets.reset(new TopJetHists(ctx, "05_htlep150_TopJets"));
   h_htlep150_event2.reset(new MTopJetHists(ctx, "05_htlep150_Event2"));
-
-  // h_topjet_event.reset(new EventHists(ctx, "06_topjet_Event"));
-  // h_topjet_elec.reset(new ElectronHists(ctx, "06_topjet_Elec"));
-  // h_topjet_muon.reset(new MuonHists(ctx, "06_topjet_Muon"));
-  // h_topjet_jets.reset(new JetHists(ctx, "06_topjet_Jets"));
-  // h_topjet_topjets.reset(new TopJetHists(ctx, "06_topjet_TopJets"));
-  // h_topjet_event2.reset(new MTopJetHists(ctx, "06_topjet_Event2"));
-
-  // h_topmass_event.reset(new EventHists(ctx, "07_topmass_Event"));
-  // h_topmass_elec.reset(new ElectronHists(ctx, "07_topmass_Elec"));
-  // h_topmass_muon.reset(new MuonHists(ctx, "07_topmass_Muon"));
-  // h_topmass_jets.reset(new JetHists(ctx, "07_topmass_Jets"));
-  // h_topmass_topjets.reset(new TopJetHists(ctx, "07_topmass_TopJets"));
-  // h_topmass_event2.reset(new MTopJetHists(ctx, "07_topmass_Event2"));
-
-  // h_toplepcleaner_event.reset(new EventHists(ctx, "08b_toplepcleaner_Event"));
-  // h_toplepcleaner_elec.reset(new ElectronHists(ctx, "08b_toplepcleaner_Elec"));
-  // h_toplepcleaner_muon.reset(new MuonHists(ctx, "08b_toplepcleaner_Muon"));
-  // h_toplepcleaner_jets.reset(new JetHists(ctx, "08b_toplepcleaner_Jets"));
-  // h_toplepcleaner_topjets.reset(new TopJetHists(ctx, "08b_toplepcleaner_TopJets"));
-  // h_toplepcleaner_event2.reset(new MTopJetHists(ctx, "08b_toplepcleaner_Event2"));
-
-  // h_toplepdR_event.reset(new EventHists(ctx, "08a_toplepdR_Event"));
-  // h_toplepdR_elec.reset(new ElectronHists(ctx, "08a_toplepdR_Elec"));
-  // h_toplepdR_muon.reset(new MuonHists(ctx, "08a_toplepdR_Muon"));
-  // h_toplepdR_jets.reset(new JetHists(ctx, "08a_toplepdR_Jets"));
-  // h_toplepdR_topjets.reset(new TopJetHists(ctx, "08a_toplepdR_TopJets"));
-  // h_toplepdR_event2.reset(new MTopJetHists(ctx, "08a_toplepdR_Event2"));
-
 ////
 
 }
@@ -343,15 +306,15 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_btag_event2->fill(event);
   ////
 
-  //// HT_lep selection
-  const bool pass_htlep100 = htlep_sel100->passes(event);
-  if(!pass_htlep100) return false;
-  h_htlep100_event->fill(event);
-  h_htlep100_elec->fill(event);
-  h_htlep100_muon->fill(event);
-  h_htlep100_jets->fill(event);
-  h_htlep100_topjets->fill(event);
-  h_htlep100_event2->fill(event);
+  // //// HT_lep selection
+  // const bool pass_htlep100 = htlep_sel100->passes(event);
+  // if(!pass_htlep100) return false;
+  // h_htlep100_event->fill(event);
+  // h_htlep100_elec->fill(event);
+  // h_htlep100_muon->fill(event);
+  // h_htlep100_jets->fill(event);
+  // h_htlep100_topjets->fill(event);
+  // h_htlep100_event2->fill(event);
 
   const bool pass_htlep150 = htlep_sel150->passes(event);
   if(!pass_htlep150) return false;
@@ -361,59 +324,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_htlep150_jets->fill(event);
   h_htlep150_topjets->fill(event);
   h_htlep150_event2->fill(event);
-
-  ////
-
-  //// Top Jet Selection
-
-  // /* 2nd AK8 jet selection */
-  // const bool pass_topjet2 = topjet2_sel->passes(event);
-  // if(!pass_topjet2) return false;
-
-  // /* 1st AK8 jet selection */
-  // const bool pass_topjet1 = topjet1_sel->passes(event);
-  // if(!pass_topjet1) return false;
-
-  // h_topjet_event->fill(event);
-  // h_topjet_elec->fill(event);
-  // h_topjet_muon->fill(event);
-  // h_topjet_jets->fill(event);
-  // h_topjet_topjets->fill(event);
-  // h_topjet_event2->fill(event);
-
-  // /* Top Jet Mass Cut M1 > M2 */
-  // const bool pass_topmass = topmass_sel->passes(event);
-  // if(!pass_topmass) return false;
-
-  // h_topmass_event->fill(event);
-  // h_topmass_elec->fill(event);
-  // h_topmass_muon->fill(event);
-  // h_topmass_jets->fill(event);
-  // h_topmass_topjets->fill(event);
-  // h_topmass_event2->fill(event);
-
-  // /* delta R (lep, topjet2) < 0.8  */
-  // const bool pass_deltaR = deltarcut_sel->passes(event);
-  // if(pass_deltaR){
-  //   h_toplepdR_event->fill(event);
-  //   h_toplepdR_elec->fill(event);
-  //   h_toplepdR_muon->fill(event);
-  //   h_toplepdR_jets->fill(event);
-  //   h_toplepdR_topjets->fill(event);
-  //   h_toplepdR_event2->fill(event);
-  // }
-
-  // topjetlepton_cleaner->process(event);
-
-  // h_toplepcleaner_event->fill(event);
-  // h_toplepcleaner_elec->fill(event);
-  // h_toplepcleaner_muon->fill(event);
-  // h_toplepcleaner_jets->fill(event);
-  // h_toplepcleaner_topjets->fill(event);
-  // h_toplepcleaner_event2->fill(event);
-
-
-
   ////
 return true;
 }
