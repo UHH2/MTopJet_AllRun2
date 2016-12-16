@@ -1,15 +1,5 @@
 #include "UHH2/MTopJet/include/RecoHists.h"
-#include "UHH2/core/include/Event.h"
-#include "UHH2/common/include/Utils.h"
 
-#include <math.h>
-#include <vector>
-
-#include "TH1F.h"
-#include "TH2F.h"
-#include <iostream>
-
-using namespace uhh2;
 
 RecoHists::RecoHists(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
   // book all histograms here

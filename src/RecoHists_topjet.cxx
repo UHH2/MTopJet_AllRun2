@@ -1,23 +1,12 @@
 #include "UHH2/MTopJet/include/RecoHists_topjet.h"
-// #include "UHH2/MTopJet/include/JetCluster.h"
-#include "UHH2/core/include/Event.h"
-#include "UHH2/common/include/Utils.h"
-// #include "UHH2/core/include/PFParticle.h"
 
-#include <math.h>
-#include <vector>
 
-#include "TH1F.h"
-#include "TH2F.h"
-#include <iostream>
-
-using namespace uhh2;
-
-RecoHists_topjet::RecoHists_topjet(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+RecoHists_topjet::RecoHists_topjet(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
   // book all histograms here
   RecoJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
   RecoJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  RecoJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
   RecoJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
@@ -31,7 +20,7 @@ RecoHists_topjet::RecoHists_topjet(uhh2::Context & ctx, const std::string & dirn
 
 
   // handle for clustered jets
-  h_jets=ctx.get_handle<std::vector<TopJet>>("topjets");
+  h_jets=ctx.get_handle<std::vector<TopJet>>(jetname);
 
 }
 
@@ -55,8 +44,6 @@ void RecoHists_topjet::fill(const Event & event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
-
-
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of 2 jets and lepton -------------------=-----------------
   //---------------------------------------------------------------------------------------
@@ -91,6 +78,7 @@ void RecoHists_topjet::fill(const Event & event){
 
   if((jets.size()) > 1){
     RecoJet1Mass->Fill(jet1_v4.M(),weight);
+    RecoJet2Mass->Fill(jet2_v4.M(),weight);
     RecoJet1PT->Fill(jet1_v4.Pt(),weight);
     RecoJet2PT->Fill(jet2_v4.Pt(),weight);
     RecoJet2Eta->Fill(jet2_v4.Eta(),weight);

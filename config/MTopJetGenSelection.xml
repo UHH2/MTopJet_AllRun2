@@ -40,8 +40,6 @@
 <JobConfiguration JobName="MTopJetGenSelectionJob" OutputLevel="INFO">
     <Library Name="libSUHH2MTopJet"/>  
     <Package Name="SUHH2MTopJet.par"/> 
-    <Library Name="libfastjet" />
-    <Library Name="libfastjettools" />
 
 
  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="2690.707225445">

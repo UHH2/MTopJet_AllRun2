@@ -1,19 +1,4 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
-#include <UHH2/MTopJet/include/MTopJetUtils.h>
-#include <UHH2/MTopJet/include/utils.h>
-#include <UHH2/MTopJet/include/GenSelections.h>
-
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <memory>
-
-#include <UHH2/core/include/LorentzVector.h>
-
-#include <UHH2/common/include/TTbarGen.h>
-#include <UHH2/common/include/ReconstructionHypothesisDiscriminators.h>
-#include <UHH2/common/include/Utils.h>
-
 
 uhh2::LeadingRecoJetPT::LeadingRecoJetPT(uhh2::Context& ctx, const std::string & name, float ptcut):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),

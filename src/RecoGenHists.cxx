@@ -1,19 +1,5 @@
 #include "UHH2/MTopJet/include/RecoGenHists.h"
-#include "UHH2/MTopJet/include/JetCluster.h"
-#include "UHH2/core/include/Event.h"
-#include "UHH2/common/include/Utils.h"
-#include "UHH2/core/include/PFParticle.h"
 
-#include "UHH2/common/include/TTbarGen.h"
-
-#include <math.h>
-#include <vector>
-
-#include "TH1F.h"
-#include "TH2F.h"
-#include <iostream>
-
-using namespace uhh2;
 
 RecoGenHists::RecoGenHists(uhh2::Context & ctx, const std::string & dirname, const std::string & rec_label, const std::string & gen_label): Hists(ctx, dirname){
   // book all histograms here

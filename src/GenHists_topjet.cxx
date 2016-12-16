@@ -1,21 +1,5 @@
 #include "UHH2/MTopJet/include/GenHists_topjet.h"
-// #include "UHH2/MTopJet/include/JetCluster.h"
-#include "UHH2/core/include/Event.h"
-#include "UHH2/common/include/Utils.h"
-#include "UHH2/core/include/PFParticle.h"
-#include "UHH2/core/include/AnalysisModule.h"
 
-#include "UHH2/common/include/TTbarGen.h"
-
-#include <math.h>
-#include <vector>
-
-#include "TH1F.h"
-#include "TH2F.h"
-#include <iostream>
-
-using namespace uhh2;
-using namespace std;
 
 GenHists_topjet::GenHists_topjet(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
@@ -122,17 +106,6 @@ void GenHists_topjet::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------- 
 
-
-  //---------------------------------------------------------------------------------------
-  //--------------------------------- Cluster Reco Jets -----------------------------------
-  //---------------------------------------------------------------------------------------
-  // std::vector<PFParticle> pfparts = event.get(h_pfpart);
-  // JetCluster* jetc_reco=new JetCluster();
-  // std::vector<fastjet::PseudoJet> reco_ak06; 
-  // reco_ak06 = jetc_reco->get_recojets(&pfparts, JetCluster::e_akt, 0.8, 200);
-  //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
- 
 
   //---------------------------------------------------------------------------------------
   //--------------------------------- define needed objects-----------------------------------

@@ -1,16 +1,4 @@
 #include <UHH2/MTopJet/include/RecoSelections_topjet.h>
-#include <UHH2/MTopJet/include/MTopJetUtils.h>
-#include <UHH2/MTopJet/include/utils.h>
-#include <UHH2/MTopJet/include/GenSelections.h>
-
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <memory>
-
-#include <UHH2/core/include/LorentzVector.h>
-#include <UHH2/common/include/ReconstructionHypothesisDiscriminators.h>
-#include <UHH2/common/include/Utils.h>
 
 
 uhh2::LeadingRecoJetPT_topjet::LeadingRecoJetPT_topjet(uhh2::Context& ctx, float ptcut):

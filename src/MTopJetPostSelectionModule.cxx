@@ -152,7 +152,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_cleaner_jets.reset(new JetHists(ctx, "00_cleaner_Jets"));
   h_cleaner_topjets.reset(new TopJetHists(ctx, "00_cleaner_TopJets"));
   h_cleaner_MTopJetHists.reset(new MTopJetHists(ctx, "00_cleaner_MTopJetHists"));
-  h_cleaner_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "00_cleaner_MTopJetHists_RecoJetHists_topjet"));
+  h_cleaner_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "00_cleaner_MTopJetHists_RecoJetHists_topjet", "topjets"));
 
   // 2 Jets with pt > 200 (SET TO 150??)
   h_2ndJet_event.reset(new EventHists(ctx, "00B_2ndJet_Event"));
@@ -161,7 +161,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_2ndJet_jets.reset(new JetHists(ctx, "00B_2ndJet_Jets"));
   h_2ndJet_topjets.reset(new TopJetHists(ctx, "00B_2ndJet_TopJets"));
   h_2ndJet_MTopJetHists.reset(new MTopJetHists(ctx, "00B_2ndJet_MTopJetHists"));
-  h_2ndJet_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "00B_2ndJet_MTopJetHists_RecoJetHists_topjet"));
+  h_2ndJet_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "00B_2ndJet_MTopJetHists_RecoJetHists_topjet", "topjets"));
  
   // Selection A (1st topjet pt > 400)
   h_topjetA_event.reset(new EventHists(ctx, "01A_topjet_Event"));
@@ -170,7 +170,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_topjetA_jets.reset(new JetHists(ctx, "01A_topjet_Jets"));
   h_topjetA_topjets.reset(new TopJetHists(ctx, "01A_topjet_TopJets"));
   h_topjetA_MTopJetHists.reset(new MTopJetHists(ctx, "01A_topjet_MTopJetHists"));
-  h_topjetA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "01A_topjet_MTopJetHists_RecoJetHists_topjet"));
+  h_topjetA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "01A_topjet_MTopJetHists_RecoJetHists_topjet", "topjets"));
 
   h_toplepdRA_event.reset(new EventHists(ctx, "02A_toplepdR_Event"));
   h_toplepdRA_elec.reset(new ElectronHists(ctx, "02A_toplepdR_Elec"));
@@ -178,7 +178,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_toplepdRA_jets.reset(new JetHists(ctx, "02A_toplepdR_Jets"));
   h_toplepdRA_topjets.reset(new TopJetHists(ctx, "02A_toplepdR_TopJets"));
   h_toplepdRA_MTopJetHists.reset(new MTopJetHists(ctx, "02A_toplepdR_MTopJetHists"));
-  h_toplepdRA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "02A_toplepdR_RecoJetHists_topjet"));
+  h_toplepdRA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "02A_toplepdR_RecoJetHists_topjet", "topjets"));
 
   h_topmassA_event.reset(new EventHists(ctx, "03A_topmass_Event"));
   h_topmassA_elec.reset(new ElectronHists(ctx, "03A_topmass_Elec"));
@@ -186,7 +186,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_topmassA_jets.reset(new JetHists(ctx, "03A_topmass_Jets"));
   h_topmassA_topjets.reset(new TopJetHists(ctx, "03A_topmass_TopJets"));
   h_topmassA_MTopJetHists.reset(new MTopJetHists(ctx, "03A_topmass_MTopJetHists"));
-  h_topmassA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "03A_topmass_RecoJetHists_topjet"));
+  h_topmassA_RecoHists_topjet.reset(new RecoHists_topjet(ctx, "03A_topmass_RecoJetHists_topjet", "topjets"));
 
  
 }

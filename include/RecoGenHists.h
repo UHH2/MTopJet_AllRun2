@@ -1,9 +1,16 @@
 #pragma once
 #include "UHH2/core/include/Hists.h"
 #include "UHH2/core/include/Event.h"
-/* #include "UHH2/core/include/PFParticle.h" */
-/* #include "UHH2/common/include/TTbarGen.h" */
-/* #include "UHH2/MTopJet/include/JetCluster.h" */
+#include "UHH2/common/include/Utils.h"
+
+#include <math.h>
+#include <vector>
+
+#include "TH1F.h"
+#include "TH2F.h"
+#include <iostream>
+
+using namespace uhh2;
  
 
 /**  \brief Example class for booking and filling histograms
