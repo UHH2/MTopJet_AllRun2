@@ -326,4 +326,7 @@ obj/MTopJetSelectionModule.o: src/MTopJetSelectionModule.cxx \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/ModuleBASE.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoSelections.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/ReconstructionHypothesis.h \
- /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/MTopJetUtils.h
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/ReconstructionHypothesisDiscriminators.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/MTopJetUtils.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/utils.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/GenSelections.h

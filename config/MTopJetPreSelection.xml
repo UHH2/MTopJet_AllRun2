@@ -265,11 +265,14 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="PFParticles ca15GenJets patJetsAk8CHSJetsSoftDropPacked_daughters patJetsCa15PuppiJetsSoftDropPacked_daughters patJetsHepTopTagCHSPacked_daughters patJetsCa15CHSJetsSoftDropPacked_daughters patJetsHepTopTagPuppiPacked_daughters"/>
+	<!-- SELECT cORRECT JETS -->
+	<Item Name="additionalBranches" Value="XConeTopJets genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets"/>
 
 
 	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
         <Item Name="METName"                 Value="slimmedMETs"/>
+
+	<!-- SELECT NEW FILE!!!! -->
         <Item Name="lumi_file" Value="/afs/desy.de/user/s/schwarzd/CMSSW_7_6_3/src/UHH2/common/data/Cert_13TeV_16Dec2015ReReco_Collisions15_25ns_JSON_Silver.root"/>
         <Item Name="use_sframe_weight" Value="true"/>
 

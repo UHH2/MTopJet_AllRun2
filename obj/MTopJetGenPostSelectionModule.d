@@ -326,8 +326,11 @@ obj/MTopJetGenPostSelectionModule.o: \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/ModuleBASE.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoSelections.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/ReconstructionHypothesis.h \
- /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoSelections_topjet.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/ReconstructionHypothesisDiscriminators.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/MTopJetUtils.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/utils.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/GenSelections.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoSelections_topjet.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/GenHists.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_8_0_24_patch1/external/slc6_amd64_gcc530/bin/../../../../../../../slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed5/include/TH1F.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_8_0_24_patch1/external/slc6_amd64_gcc530/bin/../../../../../../../slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed5/include/TH1.h \
@@ -350,5 +353,4 @@ obj/MTopJetGenPostSelectionModule.o: \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoGenHists.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/GenHists_topjet.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoHists_topjet.h \
- /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoGenHists_topjet.h \
- /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/MTopJetUtils.h
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoGenHists_topjet.h
