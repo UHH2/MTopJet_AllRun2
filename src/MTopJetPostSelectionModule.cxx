@@ -90,11 +90,6 @@ class MTopJetPostSelectionModule : public ModuleBASE {
     h_toplepdRA_event, h_toplepdRA_elec, h_toplepdRA_muon, h_toplepdRA_jets, h_toplepdRA_topjets, h_toplepdRA_MTopJetHists, h_toplepdRA_RecoHists_topjet,
     h_topmassA_event, h_topmassA_elec, h_topmassA_muon, h_topmassA_jets, h_topmassA_topjets, h_topmassA_MTopJetHists, h_topmassA_RecoHists_topjet;
 
-    // h_topjetB_event, h_topjetB_elec, h_topjetB_muon, h_topjetB_jets, h_topjetB_topjets, h_topjetB_MTopJetHists, h_topjetB_RecoHists_topjet,
-    // h_toplepdRB_event, h_toplepdRB_elec, h_toplepdRB_muon, h_toplepdRB_jets, h_toplepdRB_topjets, h_toplepdRB_MTopJetHists, h_toplepdRB_RecoHists_topjet,
-    // h_topmassB_event, h_topmassB_elec, h_topmassB_muon, h_topmassB_jets, h_topmassB_topjets, h_topmassB_MTopJetHists, h_topmassB_RecoHists_topjet;
-
-
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){

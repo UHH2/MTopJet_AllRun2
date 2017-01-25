@@ -24,6 +24,7 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGenHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
+#include <UHH2/MTopJet/include/RecoHists_xcone.h>
 
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
@@ -88,12 +89,7 @@ class MTopJetSelectionModule : public ModuleBASE {
     h_trianc_event, h_trianc_elec, h_trianc_muon, h_trianc_jets, h_trianc_topjets, h_trianc_event2,
     h_htlep100_event, h_htlep100_elec, h_htlep100_muon, h_htlep100_jets, h_htlep100_topjets, h_htlep100_event2,
     h_htlep150_event, h_htlep150_elec, h_htlep150_muon, h_htlep150_jets, h_htlep150_topjets, h_htlep150_event2,
-    // h_topjet_event, h_topjet_elec, h_topjet_muon, h_topjet_jets, h_topjet_topjets, h_topjet_event2,
-    // h_toplepcleaner_event, h_toplepcleaner_elec, h_toplepcleaner_muon, h_toplepcleaner_jets, h_toplepcleaner_topjets, h_toplepcleaner_event2,
-    // h_toplepdR_event, h_toplepdR_elec, h_toplepdR_muon, h_toplepdR_jets, h_toplepdR_topjets, h_toplepdR_event2,	
-  // h_jetlepdR_event, h_jetlepdR_elec, h_jetlepdR_muon, h_jetlepdR_jets, h_jetlepdR_topjets, h_jetlepdR_event2, 
-    // h_topmass_event, h_topmass_elec, h_topmass_muon, h_topmass_jets, h_topmass_topjets, h_topmass_event2,
-    h_btag_event, h_btag_elec, h_btag_muon, h_btag_jets, h_btag_topjets, h_btag_event2;
+    h_btag_event, h_btag_elec, h_btag_muon, h_btag_jets, h_btag_topjets, h_btag_event2, h_XCONE;
 
   // Event::Handle<float> tt_TMVA_response;// response of TMVA method, dummy value at this step
 
@@ -200,6 +196,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_htlep150_jets.reset(new JetHists(ctx, "05_htlep150_Jets"));
   h_htlep150_topjets.reset(new TopJetHists(ctx, "05_htlep150_TopJets"));
   h_htlep150_event2.reset(new MTopJetHists(ctx, "05_htlep150_Event2"));
+
+  h_XCONE.reset(new RecoHists_xcone(ctx, "XCONE"));
 ////
 
 }
@@ -248,12 +246,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // const bool pass_jet1 = jet1_sel->passes(event);
   // if(!pass_jet1) return false;
 
-  const bool pass_trigger = trigger_sel->passes(event);
-  if(!pass_trigger) return false;
+
 
   /* Only select event with exacly 1 muon or electron */
-  const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
-  if(!pass_lepsel) return false;
+
   h_PreSel_event->fill(event);
   h_PreSel_elec->fill(event);
   h_PreSel_muon->fill(event);
@@ -262,6 +258,12 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_PreSel_event2->fill(event);
 
   ////
+
+  const bool pass_trigger = trigger_sel->passes(event);
+  if(!pass_trigger) return false;
+
+  const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
+  if(!pass_lepsel) return false;
 
   // //// MET selection
   // const bool pass_met = met_sel->passes(event);
@@ -324,6 +326,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_htlep150_topjets->fill(event);
   h_htlep150_event2->fill(event);
   ////
+
+  h_XCONE->fill(event);
+
 return true;
 }
 
