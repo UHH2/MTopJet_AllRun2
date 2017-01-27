@@ -72,7 +72,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
 
 
   // store Hist collection as member variables
-
+  std::unique_ptr<Hists> h_ttbar;
 };
 
 MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
@@ -108,8 +108,8 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-  // if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700") genmttbar_sel.reset(new MttbarGenSelection( 0., 700.));
-  // else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700") genmttbar_sel.reset(new MttbarGenSelection( 0., 700.));
+  else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
 
   /******************************************************************/
 
@@ -174,6 +174,8 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   elec_sel.reset(new NElectronSelection(1, -1));
   ////
 
+
+  h_ttbar.reset(new TTbarGenHists(ctx, "TTbarHists"));
 }
 
 bool MTopJetPreSelectionModule::process(uhh2::Event& event){
@@ -273,7 +275,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
   if(!pass_lepsel) return false;
 
-
+  // h_ttbar->fill(event);
   return true;
 }
 
