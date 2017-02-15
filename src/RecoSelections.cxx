@@ -1,5 +1,7 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 
+
+
 uhh2::LeadingRecoJetPT::LeadingRecoJetPT(uhh2::Context& ctx, const std::string & name, float ptcut):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),
   ptcut_(ptcut) {}
@@ -43,6 +45,27 @@ bool uhh2::MassCutReco::passes(const uhh2::Event& event){
   }
   return pass_masscut;
 }
+////////////////////////////////////////////////////////
+
+uhh2::MassCutXCone::MassCutXCone(uhh2::Context& ctx):
+  h_hadjets(ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined")),
+  h_lepjets(ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined")){}
+
+bool uhh2::MassCutXCone::passes(const uhh2::Event& event){
+  std::vector<Jet> hadjets = event.get(h_hadjets);
+  std::vector<Jet> lepjets = event.get(h_lepjets);
+
+  bool pass_masscut = false;
+  TLorentzVector jet1_v4, jet2_v4;
+  if(hadjets.size()>0 && lepjets.size()>0){
+    jet1_v4.SetPtEtaPhiE(hadjets.at(0).pt(),hadjets.at(0).eta(),hadjets.at(0).phi(),hadjets.at(0).energy()); //v4 of first jet
+    jet2_v4.SetPtEtaPhiE(lepjets.at(0).pt(),lepjets.at(0).eta(),lepjets.at(0).phi(),lepjets.at(0).energy()); //v4 of first jet
+    if(jet1_v4.M() > jet2_v4.M()) pass_masscut = true;
+  }
+  
+  return pass_masscut;
+}
+
 ////////////////////////////////////////////////////////
 
 uhh2::DeltaRCutReco::DeltaRCutReco(uhh2::Context& ctx, const std::string & name, float jetradius):
@@ -348,7 +371,7 @@ bool uhh2::TwoDCut1::passes(const uhh2::Event& event){
   float drmin, ptrel;
   std::tie(drmin, ptrel) = drmin_pTrel(*lepton, *event.jets);
 
-  return (drmin > min_deltaR_) || (ptrel > min_pTrel_);
+  return ((drmin > min_deltaR_) || (ptrel > min_pTrel_));
 }
 ////////////////////////////////////////////////////////
 

@@ -51,6 +51,18 @@ namespace uhh2 {
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
   };
 
+ class MassCutXCone : public Selection { 
+
+  public: 
+    explicit MassCutXCone(Context&);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_hadjets;
+    uhh2::Event::Handle<std::vector<Jet>> h_lepjets;
+  };
+
+
  class DeltaRCutReco : public Selection { 
 
   public: 

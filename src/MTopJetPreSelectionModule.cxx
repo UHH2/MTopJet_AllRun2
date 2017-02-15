@@ -29,14 +29,6 @@
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 
 
- /* 
- /   TO DO:
- /
- /   activate genmttbar selection
- / 
-*/
-
-
 class MTopJetPreSelectionModule : public ModuleBASE {
 
  public:

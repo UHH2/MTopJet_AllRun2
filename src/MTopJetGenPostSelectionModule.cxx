@@ -143,24 +143,24 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   cleaner_toprec.reset(new RecoTopJetLeptonCleaner(ctx, 0.8));
 
   // JEC
-  std::vector<std::string> JEC_AK4, JEC_AK8;
-  if(isMC){
-    JEC_AK4 = JERFiles::Fall15_25ns_L123_AK4PFchs_MC;
-    JEC_AK8 = JERFiles::Fall15_25ns_L123_AK8PFchs_MC;
-  }
-  else {
-    JEC_AK4 = JERFiles::Fall15_25ns_L123_AK4PFchs_DATA;
-    JEC_AK8 = JERFiles::Fall15_25ns_L123_AK8PFchs_DATA;
-  }
+  // std::vector<std::string> JEC_AK4, JEC_AK8;
+  // if(isMC){
+  //   JEC_AK4 = JERFiles::Fall15_25ns_L123_AK4PFchs_MC;
+  //   JEC_AK8 = JERFiles::Fall15_25ns_L123_AK8PFchs_MC;
+  // }
+  // else {
+  //   JEC_AK4 = JERFiles::Fall15_25ns_L123_AK4PFchs_DATA;
+  //   JEC_AK8 = JERFiles::Fall15_25ns_L123_AK8PFchs_DATA;
+  // }
 
-  topjet_corrector.reset(new TopJetCorrector(ctx, JEC_AK8));
-  topjet_subjet_corrector.reset(new SubJetCorrector(ctx, JEC_AK4));
+  // topjet_corrector.reset(new TopJetCorrector(ctx, JEC_AK8));
+  // topjet_subjet_corrector.reset(new SubJetCorrector(ctx, JEC_AK4));
   // if(isMC){
   //   ctx.declare_event_input<std::vector<Particle> >(ctx.get("GenTopJetCollection"), "gentopjets");
   //   topjetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "gentopjets", false));
   // }
   topjet_cleaner.reset(new TopJetCleaner(ctx, TopJetId(PtEtaCut(200., 2.4))));
-  topjetlepton_cleaner.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK8, "topjets")); 
+  // topjetlepton_cleaner.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK8, "topjets")); 
 
   //// set up Hists classes:
   // GEN
@@ -343,14 +343,14 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
   cleaner_rec->process(event);
    
-  topjet_corrector->process(event);
-  topjet_subjet_corrector->process(event);
-  // if(topjetER_smearer.get()) topjetER_smearer->process(event);
-  topjet_cleaner->process(event);
-  topjetlepton_cleaner->process(event); // cleaner by key matching
-  cleaner_toprec->process(event);
-  topjet_cleaner->process(event);
-  sort_by_pt<TopJet>(*event.topjets);
+  // topjet_corrector->process(event);
+  // topjet_subjet_corrector->process(event);
+  // // if(topjetER_smearer.get()) topjetER_smearer->process(event);
+  // topjet_cleaner->process(event);
+  // topjetlepton_cleaner->process(event); // cleaner by key matching
+  // cleaner_toprec->process(event);
+  // topjet_cleaner->process(event);
+  // sort_by_pt<TopJet>(*event.topjets);
 
   h_GenHists0b->fill(event);
   h_GenHists0b_top->fill(event);

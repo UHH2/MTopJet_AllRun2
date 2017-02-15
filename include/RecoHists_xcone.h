@@ -27,7 +27,8 @@ protected:
     TH1F *HadJetPT, *LepJetPT;
     TH1F *DeltaRDiff;
 
-    uhh2::Event::Handle<std::vector<TopJet>>h_jets;
+    uhh2::Event::Handle<std::vector<Jet>>h_hadjets;
+    uhh2::Event::Handle<std::vector<Jet>>h_lepjets;
 
 };
 

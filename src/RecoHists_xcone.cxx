@@ -14,7 +14,8 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
   // handle for clustered jets
-  h_jets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
+  h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
 
 }
 
@@ -23,11 +24,11 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
 void RecoHists_xcone::fill(const Event & event){
 
   //---------------------------------------------------------------------------------------
-  //--------------------------------- get subjets and lepton ------------------------------
+  //--------------------------------- get jets and lepton ---------------------------------
   //---------------------------------------------------------------------------------------
-  std::vector<TopJet> jets = event.get(h_jets);
+  std::vector<Jet> hadjets = event.get(h_hadjets);
+  std::vector<Jet> lepjets = event.get(h_lepjets);
 
-  // identify lepton, there has to be ==1 muon OR ==1 elec 
   Particle lepton;
   if(event.muons->size() > 0 && event.electrons->size() > 0){
     return;
@@ -38,49 +39,24 @@ void RecoHists_xcone::fill(const Event & event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
-
+  float dR_had = deltaR(lepton, hadjets.at(0));
+  float dR_lep = deltaR(lepton, lepjets.at(0));
   //---------------------------------------------------------------------------------------
-  //------------- define had and lep jet (deltaR) -----------------------------------------
+  //-------- set Lorentz Vectors of Combined Jets ---------- ------------------------------
   //---------------------------------------------------------------------------------------
-  TopJet fathadjet, fatlepjet;
-  float dR1 = deltaR(lepton, jets.at(0));
-  float dR2 = deltaR(lepton, jets.at(1));
-  float dR_lep, dR_had;
-  if(dR1 < dR2){
-    fatlepjet = jets.at(0);
-    fathadjet = jets.at(1);
-    dR_lep = dR1;
-    dR_had = dR2;
-  }
-  else{
-    fatlepjet = jets.at(1);
-    fathadjet = jets.at(0);
-    dR_lep = dR2;
-    dR_had = dR1;
-  }
-
-  //---------------------------------------------------------------------------------------
-  //-------- set Lorentz Vectors of subjets and combine them ------------------------------
-  //---------------------------------------------------------------------------------------
-  std::vector<Jet> subjets_lep = fatlepjet.subjets();
-  std::vector<Jet> subjets_had = fathadjet.subjets();
   TLorentzVector hadjet_v4, lepjet_v4;
-  double pxlep=0, pylep=0, pzlep=0, Elep=0;
-  for(unsigned int i=0; i < subjets_lep.size(); ++i){
-    pxlep += subjets_lep.at(i).v4().Px();
-    pylep += subjets_lep.at(i).v4().Py();
-    pzlep += subjets_lep.at(i).v4().Pz();
-    Elep += subjets_lep.at(i).v4().E();
-  }
+  double pxlep, pylep, pzlep, Elep;
+  pxlep = lepjets.at(0).v4().Px();
+  pylep = lepjets.at(0).v4().Py();
+  pzlep = lepjets.at(0).v4().Pz();
+  Elep = lepjets.at(0).v4().E();
   lepjet_v4.SetPxPyPzE(pxlep, pylep, pzlep, Elep);
 
-  double pxhad=0, pyhad=0, pzhad=0, Ehad=0;
-  for(unsigned int i=0; i < subjets_had.size(); ++i){
-    pxhad += subjets_had.at(i).v4().Px();
-    pyhad += subjets_had.at(i).v4().Py();
-    pzhad += subjets_had.at(i).v4().Pz();
-    Ehad += subjets_had.at(i).v4().E();
-  }
+  double pxhad, pyhad, pzhad, Ehad;
+  pxhad = hadjets.at(0).v4().Px();
+  pyhad = hadjets.at(0).v4().Py();
+  pzhad = hadjets.at(0).v4().Pz();
+  Ehad = hadjets.at(0).v4().E();
   hadjet_v4.SetPxPyPzE(pxhad, pyhad, pzhad, Ehad);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
