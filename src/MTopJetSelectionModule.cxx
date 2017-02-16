@@ -15,15 +15,12 @@
 #include <UHH2/common/include/ElectronIds.h>
 #include <UHH2/common/include/JetIds.h>
 #include <UHH2/common/include/TopJetIds.h>
-#include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
 
 #include <UHH2/common/include/ElectronHists.h>
-#include <UHH2/common/include/EventHists.h>
 #include <UHH2/common/include/MuonHists.h>
 #include <UHH2/common/include/JetHists.h>
-#include <UHH2/common/include/TTbarGenHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
 
@@ -37,15 +34,7 @@
  *******************************************************************
 **************** TO DO ********************************************
 *******************************************************************
-
-- MET FILTER
-- elec/mu ID
-- CLEANER
-- COMBINE JETS
-- 2D CUT
-- HT_lep CUT
-- MET CUT
-- ==1 mu/elec
+- PU WEIGHT!!!
 - TRIGGER
 
 *******************************************************************
@@ -67,19 +56,19 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
 
-  std::unique_ptr<JetCleaner>                      jet_IDcleaner;
-  std::unique_ptr<JetCorrector>                    jet_corrector;
-  std::unique_ptr<GenericJetResolutionSmearer>     jetER_smearer;
-  std::unique_ptr<JetLeptonCleaner_by_KEYmatching> jetlepton_cleaner;
+  // std::unique_ptr<JetCleaner>                      jet_IDcleaner;
+  // std::unique_ptr<JetCorrector>                    jet_corrector;
+  // std::unique_ptr<GenericJetResolutionSmearer>     jetER_smearer;
+  // std::unique_ptr<JetLeptonCleaner_by_KEYmatching> jetlepton_cleaner;
   std::unique_ptr<JetCleaner>                      jet_cleaner1;
   std::unique_ptr<JetCleaner>                      jet_cleaner2;
 
-  std::unique_ptr<JetCleaner>                  topjet_IDcleaner;
-  std::unique_ptr<TopJetCorrector>             topjet_corrector;
-  std::unique_ptr<SubJetCorrector>             topjet_subjet_corrector;
-  std::unique_ptr<GenericJetResolutionSmearer> topjetER_smearer;
-  std::unique_ptr<TopJetLeptonDeltaRCleaner>   topjetlepton_cleaner;
-  std::unique_ptr<TopJetCleaner>               topjet_cleaner;
+  // std::unique_ptr<JetCleaner>                  topjet_IDcleaner;
+  // std::unique_ptr<TopJetCorrector>             topjet_corrector;
+  // std::unique_ptr<SubJetCorrector>             topjet_subjet_corrector;
+  // std::unique_ptr<GenericJetResolutionSmearer> topjetER_smearer;
+  // std::unique_ptr<TopJetLeptonDeltaRCleaner>   topjetlepton_cleaner;
+  // std::unique_ptr<TopJetCleaner>               topjet_cleaner;
 
   // selections
   std::unique_ptr<uhh2::AndSelection> metfilters_sel;
@@ -93,8 +82,6 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> htlep_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
   std::unique_ptr<uhh2::Selection> jet_sel;
-
-  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
 
   // store Hist collection as member variables
@@ -148,7 +135,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   jet_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(50, 2.4))));
 
   // met_sel  .reset(new METCut  (MET   , uhh2::infinity));
-  htlep_sel.reset(new HTlepCut(150, uhh2::infinity));
+  htlep_sel.reset(new HTlepCut(100, uhh2::infinity));
 
   twodcut_sel.reset(new TwoDCutALL(0.4, 40));
 
@@ -165,6 +152,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   common.reset(new CommonModules());
   common->set_muon_id(MuId);
   common->set_electron_id(EleId);
+  common->disable_mcpileupreweight();
+  common->switch_jetlepcleaner();
   // common->set_jet_id();
   common->init(ctx);
 
@@ -294,7 +283,8 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     }
   }
 
-  if(!pass_twodcut) return false; // 2D Cut
+  // 2D Cut (first soft cleaner [jet_cleaner1], then 2D Cut, then normal cleaner [jet_cleaner2]
+  if(!pass_twodcut) return false; 
   jet_cleaner2->process(event);
   sort_by_pt<Jet>(*event.jets);
 

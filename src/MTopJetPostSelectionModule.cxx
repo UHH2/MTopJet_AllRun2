@@ -24,7 +24,7 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGenHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
-#include <UHH2/MTopJet/include/RecoHists_topjet.h>
+#include <UHH2/MTopJet/include/RecoHists_xcone.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 
 

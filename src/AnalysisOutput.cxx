@@ -2,6 +2,18 @@
 
 using namespace std;
 
+/******************************
+ *     To Do
+
+  - Gen Jet Mass
+  - Jet PT
+  - Gen Jet PT
+  
+ *
+ *******************************/
+
+
+
 WriteOutput::WriteOutput(uhh2::Context & ctx):
   h_weight(ctx.declare_event_output<double>("weight")),
   h_top1_mass(ctx.declare_event_output<double>("1st_TopJet_Mass")),

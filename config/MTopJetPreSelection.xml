@@ -93,7 +93,7 @@
 <!-- ================================================================================================================================== -->
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="40" />
+   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="30" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PreSel_workdir"/>
 -->
 
@@ -117,27 +117,28 @@
  
     <!-- ********DATA**************************************** -->
     <InputData Version="SingleMuonB" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016B; 
-    &SingleMUON_Run2016Bv3; 
-    <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    &SingleMUON_Run2016B;  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-    <InputData Version="SingleMuonC" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016C; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SingleMuonBv3" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
+    &SingleMUON_Run2016Bv3; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-    <InputData Version="SingleMuonD" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016D; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <!-- <InputData Version="SingleMuonC" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &SingleMUON_Run2016C; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="SingleMuonE" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016E; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <!-- <InputData Version="SingleMuonD" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &SingleMUON_Run2016D; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="SingleMuonF" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016F; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <!-- <InputData Version="SingleMuonE" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &SingleMUON_Run2016E; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="SingleMuonG" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016G; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <!-- <InputData Version="SingleMuonF" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &SingleMUON_Run2016F; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="SingleMuonH" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False">
-    &SingleMUON_Run2016H_PromptReco; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <!-- <InputData Version="SingleMuonG" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &SingleMUON_Run2016G; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+    <!-- <InputData Version="SingleMuonH" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &SingleMUON_Run2016H_PromptReco; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
     <!-- ********SingleTop**************************************** -->
     <!-- <InputData Version="ST_t-channel_antitop" Lumi="48523.533" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
