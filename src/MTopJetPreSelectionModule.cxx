@@ -28,6 +28,7 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 
+using namespace std;
 
 class MTopJetPreSelectionModule : public ModuleBASE {
 
@@ -107,11 +108,11 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   //// COMMON MODULES
 
   if(!event.isRealData){
-
     /* GEN M-ttbar selection */
     ttgenprod->process(event);
     if(!genmttbar_sel->passes(event)) return false;
   }
+
 
   /* CMS-certified luminosity sections */
   if(event.isRealData){
@@ -120,8 +121,11 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   }
 
 
+
   const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   if(!pass_lep1) return false;
+
+  cout << "passed Lepton Sel"<<endl;
 
 
   /* JET selection */
@@ -138,9 +142,11 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   const bool pass_met = met_sel->passes(event);
   if(!pass_met) return false;
 
+
   /* select min 1 Muon OR min 1 Electron */
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
   if(!pass_lepsel) return false;
+
 
   // h_PreSel_event->fill(event);
   // h_PreSel_event2->fill(event);
