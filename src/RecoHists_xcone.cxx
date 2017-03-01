@@ -11,7 +11,7 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   HadJetPT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   LepJetPT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
 
-  DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
+  // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
   // handle for clustered jets
   h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
@@ -39,6 +39,8 @@ void RecoHists_xcone::fill(const Event & event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
+  if(hadjets.size() == 0 || lepjets.size() == 0) return;
+
   float dR_had = deltaR(lepton, hadjets.at(0));
   float dR_lep = deltaR(lepton, lepjets.at(0));
   //---------------------------------------------------------------------------------------
@@ -78,7 +80,7 @@ void RecoHists_xcone::fill(const Event & event){
   HadJetPT->Fill(hadjet_v4.Pt(), weight);
   LepJetPT->Fill(lepjet_v4.Pt(), weight);
 
-  DeltaRDiff->Fill(dR_had - dR_lep, weight);
+  // DeltaRDiff->Fill(dR_had - dR_lep, weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 

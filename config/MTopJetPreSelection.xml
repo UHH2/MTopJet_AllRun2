@@ -99,7 +99,7 @@
 <!-- ================================================================================================================================== -->
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="50" />
+   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="60" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PreSel_workdir"/>
 -->
 
@@ -195,13 +195,13 @@
     &WJetsToLNu_Pt0100to0250; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_Pt0250to0400" Lumi="25802848.782" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &WJetsToLNu_Pt0100to0250; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    &WJetsToLNu_Pt0250to0400; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_Pt0400to0600" Lumi="3857113.822" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &WJetsToLNu_Pt0100to0250; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    &WJetsToLNu_Pt0400to0600; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_Pt0600toInft" Lumi="3925568.675" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &WJetsToLNu_Pt0100to0250; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    &WJetsToLNu_Pt0600toInft; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
     <!-- ********DiBoson**************************************** -->

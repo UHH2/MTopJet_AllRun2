@@ -6,6 +6,7 @@
 #include <UHH2/core/include/Selection.h>
 
 #include <UHH2/common/include/CleaningModules.h>
+#include <UHH2/common/include/CommonModules.h>
 #include <UHH2/common/include/NSelections.h>
 #include <UHH2/common/include/TriggerSelection.h>
 #include <UHH2/common/include/JetCorrections.h>
@@ -14,23 +15,31 @@
 #include <UHH2/common/include/ElectronIds.h>
 #include <UHH2/common/include/JetIds.h>
 #include <UHH2/common/include/TopJetIds.h>
-#include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
+#include "UHH2/common/include/MCWeight.h"
 
 #include <UHH2/common/include/ElectronHists.h>
-#include <UHH2/common/include/EventHists.h>
 #include <UHH2/common/include/MuonHists.h>
 #include <UHH2/common/include/JetHists.h>
-#include <UHH2/common/include/TTbarGenHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
-#include <UHH2/MTopJet/include/RecoHists_xcone.h>
-#include <UHH2/MTopJet/include/AnalysisOutput.h>
+#include <UHH2/MTopJet/include/CombineXCone.h>
 
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
+#include <UHH2/MTopJet/include/RecoHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
+
+
+/*
+ *******************************************************************
+**************** TO DO ********************************************
+*******************************************************************
+- scale factors ?
+*******************************************************************
+*******************************************************************
+*/
 
 class MTopJetPostSelectionModule : public ModuleBASE {
 
@@ -42,85 +51,82 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   enum lepton { muon, elec };
   lepton channel_;
 
-  // Event Output
-  // std::unique_ptr<uhh2::AnalysisModule> output; 
-  // Event::Handle<bool> h_reco_sel;
-  // Event::Handle<bool> h_2Jet_sel;
-  // Event::Handle<bool> h_JetPt_sel;
-  // Event::Handle<bool> h_DeltaR_sel;
-  // Event::Handle<bool> h_Mass_sel;
-  // Event::Handle<int> h_cutflow;
-
   // cleaners
+  std::unique_ptr<CommonModules> common;
+  std::unique_ptr<MuonCleaner>     muoSR_cleaner;
+  std::unique_ptr<ElectronCleaner> eleSR_cleaner;
 
- 
+
+  std::unique_ptr<JetCleaner>                      jet_cleaner1;
+  std::unique_ptr<JetCleaner>                      jet_cleaner2;
+
+
   // selections
- 
   std::unique_ptr<uhh2::Selection> pt_sel;
   std::unique_ptr<uhh2::Selection> mass_sel;
 
 
-  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+  // scale factors
+  std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_final_xcone;
+  std::unique_ptr<Hists> h_XCone;
 
+
+  bool isMC; //define here to use it in "process" part
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
+  isMC = (ctx.get("dataset_type") == "MC");
 
-  //// Event Output
-  // output.reset(new WriteOutput(ctx));
-  // h_reco_sel = ctx.declare_event_output<bool> ("pass_RecoSel");
-  // h_2Jet_sel = ctx.declare_event_output<bool> ("pass_2JetSel");
-  // h_JetPt_sel = ctx.declare_event_output<bool> ("pass_JetPTSel");
-  // h_DeltaR_sel = ctx.declare_event_output<bool> ("pass_DeltaRSel");
-  // h_Mass_sel = ctx.declare_event_output<bool> ("pass_MassSel");
-  // h_cutflow = ctx.declare_event_output<int> ("cutflow");
-  //// COMMON MODULES
+  const std::string& channel = ctx.get("channel", ""); //define Channel
+  if     (channel == "muon") channel_ = muon;
+  else if(channel == "elec") channel_ = elec;
+  else {
 
+    std::string log("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- ");
+    log += "invalid argument for 'channel' key in xml file (must be 'muon' or 'elec'): \""+channel+"\"";
 
-  ////
-
-  //// OBJ CLEANING
+    throw std::runtime_error(log);
+  }
 
 
+ 
   //// EVENT SELECTION
-
-
   pt_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined", 400));
   mass_sel.reset(new MassCutXCone(ctx));
 
+
+  // define IDs
   ////
+
+  // scale factors
+  // muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID"));
+  // muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger"));
+
+  //// Obj Cleaning
+
+  // common.reset(new CommonModules());
+  // common->init(ctx);
+  //
 
   //// set up Hists classes:
 
-  h_final_xcone.reset(new RecoHists_xcone(ctx, "Final_XCone"));
+  h_XCone.reset(new RecoHists_xcone(ctx, "XCone"));
 
- 
+
+  //
+
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
-
-  //--------- Set bools for every selection step --------------------
-  //------------------------------------------------------------------
-
-  //==================================================================
-  //================= Apply Selection ================================
-  //==================================================================
-
-  bool pass_pt = pt_sel->passes(event);
-  if(!pass_pt) return false;
-  bool pass_mass = mass_sel->passes(event);
-  if(!pass_mass) return false;
-
-  h_final_xcone->fill(event);
-  //--------------------------------------------------------------------
-
-  // output->process(event);
+  /* Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 */
+  if(!pt_sel->passes(event)) return false;
+  if(!mass_sel->passes(event)) return false;
+  h_XCone->fill(event);
 
 return true;
 }

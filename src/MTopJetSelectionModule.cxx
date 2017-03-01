@@ -158,15 +158,11 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   //// Obj Cleaning
 
   common.reset(new CommonModules());
-  // common->set_jet_id(jetid);
-  // common->set_muon_id(muid);
-  // common->set_electron_id(eleid);
   common->set_HTjetid(jetid);
   common->switch_jetlepcleaner(true);
-  // common->switch_jetPtSorter();
   common->switch_metcorrection();
-  common->disable_mcpileupreweight();
   common->init(ctx);
+  
 
   muoSR_cleaner.reset(new     MuonCleaner(muid));
   eleSR_cleaner.reset(new ElectronCleaner(eleid));
@@ -227,6 +223,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 }
 
 bool MTopJetSelectionModule::process(uhh2::Event& event){
+  cout << "*******************************" << endl;
+  cout << "processing event nr. " << event.event<< endl;
 
   h_PreSel_event->fill(event);
   h_PreSel_elec->fill(event);
@@ -247,9 +245,13 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
 
   /* *********** Cleaner ********** */
-  common->process(event);
+  cout << "starting Common Modules" << endl;
+  if(!common->process(event)) return false;
+  cout << "passed Common Modules" << endl;
+
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
+
 
   /* *********** at least 1 good primary vertex *********** */
   if(!pv_sel->passes(event)) return false;
@@ -368,6 +370,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   /* *********** now produce final XCone Jets *********** */
   jetprod_reco->process(event);
 
+  cout << "passed whole selection" << endl;
 
 return true;
 }
