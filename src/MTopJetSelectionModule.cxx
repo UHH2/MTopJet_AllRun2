@@ -62,6 +62,7 @@ class MTopJetSelectionModule : public ModuleBASE {
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen;
 
   std::unique_ptr<uhh2::Selection> trigger_sel_A;
   std::unique_ptr<uhh2::Selection> trigger_sel_B;
@@ -75,6 +76,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> jet_sel;
 
   // scale factors
+  std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
   std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
 
@@ -115,6 +117,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // combine XCone
   jetprod_reco.reset(new CombineXCone33(ctx)); 
+  if(isMC) jetprod_gen.reset(new CombineXCone33_gen(ctx)); 
   ////
 
   // write output
@@ -159,10 +162,11 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
 
   // scale factors
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
   BTag_variation = ctx.get("BTag_variation","central");
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID"));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger"));
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
+  // BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
 
   //// Obj Cleaning
 
@@ -307,6 +311,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_Jet_muon->fill(event);
   h_Jet_jets->fill(event);
 
+  /* *********** BTag Effi Hist *********** */
+  if(!event.isRealData) BTagEffHists->fill(event);
+
   /* *********** lepton-2Dcut variables ***********  */
   const bool pass_twodcut = twodcut_sel->passes(event); {
 
@@ -368,7 +375,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
   if(jetbtagN < 1) return false;
-  if(!event.isRealData) BTagScaleFactors->process(event);
+  // if(!event.isRealData) BTagScaleFactors->process(event);
 
   h_bTag_event->fill(event);
   h_bTag_elec->fill(event);
@@ -377,6 +384,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   jetprod_reco->process(event);
+  if(!event.isRealData) jetprod_gen->process(event);
   output->process(event);
 
 return true;

@@ -22,13 +22,13 @@
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
 #include <UHH2/common/include/JetHists.h>
+
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
-
-
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/RecoHists_xcone.h>
+#include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 
 
@@ -70,7 +70,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<double>h_weight;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_XCone, h_XCone_noMassCut;
+  std::unique_ptr<Hists> h_XCone, h_XCone_noMassCut, h_XCone_reco_gen;
 
 
   bool isMC; //define here to use it in "process" part
@@ -118,6 +118,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   //// set up Hists classes:
 
   h_XCone.reset(new RecoHists_xcone(ctx, "XCone"));
+  h_XCone_reco_gen.reset(new RecoGenHists_xcone(ctx, "XCone_reco_gen"));
   h_XCone_noMassCut.reset(new RecoHists_xcone(ctx, "XCone_noMassCut"));
 
   //
@@ -134,6 +135,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_XCone_noMassCut->fill(event);
   if(!mass_sel->passes(event)) return false;
   h_XCone->fill(event);
+  h_XCone_reco_gen->fill(event);
 
 return true;
 }

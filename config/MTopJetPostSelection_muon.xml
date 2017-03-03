@@ -255,7 +255,7 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="weight XConeTopJets genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined"/>
+	<Item Name="additionalBranches" Value="weight XConeTopJets genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined GEN_XCone33_had_Combined GEN_XCone33_lep_Combined"/>
  
       <Item Name="METName"                 Value="slimmedMETs"/>
 
