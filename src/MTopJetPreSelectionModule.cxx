@@ -125,8 +125,6 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   if(!pass_lep1) return false;
 
-  cout << "passed Lepton Sel"<<endl;
-
 
   /* JET selection */
   /* 2nd AK4 jet selection */

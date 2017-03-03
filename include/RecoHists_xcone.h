@@ -23,10 +23,10 @@ public:
 
 protected:
 
-    TH1F *HadJetMass, *LepJetMass, *HadMassLepMass;
+    TH1F *HadJetMass, *HadJetMass_rebin, *LepJetMass, *HadMassLepMass;
     TH1F *HadJetPT, *LepJetPT;
     TH1F *DeltaRDiff;
-
+    TH1F *number_hadjet, *number_lepjet;
     uhh2::Event::Handle<std::vector<Jet>>h_hadjets;
     uhh2::Event::Handle<std::vector<Jet>>h_lepjets;
 

@@ -22,8 +22,7 @@ public:
     
 private:
   uhh2::Event::Handle<double>h_weight;
-  uhh2::Event::Handle<double>h_top1_mass;
-  uhh2::Event::Handle<int>h_top_number;
+
 
 };
 

@@ -66,11 +66,11 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> mass_sel;
 
 
-  // scale factors
-  std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
+  // get weight (with all SF and weight applied in previous cycle)
+  Event::Handle<double>h_weight;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_XCone;
+  std::unique_ptr<Hists> h_XCone, h_XCone_noMassCut;
 
 
   bool isMC; //define here to use it in "process" part
@@ -92,6 +92,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     throw std::runtime_error(log);
   }
 
+  // get handle for weight
+  h_weight=ctx.get_handle<double>("weight");
+  ////
 
  
   //// EVENT SELECTION
@@ -115,16 +118,20 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   //// set up Hists classes:
 
   h_XCone.reset(new RecoHists_xcone(ctx, "XCone"));
-
+  h_XCone_noMassCut.reset(new RecoHists_xcone(ctx, "XCone_noMassCut"));
 
   //
 
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
+  //apply weight
+  event.weight = event.get(h_weight);
+  ////
 
   /* Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 */
   if(!pt_sel->passes(event)) return false;
+  h_XCone_noMassCut->fill(event);
   if(!mass_sel->passes(event)) return false;
   h_XCone->fill(event);
 

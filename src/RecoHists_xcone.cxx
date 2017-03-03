@@ -5,11 +5,15 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   // book all histograms here
 
   HadJetMass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  HadJetMass_rebin = book<TH1F>("M_jet1_", "M_{jet}", 25, 0, 500);
   LepJetMass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
   HadJetPT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   LepJetPT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
+
+  number_hadjet = book<TH1F>("number_hadjet", "number", 10, 0, 10);
+  number_lepjet = book<TH1F>("number_lepjet", "number", 10, 0, 10);
 
   // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
@@ -72,8 +76,10 @@ void RecoHists_xcone::fill(const Event & event){
 
   // get weight
   double weight = event.weight;
-
+  number_hadjet->Fill(hadjets.size(), weight); // just for checks
+  number_lepjet->Fill(lepjets.size(), weight); // just for checks
   HadJetMass->Fill(hadjet_v4.M(), weight);
+  HadJetMass_rebin->Fill(hadjet_v4.M(), weight);
   LepJetMass->Fill(lepjet_v4.M(), weight);
   HadMassLepMass->Fill(hadjet_v4.M() - lepjet_v4.M(), weight);
  

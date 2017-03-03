@@ -17,14 +17,14 @@
 #include <UHH2/common/include/TopJetIds.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
-#include "UHH2/common/include/MCWeight.h"
+#include <UHH2/common/include/MCWeight.h>
 
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
-
+#include <UHH2/MTopJet/include/AnalysisOutput.h>
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
@@ -32,12 +32,10 @@
 
 
 /*
- *******************************************************************
+*******************************************************************
 **************** TO DO ********************************************
 *******************************************************************
-- PU WEIGHT!!!
-- TRIGGER
-
+- b tagging SF
 *******************************************************************
 *******************************************************************
 */
@@ -78,6 +76,10 @@ class MTopJetSelectionModule : public ModuleBASE {
 
   // scale factors
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
+  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
+
+  // write output
+  std::unique_ptr<uhh2::AnalysisModule> output; 
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_PreSel_event,  h_PreSel_elec, h_PreSel_muon, h_PreSel_jets;
@@ -91,6 +93,8 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_MET_event,  h_MET_elec, h_MET_muon, h_MET_jets;
 
   bool isMC; //define here to use it in "process" part
+
+  string BTag_variation ="central";
 };
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
@@ -113,6 +117,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   jetprod_reco.reset(new CombineXCone33(ctx)); 
   ////
 
+  // write output
+  output.reset(new WriteOutput(ctx));
+  ////
  
   //// EVENT SELECTION
 
@@ -152,8 +159,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
 
   // scale factors
+  BTag_variation = ctx.get("BTag_variation","central");
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID"));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger"));
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
 
   //// Obj Cleaning
 
@@ -223,8 +232,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 }
 
 bool MTopJetSelectionModule::process(uhh2::Event& event){
-  cout << "*******************************" << endl;
-  cout << "processing event nr. " << event.event<< endl;
+  // cout << "*******************************" << endl;
+  // cout << "processing event nr. " << event.event<< endl;
 
   h_PreSel_event->fill(event);
   h_PreSel_elec->fill(event);
@@ -245,9 +254,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
 
   /* *********** Cleaner ********** */
-  cout << "starting Common Modules" << endl;
   if(!common->process(event)) return false;
-  cout << "passed Common Modules" << endl;
 
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
@@ -361,16 +368,16 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
   if(jetbtagN < 1) return false;
+  if(!event.isRealData) BTagScaleFactors->process(event);
 
   h_bTag_event->fill(event);
   h_bTag_elec->fill(event);
   h_bTag_muon->fill(event);
   h_bTag_jets->fill(event);
 
-  /* *********** now produce final XCone Jets *********** */
+  /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   jetprod_reco->process(event);
-
-  cout << "passed whole selection" << endl;
+  output->process(event);
 
 return true;
 }
