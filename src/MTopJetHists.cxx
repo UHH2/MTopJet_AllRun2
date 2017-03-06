@@ -27,6 +27,9 @@ MTopJetHists::MTopJetHists(uhh2::Context & ctx, const std::string & dirname): Hi
   BTAG_M = book<TH1F>("BTAG_M", "N b-tags medium", 10, 0, 10);
   BTAG_T = book<TH1F>("BTAG_T", "N b-tags tight", 10, 0, 10);
 
+  deltaR_lep_Bjet = book<TH1F>("deltaR_lep_Bjet", "#Delta R(lep, b-tagged Jet)", 80, 0, 4.0);
+
+
   // delta R (lep, jet)
   deltaR_lep_jet1 = book<TH1F>("deltaR_lep_jet1", "#Delta R(lep,1st Jet)", 80, 0, 4.0);
   deltaR_lep_jet2 = book<TH1F>("deltaR_lep_jet2", "#Delta R(lep,2nd Jet)", 80, 0, 4.0);
@@ -102,6 +105,15 @@ void MTopJetHists::fill(const Event & event){
   hist("BTAG_L")->Fill(jetN__CSVL, weight);
   hist("BTAG_M")->Fill(jetN__CSVM, weight);
   hist("BTAG_T")->Fill(jetN__CSVT, weight);
+
+  for(const auto & jet : *event.jets){
+    if(jet.btag_combinedSecondaryVertex() > 0.935){
+      if((event.muons->size())!= 0){
+	deltaR_lep_Bjet->Fill(deltaR(event.muons->at(0), jet),weight);
+      }
+      else deltaR_lep_Bjet->Fill(deltaR(event.electrons->at(0), jet),weight);
+    }
+  }
   //
 
   // delta R1 Jet

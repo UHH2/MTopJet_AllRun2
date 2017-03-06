@@ -124,6 +124,18 @@ namespace uhh2 {
     float ptcut_;
   };
 
+ class LeadingJetPT_gen : public Selection { 
+
+  public: 
+    explicit LeadingJetPT_gen(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Particle>> h_jets;
+    float ptcut_;
+  };
+
+
  class LeadingTopJetPT : public Selection { 
 
   public: 
@@ -144,6 +156,17 @@ namespace uhh2 {
   private:
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+
+ class MassCut_gen : public Selection { 
+
+  public: 
+    explicit MassCut_gen(Context&, const std::string &, const std::string &);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Particle>> h_hadjets;
+    uhh2::Event::Handle<std::vector<Particle>> h_lepjets;
   };
 
   class MassCut_top : public Selection { 

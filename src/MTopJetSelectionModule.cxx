@@ -130,7 +130,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // define IDs
   MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
   ElectronId eleid = AndId<Electron>(ElectronID_Spring16_medium_noIso, PtEtaCut(55., 2.4));
-  JetId jetid = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
+  JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4));
   ////
 
   // define Trigger
@@ -150,7 +151,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
     elec_sel.reset(new NElectronSelection(0, 0, eleid));
   }
 
-  jet_sel.reset(new NJetSelection(2, -1, jetid));
+  jet_sel.reset(new NJetSelection(2, -1, jetid_selection));
   met_sel  .reset(new METCut  (50 , uhh2::infinity));
   htlep_sel.reset(new HTlepCut(100, uhh2::infinity));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
@@ -166,12 +167,12 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   BTag_variation = ctx.get("BTag_variation","central");
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID"));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger"));
-  // BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
 
   //// Obj Cleaning
 
   common.reset(new CommonModules());
-  common->set_HTjetid(jetid);
+  common->set_HTjetid(jetid_cleaner);
   common->switch_jetlepcleaner(true);
   common->switch_metcorrection();
   common->init(ctx);
@@ -375,7 +376,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
   if(jetbtagN < 1) return false;
-  // if(!event.isRealData) BTagScaleFactors->process(event);
+  BTagScaleFactors->process(event);
 
   h_bTag_event->fill(event);
   h_bTag_elec->fill(event);

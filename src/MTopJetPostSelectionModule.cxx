@@ -27,6 +27,7 @@
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
+#include <UHH2/MTopJet/include/GenSelections.h>
 #include <UHH2/MTopJet/include/RecoHists_xcone.h>
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
@@ -36,7 +37,7 @@
  *******************************************************************
 **************** TO DO ********************************************
 *******************************************************************
-- scale factors ?
+
 *******************************************************************
 *******************************************************************
 */
@@ -64,13 +65,14 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   // selections
   std::unique_ptr<uhh2::Selection> pt_sel;
   std::unique_ptr<uhh2::Selection> mass_sel;
-
+  std::unique_ptr<uhh2::Selection> pt_gensel;
+  std::unique_ptr<uhh2::Selection> mass_gensel;
 
   // get weight (with all SF and weight applied in previous cycle)
   Event::Handle<double>h_weight;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_XCone, h_XCone_noMassCut, h_XCone_reco_gen;
+  std::unique_ptr<Hists> h_XCone, h_MTopJet, h_XCone_noMassCut, h_XCone_reco_gen;
 
 
   bool isMC; //define here to use it in "process" part
@@ -101,6 +103,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   pt_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined", 400));
   mass_sel.reset(new MassCutXCone(ctx));
 
+  pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
+  mass_gensel.reset(new MassCut_gen(ctx, "GEN_XCone33_had_Combined", "GEN_XCone33_lep_Combined"));
 
   // define IDs
   ////
@@ -118,6 +122,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   //// set up Hists classes:
 
   h_XCone.reset(new RecoHists_xcone(ctx, "XCone"));
+  h_MTopJet.reset(new MTopJetHists(ctx, "MTopJetHists"));
   h_XCone_reco_gen.reset(new RecoGenHists_xcone(ctx, "XCone_reco_gen"));
   h_XCone_noMassCut.reset(new RecoHists_xcone(ctx, "XCone_noMassCut"));
 
@@ -126,6 +131,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
+  
+  bool do_recgen_hists = true;
+
   //apply weight
   event.weight = event.get(h_weight);
   ////
@@ -135,7 +143,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_XCone_noMassCut->fill(event);
   if(!mass_sel->passes(event)) return false;
   h_XCone->fill(event);
-  h_XCone_reco_gen->fill(event);
+  h_MTopJet->fill(event);
+  if(do_recgen_hists) h_XCone_reco_gen->fill(event);
+  bool passed_gensel;
+  if( mass_gensel->passes(event) && pt_gensel->passes(event) ) passed_gensel = true;
+  else passed_gensel = false;
 
 return true;
 }

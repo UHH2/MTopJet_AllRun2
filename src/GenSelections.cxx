@@ -307,6 +307,22 @@ bool uhh2::LeadingJetPT::passes(const uhh2::Event& event){
   return pass_jetpt;
 }
 
+uhh2::LeadingJetPT_gen::LeadingJetPT_gen(uhh2::Context& ctx, const std::string & name, float ptcut):
+  h_jets(ctx.get_handle<std::vector<Particle>>(name)),
+  ptcut_(ptcut) {}
+
+bool uhh2::LeadingJetPT_gen::passes(const uhh2::Event& event){
+  bool pass_jetpt = false;
+  std::vector<Particle> jets = event.get(h_jets);
+  Particle jet1;
+  if(jets.size()>0){
+    jet1 = jets.at(0);
+    float pt = jet1.pt();
+    if(pt > ptcut_) pass_jetpt = true;
+  }
+  return pass_jetpt;
+}
+
 uhh2::LeadingTopJetPT::LeadingTopJetPT(uhh2::Context& ctx, float ptcut):
   h_gentopjets(ctx.get_handle<std::vector<GenTopJet>>("gentopjets")),
   ptcut_(ptcut) {}
@@ -361,6 +377,25 @@ bool uhh2::MassCut::passes(const uhh2::Event& event){
   }
   return pass_masscut;
 }
+
+uhh2::MassCut_gen::MassCut_gen(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
+  h_hadjets(ctx.get_handle<std::vector<Particle>>(hadname)),
+  h_lepjets(ctx.get_handle<std::vector<Particle>>(lepname)){}
+
+bool uhh2::MassCut_gen::passes(const uhh2::Event& event){
+  std::vector<Particle> hadjets = event.get(h_hadjets);
+  std::vector<Particle> lepjets = event.get(h_lepjets);
+  Particle jet1, jet2;
+  TLorentzVector jet1_v4, jet2_v4;
+  bool pass_masscut = false;
+  if(hadjets.size()>0 && lepjets.size()>0){
+    jet1_v4.SetPtEtaPhiE(hadjets.at(0).pt(),hadjets.at(0).eta(),hadjets.at(0).phi(),hadjets.at(0).energy()); //v4 of first jet
+    jet2_v4.SetPtEtaPhiE(lepjets.at(0).pt(),lepjets.at(0).eta(),lepjets.at(0).phi(),lepjets.at(0).energy()); //v4 of first jet
+    if(jet1_v4.M() > jet2_v4.M()) pass_masscut = true;
+  }
+  return pass_masscut;
+}
+
 
 uhh2::MassCut_top::MassCut_top(uhh2::Context& ctx):
   h_gentopjets(ctx.get_handle<std::vector<GenTopJet>>("gentopjets")),
