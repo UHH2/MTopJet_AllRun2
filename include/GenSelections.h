@@ -292,6 +292,18 @@ namespace uhh2 {
     float M_max_; 
   };
 
+ class MassCutGen_XCone : public Selection{ 
+
+  public: 
+   explicit MassCutGen_XCone(Context&, float, float);
+    virtual bool passes(const Event& ) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Particle>> h_jets;
+    float M_min_;
+    float M_max_; 
+  };
+
   class MassCutGen1_top : public Selection{ 
 
   public: 

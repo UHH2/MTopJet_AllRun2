@@ -25,3 +25,5 @@ bool WriteOutput::process(uhh2::Event & event){
  
   return true;
 }
+
+

@@ -18,6 +18,7 @@
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
 #include <UHH2/common/include/MCWeight.h>
+#include <UHH2/common/include/TopPtReweight.h>
 
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
@@ -75,6 +76,9 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> twodcut_sel;
   std::unique_ptr<uhh2::Selection> jet_sel;
 
+  // just for testing
+  std::unique_ptr<TopPtReweight> ttbar_reweight;
+
   // scale factors
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
@@ -91,8 +95,11 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_TwoD_event,  h_TwoD_elec, h_TwoD_muon, h_TwoD_jets;
   std::unique_ptr<Hists> h_Jet_event,  h_Jet_elec, h_Jet_muon, h_Jet_jets;
   std::unique_ptr<Hists> h_bTag_event,  h_bTag_elec, h_bTag_muon, h_bTag_jets;
+  std::unique_ptr<Hists> h_Side_event,  h_Side_elec, h_Side_muon, h_Side_jets;
   std::unique_ptr<Hists> h_HTlep_event,  h_HTlep_elec, h_HTlep_muon, h_HTlep_jets;
   std::unique_ptr<Hists> h_MET_event,  h_MET_elec, h_MET_muon, h_MET_jets;
+  std::unique_ptr<Hists> h_ttbar_reweight_event, h_ttbar_reweight_elec, h_ttbar_reweight_muon, h_ttbar_reweight_jets;
+
 
   bool isMC; //define here to use it in "process" part
 
@@ -123,7 +130,11 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // write output
   output.reset(new WriteOutput(ctx));
   ////
- 
+
+  // just for testing
+  ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
+
+
   //// EVENT SELECTION
 
 
@@ -232,6 +243,17 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_bTag_elec.reset(new ElectronHists(ctx, "08_bTag_Elec"));
   h_bTag_muon.reset(new MuonHists(ctx, "08_bTag_Muon"));
   h_bTag_jets.reset(new JetHists(ctx, "08_bTag_Jets"));
+
+  h_Side_event.reset(new MTopJetHists(ctx, "Side_Event"));
+  h_Side_elec.reset(new ElectronHists(ctx, "Side_Elec"));
+  h_Side_muon.reset(new MuonHists(ctx, "Side_Muon"));
+  h_Side_jets.reset(new JetHists(ctx, "Side_Jets")); 
+
+  h_ttbar_reweight_event.reset(new MTopJetHists(ctx, "ttbar_reweight_Event"));
+  h_ttbar_reweight_elec.reset(new ElectronHists(ctx, "ttbar_reweight_Elec"));
+  h_ttbar_reweight_muon.reset(new MuonHists(ctx, "ttbar_reweight_Muon"));
+  h_ttbar_reweight_jets.reset(new JetHists(ctx, "ttbar_reweight_Jets"));
+
   //
 
 }
@@ -375,6 +397,13 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   /* *********** b-tag counter *********** */
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+  if(jetbtagN == 0){
+    h_Side_event->fill(event);
+    h_Side_elec->fill(event);
+    h_Side_muon->fill(event);
+    h_Side_jets->fill(event);
+  }
+
   if(jetbtagN < 1) return false;
   BTagScaleFactors->process(event);
 
@@ -387,6 +416,13 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   jetprod_reco->process(event);
   if(!event.isRealData) jetprod_gen->process(event);
   output->process(event);
+
+  /* *********** just a check ****************************************** */
+  ttbar_reweight->process(event);
+  h_ttbar_reweight_event->fill(event);
+  h_ttbar_reweight_elec->fill(event);
+  h_ttbar_reweight_muon->fill(event);
+  h_ttbar_reweight_jets->fill(event);
 
 return true;
 }
