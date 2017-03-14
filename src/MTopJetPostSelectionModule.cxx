@@ -28,10 +28,10 @@
 #include <vector>
 
 /*
- *******************************************************************
+*******************************************************************
 **************** TO DO ********************************************
 *******************************************************************
-
+- SF apllied to TTbar!
 *******************************************************************
 *******************************************************************
 */
@@ -70,7 +70,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<bool>h_matched;
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
+  Event::Handle<bool>h_ttbar;
   Event::Handle<int>h_massbin;
+  Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen;
   Event::Handle<double>h_mass_rec;
   Event::Handle<std::vector<Jet>>h_recjets_had;
@@ -116,9 +118,11 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   // write output
   h_matched = ctx.declare_event_output<bool>("matched");
-  h_recsel = ctx.declare_event_output<bool>("passed_recnsel");
+  h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
+  h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
   h_massbin = ctx.declare_event_output<int>("massbin");
+  h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
   h_mass_gen = ctx.declare_event_output<double>("Mass_Gen");
   h_mass_rec = ctx.declare_event_output<double>("Mass_Rec");
   h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
@@ -198,6 +202,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /***************************  some options ***************************************************************************************************************/ 
   bool scale_ttbar = true;
+  double SF_tt = 0.75;
 
   /***************************  some useful variables ******************************************************************************************************/ 
   if(isTTbar) ttgenprod->process(event);
@@ -215,7 +220,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else event.set(h_mass_gen, 0.); // set gen mass to 0 for data
 
   /***************************  apply weight *****************************************************************************************************/ 
-  if(isTTbar && scale_ttbar) event.weight = 0.75 * event.get(h_weight);
+  if(isTTbar && scale_ttbar) event.weight = SF_tt * event.get(h_weight);
   else event.weight = event.get(h_weight);
 
   /*************************** test with lower pt cut ********************************************************************************************/ 
@@ -298,7 +303,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   } 
 
   /*************************** write bools for passing selections **********************************************************************************/ 
+  event.set(h_ttbar, isTTbar);
   event.set(h_matched, is_matched);
+  event.set(h_ttbar_SF, SF_tt);
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
 
