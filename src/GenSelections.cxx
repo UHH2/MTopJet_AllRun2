@@ -212,6 +212,76 @@ bool uhh2::Matching_XCone23::passes(const uhh2::Event& event){
     return matched;
 }
 
+uhh2::Matching_XCone33::Matching_XCone33(uhh2::Context& ctx):
+  h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")),
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
+
+
+bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
+  // get jets
+  std::vector<TopJet> fatjets = event.get(h_fatjets);
+
+  // get reco lepton (to get same definition as in jet combination)
+  Particle lepton;
+  bool muonislep = false;
+  bool elecislep = false;
+
+  if(event.muons->size() > 0 && event.electrons->size() > 0){
+    if(event.muons->at(0).pt() > event.electrons->at(0).pt()) muonislep = true;
+    else elecislep = true;
+  }
+  else if(event.muons->size() > 0) muonislep = true;
+  else if(event.electrons->size() > 0) elecislep = true;
+
+  if(muonislep) lepton = event.muons->at(0);
+  if(elecislep) lepton = event.electrons->at(0);
+
+  // get decay products from ttbar
+  const auto & ttbargen = event.get(h_ttbargen);
+
+  // get stable particles from ttbar decay and sort them into leptonic and hadronic
+  GenParticle bot, q1, q2; 
+  if(ttbargen.IsTopHadronicDecay()){
+    bot = ttbargen.bTop();
+    q1 = ttbargen.Wdecay1();
+    q2 = ttbargen.Wdecay2();
+  }
+  else if(ttbargen.IsAntiTopHadronicDecay()){
+    bot = ttbargen.bAntitop();
+    q1 = ttbargen.WMinusdecay1();
+    q2 = ttbargen.WMinusdecay2();
+  }
+  else return false;
+    
+  TopJet fathadjet;
+  float dR1 = deltaR(lepton, fatjets.at(0));
+  float dR2 = deltaR(lepton, fatjets.at(1));
+  if(dR1 < dR2){
+    fathadjet = fatjets.at(1);
+  }
+  else{
+    fathadjet = fatjets.at(0);
+  }
+
+  std::vector<Jet> jets = fathadjet.subjets();
+  Jet jet1, jet2, jet3;
+  jet1 = jets.at(0);
+  jet2 = jets.at(1);
+  jet3 = jets.at(2);
+
+  bool matched = false;
+  bool matched_q1 = false;
+  bool matched_q2 = false;
+  bool matched_bot = false;
+
+  if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
+  if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
+  if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
+    
+  if(matched_q1 && matched_q2 && matched_bot) matched = true;
+  return matched;
+}
+
 uhh2::Matching_XCone_botlep_lep::Matching_XCone_botlep_lep(uhh2::Context& ctx, const std::string & name):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),
   h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}

@@ -22,6 +22,7 @@
 
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
+#include <UHH2/common/include/LuminosityHists.h>
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
@@ -88,17 +89,17 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::AnalysisModule> output; 
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_PreSel_event,  h_PreSel_elec, h_PreSel_muon, h_PreSel_jets;
-  std::unique_ptr<Hists> h_Trigger_event,  h_Trigger_elec, h_Trigger_muon, h_Trigger_jets;
-  std::unique_ptr<Hists> h_Cleaner_event,  h_Cleaner_elec, h_Cleaner_muon, h_Cleaner_jets;
-  std::unique_ptr<Hists> h_Lepton_event,  h_Lepton_elec, h_Lepton_muon, h_Lepton_jets;
-  std::unique_ptr<Hists> h_TwoD_event,  h_TwoD_elec, h_TwoD_muon, h_TwoD_jets;
-  std::unique_ptr<Hists> h_Jet_event,  h_Jet_elec, h_Jet_muon, h_Jet_jets;
-  std::unique_ptr<Hists> h_bTag_event,  h_bTag_elec, h_bTag_muon, h_bTag_jets;
-  std::unique_ptr<Hists> h_Side_event,  h_Side_elec, h_Side_muon, h_Side_jets;
-  std::unique_ptr<Hists> h_HTlep_event,  h_HTlep_elec, h_HTlep_muon, h_HTlep_jets;
-  std::unique_ptr<Hists> h_MET_event,  h_MET_elec, h_MET_muon, h_MET_jets;
-  std::unique_ptr<Hists> h_ttbar_reweight_event, h_ttbar_reweight_elec, h_ttbar_reweight_muon, h_ttbar_reweight_jets;
+  std::unique_ptr<Hists> h_PreSel_event,  h_PreSel_elec, h_PreSel_muon, h_PreSel_jets, h_PreSel_lumi;
+  std::unique_ptr<Hists> h_Trigger_event,  h_Trigger_elec, h_Trigger_muon, h_Trigger_jets, h_Trigger_lumi;
+  std::unique_ptr<Hists> h_Cleaner_event,  h_Cleaner_elec, h_Cleaner_muon, h_Cleaner_jets, h_Cleaner_lumi;
+  std::unique_ptr<Hists> h_Lepton_event,  h_Lepton_elec, h_Lepton_muon, h_Lepton_jets, h_Lepton_lumi;
+  std::unique_ptr<Hists> h_TwoD_event,  h_TwoD_elec, h_TwoD_muon, h_TwoD_jets, h_TwoD_lumi;
+  std::unique_ptr<Hists> h_Jet_event,  h_Jet_elec, h_Jet_muon, h_Jet_jets, h_Jet_lumi;
+  std::unique_ptr<Hists> h_bTag_event,  h_bTag_elec, h_bTag_muon, h_bTag_jets, h_bTag_lumi;
+  std::unique_ptr<Hists> h_Side_event,  h_Side_elec, h_Side_muon, h_Side_jets, h_Side_lumi;
+  std::unique_ptr<Hists> h_HTlep_event,  h_HTlep_elec, h_HTlep_muon, h_HTlep_jets, h_HTlep_lumi;
+  std::unique_ptr<Hists> h_MET_event,  h_MET_elec, h_MET_muon, h_MET_jets, h_MET_lumi;
+  std::unique_ptr<Hists> h_ttbar_reweight_event, h_ttbar_reweight_elec, h_ttbar_reweight_muon, h_ttbar_reweight_jets, h_ttbar_reweight_lumi;
 
 
   bool isMC; //define here to use it in "process" part
@@ -203,56 +204,67 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_PreSel_elec.reset(new ElectronHists(ctx, "00_PreSel_Elec"));
   h_PreSel_muon.reset(new MuonHists(ctx, "00_PreSel_Muon"));
   h_PreSel_jets.reset(new JetHists(ctx, "00_PreSel_Jets"));
+  h_PreSel_lumi.reset(new LuminosityHists(ctx, "00_PreSel_lumi"));
 
   h_Cleaner_event.reset(new MTopJetHists(ctx, "01_Cleaner_Event"));
   h_Cleaner_elec.reset(new ElectronHists(ctx, "01_Cleaner_Elec"));
   h_Cleaner_muon.reset(new MuonHists(ctx, "01_Cleaner_Muon"));
   h_Cleaner_jets.reset(new JetHists(ctx, "01_Cleaner_Jets"));
+  h_Cleaner_lumi.reset(new LuminosityHists(ctx, "01_Cleaner_lumi"));
 
   h_Trigger_event.reset(new MTopJetHists(ctx, "02_Trigger_Event"));
   h_Trigger_elec.reset(new ElectronHists(ctx, "02_Trigger_Elec"));
   h_Trigger_muon.reset(new MuonHists(ctx, "02_Trigger_Muon"));
   h_Trigger_jets.reset(new JetHists(ctx, "02_Trigger_Jets"));
+  h_Trigger_lumi.reset(new LuminosityHists(ctx, "02_Trigger_lumi"));
 
   h_Lepton_event.reset(new MTopJetHists(ctx, "03_Lepton_Event"));
   h_Lepton_elec.reset(new ElectronHists(ctx, "03_Lepton_Elec"));
   h_Lepton_muon.reset(new MuonHists(ctx, "03_Lepton_Muon"));
   h_Lepton_jets.reset(new JetHists(ctx, "03_Lepton_Jets"));
+  h_Lepton_lumi.reset(new LuminosityHists(ctx, "03_Lepton_lumi"));
 
   h_Jet_event.reset(new MTopJetHists(ctx, "04_Jet_Event"));
   h_Jet_elec.reset(new ElectronHists(ctx, "04_Jet_Elec"));
   h_Jet_muon.reset(new MuonHists(ctx, "04_Jet_Muon"));
   h_Jet_jets.reset(new JetHists(ctx, "04_Jet_Jets"));
+  h_Jet_lumi.reset(new LuminosityHists(ctx, "04_Jet_lumi"));
 
   h_TwoD_event.reset(new MTopJetHists(ctx, "05_TwoD_Event"));
   h_TwoD_elec.reset(new ElectronHists(ctx, "05_TwoD_Elec"));
   h_TwoD_muon.reset(new MuonHists(ctx, "05_TwoD_Muon"));
   h_TwoD_jets.reset(new JetHists(ctx, "05_TwoD_Jets"));
+  h_TwoD_lumi.reset(new LuminosityHists(ctx, "05_TwoD_lumi"));
 
   h_MET_event.reset(new MTopJetHists(ctx, "06_MET_Event"));
   h_MET_elec.reset(new ElectronHists(ctx, "06_MET_Elec"));
   h_MET_muon.reset(new MuonHists(ctx, "06_MET_Muon"));
   h_MET_jets.reset(new JetHists(ctx, "06_MET_Jets"));
+  h_MET_lumi.reset(new LuminosityHists(ctx, "06_MET_lumi"));
 
   h_HTlep_event.reset(new MTopJetHists(ctx, "07_HTlep_Event"));
   h_HTlep_elec.reset(new ElectronHists(ctx, "07_HTlep_Elec"));
   h_HTlep_muon.reset(new MuonHists(ctx, "07_HTlep_Muon"));
   h_HTlep_jets.reset(new JetHists(ctx, "07_HTlep_Jets"));
+  h_HTlep_lumi.reset(new LuminosityHists(ctx, "07_HTlep_lumi"));
 
   h_bTag_event.reset(new MTopJetHists(ctx, "08_bTag_Event"));
   h_bTag_elec.reset(new ElectronHists(ctx, "08_bTag_Elec"));
   h_bTag_muon.reset(new MuonHists(ctx, "08_bTag_Muon"));
-  h_bTag_jets.reset(new JetHists(ctx, "08_bTag_Jets"));
+  h_bTag_jets.reset(new JetHists(ctx, "08_bTag_jets"));
+  h_bTag_lumi.reset(new LuminosityHists(ctx, "08_bTag_lumi"));
 
   h_Side_event.reset(new MTopJetHists(ctx, "Side_Event"));
   h_Side_elec.reset(new ElectronHists(ctx, "Side_Elec"));
   h_Side_muon.reset(new MuonHists(ctx, "Side_Muon"));
   h_Side_jets.reset(new JetHists(ctx, "Side_Jets")); 
+  h_Side_lumi.reset(new LuminosityHists(ctx, "Side_lumi")); 
 
   h_ttbar_reweight_event.reset(new MTopJetHists(ctx, "ttbar_reweight_Event"));
   h_ttbar_reweight_elec.reset(new ElectronHists(ctx, "ttbar_reweight_Elec"));
   h_ttbar_reweight_muon.reset(new MuonHists(ctx, "ttbar_reweight_Muon"));
   h_ttbar_reweight_jets.reset(new JetHists(ctx, "ttbar_reweight_Jets"));
+  h_ttbar_reweight_lumi.reset(new LuminosityHists(ctx, "ttbar_reweight_lumi"));
 
   //
 
@@ -266,6 +278,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_PreSel_elec->fill(event);
   h_PreSel_muon->fill(event);
   h_PreSel_jets->fill(event);
+  h_PreSel_lumi->fill(event);
   ////
 
   /* *********** Lepton Cleaner and Selection *********** */
@@ -297,6 +310,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_Cleaner_elec->fill(event);
   h_Cleaner_muon->fill(event);
   h_Cleaner_jets->fill(event);
+  h_Cleaner_lumi->fill(event);
 
   /* *********** Trigger *********** */
   // for DATA until run 274954 -> use only Trigger A
@@ -315,6 +329,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_Trigger_elec->fill(event);
   h_Trigger_muon->fill(event);
   h_Trigger_jets->fill(event);
+  h_Trigger_lumi->fill(event);
 
   /* *********** lEPTON Selection *********** */
   const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
@@ -323,6 +338,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_Lepton_elec->fill(event);
   h_Lepton_muon->fill(event);
   h_Lepton_jets->fill(event);
+  h_Lepton_lumi->fill(event);
   ////
 
   /* *********** Jet Selection *********** */
@@ -333,6 +349,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_Jet_elec->fill(event);
   h_Jet_muon->fill(event);
   h_Jet_jets->fill(event);
+  h_Jet_lumi->fill(event);
 
   /* *********** BTag Effi Hist *********** */
   if(!event.isRealData) BTagEffHists->fill(event);
@@ -368,6 +385,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_TwoD_elec->fill(event);
   h_TwoD_muon->fill(event);
   h_TwoD_jets->fill(event);
+  h_TwoD_lumi->fill(event);
   ////
 
 
@@ -380,6 +398,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_MET_elec->fill(event);
   h_MET_muon->fill(event);
   h_MET_jets->fill(event);
+  h_MET_lumi->fill(event);
 
   /* Triangular Cut in Electron channel */
   // const bool pass_trianc = triangc_sel->passes(event);
@@ -393,6 +412,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_HTlep_elec->fill(event);
   h_HTlep_muon->fill(event);
   h_HTlep_jets->fill(event);
+  h_HTlep_lumi->fill(event);
 
   /* *********** b-tag counter *********** */
   int jetbtagN(0);
@@ -402,6 +422,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_Side_elec->fill(event);
     h_Side_muon->fill(event);
     h_Side_jets->fill(event);
+    h_Side_lumi->fill(event);
   }
 
   if(jetbtagN < 1) return false;
@@ -411,6 +432,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_bTag_elec->fill(event);
   h_bTag_muon->fill(event);
   h_bTag_jets->fill(event);
+  h_bTag_lumi->fill(event);
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   jetprod_reco->process(event);
@@ -423,6 +445,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_ttbar_reweight_elec->fill(event);
   h_ttbar_reweight_muon->fill(event);
   h_ttbar_reweight_jets->fill(event);
+  h_ttbar_reweight_lumi->fill(event);
 
 return true;
 }

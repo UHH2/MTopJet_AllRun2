@@ -89,6 +89,17 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
+ class Matching_XCone33 : public Selection { 
+
+  public: 
+    explicit Matching_XCone33(Context&);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<TopJet>> h_fatjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  };
+
   class Matching_XCone_botlep_lep : public Selection { 
 
   public: 

@@ -13,6 +13,9 @@ RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & 
   pt_rec2_gen2_afterMatching = book<TH1F>("pt_rec2_gen2_afterMatching", "p^{rec}_{T, jet2} - p^{gen}_{T, jet2}", 30, -300, 300);
   GenJetMass = book<TH1F>("GenJetMass", "M^{gen}_{jet1}", 50, 0, 500);
 
+  RecGenMass = book<TH2F>("RecGenMass", "x=M_Gen y=M_Rec", 50, 0, 500., 50, 0, 500.);
+  RecGenPT = book<TH2F>("RecGenPT", "x=PT_Gen y=PT_Rec", 50, 0, 2000., 50, 0, 2000.);
+
   // handle for clustered jets
   h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
   h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
@@ -79,6 +82,9 @@ void RecoGenHists_xcone::fill(const Event & event){
     PtReso->Fill( (rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
     pt_rec1_gen1_afterMatching->Fill( rec_jet1_v4.Pt() - gen_jet1_v4.Pt(), weight);
     pt_rec2_gen2_afterMatching->Fill( rec_jet2_v4.Pt() - gen_jet2_v4.Pt(), weight);
+
+    RecGenMass->Fill(gen_jet1_v4.M(), rec_jet1_v4.M(), weight);
+    RecGenPT->Fill(gen_jet1_v4.Pt(), rec_jet1_v4.Pt(), weight);
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------

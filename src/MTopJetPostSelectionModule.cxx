@@ -11,6 +11,7 @@
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
 #include <UHH2/common/include/JetHists.h>
+#include <UHH2/common/include/TTbarGen.h>
 
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
@@ -24,6 +25,7 @@
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 
+#include <vector>
 
 /*
  *******************************************************************
@@ -59,17 +61,25 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> massbin4;
   std::unique_ptr<uhh2::Selection> massbin5;
   std::unique_ptr<uhh2::Selection> massbin6;
+  std::unique_ptr<uhh2::Selection> matched;
 
   // get weight (with all SF and weight applied in previous cycle)
   Event::Handle<double>h_weight;
 
   // handles for output
+  Event::Handle<bool>h_matched;
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
   Event::Handle<int>h_massbin;
+  Event::Handle<double>h_mass_gen;
+  Event::Handle<double>h_mass_rec;
+  Event::Handle<std::vector<Jet>>h_recjets_had;
+  Event::Handle<std::vector<Particle>>h_genjets_had;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_XCone, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
+  std::unique_ptr<Hists> h_XCone, h_XCone_m, h_XCone_u, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
   std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_GenOnly, h_XCone_GEN_Both;
   std::unique_ptr<Hists> h_RecGenHists_GenOnly0, h_RecGenHists_GenOnly1, h_RecGenHists_GenOnly2, h_RecGenHists_GenOnly3, h_RecGenHists_GenOnly4, h_RecGenHists_GenOnly5, h_RecGenHists_GenOnly6;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly0, h_RecGenHists_RecOnly1, h_RecGenHists_RecOnly2, h_RecGenHists_RecOnly3, h_RecGenHists_RecOnly4, h_RecGenHists_RecOnly5, h_RecGenHists_RecOnly6;
@@ -77,12 +87,20 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_GenParticles_RecOnly, h_GenParticles_GenOnly, h_GenParticles_Both;
 
   bool isMC; //define here to use it in "process" part
+  bool isTTbar; //define here to use it in "process" part
+
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   /*************************** CONFIGURATION **********************************************************************************/ 
   isMC = (ctx.get("dataset_type") == "MC");
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || ctx.get("dataset_version") == "TTbar_Mtt1000toInft") isTTbar = true;
+  else  isTTbar = false;
+
+  // ttbar gen
+  const std::string ttbar_gen_label("ttbargen");
+  if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   const std::string& channel = ctx.get("channel", ""); //define Channel
   if     (channel == "muon") channel_ = muon;
@@ -97,9 +115,14 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_weight=ctx.get_handle<double>("weight");
 
   // write output
+  h_matched = ctx.declare_event_output<bool>("matched");
   h_recsel = ctx.declare_event_output<bool>("passed_recnsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
   h_massbin = ctx.declare_event_output<int>("massbin");
+  h_mass_gen = ctx.declare_event_output<double>("Mass_Gen");
+  h_mass_rec = ctx.declare_event_output<double>("Mass_Rec");
+  h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
+  if(isMC) h_genjets_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
 
   /*************************** Setup Selections **********************************************************************************/ 
 
@@ -121,55 +144,79 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   massbin5.reset(new MassCutGen_XCone(ctx, 250, 300));
   massbin6.reset(new MassCutGen_XCone(ctx, 300, 500));
 
+  // Selection for matching reco jets to gen particles
+  if(isTTbar) matched.reset(new Matching_XCone33(ctx));
+
   /*************************** Set up Hists classes **********************************************************************************/ 
 
   h_XCone.reset(new RecoHists_xcone(ctx, "XCone"));
+  if(isTTbar) h_XCone_m.reset(new RecoHists_xcone(ctx, "XCone_matched"));
+  if(isTTbar) h_XCone_u.reset(new RecoHists_xcone(ctx, "XCone_unmatched"));
   h_XCone_pt200.reset(new RecoHists_xcone(ctx, "XCone_pt200"));
   h_XCone_pt300.reset(new RecoHists_xcone(ctx, "XCone_pt300"));
   h_MTopJet.reset(new MTopJetHists(ctx, "MTopJetHists"));
   h_XCone_noMassCut.reset(new RecoHists_xcone(ctx, "XCone_noMassCut"));
 
-  h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
-  h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
-  h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
+  if(isMC){
+    h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
+    h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
+    h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
 
-  h_GenParticles_GenOnly.reset(new GenHists_particles(ctx, "GenParticles_GenOnly"));
-  h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
-  h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
+    h_GenParticles_GenOnly.reset(new GenHists_particles(ctx, "GenParticles_GenOnly"));
+    h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
+    h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
 
-  h_RecGenHists_GenOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_all"));
-  h_RecGenHists_GenOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_000to100"));
-  h_RecGenHists_GenOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_100to150"));
-  h_RecGenHists_GenOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_150to200"));
-  h_RecGenHists_GenOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_200to250"));
-  h_RecGenHists_GenOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_250to300"));
-  h_RecGenHists_GenOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_300to500"));
+    h_RecGenHists_GenOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_all"));
+    h_RecGenHists_GenOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_000to100"));
+    h_RecGenHists_GenOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_100to150"));
+    h_RecGenHists_GenOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_150to200"));
+    h_RecGenHists_GenOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_200to250"));
+    h_RecGenHists_GenOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_250to300"));
+    h_RecGenHists_GenOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_300to500"));
 
-  h_RecGenHists_RecOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_all"));
-  h_RecGenHists_RecOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_000to100"));
-  h_RecGenHists_RecOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_100to150"));
-  h_RecGenHists_RecOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_150to200"));
-  h_RecGenHists_RecOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_200to250"));
-  h_RecGenHists_RecOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_250to300"));
-  h_RecGenHists_RecOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_300to500"));
+    h_RecGenHists_RecOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_all"));
+    h_RecGenHists_RecOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_000to100"));
+    h_RecGenHists_RecOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_100to150"));
+    h_RecGenHists_RecOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_150to200"));
+    h_RecGenHists_RecOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_200to250"));
+    h_RecGenHists_RecOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_250to300"));
+    h_RecGenHists_RecOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_300to500"));
 
-  h_RecGenHists_Both0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_all"));
-  h_RecGenHists_Both1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_000to100"));
-  h_RecGenHists_Both2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_100to150"));
-  h_RecGenHists_Both3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_150to200"));
-  h_RecGenHists_Both4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_200to250"));
-  h_RecGenHists_Both5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_250to300"));
-  h_RecGenHists_Both6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_300to500"));
+    h_RecGenHists_Both0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_all"));
+    h_RecGenHists_Both1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_000to100"));
+    h_RecGenHists_Both2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_100to150"));
+    h_RecGenHists_Both3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_150to200"));
+    h_RecGenHists_Both4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_200to250"));
+    h_RecGenHists_Both5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_250to300"));
+    h_RecGenHists_Both6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_300to500"));
+  }
   /*********************************************************************************************************************************/ 
 
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
-  
+
+  /***************************  some options ***************************************************************************************************************/ 
+  bool scale_ttbar = true;
+
+  /***************************  some useful variables ******************************************************************************************************/ 
+  if(isTTbar) ttgenprod->process(event);
+
+  /***************************  get jets to write mass *****************************************************************************************************/ 
+  std::vector<Jet> rec_hadjets = event.get(h_recjets_had);
+  double mass_rec = rec_hadjets.at(0).v4().M();
+  event.set(h_mass_rec, mass_rec);
+
+  if(isMC){
+    std::vector<Particle> gen_hadjets = event.get(h_genjets_had);
+    double mass_gen = gen_hadjets.at(0).v4().M();
+    event.set(h_mass_gen, mass_gen);
+  }
+  else event.set(h_mass_gen, 0.); // set gen mass to 0 for data
 
   /***************************  apply weight *****************************************************************************************************/ 
-  event.weight = event.get(h_weight);
-  ////
+  if(isTTbar && scale_ttbar) event.weight = 0.75 * event.get(h_weight);
+  else event.weight = event.get(h_weight);
 
   /*************************** test with lower pt cut ********************************************************************************************/ 
   if(pt200_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt200->fill(event);
@@ -182,12 +229,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
   bool passed_gensel;
-  if(!event.isRealData && mass_gensel->passes(event) && pt_gensel->passes(event) ) passed_gensel = true;
+  if(isMC && mass_gensel->passes(event) && pt_gensel->passes(event) ) passed_gensel = true;
   else passed_gensel = false;
 
   /*************************** get massbin (independent from selection) and write it (for purity and stability)  **********************************/ 
   int massbin = 0;
-  if(!event.isRealData){
+  if(isMC){
     if(massbin1->passes(event)) massbin = 1;
     if(massbin2->passes(event)) massbin = 2;
     if(massbin3->passes(event)) massbin = 3;
@@ -199,13 +246,19 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
 
   /*************************** fill hists with reco sel applied ***********************************************************************************/ 
+  bool is_matched = false;
   if(passed_recsel){
     h_XCone->fill(event);
     h_MTopJet->fill(event);
+    if(isTTbar){
+      is_matched = matched->passes(event);
+      if(is_matched) h_XCone_m->fill(event);
+      else h_XCone_u->fill(event);
+    }
     if(!mass_sel->passes(event)){
       h_XCone_noMassCut->fill(event);
     }
-    if(!event.isRealData){
+    if(isMC){
       h_XCone_GEN_RecOnly->fill(event);
       h_GenParticles_RecOnly->fill(event);
       h_RecGenHists_RecOnly0->fill(event);
@@ -245,6 +298,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   } 
 
   /*************************** write bools for passing selections **********************************************************************************/ 
+  event.set(h_matched, is_matched);
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
 
