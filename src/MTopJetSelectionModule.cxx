@@ -103,7 +103,6 @@ class MTopJetSelectionModule : public ModuleBASE {
 
 
   bool isMC; //define here to use it in "process" part
-
   string BTag_variation ="central";
 };
 
@@ -316,14 +315,15 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // for DATA until run 274954 -> use only Trigger A
   // for MC and DATA from 274954 -> use "A || B"
 
-  if( !isMC && event.run < 274954) {
-    if(!trigger_sel_A->passes(event)) return false;
-  }else{
-    if( !(trigger_sel_A->passes(event) || trigger_sel_B->passes(event)) ) return false;
+  if(channel_ == muon){
+    if( !isMC && event.run < 274954) {
+      if(!trigger_sel_A->passes(event)) return false;
+    }else{
+      if( !(trigger_sel_A->passes(event) || trigger_sel_B->passes(event)) ) return false;
+    }
+    // Trigger scale factor
+    muo_trigger_SF->process(event);
   }
-  // Trigger scale factor
-  muo_trigger_SF->process(event);
-
 
   h_Trigger_event->fill(event);
   h_Trigger_elec->fill(event);
