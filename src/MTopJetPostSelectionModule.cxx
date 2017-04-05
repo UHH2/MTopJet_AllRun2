@@ -55,6 +55,8 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> mass_sel;
   std::unique_ptr<uhh2::Selection> pt_gensel;
   std::unique_ptr<uhh2::Selection> mass_gensel;
+  std::unique_ptr<uhh2::Selection> pt_gensel23;
+  std::unique_ptr<uhh2::Selection> mass_gensel23;
   std::unique_ptr<uhh2::Selection> massbin1;
   std::unique_ptr<uhh2::Selection> massbin2;
   std::unique_ptr<uhh2::Selection> massbin3;
@@ -69,14 +71,17 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   // handles for output
   Event::Handle<bool>h_matched;
   Event::Handle<bool>h_recsel;
-  Event::Handle<bool>h_gensel;
+  Event::Handle<bool>h_gensel23;
+  Event::Handle<bool>h_gensel33;
   Event::Handle<bool>h_ttbar;
   Event::Handle<int>h_massbin;
   Event::Handle<double>h_ttbar_SF;
-  Event::Handle<double>h_mass_gen;
+  Event::Handle<double>h_mass_gen33;
+  Event::Handle<double>h_mass_gen23;
   Event::Handle<double>h_mass_rec;
   Event::Handle<std::vector<Jet>>h_recjets_had;
-  Event::Handle<std::vector<Particle>>h_genjets_had;
+  Event::Handle<std::vector<Particle>>h_genjets23_had;
+  Event::Handle<std::vector<Particle>>h_genjets33_had;
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
 
@@ -119,14 +124,17 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   // write output
   h_matched = ctx.declare_event_output<bool>("matched");
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
-  h_gensel = ctx.declare_event_output<bool>("passed_gensel");
+  h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23");
+  h_gensel33 = ctx.declare_event_output<bool>("passed_gensel33");
   h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
   h_massbin = ctx.declare_event_output<int>("massbin");
   h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
-  h_mass_gen = ctx.declare_event_output<double>("Mass_Gen");
+  h_mass_gen23 = ctx.declare_event_output<double>("Mass_Gen23");
+  h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
   h_mass_rec = ctx.declare_event_output<double>("Mass_Rec");
   h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
-  if(isMC) h_genjets_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
+  if(isMC) h_genjets23_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone23_had_Combined");
+  if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
 
   /*************************** Setup Selections **********************************************************************************/ 
 
@@ -139,6 +147,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   // GEN Selection
   pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
   mass_gensel.reset(new MassCut_gen(ctx, "GEN_XCone33_had_Combined", "GEN_XCone33_lep_Combined"));
+  pt_gensel23.reset(new LeadingJetPT_gen(ctx, "GEN_XCone23_had_Combined", 400));
+  mass_gensel23.reset(new MassCut_gen(ctx, "GEN_XCone23_had_Combined", "GEN_XCone23_lep_Combined"));
 
   // Selection for Mass binning
   massbin1.reset(new MassCutGen_XCone(ctx,   0, 100));
@@ -213,11 +223,17 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_mass_rec, mass_rec);
 
   if(isMC){
-    std::vector<Particle> gen_hadjets = event.get(h_genjets_had);
-    double mass_gen = gen_hadjets.at(0).v4().M();
-    event.set(h_mass_gen, mass_gen);
+    std::vector<Particle> gen_hadjets23 = event.get(h_genjets23_had);
+    std::vector<Particle> gen_hadjets33 = event.get(h_genjets33_had);
+    double mass_gen23 = gen_hadjets23.at(0).v4().M();
+    double mass_gen33 = gen_hadjets33.at(0).v4().M();
+    event.set(h_mass_gen23, mass_gen23);
+    event.set(h_mass_gen33, mass_gen33);
   }
-  else event.set(h_mass_gen, 0.); // set gen mass to 0 for data
+  else{
+    event.set(h_mass_gen23, 0.); // set gen mass to 0 for data
+    event.set(h_mass_gen33, 0.); // set gen mass to 0 for data
+  }
 
   /***************************  apply weight *****************************************************************************************************/ 
   if(isTTbar && scale_ttbar) event.weight = SF_tt * event.get(h_weight);
@@ -233,10 +249,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else passed_recsel = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
-  bool passed_gensel;
-  if(isMC && mass_gensel->passes(event) && pt_gensel->passes(event) ) passed_gensel = true;
-  else passed_gensel = false;
-
+  bool passed_gensel33;
+  if(isMC && mass_gensel->passes(event) && pt_gensel->passes(event) ) passed_gensel33 = true;
+  else passed_gensel33 = false;
+  bool passed_gensel23;
+  if(isMC && mass_gensel23->passes(event) && pt_gensel23->passes(event) ) passed_gensel23 = true;
+  else passed_gensel23 = false;
   /*************************** get massbin (independent from selection) and write it (for purity and stability)  **********************************/ 
   int massbin = 0;
   if(isMC){
@@ -265,7 +283,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     }
     if(isMC){
       h_XCone_GEN_RecOnly->fill(event);
-      h_GenParticles_RecOnly->fill(event);
+      h_XCone_GEN_RecOnly->fill(event);
+      if(isTTbar) h_GenParticles_RecOnly->fill(event);
       h_RecGenHists_RecOnly0->fill(event);
       if(massbin1->passes(event)) h_RecGenHists_RecOnly1->fill(event);
       if(massbin2->passes(event)) h_RecGenHists_RecOnly2->fill(event);
@@ -277,9 +296,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
 
   /*************************** fill hists with gen sel applied *************************************************************************************/ 
-  if(passed_gensel){
+  if(passed_gensel33){
     h_XCone_GEN_GenOnly->fill(event);
-    h_GenParticles_GenOnly->fill(event);
+    h_XCone_GEN_GenOnly->fill(event);
+    if(isTTbar) h_GenParticles_GenOnly->fill(event);
     h_RecGenHists_GenOnly0->fill(event);
     if(massbin1->passes(event)) h_RecGenHists_GenOnly1->fill(event);
     if(massbin2->passes(event)) h_RecGenHists_GenOnly2->fill(event);
@@ -290,9 +310,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   } 
 
   /*************************** fill hists with reco+gen selection applied **************************************************************************/ 
-  if(passed_recsel && passed_gensel){
+  if(passed_recsel && passed_gensel33){
     h_XCone_GEN_Both->fill(event);
-    h_GenParticles_Both->fill(event);
+    h_XCone_GEN_Both->fill(event);
+    if(isTTbar) h_GenParticles_Both->fill(event);
     h_RecGenHists_Both0->fill(event);
     if(massbin1->passes(event)) h_RecGenHists_Both1->fill(event);
     if(massbin2->passes(event)) h_RecGenHists_Both2->fill(event);
@@ -307,7 +328,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_matched, is_matched);
   event.set(h_ttbar_SF, SF_tt);
   event.set(h_recsel, passed_recsel);
-  event.set(h_gensel, passed_gensel);
+  event.set(h_gensel23, passed_gensel23);
+  event.set(h_gensel33, passed_gensel33);
 
 return true;
 }

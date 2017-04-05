@@ -55,3 +55,19 @@ private:
   uhh2::Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
 
 };
+
+
+class CombineXCone23_gen: public uhh2::AnalysisModule{
+public:
+
+  explicit CombineXCone23_gen(uhh2::Context &);
+  virtual bool process(uhh2::Event & ) override;
+
+private:
+
+  uhh2::Event::Handle<std::vector<Particle>>h_GENxcone23hadjets;
+  uhh2::Event::Handle<std::vector<Particle>>h_GENxcone23lepjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GEN23fatjets;
+
+};
+

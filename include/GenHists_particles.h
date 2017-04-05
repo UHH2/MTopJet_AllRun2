@@ -2,6 +2,7 @@
 #include "UHH2/core/include/Hists.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
+#include "UHH2/common/include/TTbarGen.h"
 
 #include <math.h>
 #include <vector>
@@ -23,6 +24,7 @@ public:
 
 protected:
 
-  TH1F *W_pt, *top_pt, *elec_pt, *muon_pt;
-
+    TH1F *number_top, *hadtop_pt, *leptop_pt, *lepton_pt,*deltaR_hadtop_b, *deltaR_leptop_b, *deltaR_lep_b, *deltaR_lep_neu, *deltaR_hadtop_leptop, *deltaPhi_hadtop_leptop;
+    
+    uhh2::Event::Handle<TTbarGen>h_ttbargen;
 };

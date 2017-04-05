@@ -23,11 +23,21 @@ public:
 
 protected:
 
-    TH1F *HadJetMass, *HadJetMass_rebin, *LepJetMass, *HadMassLepMass;
-    TH1F *HadJetPT, *LepJetPT;
-    TH1F *DeltaRDiff;
-    TH1F *number_hadjet, *number_lepjet;
-    uhh2::Event::Handle<std::vector<Particle>>h_hadjets;
-    uhh2::Event::Handle<std::vector<Particle>>h_lepjets;
+    TH1F *Mass_HadJet23, *Mass_HadJet23_rebin, *Mass_LepJet23, *MassDiff23;
+    TH1F *PT_HadJet23, *PT_LepJet23;
+    TH1F *number_HadJet23, *number_LepJet23;
 
+    TH1F *Mass_HadJet33, *Mass_HadJet33_rebin, *Mass_LepJet33, *MassDiff33;
+    TH1F *PT_HadJet33, *PT_LepJet33;
+    TH1F *number_HadJet33, *number_LepJet33;
+
+    TH1F *DeltaR_23_33, *DeltaMass_23_33, *DeltaPT_23_33;
+    TH1F *DeltaR_jet2_23_33, *DeltaMass_jet2_23_33, *DeltaPT_jet2_23_33;
+
+
+
+    uhh2::Event::Handle<std::vector<Particle>>h_hadjets23;
+    uhh2::Event::Handle<std::vector<Particle>>h_lepjets23;
+    uhh2::Event::Handle<std::vector<Particle>>h_hadjets33;
+    uhh2::Event::Handle<std::vector<Particle>>h_lepjets33;
 };

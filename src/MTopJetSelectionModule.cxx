@@ -64,7 +64,8 @@ class MTopJetSelectionModule : public ModuleBASE {
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
-  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
 
   std::unique_ptr<uhh2::Selection> trigger_sel_A;
   std::unique_ptr<uhh2::Selection> trigger_sel_B;
@@ -124,7 +125,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // combine XCone
   jetprod_reco.reset(new CombineXCone33(ctx)); 
-  if(isMC) jetprod_gen.reset(new CombineXCone33_gen(ctx)); 
+  if(isMC){
+    jetprod_gen23.reset(new CombineXCone23_gen(ctx));
+    jetprod_gen33.reset(new CombineXCone33_gen(ctx));
+  }	
   ////
 
   // write output
@@ -436,7 +440,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   jetprod_reco->process(event);
-  if(!event.isRealData) jetprod_gen->process(event);
+  if(!event.isRealData){
+    jetprod_gen23->process(event);
+    jetprod_gen33->process(event);
+  } 
   output->process(event);
 
   /* *********** just a check ****************************************** */
