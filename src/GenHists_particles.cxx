@@ -2,20 +2,22 @@
 
 
 GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
-  // book all histograms here
 
+  // book all histograms here
   number_top = book<TH1F>("number_top", "number of tops", 10, 0, 10);
   hadtop_pt = book<TH1F>("hadtop_pt", "p_{T}", 100, 0, 1000);
   leptop_pt = book<TH1F>("leptop_pt", "p_{T}", 100, 0, 1000);
+  hadtop_phi = book<TH1F>("hadtop_phi", "#Phi", 30, -6, 6);
+  leptop_phi = book<TH1F>("leptop_phi", "#Phi", 30, -6, 6);
   lepton_pt = book<TH1F>("lepton_pt", "p_{T}", 100, 0, 1000);
   deltaR_hadtop_b = book<TH1F>("deltaR_hadtop_b", "#Delta R(had. top, b)", 30, 0, 6);
   deltaR_leptop_b = book<TH1F>("deltaR_leptop_b", "#Delta R(lep. top, b)", 30, 0, 6);
   deltaR_lep_b = book<TH1F>("deltaR_lep_b", "#Delta R(lep, b)", 30, 0, 6);
   deltaR_lep_neu = book<TH1F>("deltaR_lep_neu", "#Delta R(lepton, neutrino)", 30, 0, 6);
   deltaR_hadtop_leptop = book<TH1F>("deltaR_hadtop_leptop", "#Delta R(had. top, lep. top)", 30, 0, 6);
-  deltaPhi_hadtop_leptop = book<TH1F>("deltaPhi_hadtop_leptop", "#Delta #Phi(had. top, lep. top)", 30, 0, 6);
+  deltaPhi_hadtop_leptop = book<TH1F>("deltaPhi_hadtop_leptop", "#Delta #Phi(had. top, lep. top)", 60, 0, 6);
 
-
+  // handle for ttbargen class
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
 }
 
@@ -78,12 +80,19 @@ void GenHists_particles::fill(const Event & event){
   hadtop_pt->Fill(tophad.pt(), weight);
   leptop_pt->Fill(toplep.pt(), weight);
   lepton_pt->Fill(lepton.pt(), weight);
+  hadtop_phi->Fill(tophad.phi(), weight);
+  leptop_phi->Fill(toplep.phi(), weight);
   deltaR_hadtop_b->Fill(deltaR(tophad, bot), weight);
   deltaR_leptop_b->Fill(deltaR(toplep, bot_lep), weight);
   deltaR_lep_b->Fill(deltaR(lepton, bot_lep), weight);
   deltaR_lep_neu->Fill(deltaR(lepton, neutrino), weight);
   deltaR_hadtop_leptop->Fill(deltaR(tophad, toplep), weight);
-  deltaPhi_hadtop_leptop->Fill(abs(tophad.phi() - toplep.phi()), weight);
+
+  double had_phi, lep_phi, delta_phi;
+  had_phi = tophad.phi() + M_PI;
+  lep_phi = toplep.phi() + M_PI;
+  delta_phi = abs(had_phi - lep_phi);
+  deltaPhi_hadtop_leptop->Fill(delta_phi, weight);
 
   return;
 }

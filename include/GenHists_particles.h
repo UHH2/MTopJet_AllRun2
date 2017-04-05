@@ -24,7 +24,7 @@ public:
 
 protected:
 
-    TH1F *number_top, *hadtop_pt, *leptop_pt, *lepton_pt,*deltaR_hadtop_b, *deltaR_leptop_b, *deltaR_lep_b, *deltaR_lep_neu, *deltaR_hadtop_leptop, *deltaPhi_hadtop_leptop;
+    TH1F *number_top, *hadtop_pt, *leptop_pt,  *hadtop_phi, *leptop_phi, *lepton_pt,*deltaR_hadtop_b, *deltaR_leptop_b, *deltaR_lep_b, *deltaR_lep_neu, *deltaR_hadtop_leptop, *deltaPhi_hadtop_leptop;
     
     uhh2::Event::Handle<TTbarGen>h_ttbargen;
 };
