@@ -21,6 +21,7 @@ RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & 
   h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
   h_genjets_had=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
   h_genjets_lep=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_lep_Combined");
+
 }
 
 
@@ -34,9 +35,10 @@ void RecoGenHists_xcone::fill(const Event & event){
  // define all objects needed
   std::vector<Jet> rec_hadjets = event.get(h_recjets_had);
   std::vector<Jet> rec_lepjets = event.get(h_recjets_lep);
-
   std::vector<Particle> gen_hadjets = event.get(h_genjets_had);
   std::vector<Particle> gen_lepjets = event.get(h_genjets_lep);
+
+
   TLorentzVector rec_jet1_v4, rec_jet2_v4, gen_jet1_v4, gen_jet2_v4;
   Jet rec_jet1, rec_jet2;
   Particle gen_jet1, gen_jet2;
@@ -70,7 +72,6 @@ void RecoGenHists_xcone::fill(const Event & event){
 
   // get weight
   double weight = event.weight;
-
 
   if(gen_hadjets.size() > 0 && gen_lepjets.size() > 0 && rec_hadjets.size() > 0&& rec_lepjets.size() > 0 ){
     DeltaR_Rec1_Gen1->Fill(deltaR(rec_jet1, gen_jet1), weight);

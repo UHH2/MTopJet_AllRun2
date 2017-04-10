@@ -111,8 +111,8 @@ bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<Jet> subjets_lep = fatlepjet.subjets();
   std::vector<Jet> subjets_had = fathadjet.subjets();
-  Jet lepjet = combine->AddSubjets(subjets_lep, 30);
-  Jet hadjet = combine->AddSubjets(subjets_had, 30);
+  Jet lepjet = combine->AddSubjets(subjets_lep, 0);
+  Jet hadjet = combine->AddSubjets(subjets_had, 0);
   vector<Jet> hadjets;
   vector<Jet> lepjets;
   hadjets.push_back(hadjet);
@@ -161,8 +161,8 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
-  Particle lepjet = combine->AddSubjets_gen(subjets_lep, 30);
-  Particle hadjet = combine->AddSubjets_gen(subjets_had, 30);
+  Particle lepjet = combine->AddSubjets_gen(subjets_lep, 0);
+  Particle hadjet = combine->AddSubjets_gen(subjets_had, 0);
   vector<Particle> hadjets;
   vector<Particle> lepjets;
   hadjets.push_back(hadjet);
@@ -213,8 +213,8 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
-  Particle lepjet = combine->AddSubjets_gen(subjets_lep, 30);
-  Particle hadjet = combine->AddSubjets_gen(subjets_had, 30);
+  Particle lepjet = combine->AddSubjets_gen(subjets_lep, 0);
+  Particle hadjet = combine->AddSubjets_gen(subjets_had, 0);
   vector<Particle> hadjets;
   vector<Particle> lepjets;
   hadjets.push_back(hadjet);

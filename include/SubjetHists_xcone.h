@@ -1,0 +1,33 @@
+#pragma once
+#include "UHH2/core/include/Hists.h"
+#include "UHH2/core/include/Event.h"
+#include "UHH2/common/include/Utils.h"
+#include <math.h>
+#include <vector>
+
+#include "TH1F.h"
+#include "TH2F.h"
+#include <iostream>
+
+using namespace uhh2;
+ 
+class SubjetHists_xcone: public uhh2::Hists {
+public:
+    // use the same constructor arguments as Hists for forwarding:
+  SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname);
+    
+    virtual void fill(const uhh2::Event & ev) override;
+
+protected:
+
+
+    TH1F *pt_had_subjets, *pt_lep_subjets;
+    TH1F *eta_had_subjets, *eta_lep_subjets;
+    TH1F *pt_had_combine, *pt_lep_combine;
+    TH1F *mass_had_combine, *mass_lep_combine;
+
+    uhh2::Event::Handle<std::vector<TopJet>>h_recfatjets;
+
+};
+
+

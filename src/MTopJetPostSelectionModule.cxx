@@ -24,6 +24,7 @@
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
+#include <UHH2/MTopJet/include/SubjetHists_xcone.h>
 
 #include <vector>
 
@@ -87,6 +88,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_XCone, h_XCone_m, h_XCone_u, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
+  std::unique_ptr<Hists> h_XCone_subjets;
   std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_GenOnly, h_XCone_GEN_Both;
   std::unique_ptr<Hists> h_RecGenHists_GenOnly0, h_RecGenHists_GenOnly1, h_RecGenHists_GenOnly2, h_RecGenHists_GenOnly3, h_RecGenHists_GenOnly4, h_RecGenHists_GenOnly5, h_RecGenHists_GenOnly6;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly0, h_RecGenHists_RecOnly1, h_RecGenHists_RecOnly2, h_RecGenHists_RecOnly3, h_RecGenHists_RecOnly4, h_RecGenHists_RecOnly5, h_RecGenHists_RecOnly6;
@@ -164,6 +166,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   /*************************** Set up Hists classes **********************************************************************************/ 
 
   h_XCone.reset(new RecoHists_xcone(ctx, "XCone"));
+  h_XCone_subjets.reset(new SubjetHists_xcone(ctx, "XCone_subjets"));
   if(isTTbar) h_XCone_m.reset(new RecoHists_xcone(ctx, "XCone_matched"));
   if(isTTbar) h_XCone_u.reset(new RecoHists_xcone(ctx, "XCone_unmatched"));
   h_XCone_pt200.reset(new RecoHists_xcone(ctx, "XCone_pt200"));
@@ -272,6 +275,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool is_matched = false;
   if(passed_recsel){
     h_XCone->fill(event);
+    h_XCone_subjets->fill(event);
     h_MTopJet->fill(event);
     if(isTTbar){
       is_matched = matched->passes(event);
@@ -282,7 +286,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       h_XCone_noMassCut->fill(event);
     }
     if(isMC){
-      h_XCone_GEN_RecOnly->fill(event);
       h_XCone_GEN_RecOnly->fill(event);
       if(isTTbar) h_GenParticles_RecOnly->fill(event);
       h_RecGenHists_RecOnly0->fill(event);
@@ -298,7 +301,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /*************************** fill hists with gen sel applied *************************************************************************************/ 
   if(passed_gensel33){
     h_XCone_GEN_GenOnly->fill(event);
-    h_XCone_GEN_GenOnly->fill(event);
     if(isTTbar) h_GenParticles_GenOnly->fill(event);
     h_RecGenHists_GenOnly0->fill(event);
     if(massbin1->passes(event)) h_RecGenHists_GenOnly1->fill(event);
@@ -311,7 +313,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /*************************** fill hists with reco+gen selection applied **************************************************************************/ 
   if(passed_recsel && passed_gensel33){
-    h_XCone_GEN_Both->fill(event);
     h_XCone_GEN_Both->fill(event);
     if(isTTbar) h_GenParticles_Both->fill(event);
     h_RecGenHists_Both0->fill(event);

@@ -1,0 +1,106 @@
+#include "UHH2/MTopJet/include/SubjetHists_xcone.h"
+
+
+SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+  // book all histograms here
+  pt_had_subjets = book<TH1F>("pt_had_subjet", "p_{T}^{had subjets}", 100, 0, 500);
+  eta_had_subjets = book<TH1F>("eta_had_subjet", "#eta^{had subjets}", 100, -3, 3);
+  pt_lep_subjets = book<TH1F>("pt_lep_subjet", "p_{T}^{lep subjets}", 100, 0, 500);
+  eta_lep_subjets = book<TH1F>("eta_lep_subjet", "#eta^{lep subjets}", 100, -3, 3);
+
+  pt_lep_combine = book<TH1F>("pt_lep_combine", "p_{T}^{lep combined}", 50, 0, 1000);
+  pt_had_combine = book<TH1F>("pt_lep_combine", "p_{T}^{had combined}", 50, 0, 1000);
+  mass_lep_combine = book<TH1F>("mass_lep_combine", "M^{lep combined}", 50, 0, 500);
+  mass_had_combine = book<TH1F>("mass_lep_combine", "M^{had combined}", 50, 0, 500);
+
+
+  // handle for jets
+  h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+}
+
+
+
+void SubjetHists_xcone::fill(const Event & event){
+
+
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- define needed objects-----------------------------------
+  //---------------------------------------------------------------------------------------
+ // define all objects needed
+  std::vector<TopJet> rec_fatjets = event.get(h_recfatjets);
+
+  std::vector<Jet> had_subjets, lep_subjets;
+  Particle lepton;
+  if(event.muons->size() > 0 && event.electrons->size() > 0){
+    return;
+  }
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+  }
+  double dR1 = uhh2::deltaR(lepton, rec_fatjets.at(0));
+  double dR2 = uhh2::deltaR(lepton, rec_fatjets.at(1));
+  if(dR1 > dR2){
+    had_subjets = rec_fatjets.at(0).subjets();
+    lep_subjets = rec_fatjets.at(1).subjets();
+  }
+  else if(dR1 < dR2){
+    lep_subjets = rec_fatjets.at(0).subjets();
+    had_subjets = rec_fatjets.at(1).subjets();
+  }
+
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- add subjets without pt cut --------------------------
+  //---------------------------------------------------------------------------------------
+  double px=0, py=0, pz=0, E=0;
+  TLorentzVector had_jet_v4;
+  for(unsigned int i=0; i < had_subjets.size(); ++i){
+    px += had_subjets.at(i).v4().Px();
+    py += had_subjets.at(i).v4().Py();
+    pz += had_subjets.at(i).v4().Pz();
+    E += had_subjets.at(i).v4().E();
+  }
+  had_jet_v4.SetPxPyPzE(px, py, pz, E);
+
+  px=0;
+  py=0;
+  pz=0;
+  E=0;
+  TLorentzVector lep_jet_v4;
+  for(unsigned int i=0; i < lep_subjets.size(); ++i){
+    px += lep_subjets.at(i).v4().Px();
+    py += lep_subjets.at(i).v4().Py();
+    pz += lep_subjets.at(i).v4().Pz();
+    E += lep_subjets.at(i).v4().E();
+  }
+  lep_jet_v4.SetPxPyPzE(px, py, pz, E);
+
+  //---------------------------------------------------------------------------------------
+  //--------------------------------- Fill Hists here -------------------------------------
+  //---------------------------------------------------------------------------------------
+
+  // get weight
+  double weight = event.weight;
+
+  for(unsigned int i=0; i<had_subjets.size(); i++){
+    pt_had_subjets->Fill(had_subjets.at(i).pt(), weight);
+    eta_had_subjets->Fill(had_subjets.at(i).eta(), weight);
+  }
+  for(unsigned int i=0; i<lep_subjets.size(); i++){
+    pt_lep_subjets->Fill(lep_subjets.at(i).pt(), weight);
+    eta_lep_subjets->Fill(lep_subjets.at(i).eta(), weight);
+  }
+
+  pt_had_combine->Fill(had_jet_v4.Pt(), weight);
+  pt_lep_combine->Fill(lep_jet_v4.Pt(), weight);
+  mass_had_combine->Fill(had_jet_v4.M(), weight);
+  mass_lep_combine->Fill(lep_jet_v4.M(), weight);
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+ 
+
+}
+
+
