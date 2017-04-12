@@ -1,0 +1,46 @@
+#include "UHH2/MTopJet/include/JetCorrections_xcone.h"
+
+// JEC_factor_raw has to be set to a non 0 value for JEC
+std::vector<TopJet> set_JEC_factor(std::vector<TopJet> jets){
+  Jet new_subjet;
+  vector<Jet> new_subjets;
+  TopJet new_fatjet;
+  vector<TopJet> new_fatjets;
+  for(unsigned int i=0; i<jets.size(); i++){
+    new_fatjet = jets.at(i);
+    new_subjets.clear();
+    for(unsigned int j=0; j<new_fatjet.subjets().size(); j++){
+      new_subjet = jets.at(i).subjets().at(j);
+      new_subjet.set_JEC_factor_raw(1.);
+      new_subjets.push_back(new_subjet);
+    }
+    new_fatjet.set_subjets(new_subjets);
+    new_fatjets.push_back(new_fatjet);
+  }
+  return new_fatjets;
+}
+
+JetCorrections_xcone::JetCorrections_xcone(){}
+
+void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_collection){
+  h_topjets = ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  isMC = (ctx.get("dataset_type") == "MC");
+  jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, jet_collection));
+  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection));
+  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection));
+  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection));
+  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA, jet_collection));
+}
+
+bool JetCorrections_xcone::process(uhh2::Event & event){
+  std::vector<TopJet> jets = event.get(h_topjets);
+  event.set(h_topjets, set_JEC_factor(jets)); // first set JEC_factor_raw to a non-0 value
+  if(isMC)jet_corrector_MC->process(event);
+  else{
+    if(event.run <= runnr_BCD)         jet_corrector_BCD->process(event);
+    else if(event.run < runnr_EFearly) jet_corrector_EFearly->process(event);
+    else if(event.run <= runnr_FlateG) jet_corrector_FlateG->process(event);
+    else if(event.run > runnr_FlateG)  jet_corrector_H->process(event);
+    else throw runtime_error("Jet Correction: run number not covered by if-statements in process-routine.");
+  }
+}

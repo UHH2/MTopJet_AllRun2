@@ -1,7 +1,7 @@
 #include "UHH2/MTopJet/include/RecoGenHists_xcone.h"
 
 
-RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & dirname, bool use_JEC): Hists(ctx, dirname){
   // book all histograms here
   MassReso = book<TH1F>("MassResolution", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
   PtReso = book<TH1F>("PtResolution", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
@@ -17,8 +17,14 @@ RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & 
   RecGenPT = book<TH2F>("RecGenPT", "x=PT_Gen y=PT_Rec", 50, 0, 2000., 50, 0, 2000.);
 
   // handle for clustered jets
-  h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
-  h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
+  if(use_JEC){
+    h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
+    h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
+  }
+  else{
+    h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
+    h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_noJEC");
+  }
   h_genjets_had=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
   h_genjets_lep=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_lep_Combined");
 

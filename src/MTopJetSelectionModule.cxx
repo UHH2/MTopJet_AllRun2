@@ -27,6 +27,7 @@
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
+#include <UHH2/MTopJet/include/JetCorrections_xcone.h>
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
@@ -58,15 +59,16 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
 
 
-  std::unique_ptr<JetCleaner>                      jet_cleaner1;
-  std::unique_ptr<JetCleaner>                      jet_cleaner2;
+  std::unique_ptr<JetCleaner> jet_cleaner1;
+  std::unique_ptr<JetCleaner> jet_cleaner2;
+  std::unique_ptr<JetCorrections_xcone> JetCorrections;
 
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
-
   std::unique_ptr<uhh2::Selection> trigger_sel_A;
   std::unique_ptr<uhh2::Selection> trigger_sel_B;
   std::unique_ptr<uhh2::Selection> muon_sel;
@@ -124,7 +126,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   }
 
   // combine XCone
-  jetprod_reco.reset(new CombineXCone33(ctx)); 
+  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined")); 
+  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC")); 
   if(isMC){
     jetprod_gen23.reset(new CombineXCone23_gen(ctx));
     jetprod_gen33.reset(new CombineXCone33_gen(ctx));
@@ -138,6 +141,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // just for testing
   ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
 
+  // correct subjets
+  JetCorrections.reset(new JetCorrections_xcone());
+  JetCorrections->init(ctx, "XConeTopJets");
 
   //// EVENT SELECTION
 
@@ -302,9 +308,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
 
-
   /* *********** at least 1 good primary vertex *********** */
   if(!pv_sel->passes(event)) return false;
+
 
   /* *********** scale factor muon *********** */
   muo_tight_noniso_SF->process(event);
@@ -439,6 +445,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_bTag_lumi->fill(event);
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
+  // store reco jets with and without JEC applied
+  jetprod_reco_noJEC->process(event);
+  JetCorrections->process(event);
   jetprod_reco->process(event);
   if(!event.isRealData){
     jetprod_gen23->process(event);

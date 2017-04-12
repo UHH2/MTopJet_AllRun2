@@ -78,9 +78,9 @@ Particle CombineXCone::AddSubjets_gen(vector<Particle> subjets, double ptmin){
 
 
 // Get final Jets from 3+3 Method on Reco level
-CombineXCone33::CombineXCone33(uhh2::Context & ctx):
-  h_xcone33hadjets(ctx.declare_event_output<std::vector<Jet>>("XCone33_had_Combined")),
-  h_xcone33lepjets(ctx.declare_event_output<std::vector<Jet>>("XCone33_lep_Combined")),
+CombineXCone33::CombineXCone33(uhh2::Context & ctx, const std::string & name_had, const std::string & name_lep):
+  h_xcone33hadjets(ctx.declare_event_output<std::vector<Jet>>(name_had)),
+  h_xcone33lepjets(ctx.declare_event_output<std::vector<Jet>>(name_lep)),
   h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")) {}
 
 bool CombineXCone33::process(uhh2::Event & event){

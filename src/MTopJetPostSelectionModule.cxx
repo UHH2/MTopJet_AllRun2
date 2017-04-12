@@ -13,6 +13,7 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGen.h>
 
+#include <UHH2/MTopJet/include/JetCorrections_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/ModuleBASE.h>
@@ -47,7 +48,8 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   enum lepton { muon, elec };
   lepton channel_;
 
-  // cleaners
+  // cleaners & Correctors
+  std::unique_ptr<JetCorrections_xcone> JetCorrections;
 
   // selections
   std::unique_ptr<uhh2::Selection> pt_sel;
@@ -92,6 +94,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_GenOnly, h_XCone_GEN_Both;
   std::unique_ptr<Hists> h_RecGenHists_GenOnly0, h_RecGenHists_GenOnly1, h_RecGenHists_GenOnly2, h_RecGenHists_GenOnly3, h_RecGenHists_GenOnly4, h_RecGenHists_GenOnly5, h_RecGenHists_GenOnly6;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly0, h_RecGenHists_RecOnly1, h_RecGenHists_RecOnly2, h_RecGenHists_RecOnly3, h_RecGenHists_RecOnly4, h_RecGenHists_RecOnly5, h_RecGenHists_RecOnly6;
+  std::unique_ptr<Hists> h_RecGenHists_RecOnly0_noJEC, h_RecGenHists_RecOnly1_noJEC, h_RecGenHists_RecOnly2_noJEC, h_RecGenHists_RecOnly3_noJEC, h_RecGenHists_RecOnly4_noJEC, h_RecGenHists_RecOnly5_noJEC, h_RecGenHists_RecOnly6_noJEC;
   std::unique_ptr<Hists> h_RecGenHists_Both0, h_RecGenHists_Both1, h_RecGenHists_Both2, h_RecGenHists_Both3, h_RecGenHists_Both4, h_RecGenHists_Both5, h_RecGenHists_Both6;
   std::unique_ptr<Hists> h_GenParticles_RecOnly, h_GenParticles_GenOnly, h_GenParticles_Both;
 
@@ -138,8 +141,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isMC) h_genjets23_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone23_had_Combined");
   if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
 
+  /*************************** Setup Subjet Corrector **********************************************************************************/ 
+  JetCorrections.reset(new JetCorrections_xcone());
+  JetCorrections->init(ctx, "XConeTopJets");
   /*************************** Setup Selections **********************************************************************************/ 
-
   // RECO Selection
   pt_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined", 400));
   pt300_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined", 300));
@@ -183,29 +188,38 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
     h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
 
-    h_RecGenHists_GenOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_all"));
-    h_RecGenHists_GenOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_000to100"));
-    h_RecGenHists_GenOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_100to150"));
-    h_RecGenHists_GenOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_150to200"));
-    h_RecGenHists_GenOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_200to250"));
-    h_RecGenHists_GenOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_250to300"));
-    h_RecGenHists_GenOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_300to500"));
+    // "true" for RecGenHists means to use jets with JEC applied
+    h_RecGenHists_GenOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_all", true));
+    h_RecGenHists_GenOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_000to100", true));
+    h_RecGenHists_GenOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_100to150", true));
+    h_RecGenHists_GenOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_150to200", true));
+    h_RecGenHists_GenOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_200to250", true));
+    h_RecGenHists_GenOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_250to300", true));
+    h_RecGenHists_GenOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly_300to500", true));
 
-    h_RecGenHists_RecOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_all"));
-    h_RecGenHists_RecOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_000to100"));
-    h_RecGenHists_RecOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_100to150"));
-    h_RecGenHists_RecOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_150to200"));
-    h_RecGenHists_RecOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_200to250"));
-    h_RecGenHists_RecOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_250to300"));
-    h_RecGenHists_RecOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_300to500"));
+    h_RecGenHists_RecOnly0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_all", true));
+    h_RecGenHists_RecOnly1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_000to100", true));
+    h_RecGenHists_RecOnly2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_100to150", true));
+    h_RecGenHists_RecOnly3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_150to200", true));
+    h_RecGenHists_RecOnly4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_200to250", true));
+    h_RecGenHists_RecOnly5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_250to300", true));
+    h_RecGenHists_RecOnly6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_300to500", true));
 
-    h_RecGenHists_Both0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_all"));
-    h_RecGenHists_Both1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_000to100"));
-    h_RecGenHists_Both2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_100to150"));
-    h_RecGenHists_Both3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_150to200"));
-    h_RecGenHists_Both4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_200to250"));
-    h_RecGenHists_Both5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_250to300"));
-    h_RecGenHists_Both6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_300to500"));
+    h_RecGenHists_RecOnly0_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_all", false));
+    h_RecGenHists_RecOnly1_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_000to100", false));
+    h_RecGenHists_RecOnly2_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_100to150", false));
+    h_RecGenHists_RecOnly3_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_150to200", false));
+    h_RecGenHists_RecOnly4_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_200to250", false));
+    h_RecGenHists_RecOnly5_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_250to300", false));
+    h_RecGenHists_RecOnly6_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC_300to500", false));
+
+    h_RecGenHists_Both0.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_all", true));
+    h_RecGenHists_Both1.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_000to100", true));
+    h_RecGenHists_Both2.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_100to150", true));
+    h_RecGenHists_Both3.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_150to200", true));
+    h_RecGenHists_Both4.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_200to250", true));
+    h_RecGenHists_Both5.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_250to300", true));
+    h_RecGenHists_Both6.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_300to500", true));
   }
   /*********************************************************************************************************************************/ 
 
@@ -242,6 +256,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isTTbar && scale_ttbar) event.weight = SF_tt * event.get(h_weight);
   else event.weight = event.get(h_weight);
 
+  /***************************  SubJet Corrector *****************************************************************************************************/ 
+  JetCorrections->process(event);
   /*************************** test with lower pt cut ********************************************************************************************/ 
   if(pt200_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt200->fill(event);
   if(pt300_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt300->fill(event);
@@ -289,12 +305,19 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       h_XCone_GEN_RecOnly->fill(event);
       if(isTTbar) h_GenParticles_RecOnly->fill(event);
       h_RecGenHists_RecOnly0->fill(event);
+      h_RecGenHists_RecOnly0_noJEC->fill(event);
       if(massbin1->passes(event)) h_RecGenHists_RecOnly1->fill(event);
       if(massbin2->passes(event)) h_RecGenHists_RecOnly2->fill(event);
       if(massbin3->passes(event)) h_RecGenHists_RecOnly3->fill(event);
       if(massbin4->passes(event)) h_RecGenHists_RecOnly4->fill(event);
       if(massbin5->passes(event)) h_RecGenHists_RecOnly5->fill(event);
       if(massbin6->passes(event)) h_RecGenHists_RecOnly6->fill(event);
+      if(massbin1->passes(event)) h_RecGenHists_RecOnly1_noJEC->fill(event);
+      if(massbin2->passes(event)) h_RecGenHists_RecOnly2_noJEC->fill(event);
+      if(massbin3->passes(event)) h_RecGenHists_RecOnly3_noJEC->fill(event);
+      if(massbin4->passes(event)) h_RecGenHists_RecOnly4_noJEC->fill(event);
+      if(massbin5->passes(event)) h_RecGenHists_RecOnly5_noJEC->fill(event);
+      if(massbin6->passes(event)) h_RecGenHists_RecOnly6_noJEC->fill(event);
     }
   }
 

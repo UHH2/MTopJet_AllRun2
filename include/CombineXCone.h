@@ -31,7 +31,7 @@ class CombineXCone{
 class CombineXCone33: public uhh2::AnalysisModule{
 public:
 
-  explicit CombineXCone33(uhh2::Context &);
+  explicit CombineXCone33(uhh2::Context &,  const std::string &, const std::string & );
   virtual bool process(uhh2::Event & ) override; 
     
 private:
