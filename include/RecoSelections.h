@@ -54,7 +54,7 @@ namespace uhh2 {
  class MassCutXCone : public Selection { 
 
   public: 
-    explicit MassCutXCone(Context&);
+    explicit MassCutXCone(Context&, const std::string &, const std::string &);
     virtual bool passes(const Event&) override;
 
   private:

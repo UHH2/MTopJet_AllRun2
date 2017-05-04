@@ -69,6 +69,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
+  std::unique_ptr<uhh2::AnalysisModule> copy_jet;
   std::unique_ptr<uhh2::Selection> trigger_sel_A;
   std::unique_ptr<uhh2::Selection> trigger_sel_B;
   std::unique_ptr<uhh2::Selection> muon_sel;
@@ -128,6 +129,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // combine XCone
   jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined")); 
   jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC")); 
+  copy_jet.reset(new CopyJets(ctx, "XConeTopJets", "XConeTopJets_noJEC")); 
+
   if(isMC){
     jetprod_gen23.reset(new CombineXCone23_gen(ctx));
     jetprod_gen33.reset(new CombineXCone33_gen(ctx));
@@ -445,8 +448,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   h_bTag_lumi->fill(event);
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
-  // store reco jets with and without JEC applied
+  // store reco jets with and without JEC applied, and also copy uncorrected subjets
   jetprod_reco_noJEC->process(event);
+  copy_jet->process(event);
   JetCorrections->process(event);
   jetprod_reco->process(event);
   if(!event.isRealData){

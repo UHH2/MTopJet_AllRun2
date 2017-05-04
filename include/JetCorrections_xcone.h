@@ -28,3 +28,27 @@ class JetCorrections_xcone : public uhh2::AnalysisModule {
   Event::Handle<std::vector<TopJet>>h_topjets;
 
 };
+
+
+
+// define JER Smearer for XCone Jets
+class JER_Smearer : public uhh2::AnalysisModule {
+
+ public:
+  explicit JER_Smearer(uhh2::Context&, const std::string& recj="jets", const std::string& genj="genjets", const bool allow_met_smear=true,
+                                       const JERSmearing::SFtype1& JER_sf=JERSmearing::SF_13TeV_2016);
+  virtual ~JER_Smearer() {}
+
+  virtual bool process(uhh2::Event&) override;
+
+  void apply_smearing(std::vector<Jet>&, const std::vector<Particle>&, LorentzVector&);
+
+ private:
+  uhh2::Event::Handle<std::vector<TopJet> >    h_rectopjets_;
+  uhh2::Event::Handle<std::vector<GenTopJet> > h_gentopjets_;
+
+  int direction = 0; // -1 = down, +1 = up, 0 = nominal
+  JERSmearing::SFtype1 JER_SFs_;
+};
+
+

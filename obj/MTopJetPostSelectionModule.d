@@ -348,4 +348,5 @@ obj/MTopJetPostSelectionModule.o: src/MTopJetPostSelectionModule.cxx \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/GenHists_particles.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoGenHists_xcone.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/AnalysisOutput.h \
- /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/SubjetHists_xcone.h
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/SubjetHists_xcone.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/include/RecoGenHists_subjets.h

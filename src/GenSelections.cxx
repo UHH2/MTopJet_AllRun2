@@ -212,9 +212,10 @@ bool uhh2::Matching_XCone23::passes(const uhh2::Event& event){
     return matched;
 }
 
-uhh2::Matching_XCone33::Matching_XCone33(uhh2::Context& ctx):
+uhh2::Matching_XCone33::Matching_XCone33(uhh2::Context& ctx, bool subjet_matching_):
   h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")),
-  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
+  h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+  subjet_matching(subjet_matching_){}
 
 
 bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
@@ -263,23 +264,34 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
     fathadjet = fatjets.at(0);
   }
 
-  std::vector<Jet> jets = fathadjet.subjets();
-  Jet jet1, jet2, jet3;
-  jet1 = jets.at(0);
-  jet2 = jets.at(1);
-  jet3 = jets.at(2);
-
   bool matched = false;
   bool matched_q1 = false;
   bool matched_q2 = false;
   bool matched_bot = false;
-
-  if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
-  if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
-  if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
+  
+  // if merging is selected, only confirm if top decay products are inside R=1.2 cone of fatjets.
+ 
+  if(!subjet_matching){
+    if(deltaR(q1, fathadjet) < 1.2) matched_q1 = true;
+    if(deltaR(q2, fathadjet) < 1.2) matched_q2 = true;
+    if(deltaR(bot, fathadjet) < 1.2) matched_bot = true;
+  }
+  // continue here if matching should be performed
+  else if (subjet_matching){
+    std::vector<Jet> jets = fathadjet.subjets();
+    Jet jet1, jet2, jet3;
+    jet1 = jets.at(0);
+    jet2 = jets.at(1);
+    jet3 = jets.at(2);
+    if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
+    if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
+    if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
     
-  if(matched_q1 && matched_q2 && matched_bot) matched = true;
-  return matched;
+    if(matched_q1 && matched_q2 && matched_bot) matched = true;
+    return matched;
+  }
+  else return false;
+
 }
 
 uhh2::Matching_XCone_botlep_lep::Matching_XCone_botlep_lep(uhh2::Context& ctx, const std::string & name):

@@ -47,9 +47,9 @@ bool uhh2::MassCutReco::passes(const uhh2::Event& event){
 }
 ////////////////////////////////////////////////////////
 
-uhh2::MassCutXCone::MassCutXCone(uhh2::Context& ctx):
-  h_hadjets(ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined")),
-  h_lepjets(ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined")){}
+uhh2::MassCutXCone::MassCutXCone(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
+  h_hadjets(ctx.get_handle<std::vector<Jet>>(hadname)),
+  h_lepjets(ctx.get_handle<std::vector<Jet>>(lepname)){}
 
 bool uhh2::MassCutXCone::passes(const uhh2::Event& event){
   std::vector<Jet> hadjets = event.get(h_hadjets);

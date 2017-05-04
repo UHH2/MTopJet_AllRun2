@@ -16,6 +16,31 @@ RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & 
   RecGenMass = book<TH2F>("RecGenMass", "x=M_Gen y=M_Rec", 50, 0, 500., 50, 0, 500.);
   RecGenPT = book<TH2F>("RecGenPT", "x=PT_Gen y=PT_Rec", 50, 0, 2000., 50, 0, 2000.);
 
+  PtReso_mass1 = book<TH1F>("PtResolution_mass1", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_mass2 = book<TH1F>("PtResolution_mass2", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_mass3 = book<TH1F>("PtResolution_mass3", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_mass4 = book<TH1F>("PtResolution_mass4", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_mass5 = book<TH1F>("PtResolution_mass5", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_mass6 = book<TH1F>("PtResolution_mass6", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  MassReso_mass1 = book<TH1F>("MassResolution_mass1", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_mass2 = book<TH1F>("MassResolution_mass2", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_mass3 = book<TH1F>("MassResolution_mass3", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_mass4 = book<TH1F>("MassResolution_mass4", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_mass5 = book<TH1F>("MassResolution_mass5", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_mass6 = book<TH1F>("MassResolution_mass6", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+
+  PtReso_pt1 = book<TH1F>("PtResolution_pt1", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_pt2 = book<TH1F>("PtResolution_pt2", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_pt3 = book<TH1F>("PtResolution_pt3", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_pt4 = book<TH1F>("PtResolution_pt4", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_pt5 = book<TH1F>("PtResolution_pt5", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  PtReso_pt6 = book<TH1F>("PtResolution_pt6", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt1 = book<TH1F>("MassResolution_pt1", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt2 = book<TH1F>("MassResolution_pt2", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt3 = book<TH1F>("MassResolution_pt3", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt4 = book<TH1F>("MassResolution_pt4", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt5 = book<TH1F>("MassResolution_pt5", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt6 = book<TH1F>("MassResolution_pt6", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
   // handle for clustered jets
   if(use_JEC){
     h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
@@ -92,6 +117,58 @@ void RecoGenHists_xcone::fill(const Event & event){
 
     RecGenMass->Fill(gen_jet1_v4.M(), rec_jet1_v4.M(), weight);
     RecGenPT->Fill(gen_jet1_v4.Pt(), rec_jet1_v4.Pt(), weight);
+
+    // resolution binned in Mass
+    if(gen_jet1_v4.M() < 100) {
+      PtReso_mass1->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_mass1->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.M() >= 100 && gen_jet1_v4.M() < 150){
+      PtReso_mass2->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_mass2->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.M() >= 150 && gen_jet1_v4.M() < 200){
+      PtReso_mass3->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_mass3->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.M() >= 200 && gen_jet1_v4.M() < 250){
+      PtReso_mass4->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_mass4->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.M() >= 250 && gen_jet1_v4.M() < 300){
+      PtReso_mass5->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_mass5->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.M() >= 300 && gen_jet1_v4.M() < 500){
+      PtReso_mass6->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_mass6->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    // resolution binned in PT
+    if(gen_jet1_v4.Pt() < 450) {
+      PtReso_pt1->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_pt1->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.Pt() >= 450 && gen_jet1_v4.Pt() < 500){
+      PtReso_pt2->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_pt2->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.Pt() >= 500 && gen_jet1_v4.Pt() < 600){
+      PtReso_pt3->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_pt3->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.Pt() >= 600 && gen_jet1_v4.Pt() < 700){
+      PtReso_pt4->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_pt4->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.Pt() >= 700 && gen_jet1_v4.Pt() < 800){
+      PtReso_pt5->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_pt5->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+    if(gen_jet1_v4.Pt() >= 800){
+      PtReso_pt6->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
+      MassReso_pt6->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
+    }
+
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------

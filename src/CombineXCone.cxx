@@ -229,3 +229,14 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   return true;
 }
 
+CopyJets::CopyJets(uhh2::Context & ctx, const std::string & old_name, const std::string & new_name):
+  h_new(ctx.declare_event_output<std::vector<TopJet>>(new_name)),
+  h_old(ctx.get_handle<std::vector<TopJet>>(old_name)) {}
+
+
+bool CopyJets::process(uhh2::Event & event){
+  std::vector<TopJet> jets = event.get(h_old);
+  event.set(h_new, jets);
+
+return true;
+}

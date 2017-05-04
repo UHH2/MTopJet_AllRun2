@@ -71,3 +71,16 @@ private:
 
 };
 
+
+class CopyJets: public uhh2::AnalysisModule{
+public:
+
+  explicit CopyJets(uhh2::Context &, const std::string &, const std::string &);
+  virtual bool process(uhh2::Event & ) override;
+
+private:
+
+  uhh2::Event::Handle<std::vector<TopJet>>h_new;
+  uhh2::Event::Handle<std::vector<TopJet>>h_old;
+
+};

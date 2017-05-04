@@ -92,12 +92,13 @@ namespace uhh2 {
  class Matching_XCone33 : public Selection { 
 
   public: 
-    explicit Matching_XCone33(Context&);
+    explicit Matching_XCone33(Context&, bool);
     virtual bool passes(const Event&) override;
 
   private:
     uhh2::Event::Handle<std::vector<TopJet>> h_fatjets;
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    bool subjet_matching;
   };
 
   class Matching_XCone_botlep_lep : public Selection { 
