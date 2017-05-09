@@ -86,6 +86,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_Muon;
   std::unique_ptr<Hists> h_XCone, h_XCone_m, h_XCone_u, h_XCone_m_fat, h_XCone_u_fat, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
+  std::unique_ptr<Hists> h_XCone_NoSel, h_XConeNoJEC_NoSel;
   std::unique_ptr<Hists> h_XConeNoJEC, h_XCone_subjets_noJEC, h_XConeNoJEC_noMassCut;
   std::unique_ptr<Hists> h_XCone_subjets;
   std::unique_ptr<Hists> h_XCone_lowPU_subjets, h_XCone_medPU_subjets, h_XCone_highPU_subjets, h_XCone_lowPU, h_XCone_medPU, h_XCone_highPU;
@@ -163,10 +164,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   /*************************** Set up Hists classes **********************************************************************************/ 
   // "true" for XCone Hists means to use jets with JEC applied
   h_XCone.reset(new RecoHists_xcone(ctx, "XCone", true));
+  h_XCone_NoSel.reset(new RecoHists_xcone(ctx, "XCone_NoSel", true));
   h_XCone_lowPU.reset(new RecoHists_xcone(ctx, "XCone_lowPU", true));
   h_XCone_medPU.reset(new RecoHists_xcone(ctx, "XCone_medPU", true));
   h_XCone_highPU.reset(new RecoHists_xcone(ctx, "XCone_highPU", true));
   h_XConeNoJEC.reset(new RecoHists_xcone(ctx, "XConeNoJEC", false));
+  h_XConeNoJEC_NoSel.reset(new RecoHists_xcone(ctx, "XConeNoJEC_NoSel", false));
   h_XCone_subjets.reset(new SubjetHists_xcone(ctx, "XCone_subjets", true));
   h_XCone_subjets_noJEC.reset(new SubjetHists_xcone(ctx, "XCone_subjets_noJEC", false));
   h_XCone_lowPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_lowPU_subjets", true));
@@ -262,6 +265,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isMC && mass_gensel23->passes(event) && pt_gensel23->passes(event) ) passed_gensel23 = true;
   else passed_gensel23 = false;
  
+  /*************************** fill hists with no sel applied ***********************************************************************************/ 
+  h_XCone_NoSel->fill(event);
+  h_XConeNoJEC_NoSel->fill(event);
   /*************************** fill hists with reco sel applied ***********************************************************************************/ 
 
   if(pt_sel->passes(event)) h_XCone_noMassCut->fill(event);
