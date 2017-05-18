@@ -34,10 +34,12 @@ protected:
     TH1F *DeltaR_23_33, *DeltaMass_23_33, *DeltaPT_23_33;
     TH1F *DeltaR_jet2_23_33, *DeltaMass_jet2_23_33, *DeltaPT_jet2_23_33;
 
+    TH1F *SoftDropMass;
 
 
     uhh2::Event::Handle<std::vector<Particle>>h_hadjets23;
     uhh2::Event::Handle<std::vector<Particle>>h_lepjets23;
     uhh2::Event::Handle<std::vector<Particle>>h_hadjets33;
     uhh2::Event::Handle<std::vector<Particle>>h_lepjets33;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_softdrop;
 };

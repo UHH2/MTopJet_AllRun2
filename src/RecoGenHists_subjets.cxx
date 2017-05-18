@@ -75,6 +75,8 @@ void RecoGenHists_subjets::fill(const Event & event){
   int nearest_j;
   bool isolated = false;
   double gen_pt;
+
+  // do matching
   for(unsigned int i=0; i<rec_sub.size(); i++){
     dR = 1000;
     nearest_j = 100;

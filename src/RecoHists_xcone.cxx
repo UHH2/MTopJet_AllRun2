@@ -16,6 +16,12 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   HadJetPT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   LepJetPT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
 
+  RhoA_fat = book<TH1F>("RhoA_fat", "#rho A_{fat}", 50, 0, 100);
+  RhoA = book<TH1F>("RhoA", "#rho A_{final}", 50, 0, 100);
+  RhoA_diff = book<TH1F>("RhoA_diff", "#rho (A_{fat} - A_{final})", 50, -50, 50);
+  E_diff = book<TH1F>("E_diff", "E_{fat} - E_{final}", 50, -50, 50);
+
+
   FatJetPT_had = book<TH1F>("FatJetPT_had", "p_{T, fat had jet}", 50, 0, 1000);
   FatJetPT_lep = book<TH1F>("FatJetPT_lep", "p_{T, fat lep jet}", 50, 0, 1000);
 
@@ -52,7 +58,7 @@ void RecoHists_xcone::fill(const Event & event){
   std::vector<Jet> hadjets = event.get(h_hadjets);
   std::vector<Jet> lepjets = event.get(h_lepjets);
   std::vector<TopJet> fatjets = event.get(h_fatjets);
-
+  double rho = event.rho;
   // Particle lepton;
   // if(event.muons->size() > 0 && event.electrons->size() > 0){
   //   return;
@@ -125,7 +131,19 @@ void RecoHists_xcone::fill(const Event & event){
   FatJetPTDiff_lep->Fill((fatjets.at(nr_lepjet).pt() - lepjet_v4.Pt()), weight);
   FatJetMassDiff_lep->Fill((fatjets.at(nr_lepjet).softdropmass() - lepjet_v4.M()), weight);
   if(fatjets.at(nr_hadjet).pt() > 400 && fatjets.at(nr_lepjet).softdropmass() < fatjets.at(nr_hadjet).softdropmass())SoftdropMass_Sel->Fill(fatjets.at(nr_hadjet).softdropmass(), weight);
-  // DeltaRDiff->Fill(dR_had - dR_lep, weight);
+
+  double rhoa_fat = rho * M_PI * 1.2 * 1.2;
+  double rhoa, area = 0;
+  for(unsigned int i = 0; i < fatjets.at(nr_hadjet).subjets().size(); i++){
+    area += fatjets.at(nr_hadjet).subjets().at(i).jetArea();
+  }
+  rhoa = rho * area;
+
+  RhoA_fat->Fill(rhoa_fat, weight);
+  RhoA->Fill(rhoa, weight);
+  RhoA_diff->Fill(rhoa_fat - rhoa, weight);
+  E_diff->Fill((fatjets.at(nr_hadjet).v4().E() - hadjet_v4.E()), weight);
+
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 

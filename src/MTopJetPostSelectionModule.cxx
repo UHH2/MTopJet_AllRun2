@@ -13,7 +13,6 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGen.h>
 
-#include <UHH2/MTopJet/include/JetCorrections_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/ModuleBASE.h>
@@ -27,6 +26,10 @@
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/SubjetHists_xcone.h>
 #include "UHH2/MTopJet/include/RecoGenHists_subjets.h"
+#include "UHH2/MTopJet/include/RecoGenHists_ak4.h"
+#include "UHH2/MTopJet/include/CorrectionHists_subjets.h"
+#include "UHH2/MTopJet/include/CorrectionFactor.h"
+
 
 #include <vector>
 
@@ -50,7 +53,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   lepton channel_;
 
   // cleaners & Correctors
-  // std::unique_ptr<JetCorrections_xcone> JetCorrections;
+  std::unique_ptr<uhh2::AnalysisModule> Correction;
 
   // selections
   std::unique_ptr<uhh2::Selection> pt_sel;
@@ -85,6 +88,8 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_Muon;
+  std::unique_ptr<Hists> h_CorrectionHists;
+  std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
   std::unique_ptr<Hists> h_XCone, h_XCone_m, h_XCone_u, h_XCone_m_fat, h_XCone_u_fat, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
   std::unique_ptr<Hists> h_XCone_NoSel, h_XConeNoJEC_NoSel;
   std::unique_ptr<Hists> h_XConeNoJEC, h_XCone_subjets_noJEC, h_XConeNoJEC_noMassCut;
@@ -142,8 +147,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
 
   /*************************** Setup Subjet Corrector **********************************************************************************/ 
-  // JetCorrections.reset(new JetCorrections_xcone());
-  // JetCorrections->init(ctx, "XConeTopJets");
+  Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected"));
   /*************************** Setup Selections **********************************************************************************/ 
   // RECO Selection
   pt_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined_noJEC", 400));
@@ -187,6 +191,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_Muon.reset(new MuonHists(ctx, "Muon"));
 
   if(isMC){
+    if(isTTbar) h_CorrectionHists.reset(new CorrectionHists_subjets(ctx, "CorrectionHists"));
+
     h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
     h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
     h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
@@ -197,6 +203,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
     h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", true));
     h_RecGenHists_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC", false));
+
+    h_RecGenHists_ak4.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4", true));
+    h_RecGenHists_ak4_noJEC.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4_noJEC", false));
 
     h_RecGenHists_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU", true));
     h_RecGenHists_medPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU", true));
@@ -220,6 +229,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /***************************  some options ***************************************************************************************************************/ 
   bool scale_ttbar = true;
   double SF_tt = 0.75;
+  /*************************** otion to split TTbar sample for closure test of unfolding *******************************************************************/ 
+  // if(isTTbar && event.muons->at(0).phi() > 0) return false;
 
   /***************************  some useful variables ******************************************************************************************************/ 
   if(isTTbar) ttgenprod->process(event);
@@ -247,7 +258,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else event.weight = event.get(h_weight);
 
   /***************************  SubJet Corrector *****************************************************************************************************/ 
-  // JetCorrections->process(event);
+  Correction->process(event);
   /*************************** test with lower pt cut ********************************************************************************************/ 
   if(pt200_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt200->fill(event);
   if(pt300_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt300->fill(event);
@@ -278,6 +289,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_recsel){
     h_XCone_subjets->fill(event);
     h_XCone_subjets_noJEC->fill(event);
+
     h_XCone->fill(event);
     if(event.pvs->size() <= 10){
       h_XCone_lowPU_subjets->fill(event);
@@ -315,6 +327,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       h_RecGenHists_RecOnly_noJEC->fill(event);
       h_RecGenHists_subjets->fill(event);
       h_RecGenHists_subjets_noJEC->fill(event);
+      if(isTTbar) h_CorrectionHists->fill(event);
+      h_RecGenHists_ak4->fill(event);
+      h_RecGenHists_ak4_noJEC->fill(event);
     }
   }
 

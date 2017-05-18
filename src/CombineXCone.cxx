@@ -39,12 +39,19 @@ Jet CombineXCone::AddSubjets(vector<Jet> subjets, double ptmin){
   double px=0, py=0, pz=0, E=0;
   TLorentzVector jet_v4;
   Jet jet;
+  // only combine if all subjets have pt > ptmin
+  bool good_jet = true;
   for(unsigned int i=0; i < subjets.size(); ++i){
-    if(subjets.at(i).pt() < ptmin) continue;
-    px += subjets.at(i).v4().Px();
-    py += subjets.at(i).v4().Py();
-    pz += subjets.at(i).v4().Pz();
-    E += subjets.at(i).v4().E();
+    if(subjets.at(i).pt() < ptmin) good_jet = false;
+  }
+  if(good_jet){
+    for(unsigned int i=0; i < subjets.size(); ++i){
+      if(subjets.at(i).pt() < ptmin) continue;
+      px += subjets.at(i).v4().Px();
+      py += subjets.at(i).v4().Py();
+      pz += subjets.at(i).v4().Pz();
+      E += subjets.at(i).v4().E();
+    }
   }
   jet_v4.SetPxPyPzE(px, py, pz, E);
   jet.set_pt(jet_v4.Pt());
@@ -59,12 +66,18 @@ Particle CombineXCone::AddSubjets_gen(vector<Particle> subjets, double ptmin){
   double px=0, py=0, pz=0, E=0;
   TLorentzVector jet_v4;
   Particle jet;
+  // only combine if all subjets have pt > ptmin
+  bool good_jet = true;
   for(unsigned int i=0; i < subjets.size(); ++i){
-    if(subjets.at(i).pt() < ptmin) continue;
-    px += subjets.at(i).v4().Px();
-    py += subjets.at(i).v4().Py();
-    pz += subjets.at(i).v4().Pz();
-    E += subjets.at(i).v4().E();
+    if(subjets.at(i).pt() < ptmin) good_jet = false;
+  }
+  if(good_jet){
+    for(unsigned int i=0; i < subjets.size(); ++i){
+      px += subjets.at(i).v4().Px();
+      py += subjets.at(i).v4().Py();
+      pz += subjets.at(i).v4().Pz();
+      E += subjets.at(i).v4().E();
+    }
   }
   jet_v4.SetPxPyPzE(px, py, pz, E);
   jet.set_pt(jet_v4.Pt());
@@ -81,7 +94,7 @@ Particle CombineXCone::AddSubjets_gen(vector<Particle> subjets, double ptmin){
 CombineXCone33::CombineXCone33(uhh2::Context & ctx, const std::string & name_had, const std::string & name_lep):
   h_xcone33hadjets(ctx.declare_event_output<std::vector<Jet>>(name_had)),
   h_xcone33lepjets(ctx.declare_event_output<std::vector<Jet>>(name_lep)),
-  h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")) {}
+  h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")){}
 
 bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
@@ -112,7 +125,7 @@ bool CombineXCone33::process(uhh2::Event & event){
   std::vector<Jet> subjets_lep = fatlepjet.subjets();
   std::vector<Jet> subjets_had = fathadjet.subjets();
   Jet lepjet = combine->AddSubjets(subjets_lep, 0);
-  Jet hadjet = combine->AddSubjets(subjets_had, 0);
+  Jet hadjet = combine->AddSubjets(subjets_had, 30);
   vector<Jet> hadjets;
   vector<Jet> lepjets;
   hadjets.push_back(hadjet);
@@ -162,7 +175,7 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
   Particle lepjet = combine->AddSubjets_gen(subjets_lep, 0);
-  Particle hadjet = combine->AddSubjets_gen(subjets_had, 0);
+  Particle hadjet = combine->AddSubjets_gen(subjets_had, 30);
   vector<Particle> hadjets;
   vector<Particle> lepjets;
   hadjets.push_back(hadjet);
@@ -214,7 +227,7 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
   Particle lepjet = combine->AddSubjets_gen(subjets_lep, 0);
-  Particle hadjet = combine->AddSubjets_gen(subjets_had, 0);
+  Particle hadjet = combine->AddSubjets_gen(subjets_had, 30);
   vector<Particle> hadjets;
   vector<Particle> lepjets;
   hadjets.push_back(hadjet);

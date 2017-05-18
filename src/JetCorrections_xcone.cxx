@@ -133,4 +133,3 @@ bool JER_Smearer::process(uhh2::Event& evt){
 
   return true;
 }
-

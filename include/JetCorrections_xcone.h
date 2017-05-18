@@ -10,6 +10,8 @@
 using namespace uhh2;
 using namespace std;
 
+
+
 std::vector<TopJet> set_JEC_factor(std::vector<TopJet> jets);
 
 class JetCorrections_xcone : public uhh2::AnalysisModule {
@@ -50,5 +52,3 @@ class JER_Smearer : public uhh2::AnalysisModule {
   int direction = 0; // -1 = down, +1 = up, 0 = nominal
   JERSmearing::SFtype1 JER_SFs_;
 };
-
-

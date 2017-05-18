@@ -28,6 +28,8 @@ protected:
     TH1F *DeltaRDiff;
     TH1F *number_hadjet, *number_lepjet;
     TH1F *FatJetPTDiff_had, *FatJetMassDiff_had, *FatJetPTDiff_lep, *FatJetMassDiff_lep;
+    TH1F *RhoA, *RhoA_fat, *RhoA_diff, *E_diff;
+
     uhh2::Event::Handle<std::vector<Jet>>h_hadjets;
     uhh2::Event::Handle<std::vector<Jet>>h_lepjets;
     uhh2::Event::Handle<std::vector<TopJet>>h_fatjets;
