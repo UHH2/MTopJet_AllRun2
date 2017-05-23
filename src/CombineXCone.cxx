@@ -91,10 +91,10 @@ Particle CombineXCone::AddSubjets_gen(vector<Particle> subjets, double ptmin){
 
 
 // Get final Jets from 3+3 Method on Reco level
-CombineXCone33::CombineXCone33(uhh2::Context & ctx, const std::string & name_had, const std::string & name_lep):
+CombineXCone33::CombineXCone33(uhh2::Context & ctx, const std::string & name_had, const std::string & name_lep, const std::string & name_fat):
   h_xcone33hadjets(ctx.declare_event_output<std::vector<Jet>>(name_had)),
   h_xcone33lepjets(ctx.declare_event_output<std::vector<Jet>>(name_lep)),
-  h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")){}
+  h_fatjets(ctx.get_handle<std::vector<TopJet>>(name_fat)){}
 
 bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
   Particle lepjet = combine->AddSubjets_gen(subjets_lep, 0);
-  Particle hadjet = combine->AddSubjets_gen(subjets_had, 30);
+  Particle hadjet = combine->AddSubjets_gen(subjets_had, 0);
   vector<Particle> hadjets;
   vector<Particle> lepjets;
   hadjets.push_back(hadjet);
@@ -227,7 +227,7 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
   Particle lepjet = combine->AddSubjets_gen(subjets_lep, 0);
-  Particle hadjet = combine->AddSubjets_gen(subjets_had, 30);
+  Particle hadjet = combine->AddSubjets_gen(subjets_had, 0);
   vector<Particle> hadjets;
   vector<Particle> lepjets;
   hadjets.push_back(hadjet);

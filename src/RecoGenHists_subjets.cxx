@@ -1,7 +1,7 @@
 #include "UHH2/MTopJet/include/RecoGenHists_subjets.h"
 
 
-RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::string & dirname, bool use_JEC): Hists(ctx, dirname){
+RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::string & dirname,  const std::string & type): Hists(ctx, dirname){
   // book all histograms here
   MassReso = book<TH1F>("MassResolution", "(M^{rec}_{jet} - M^{gen}_{jet}) / M^{gen}_{jet}) ", 90, -1.5, 1.5);
   PtReso = book<TH1F>("PtResolution", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
@@ -28,9 +28,18 @@ RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::strin
   WMassReso = book<TH1F>("WMassResolution", "(M^{rec}_{W} - M^{gen}_{W}) / M^{gen}_{W}) ", 90, -1.5, 1.5);
 
   // handle for clustered jets
-  if(use_JEC) h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
-  else h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
-
+ if(type == "jec"){
+    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
+    h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  }
+  else if(type == "raw"){
+    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
+    h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  }
+  else if(type == "cor"){
+    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
+    h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected");
+  }
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
 }
@@ -46,15 +55,19 @@ void RecoGenHists_subjets::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   // define all objects needed
   std::vector<TopJet> rec = event.get(h_recjets);
+  std::vector<Jet> had = event.get(h_hadjets);
   std::vector<GenTopJet> gen = event.get(h_genjets);
   std::vector<Jet> rec_sub;
   std::vector<Particle> gen_sub;
 
-  for(unsigned int i=0; i<rec.size(); i++){
-    for(unsigned int j=0; j<rec.at(i).subjets().size(); j++){
-      rec_sub.push_back(rec.at(i).subjets().at(j));
-    }
+  // only look in had subjets, to not correct for lepton
+  int had_nr = 0;
+  if(deltaR(had.at(0), rec.at(0)) > deltaR(had.at(0), rec.at(1))) had_nr = 1;
+
+  for(unsigned int j=0; j<rec.at(had_nr).subjets().size(); j++){
+    rec_sub.push_back(rec.at(had_nr).subjets().at(j));
   }
+  // get all subjets on gen level
   for(unsigned int i=0; i<gen.size(); i++){
     for(unsigned int j=0; j<gen.at(i).subjets().size(); j++){
       gen_sub.push_back(gen.at(i).subjets().at(j));

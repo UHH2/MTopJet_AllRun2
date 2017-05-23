@@ -102,6 +102,7 @@ void CorrectionHists_subjets::fill(const Event & event){
   double gen_pt;
   double gen_eta;
   double rec_pt;
+  double rec_eta;
   double R;
   int pt_bin = 100;
   int eta_bin = 100;
@@ -119,31 +120,32 @@ void CorrectionHists_subjets::fill(const Event & event){
     gen_pt=gen_sub.at(nearest_j).v4().Pt();
     gen_eta=gen_sub.at(nearest_j).v4().Eta();
     rec_pt=rec_sub.at(i).v4().Pt();
-    R = (rec_pt - gen_pt)/gen_pt;
+    rec_eta=rec_sub.at(i).v4().Eta();
+    R = rec_pt/gen_pt;
     if(nearest_j != 100 && dR <= 0.2){
       // bins in pt_gen
-      if(gen_pt <= 80) pt_bin = 0;
-      if(gen_pt > 80 && gen_pt <= 130) pt_bin = 1;
-      if(gen_pt > 130 && gen_pt <= 180) pt_bin = 2; 
-      if(gen_pt > 180 && gen_pt <= 250) pt_bin = 3;
-      if(gen_pt > 250 && gen_pt <= 350) pt_bin = 4;
-      if(gen_pt > 350) pt_bin = 5;
+      if(rec_pt <= 80) pt_bin = 0;
+      if(rec_pt > 80 && rec_pt <= 130) pt_bin = 1;
+      if(rec_pt > 130 && rec_pt <= 180) pt_bin = 2; 
+      if(rec_pt > 180 && rec_pt <= 250) pt_bin = 3;
+      if(rec_pt > 250 && rec_pt <= 350) pt_bin = 4;
+      if(rec_pt > 350) pt_bin = 5;
       // bins in eta_gen
-      if(gen_eta <= -1.5) eta_bin = 0;
-      if(gen_eta > -1.5 && gen_eta <= -1.0) eta_bin = 1;
-      if(gen_eta > -1.0 && gen_eta <= -0.7) eta_bin = 2; 
-      if(gen_eta > -0.7 && gen_eta <= -0.4) eta_bin = 3;
-      if(gen_eta > -0.4 && gen_eta <= -0.2) eta_bin = 4;
-      if(gen_eta > -0.2 && gen_eta <= -0.0) eta_bin = 5;
-      if(gen_eta > 0.0 && gen_eta <= 0.2) eta_bin = 6;
-      if(gen_eta > 0.2 && gen_eta <= 0.4) eta_bin = 7;
-      if(gen_eta > 0.4 && gen_eta <= 0.7) eta_bin = 8;
-      if(gen_eta > 0.7 && gen_eta <= 1.0) eta_bin = 9;
-      if(gen_eta > 1.0 && gen_eta <= 1.5) eta_bin = 10;
-      if(gen_eta > 1.5) eta_bin = 11;
+      if(rec_eta <= -1.5) eta_bin = 0;
+      if(rec_eta > -1.5 && rec_eta <= -1.0) eta_bin = 1;
+      if(rec_eta > -1.0 && rec_eta <= -0.7) eta_bin = 2; 
+      if(rec_eta > -0.7 && rec_eta <= -0.4) eta_bin = 3;
+      if(rec_eta > -0.4 && rec_eta <= -0.2) eta_bin = 4;
+      if(rec_eta > -0.2 && rec_eta <= -0.0) eta_bin = 5;
+      if(rec_eta > 0.0 && rec_eta <= 0.2) eta_bin = 6;
+      if(rec_eta > 0.2 && rec_eta <= 0.4) eta_bin = 7;
+      if(rec_eta > 0.4 && rec_eta <= 0.7) eta_bin = 8;
+      if(rec_eta > 0.7 && rec_eta <= 1.0) eta_bin = 9;
+      if(rec_eta > 1.0 && rec_eta <= 1.5) eta_bin = 10;
+      if(rec_eta > 1.5) eta_bin = 11;
       if(pt_bin != 100 && eta_bin != 100){
 	pt_reso[pt_bin][eta_bin]->Fill(R, weight);
-	pt_eta[pt_bin][eta_bin]->Fill(gen_pt, gen_eta, weight);
+	pt_eta[pt_bin][eta_bin]->Fill(rec_pt, rec_eta, weight);
 	event_count[pt_bin][eta_bin]->Fill(1, weight);
 
       }

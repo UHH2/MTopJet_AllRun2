@@ -1,7 +1,7 @@
 #include "UHH2/MTopJet/include/RecoHists_xcone.h"
 
 
-RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname,  bool use_JEC): Hists(ctx, dirname){
+RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
 
   HadJetMass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
@@ -36,15 +36,20 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
   // handle for clustered jets
-  if(use_JEC){
+  if(type == "jec"){
     h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
     h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
     h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
   }
-  else{
+  else if(type == "raw"){
     h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
     h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_noJEC");
     h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  }
+  else if(type == "cor"){
+    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
+    h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_Corrected");
+    h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected");
   }
 }
 

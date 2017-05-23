@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
-  <!ENTITY NEVT "20000">
+  <!ENTITY NEVT "-1">
 
   <!ENTITY channel "muon">
 
@@ -74,7 +74,7 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="400000" LastBreak="0" FileSplit="0"/>
+   <ConfigParse NEventsBreak="200000" LastBreak="0" FileSplit="0"/>
    <ConfigSGE RAM="2" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/SelMu_workdir"/>
 -->
 
@@ -91,8 +91,9 @@
 
     <!-- ********DATA**************************************** -->
 
-    <InputData Version="SingleMuonBv3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&SingleMuonBv3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <!-- <InputData Version="SingleMuonBv3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- <In FileName="&SingleMuonBv3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
     <!-- <InputData Version="SingleMuonC" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&SingleMuonC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
     <!-- <InputData Version="SingleMuonD" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
@@ -105,6 +106,7 @@
     <!-- <In FileName="&SingleMuonG;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
     <!-- <InputData Version="SingleMuonH" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&SingleMuonH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
 
     <!-- ********SingleTop**************************************** -->
 
@@ -125,15 +127,15 @@
 
     <!-- ********DiBoson**************************************** -->
 
-    <!-- <InputData Version="WW" Lumi="8374.195" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WW;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+    <InputData Version="WW" Lumi="8374.195" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&WW;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <!-- <InputData Version="WZ" Lumi="21005.792" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&WZ;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
     <!-- <InputData Version="ZZ" Lumi="60107.365" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&ZZ;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
     <!-- ********TTbar**************************************** -->
-  
+
     <!-- <InputData Version="TTbar_Mtt0000to0700" Lumi="92847.91" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&TTbar_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
@@ -142,6 +144,7 @@
 
     <!-- <InputData Version="TTbar_Mtt1000toInft" Lumi="1189652.930" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&TTbar_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
     <!-- ********W+Jets**************************************** -->
 
     <!-- <InputData Version="WJetsToLNu_HT0100to0200" Lumi="48629.563" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
@@ -241,6 +244,8 @@
 
     <!-- <InputData Version="QCD_Pt-1000toInft_MuEnrichedPt5" Lumi="2452373.716" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- <In FileName="&QCD_Pt-1000toInft_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+
 <!-- ================================================================================================================================== -->
 <!-- ====================================================== User Config =============================================================== -->
 <!-- ================================================================================================================================== -->
@@ -272,7 +277,7 @@
       <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" />
       <Item Name="channel" Value="&channel;"/>
 
-      <!-- <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/" /> -->
+      <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
       <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" /> 
       <Item Name="BTag_variation" Value="central" />
       <Item Name="AnalysisModule" Value="MTopJetSelectionModule"/>

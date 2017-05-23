@@ -32,6 +32,7 @@
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
+#include "UHH2/MTopJet/include/CorrectionFactor.h"
 
 
 /*
@@ -53,7 +54,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   enum lepton { muon, elec };
   lepton channel_;
 
-  // cleaners
+  // cleaners & Correctors
   std::unique_ptr<CommonModules> common;
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
@@ -62,11 +63,12 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<JetCleaner> jet_cleaner1;
   std::unique_ptr<JetCleaner> jet_cleaner2;
   std::unique_ptr<JetCorrections_xcone> JetCorrections;
-
+  std::unique_ptr<uhh2::AnalysisModule> Correction;
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
   std::unique_ptr<uhh2::AnalysisModule> copy_jet;
@@ -127,8 +129,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   }
 
   // combine XCone
-  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined")); 
-  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC")); 
+  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "XConeTopJets")); 
+  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "XConeTopJets" )); 
+  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "XConeTopJets_Corrected")); 
   copy_jet.reset(new CopyJets(ctx, "XConeTopJets", "XConeTopJets_noJEC")); 
 
   if(isMC){
@@ -144,9 +147,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // just for testing
   ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
 
-  // correct subjets
+  // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
   JetCorrections->init(ctx, "XConeTopJets");
+  Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected"));
 
   //// EVENT SELECTION
 
@@ -453,6 +457,8 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   copy_jet->process(event);
   JetCorrections->process(event);
   jetprod_reco->process(event);
+  Correction->process(event);
+  jetprod_reco_corrected->process(event);
   if(!event.isRealData){
     jetprod_gen23->process(event);
     jetprod_gen33->process(event);

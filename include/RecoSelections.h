@@ -29,6 +29,16 @@
 
 namespace uhh2 {
 
+ class NJetXCone : public Selection { 
+
+  public: 
+    explicit NJetXCone(Context&, const std::string &, int);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    int njet_;
+  };
 
  class LeadingRecoJetPT : public Selection { 
 

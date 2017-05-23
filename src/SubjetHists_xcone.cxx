@@ -1,9 +1,10 @@
 #include "UHH2/MTopJet/include/SubjetHists_xcone.h"
 
 
-SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, bool use_JEC): Hists(ctx, dirname){
+SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
-  pt_had_subjets = book<TH1F>("pt_had_subjets", "p_{T}^{had subjets}", 100, 0, 500);
+  pt_had_subjets = book<TH1F>("pt_had_subjets", "p_{T}^{had subjets}", 50, 0, 500);
+  pt_had_subjets_fine = book<TH1F>("pt_had_subjets_fine", "p_{T}^{had subjets}", 100, 0, 500);
   eta_had_subjets = book<TH1F>("eta_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 5);
   area_had1_subjet = book<TH1F>("area_had1_subjet", "jet area (had subjet 1)", 100, 0, 5);
@@ -46,8 +47,9 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   JEC_L2L3_ak4 = book<TH1F>("JEC_L2L3_ak4", "JEC factor L2L3", 100, 0, 2);
 
   // handle for jets
-  if(use_JEC) h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
-  else h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  if(type == "raw") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  else if(type == "jec") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  else if(type == "cor") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected");
 }
 
 
@@ -176,6 +178,7 @@ void SubjetHists_xcone::fill(const Event & event){
   double tot_area=0;
   for(unsigned int i=0; i<had_subjets.size(); i++){
     pt_had_subjets->Fill(had_subjets.at(i).pt(), weight);
+    pt_had_subjets_fine->Fill(had_subjets.at(i).pt(), weight);
     eta_had_subjets->Fill(had_subjets.at(i).eta(), weight);
     area_had_subjets->Fill(had_subjets.at(i).jetArea(), weight);
     pt_all_subjets->Fill(had_subjets.at(i).pt(), weight);

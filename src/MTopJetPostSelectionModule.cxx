@@ -53,9 +53,11 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   lepton channel_;
 
   // cleaners & Correctors
-  std::unique_ptr<uhh2::AnalysisModule> Correction;
+  // std::unique_ptr<uhh2::AnalysisModule> Correction;
 
   // selections
+  std::unique_ptr<uhh2::Selection> njet_had;
+  std::unique_ptr<uhh2::Selection> njet_lep;
   std::unique_ptr<uhh2::Selection> pt_sel;
   std::unique_ptr<uhh2::Selection> pt200_sel;
   std::unique_ptr<uhh2::Selection> pt300_sel;
@@ -90,18 +92,18 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_Muon;
   std::unique_ptr<Hists> h_CorrectionHists;
   std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
-  std::unique_ptr<Hists> h_XCone, h_XCone_m, h_XCone_u, h_XCone_m_fat, h_XCone_u_fat, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
+  std::unique_ptr<Hists> h_XCone, h_XCone_corr, h_XCone_m, h_XCone_u, h_XCone_m_fat, h_XCone_u_fat, h_XCone_pt200, h_XCone_pt300, h_MTopJet, h_XCone_noMassCut;
   std::unique_ptr<Hists> h_XCone_NoSel, h_XConeNoJEC_NoSel;
-  std::unique_ptr<Hists> h_XConeNoJEC, h_XCone_subjets_noJEC, h_XConeNoJEC_noMassCut;
+  std::unique_ptr<Hists> h_XConeNoJEC, h_XCone_subjets_noJEC, h_XCone_subjets_corr, h_XConeNoJEC_noMassCut;
   std::unique_ptr<Hists> h_XCone_subjets;
   std::unique_ptr<Hists> h_XCone_lowPU_subjets, h_XCone_medPU_subjets, h_XCone_highPU_subjets, h_XCone_lowPU, h_XCone_medPU, h_XCone_highPU;
-  std::unique_ptr<Hists> h_RecGenHists_lowPU, h_RecGenHists_medPU, h_RecGenHists_highPU, h_RecGenHists_lowPU_noJEC, h_RecGenHists_medPU_noJEC, h_RecGenHists_highPU_noJEC;
+  std::unique_ptr<Hists> h_RecGenHists_lowPU, h_RecGenHists_medPU, h_RecGenHists_highPU, h_RecGenHists_lowPU_noJEC, h_RecGenHists_medPU_noJEC, h_RecGenHists_highPU_noJEC, h_RecGenHists_RecOnly_corr;
   std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_GenOnly, h_XCone_GEN_Both;
   std::unique_ptr<Hists> h_RecGenHists_GenOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly_noJEC;
   std::unique_ptr<Hists> h_RecGenHists_Both;
-  std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC;
+  std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC, h_RecGenHists_subjets_corrected;
   std::unique_ptr<Hists> h_GenParticles_RecOnly, h_GenParticles_GenOnly, h_GenParticles_Both;
 
   bool isMC; //define here to use it in "process" part
@@ -147,13 +149,19 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
 
   /*************************** Setup Subjet Corrector **********************************************************************************/ 
-  Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected"));
+  // Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected"));
   /*************************** Setup Selections **********************************************************************************/ 
   // RECO Selection
-  pt_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined_noJEC", 400));
-  pt300_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined_noJEC", 300));
-  pt200_sel.reset(new LeadingRecoJetPT(ctx, "XCone33_had_Combined_noJEC", 200));
-  mass_sel.reset(new MassCutXCone(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC"));
+  // chose: XCone33_had_Combined_Corrected,  XCone33_had_Combined_noJEC,  XCone33_had_Combined
+  const std::string& jet_label_had = "XCone33_had_Combined_Corrected";
+  const std::string& jet_label_lep = "XCone33_lep_Combined_Corrected";
+
+  njet_had.reset(new NJetXCone(ctx, jet_label_had, 1));
+  njet_lep.reset(new NJetXCone(ctx, jet_label_lep, 1));
+  pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
+  pt300_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 300));
+  pt200_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 200));
+  mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
   // GEN Selection
   pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
@@ -165,29 +173,32 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isTTbar) matched_sub.reset(new Matching_XCone33(ctx, true));
   if(isTTbar) matched_fat.reset(new Matching_XCone33(ctx, false));
 
-  /*************************** Set up Hists classes **********************************************************************************/ 
+  /*************************** Set up Hists classes **********************************************************************************/
+
   // "true" for XCone Hists means to use jets with JEC applied
-  h_XCone.reset(new RecoHists_xcone(ctx, "XCone", true));
-  h_XCone_NoSel.reset(new RecoHists_xcone(ctx, "XCone_NoSel", true));
-  h_XCone_lowPU.reset(new RecoHists_xcone(ctx, "XCone_lowPU", true));
-  h_XCone_medPU.reset(new RecoHists_xcone(ctx, "XCone_medPU", true));
-  h_XCone_highPU.reset(new RecoHists_xcone(ctx, "XCone_highPU", true));
-  h_XConeNoJEC.reset(new RecoHists_xcone(ctx, "XConeNoJEC", false));
-  h_XConeNoJEC_NoSel.reset(new RecoHists_xcone(ctx, "XConeNoJEC_NoSel", false));
-  h_XCone_subjets.reset(new SubjetHists_xcone(ctx, "XCone_subjets", true));
-  h_XCone_subjets_noJEC.reset(new SubjetHists_xcone(ctx, "XCone_subjets_noJEC", false));
-  h_XCone_lowPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_lowPU_subjets", true));
-  h_XCone_medPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_medPU_subjets", true));
-  h_XCone_highPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_highPU_subjets", true));
-  if(isTTbar) h_XCone_m.reset(new RecoHists_xcone(ctx, "XCone_matched", true));
-  if(isTTbar) h_XCone_u.reset(new RecoHists_xcone(ctx, "XCone_unmatched", true));
-  if(isTTbar) h_XCone_m_fat.reset(new RecoHists_xcone(ctx, "XCone_matched_fat", true));
-  if(isTTbar) h_XCone_u_fat.reset(new RecoHists_xcone(ctx, "XCone_unmatched_fat", true));
-  h_XCone_pt200.reset(new RecoHists_xcone(ctx, "XCone_pt200", true));
-  h_XCone_pt300.reset(new RecoHists_xcone(ctx, "XCone_pt300", true));
+  h_XCone.reset(new RecoHists_xcone(ctx, "XCone", "jec"));
+  h_XCone_corr.reset(new RecoHists_xcone(ctx, "XCone_corrected", "cor"));
+  h_XCone_NoSel.reset(new RecoHists_xcone(ctx, "XCone_NoSel", "jec"));
+  h_XCone_lowPU.reset(new RecoHists_xcone(ctx, "XCone_lowPU", "jec"));
+  h_XCone_medPU.reset(new RecoHists_xcone(ctx, "XCone_medPU", "jec"));
+  h_XCone_highPU.reset(new RecoHists_xcone(ctx, "XCone_highPU", "jec"));
+  h_XConeNoJEC.reset(new RecoHists_xcone(ctx, "XConeNoJEC", "raw"));
+  h_XConeNoJEC_NoSel.reset(new RecoHists_xcone(ctx, "XConeNoJEC_NoSel", "raw"));
+  h_XCone_subjets.reset(new SubjetHists_xcone(ctx, "XCone_subjets", "jec"));
+  h_XCone_subjets_noJEC.reset(new SubjetHists_xcone(ctx, "XCone_subjets_noJEC", "raw"));
+  h_XCone_subjets_corr.reset(new SubjetHists_xcone(ctx, "XCone_subjets_corrected", "cor"));
+  h_XCone_lowPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_lowPU_subjets", "jec"));
+  h_XCone_medPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_medPU_subjets", "jec"));
+  h_XCone_highPU_subjets.reset(new SubjetHists_xcone(ctx, "XCone_highPU_subjets", "jec"));
+  if(isTTbar) h_XCone_m.reset(new RecoHists_xcone(ctx, "XCone_matched", "jec"));
+  if(isTTbar) h_XCone_u.reset(new RecoHists_xcone(ctx, "XCone_unmatched", "jec"));
+  if(isTTbar) h_XCone_m_fat.reset(new RecoHists_xcone(ctx, "XCone_matched_fat", "jec"));
+  if(isTTbar) h_XCone_u_fat.reset(new RecoHists_xcone(ctx, "XCone_unmatched_fat", "jec"));
+  h_XCone_pt200.reset(new RecoHists_xcone(ctx, "XCone_pt200", "jec"));
+  h_XCone_pt300.reset(new RecoHists_xcone(ctx, "XCone_pt300", "jec"));
   h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
-  h_XCone_noMassCut.reset(new RecoHists_xcone(ctx, "XCone_noMassCut", true));
-  h_XConeNoJEC_noMassCut.reset(new RecoHists_xcone(ctx, "XConeNoJEC_noMassCut", false));
+  h_XCone_noMassCut.reset(new RecoHists_xcone(ctx, "XCone_noMassCut", "jec"));
+  h_XConeNoJEC_noMassCut.reset(new RecoHists_xcone(ctx, "XConeNoJEC_noMassCut", "raw"));
   h_Muon.reset(new MuonHists(ctx, "Muon"));
 
   if(isMC){
@@ -201,30 +212,36 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
     h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
 
-    h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", true));
-    h_RecGenHists_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC", false));
+    h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", "jec"));
+    h_RecGenHists_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC", "raw"));
+    h_RecGenHists_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_corrected", "cor"));
 
     h_RecGenHists_ak4.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4", true));
     h_RecGenHists_ak4_noJEC.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4_noJEC", false));
 
-    h_RecGenHists_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU", true));
-    h_RecGenHists_medPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU", true));
-    h_RecGenHists_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU", true));
-    h_RecGenHists_lowPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU_noJEC", false));
-    h_RecGenHists_medPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU_noJEC", false));
-    h_RecGenHists_highPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU_noJEC", false));
+    h_RecGenHists_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU", "jec"));
+    h_RecGenHists_medPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU", "jec"));
+    h_RecGenHists_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU", "jec"));
+    h_RecGenHists_lowPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU_noJEC", "raw"));
+    h_RecGenHists_medPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU_noJEC", "raw"));
+    h_RecGenHists_highPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU_noJEC", "raw"));
 
     // "true" for RecGenHists means to use jets with JEC applied
-    h_RecGenHists_GenOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly", true));
-    h_RecGenHists_RecOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly", true));
-    h_RecGenHists_RecOnly_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC", false));
-    h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", true));
+    h_RecGenHists_GenOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly", "jec"));
+    h_RecGenHists_RecOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly", "jec"));
+    h_RecGenHists_RecOnly_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC", "raw"));
+    h_RecGenHists_RecOnly_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_corrected", "cor"));
+    h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", "jec"));
   }
   /*********************************************************************************************************************************/ 
 
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
+
+  // first check if event has one had and one lep jet
+  if( !(njet_had->passes(event)) ) return false;
+  if( !(njet_lep->passes(event)) ) return false;
 
   /***************************  some options ***************************************************************************************************************/ 
   bool scale_ttbar = true;
@@ -258,7 +275,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else event.weight = event.get(h_weight);
 
   /***************************  SubJet Corrector *****************************************************************************************************/ 
-  Correction->process(event);
+  // Correction->process(event);
   /*************************** test with lower pt cut ********************************************************************************************/ 
   if(pt200_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt200->fill(event);
   if(pt300_sel->passes(event) && mass_sel->passes(event)) h_XCone_pt300->fill(event);
@@ -276,6 +293,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isMC && mass_gensel23->passes(event) && pt_gensel23->passes(event) ) passed_gensel23 = true;
   else passed_gensel23 = false;
  
+
   /*************************** fill hists with no sel applied ***********************************************************************************/ 
   h_XCone_NoSel->fill(event);
   h_XConeNoJEC_NoSel->fill(event);
@@ -289,8 +307,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_recsel){
     h_XCone_subjets->fill(event);
     h_XCone_subjets_noJEC->fill(event);
-
+    h_XCone_subjets_corr->fill(event);
     h_XCone->fill(event);
+    h_XCone_corr->fill(event);
     if(event.pvs->size() <= 10){
       h_XCone_lowPU_subjets->fill(event);
       h_XCone_lowPU->fill(event);
@@ -321,19 +340,26 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       else h_XCone_u_fat->fill(event);
     }
     if(isMC){
+      cout << "gen hists" << endl;
       h_XCone_GEN_RecOnly->fill(event);
       if(isTTbar) h_GenParticles_RecOnly->fill(event);
+      cout << "rec gen hists" << endl;
       h_RecGenHists_RecOnly->fill(event);
       h_RecGenHists_RecOnly_noJEC->fill(event);
+      h_RecGenHists_RecOnly_corr->fill(event);
+      cout << "subjets hists" << endl;
       h_RecGenHists_subjets->fill(event);
       h_RecGenHists_subjets_noJEC->fill(event);
+      h_RecGenHists_subjets_corrected->fill(event);
       if(isTTbar) h_CorrectionHists->fill(event);
+      cout << "ak4 hists" << endl;
       h_RecGenHists_ak4->fill(event);
       h_RecGenHists_ak4_noJEC->fill(event);
     }
   }
 
   /*************************** fill hists with gen sel applied *************************************************************************************/ 
+  cout << "gen hists" << endl;
   if(passed_gensel33){
     h_XCone_GEN_GenOnly->fill(event);
     if(isTTbar) h_GenParticles_GenOnly->fill(event);

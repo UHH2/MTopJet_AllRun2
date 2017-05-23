@@ -14,14 +14,14 @@ using namespace uhh2;
 class SubjetHists_xcone: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
-  SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, bool);
+  SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type);
     
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
 
 
-    TH1F *pt_had_subjets, *pt_lep_subjets;
+    TH1F *pt_had_subjets, *pt_had_subjets_fine, *pt_lep_subjets;
     TH1F *eta_had_subjets, *eta_lep_subjets;
     TH1F *area_had_subjets, *area_had1_subjet, *area_had2_subjet, *area_had3_subjet;
     TH1F *area_lep_subjets, *area_lep1_subjet, *area_lep2_subjet, *area_lep3_subjet;

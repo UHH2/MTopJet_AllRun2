@@ -143,27 +143,6 @@
     <In FileName="&TTbar_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <!-- ********W+Jets**************************************** -->
 
-    <!-- <InputData Version="WJetsToLNu_HT0100to0200" Lumi="48629.563" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
-    <!-- <InputData Version="WJetsToLNu_HT0200to0400" Lumi="90848.565" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT0200to0400;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
-    <!-- <InputData Version="WJetsToLNu_HT0400to0600" Lumi="131111.115" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT0400to0600;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
-    <!--  <InputData Version="WJetsToLNu_HT0600to0800" Lumi="1254954.425" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT0600to0800;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
-    <!-- <InputData Version="WJetsToLNu_HT0800to1200" Lumi="1163509.114" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT0800to1200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
-    <!-- <InputData Version="WJetsToLNu_HT1200to2500" Lumi="4059973.633" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT1200to2500;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
-    <!-- <InputData Version="WJetsToLNu_HT2500toInft" Lumi="67214110.234" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&WJetsToLNu_HT2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
     <InputData Version="WJetsToLNu_Pt0100to0250" Lumi="261411503.121" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&WJetsToLNu_Pt0100to0250;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
@@ -256,7 +235,7 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="weight XConeTopJets XConeTopJets_noJEC genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined"/>
+	<Item Name="additionalBranches" Value="weight XConeTopJets XConeTopJets_noJEC XConeTopJets_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined"/>
  
 	<Item Name="METName" Value="slimmedMETs"/>
 

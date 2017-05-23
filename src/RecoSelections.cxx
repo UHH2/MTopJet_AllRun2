@@ -1,6 +1,17 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 
 
+uhh2::NJetXCone::NJetXCone(uhh2::Context& ctx, const std::string & name, int njet):
+  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  njet_(njet) {}
+
+bool uhh2::NJetXCone::passes(const uhh2::Event& event){
+  bool pass_njet = false;
+  std::vector<Jet> jets = event.get(h_jets);
+  if(jets.size() >= njet_) pass_njet = true;
+  return pass_njet;
+}
+////////////////////////////////////////////////////////
 
 uhh2::LeadingRecoJetPT::LeadingRecoJetPT(uhh2::Context& ctx, const std::string & name, float ptcut):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),

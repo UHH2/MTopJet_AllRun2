@@ -17,7 +17,7 @@ using namespace uhh2;
 class RecoHists_xcone: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
-  RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, bool);
+  RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type);
     
     virtual void fill(const uhh2::Event & ev) override;
 

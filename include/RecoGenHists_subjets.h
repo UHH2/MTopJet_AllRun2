@@ -14,7 +14,7 @@ using namespace uhh2;
 class RecoGenHists_subjets: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
-  RecoGenHists_subjets(uhh2::Context & ctx, const std::string & dirname, bool);
+  RecoGenHists_subjets(uhh2::Context & ctx, const std::string & dirname,  const std::string & type);
     
     virtual void fill(const uhh2::Event & ev) override;
 
@@ -28,8 +28,9 @@ protected:
     TH1F *min_mass_Wjet_rec, *min_mass_Wjet_gen;
 
     uhh2::Event::Handle<std::vector<TopJet>>h_recjets;
+    uhh2::Event::Handle<std::vector<Jet>>h_hadjets;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_genjets;
- 
+
 };
 
 
