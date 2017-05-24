@@ -21,9 +21,8 @@ public:
 protected:
 
     TH1F *MassReso, *PtReso, *WMassReso;
-    TH1F *MassReso_iso, *PtReso_iso;
     TH1F *PtReso_1, *PtReso_2, *PtReso_3, *PtReso_4, *PtReso_5, *PtReso_6;
-    TH1F *PtReso_iso_1, *PtReso_iso_2, *PtReso_iso_3, *PtReso_iso_4, *PtReso_iso_5, *PtReso_iso_6;
+    TH1F *PtReso_rec1, *PtReso_rec2, *PtReso_rec3, *PtReso_rec4, *PtReso_rec5, *PtReso_rec6;
     TH1F *area_all, *area_iso;
     TH1F *min_mass_Wjet_rec, *min_mass_Wjet_gen;
 
