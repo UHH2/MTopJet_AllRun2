@@ -254,7 +254,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
   deltaPhi.reset(new DeltaPhiCut(ctx, jet_label_gen, 1.0)); 
   masscut.reset(new MassCut(ctx, jet_label_gen));
   matching.reset(new Matching(ctx, jet_label_gen, jet_radius));
-  // matching_XCone.reset(new Matching_XCone23(ctx, "xcone23_gen_subjets"));
+  matching_XCone.reset(new Matching_XCone23(ctx, "gen_xcone33subjets_1"));
  
   // GEN Top
   n_genjets_top.reset(new NGenTopJets(ctx, 200, 2, 2));  // ==2 jets with pt > 200 (topjets are produced >~ 180)
@@ -306,10 +306,10 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // cout<<event.event<<endl;
   //  COMMON MODULES
   // ================ set to true / false to run analysis =============================
-  bool do_gensel = false;
+  bool do_gensel = true;
   bool do_gensel_top = false;
   bool do_recsel = false;
-  bool do_recsel_top = true;
+  bool do_recsel_top = false;
   // ==================================================================================
   
   ttgenprod->process(event);
@@ -363,13 +363,13 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   h_GenHists1->fill(event);
   h_GenHists1_top->fill(event);
   // apply matching
-  if(do_gensel  && matching->passes(event)){
+  if(do_gensel  && matching_XCone->passes(event)){
     h_GenHists1_m->fill(event);
   }
   if(do_gensel_top  && matching_top->passes(event)){
     h_GenHists1_m_top->fill(event);
   }
-  if(do_gensel  && !(matching->passes(event))){
+  if(do_gensel  && !(matching_XCone->passes(event))){
     h_GenHists1_u->fill(event);
   }
   if(do_gensel_top  && !(matching_top->passes(event))){
@@ -377,20 +377,19 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   }
   // ===================================================================================
 
-
   // ================ pT cut on leading Jet ============================================
   if(do_gensel  && !(topjetpt->passes(event))) return false;
   if(do_gensel_top  && !(topjetpt_top->passes(event))) return false;
   h_GenHists2->fill(event);
   h_GenHists2_top->fill(event);
   // apply matching
-  if(do_gensel  && matching->passes(event)){
+  if(do_gensel  && matching_XCone->passes(event)){
     h_GenHists2_m->fill(event);
   }
   if(do_gensel_top  && matching_top->passes(event)){
     h_GenHists2_m_top->fill(event);
   }
-  if(do_gensel  && !(matching->passes(event))){
+  if(do_gensel  && !(matching_XCone->passes(event))){
     h_GenHists2_u->fill(event);
   }
   if(do_gensel_top  && !(matching_top->passes(event))){
@@ -406,13 +405,13 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   h_GenHists3->fill(event);
   h_GenHists3_top->fill(event);
   // apply matching
-  if(do_gensel  && matching->passes(event)){
+  if(do_gensel  && matching_XCone->passes(event)){
     h_GenHists3_m->fill(event);
   }
   if(do_gensel_top  && matching_top->passes(event)){
     h_GenHists3_m_top->fill(event);
   }
-  if(do_gensel  && !(matching->passes(event))){
+  if(do_gensel  && !(matching_XCone->passes(event))){
     h_GenHists3_u->fill(event);
   }
   if(do_gensel_top  && !(matching_top->passes(event))){
@@ -423,7 +422,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
 
   // ===================================================================================
 
- 
+
   // ================ m(1st jet) > m(2nd jet + lepton)================================== 
   if(do_gensel  && !(masscut->passes(event))) return false;
   if(do_gensel_top  && !(masscut_top->passes(event))) return false;
@@ -432,13 +431,13 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // h_GenHists4_xconeN5->fill(event);
 
   // apply matching
-  if(do_gensel  && matching->passes(event)){
+  if(do_gensel  && matching_XCone->passes(event)){
     h_GenHists4_m->fill(event);
   }
   if(do_gensel_top  && matching_top->passes(event)){
     h_GenHists4_m_top->fill(event);
   }
-  if(do_gensel  && !(matching->passes(event))){
+  if(do_gensel  && !(matching_XCone->passes(event))){
     h_GenHists4_u->fill(event);
   }
   if(do_gensel_top  && !(matching_top->passes(event))){
@@ -482,6 +481,7 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
     const bool pass_lep1 = (((event.muons->size() == 1)&&(event.electrons->size() == 0)) ||((event.muons->size() == 0)&&(event.electrons->size() == 1)));
     if(!pass_lep1) return false;
   }
+
 
   h_RecHists0c->fill(event);
   h_RecHists0c_top->fill(event);
@@ -527,33 +527,33 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   // if(do_recsel && !(pass_twodcut)) return false;
   // }
   
-  h_RecHists0d->fill(event);
-  h_RecHists0d_top->fill(event);
+  // h_RecHists0d->fill(event);
+  // h_RecHists0d_top->fill(event);
 
 
-  // ==2 Jets with pT > 150
-  if(do_recsel && !(n_recjets->passes(event))) return false;
-  if(do_recsel_top && !(n_recjets_top->passes(event))) return false;
-  h_RecHists1->fill(event);
-  h_RecHists1_top->fill(event);
+  // // ==2 Jets with pT > 150
+  // if(do_recsel && !(n_recjets->passes(event))) return false;
+  // if(do_recsel_top && !(n_recjets_top->passes(event))) return false;
+  // h_RecHists1->fill(event);
+  // h_RecHists1_top->fill(event);
 
-  // pT cut on leading Jet
-  if(do_recsel && !(topjetpt_rec->passes(event))) return false;
-  if(do_recsel_top && !(topjetpt_rec_top->passes(event))) return false;
-  h_RecHists2->fill(event);
-  h_RecHists2_top->fill(event);
+  // // pT cut on leading Jet
+  // if(do_recsel && !(topjetpt_rec->passes(event))) return false;
+  // if(do_recsel_top && !(topjetpt_rec_top->passes(event))) return false;
+  // h_RecHists2->fill(event);
+  // h_RecHists2_top->fill(event);
 
-  // deltaR(lepton, 2nd jet) < jet radius
-  // if(do_recsel && !(deltaR_rec->passes(event))) return false;
-  if(do_recsel_top && !(deltaR_rec_top->passes(event))) return false;
-  h_RecHists3->fill(event);
-  h_RecHists3_top->fill(event);
+  // // deltaR(lepton, 2nd jet) < jet radius
+  // // if(do_recsel && !(deltaR_rec->passes(event))) return false;
+  // if(do_recsel_top && !(deltaR_rec_top->passes(event))) return false;
+  // h_RecHists3->fill(event);
+  // h_RecHists3_top->fill(event);
 
-  // m(1st jet) > m(2nd jet + lepton)
-  if(do_recsel && !(masscut_rec->passes(event))) return false;
-  if(do_recsel_top && !(masscut_rec_top->passes(event))) return false;
-  h_RecHists4->fill(event);
-  h_RecHists4_top->fill(event);
+  // // m(1st jet) > m(2nd jet + lepton)
+  // if(do_recsel && !(masscut_rec->passes(event))) return false;
+  // if(do_recsel_top && !(masscut_rec_top->passes(event))) return false;
+  // h_RecHists4->fill(event);
+  // h_RecHists4_top->fill(event);
   // ---------------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------------
 

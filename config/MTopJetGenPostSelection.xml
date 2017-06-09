@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
-<!ENTITY NEVT "100">
+<!ENTITY NEVT "-1">
 
   <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
   <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/GenPost"> 

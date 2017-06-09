@@ -28,6 +28,8 @@ protected:
     TH1F *PtReso_mass1, *PtReso_mass2, *PtReso_mass3, *PtReso_mass4, *PtReso_mass5, *PtReso_mass6;
     TH1F *MassReso_pt1, *MassReso_pt2, *MassReso_pt3, *MassReso_pt4, *MassReso_pt5, *MassReso_pt6;
     TH1F *PtReso_pt1, *PtReso_pt2, *PtReso_pt3, *PtReso_pt4, *PtReso_pt5, *PtReso_pt6;
+    TH1F *PtReso_pt1_rec, *PtReso_pt2_rec, *PtReso_pt3_rec, *PtReso_pt4_rec, *PtReso_pt5_rec, *PtReso_pt6_rec;
+    TH1F *MassReso_pt1_rec, *MassReso_pt2_rec, *MassReso_pt3_rec, *MassReso_pt4_rec, *MassReso_pt5_rec, *MassReso_pt6_rec;
 
     uhh2::Event::Handle<std::vector<Jet>>h_recjets_had;
     uhh2::Event::Handle<std::vector<Jet>>h_recjets_lep;
