@@ -9,9 +9,9 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   LepJetMass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
-  SoftdropMass_had = book<TH1F>("SoftdropMass_had", "M_{fat had jet}", 50, 0, 500);
-  SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "M_{fat had jet}", 50, 0, 500);
-  SoftdropMass_lep = book<TH1F>("SoftdropMass_lep", "M_{fat lep jet}", 50, 0, 500);
+  SoftdropMass_had = book<TH1F>("SoftdropMass_had", "M_{fat had jet}", 25, 0, 500);
+  SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "M_{fat had jet}", 25, 0, 500);
+  SoftdropMass_lep = book<TH1F>("SoftdropMass_lep", "M_{fat lep jet}", 25, 0, 500);
 
   HadJetPT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   LepJetPT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);

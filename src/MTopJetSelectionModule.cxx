@@ -83,6 +83,12 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> twodcut_sel;
   std::unique_ptr<uhh2::Selection> jet_sel;
 
+  Event::Handle<bool>h_gensel;
+  Event::Handle<bool>h_recsel;
+  Event::Handle<bool>h_gensel_2;
+  Event::Handle<bool>h_recsel_2;
+  Event::Handle<std::vector<TopJet>>h_fatjets;
+
   // just for testing
   std::unique_ptr<TopPtReweight> ttbar_reweight;
 
@@ -109,12 +115,23 @@ class MTopJetSelectionModule : public ModuleBASE {
 
 
   bool isMC; //define here to use it in "process" part
+  bool isTTbar; //define here to use it in "process" part
+
   string BTag_variation ="central";
 };
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || ctx.get("dataset_version") == "TTbar_Mtt1000toInft") isTTbar = true;
+  else  isTTbar = false;
+
+  if(isTTbar) h_gensel = ctx.get_handle<bool>("passed_gensel");
+  h_recsel = ctx.get_handle<bool>("passed_recsel");
+  h_gensel_2 = ctx.declare_event_output<bool>("passed_gensel_2");
+  h_recsel_2 = ctx.declare_event_output<bool>("passed_recsel_2");
+  h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+
   isMC = (ctx.get("dataset_type") == "MC");
 
   const std::string& channel = ctx.get("channel", ""); //define Channel
@@ -145,7 +162,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ////
 
   // just for testing
-  ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819));
+  // ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); // 8 TeV
+  ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
+
 
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
@@ -287,178 +306,192 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 }
 
 bool MTopJetSelectionModule::process(uhh2::Event& event){
+
+  bool passed_gensel;
+  if(isTTbar) passed_gensel = event.get(h_gensel);
+  else passed_gensel = false;
+
+  bool passed_recsel;
+  if(isTTbar) passed_recsel = event.get(h_recsel);
+  passed_recsel = true;
+
   // cout << "*******************************" << endl;
   // cout << "processing event nr. " << event.event<< endl;
 
-  h_PreSel_event->fill(event);
-  h_PreSel_elec->fill(event);
-  h_PreSel_muon->fill(event);
-  h_PreSel_jets->fill(event);
-  h_PreSel_lumi->fill(event);
+  // if(passed_recsel){
+  //   h_PreSel_event->fill(event);
+  //   h_PreSel_elec->fill(event);
+  //   h_PreSel_muon->fill(event);
+  //   h_PreSel_jets->fill(event);
+  //   h_PreSel_lumi->fill(event);
+  // }
   ////
 
   /* *********** Lepton Cleaner and Selection *********** */
-  muoSR_cleaner->process(event);
-  sort_by_pt<Muon>(*event.muons);
+  if(passed_recsel){
+    muoSR_cleaner->process(event);
+    sort_by_pt<Muon>(*event.muons);
 
-  eleSR_cleaner->process(event);
-  sort_by_pt<Electron>(*event.electrons);
-
-  const bool pass_lep1 = ((event.muons->size() > 0) || (event.electrons->size() > 0));
-  if(!pass_lep1) return false;
+    eleSR_cleaner->process(event);
+    sort_by_pt<Electron>(*event.electrons);
+    const bool pass_lep1 = ((event.muons->size() > 0) || (event.electrons->size() > 0));
+    if(!pass_lep1) passed_recsel = false;
+  }
   ////
-
 
   /* *********** Cleaner ********** */
   if(!common->process(event)) return false;
-
-  jet_cleaner1->process(event);
-  sort_by_pt<Jet>(*event.jets);
-
-  /* *********** at least 1 good primary vertex *********** */
-  if(!pv_sel->passes(event)) return false;
-
+  if(passed_recsel){
+    jet_cleaner1->process(event);
+    sort_by_pt<Jet>(*event.jets);
+  }
+   /* *********** at least 1 good primary vertex *********** */
+  if(passed_recsel){
+    if(!pv_sel->passes(event)) passed_recsel = false;
+  }
 
   /* *********** scale factor muon *********** */
   muo_tight_noniso_SF->process(event);
-
-  h_Cleaner_event->fill(event);
-  h_Cleaner_elec->fill(event);
-  h_Cleaner_muon->fill(event);
-  h_Cleaner_jets->fill(event);
-  h_Cleaner_lumi->fill(event);
-
+  if(passed_recsel){
+    h_Cleaner_event->fill(event);
+    h_Cleaner_elec->fill(event);
+    h_Cleaner_muon->fill(event);
+    h_Cleaner_jets->fill(event);
+    h_Cleaner_lumi->fill(event);
+  }
   /* *********** Trigger *********** */
   // for DATA until run 274954 -> use only Trigger A
   // for MC and DATA from 274954 -> use "A || B"
-
   if(channel_ == muon){
-    if( !isMC && event.run < 274954) {
-      if(!trigger_sel_A->passes(event)) return false;
-    }else{
-      if( !(trigger_sel_A->passes(event) || trigger_sel_B->passes(event)) ) return false;
+    if(passed_recsel){
+      if( !isMC && event.run < 274954) {
+	if(!trigger_sel_A->passes(event)) passed_recsel = false;
+      }else{
+	if( !(trigger_sel_A->passes(event) || trigger_sel_B->passes(event)) ) passed_recsel = false;
+      }
     }
-    // Trigger scale factor
     muo_trigger_SF->process(event);
   }
 
-  h_Trigger_event->fill(event);
-  h_Trigger_elec->fill(event);
-  h_Trigger_muon->fill(event);
-  h_Trigger_jets->fill(event);
-  h_Trigger_lumi->fill(event);
-
+  if(passed_recsel){
+    h_Trigger_event->fill(event);
+    h_Trigger_elec->fill(event);
+    h_Trigger_muon->fill(event);
+    h_Trigger_jets->fill(event);
+    h_Trigger_lumi->fill(event);
+  }
   /* *********** lEPTON Selection *********** */
-  const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
-  if(!pass_lepsel) return false;
-  h_Lepton_event->fill(event);
-  h_Lepton_elec->fill(event);
-  h_Lepton_muon->fill(event);
-  h_Lepton_jets->fill(event);
-  h_Lepton_lumi->fill(event);
+  if(passed_recsel){
+    const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
+    if(!pass_lepsel) passed_recsel = false;
+    h_Lepton_event->fill(event);
+    h_Lepton_elec->fill(event);
+    h_Lepton_muon->fill(event);
+    h_Lepton_jets->fill(event);
+    h_Lepton_lumi->fill(event);
+  }
   ////
 
   /* *********** Jet Selection *********** */
-  const bool pass_jetsel = (jet_sel->passes(event));
-  if(!pass_jetsel) return false;
-
-  // h_Jet_event->fill(event);
-  h_Jet_elec->fill(event);
-  h_Jet_muon->fill(event);
-  h_Jet_jets->fill(event);
-  h_Jet_lumi->fill(event);
-
-  /* *********** BTag Effi Hist *********** */
-  if(!event.isRealData) BTagEffHists->fill(event);
-
-  /* *********** lepton-2Dcut variables ***********  */
-  const bool pass_twodcut = twodcut_sel->passes(event); {
-
-    for(auto& muo : *event.muons){
-
-      float    dRmin, pTrel;
-      std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
-
-      muo.set_tag(Muon::twodcut_dRmin, dRmin);
-      muo.set_tag(Muon::twodcut_pTrel, pTrel);
-    }
-
-    for(auto& ele : *event.electrons){
-
-      float    dRmin, pTrel;
-      std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
-
-      ele.set_tag(Electron::twodcut_dRmin, dRmin);
-      ele.set_tag(Electron::twodcut_pTrel, pTrel);
-    }
+  if(passed_recsel){
+    const bool pass_jetsel = (jet_sel->passes(event));
+    if(!pass_jetsel) passed_recsel = false;
+    // h_Jet_event->fill(event);
+    h_Jet_elec->fill(event);
+    h_Jet_muon->fill(event);
+    h_Jet_jets->fill(event);
+    h_Jet_lumi->fill(event);
   }
+  /* *********** BTag Effi Hist *********** */
+  if(passed_recsel){
+    if(!event.isRealData) BTagEffHists->fill(event);
+  }
+  /* *********** lepton-2Dcut variables ***********  */
+  if(passed_recsel){
+    const bool pass_twodcut = twodcut_sel->passes(event); {
 
-  // 2D Cut (first soft cleaner [jet_cleaner1], then 2D Cut, then normal cleaner [jet_cleaner2]
-  if(!pass_twodcut) return false;
-  jet_cleaner2->process(event);
-  sort_by_pt<Jet>(*event.jets);
+      for(auto& muo : *event.muons){
 
-  h_TwoD_event->fill(event);
-  h_TwoD_elec->fill(event);
-  h_TwoD_muon->fill(event);
-  h_TwoD_jets->fill(event);
-  h_TwoD_lumi->fill(event);
+	float    dRmin, pTrel;
+	std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
+
+	muo.set_tag(Muon::twodcut_dRmin, dRmin);
+	muo.set_tag(Muon::twodcut_pTrel, pTrel);
+      }
+
+      for(auto& ele : *event.electrons){
+
+	float    dRmin, pTrel;
+	std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+
+	ele.set_tag(Electron::twodcut_dRmin, dRmin);
+	ele.set_tag(Electron::twodcut_pTrel, pTrel);
+      }
+    }
+
+    if(!pass_twodcut) passed_recsel = false;
+    jet_cleaner2->process(event);
+    sort_by_pt<Jet>(*event.jets);
+
+    h_TwoD_event->fill(event);
+    h_TwoD_elec->fill(event);
+    h_TwoD_muon->fill(event);
+    h_TwoD_jets->fill(event);
+    h_TwoD_lumi->fill(event);
+  }
   ////
 
 
 
   /* *********** MET selection *********** */
-  const bool pass_met = met_sel->passes(event);
-  if(!pass_met) return false;
+  if(passed_recsel){
+    const bool pass_met = met_sel->passes(event);
+    if(!pass_met) passed_recsel = false;
 
-  h_MET_event->fill(event);
-  h_MET_elec->fill(event);
-  h_MET_muon->fill(event);
-  h_MET_jets->fill(event);
-  h_MET_lumi->fill(event);
-
-  /* Triangular Cut in Electron channel */
-  // const bool pass_trianc = triangc_sel->passes(event);
-  // if(!pass_trianc) return false;
-
-  /* *********** HT lep *********** */
-  const bool pass_htlep = htlep_sel->passes(event);
-  if(!pass_htlep) return false;
-
-  h_HTlep_event->fill(event);
-  h_HTlep_elec->fill(event);
-  h_HTlep_muon->fill(event);
-  h_HTlep_jets->fill(event);
-  h_HTlep_lumi->fill(event);
+    h_MET_event->fill(event);
+    h_MET_elec->fill(event);
+    h_MET_muon->fill(event);
+    h_MET_jets->fill(event);
+    h_MET_lumi->fill(event);
+  }
 
   /* *********** b-tag counter *********** */
   int jetbtagN(0);
-  for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
-  if(jetbtagN == 0){
-    h_Side_event->fill(event);
-    h_Side_elec->fill(event);
-    h_Side_muon->fill(event);
-    h_Side_jets->fill(event);
-    h_Side_lumi->fill(event);
+  if(passed_recsel){
+    for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+    if(jetbtagN == 0){
+      h_Side_event->fill(event);
+      h_Side_elec->fill(event);
+      h_Side_muon->fill(event);
+      h_Side_jets->fill(event);
+      h_Side_lumi->fill(event);
+    }
+  }
+  if(passed_recsel && jetbtagN < 1) passed_recsel = false;
+  BTagScaleFactors->process(event);
+  if(passed_recsel){
+    h_bTag_event->fill(event);
+    h_bTag_elec->fill(event);
+    h_bTag_muon->fill(event);
+    h_bTag_jets->fill(event);
+    h_bTag_lumi->fill(event);
   }
 
-  if(jetbtagN < 1) return false;
-  BTagScaleFactors->process(event);
+  if(!passed_gensel && !passed_recsel) return false;
 
-  h_bTag_event->fill(event);
-  h_bTag_elec->fill(event);
-  h_bTag_muon->fill(event);
-  h_bTag_jets->fill(event);
-  h_bTag_lumi->fill(event);
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   // store reco jets with and without JEC applied, and also copy uncorrected subjets
+  std::vector<TopJet> jets = event.get(h_fatjets);
+  if(jets.size() < 2) return false;
+
   jetprod_reco_noJEC->process(event);
   copy_jet->process(event);
   JetCorrections->process(event);
   jetprod_reco->process(event);
   Correction->process(event);
   jetprod_reco_corrected->process(event);
+
   if(!event.isRealData){
     jetprod_gen23->process(event);
     jetprod_gen33->process(event);
@@ -466,12 +499,17 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   output->process(event);
 
   /* *********** just a check ****************************************** */
-  ttbar_reweight->process(event);
-  h_ttbar_reweight_event->fill(event);
-  h_ttbar_reweight_elec->fill(event);
-  h_ttbar_reweight_muon->fill(event);
-  h_ttbar_reweight_jets->fill(event);
-  h_ttbar_reweight_lumi->fill(event);
+  if(passed_recsel){
+    ttbar_reweight->process(event);
+    h_ttbar_reweight_event->fill(event);
+    h_ttbar_reweight_elec->fill(event);
+    h_ttbar_reweight_muon->fill(event);
+    h_ttbar_reweight_jets->fill(event);
+    h_ttbar_reweight_lumi->fill(event);
+  }
+
+  event.set(h_recsel_2, passed_recsel);
+  event.set(h_gensel_2, passed_gensel);
 
 return true;
 }

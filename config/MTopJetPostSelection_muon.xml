@@ -235,11 +235,11 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="weight XConeTopJets XConeTopJets_noJEC XConeTopJets_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined"/>
+	<Item Name="additionalBranches" Value="weight XConeTopJets XConeTopJets_noJEC XConeTopJets_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined passed_gensel_2 passed_recsel_2"/>
  
 	<Item Name="METName" Value="slimmedMETs"/>
 
-	<Item Name="use_sframe_weight" Value="false"/>
+	<Item Name="use_sframe_weight" Value="true"/>
 	<Item Name="dometfilters" Value="true" />
 	<Item Name="dopvfilter" Value="true" />
 	<!-- <Item Name="lumi_file" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/> -->

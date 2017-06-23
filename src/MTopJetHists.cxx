@@ -197,46 +197,46 @@ void MTopJetHists::fill(const Event & event){
   //
 
   //Top Number
-  float number;
-  number = event.topjets->size();
-  TopNumber->Fill(number, weight);
-  //
+  // float number;
+  // number = event.topjets->size();
+  // TopNumber->Fill(number, weight);
+  // //
 
-  //Top pT
-  if((event.topjets->size())>0){
-  assert(event.jets);
-  float toppt1;
-  const Particle* Top1 = &event.topjets->at(0);
-  toppt1 = Top1->v4().pt();
-  TopPT1->Fill(toppt1, weight);
-  }
-  if((event.topjets->size())>1){
-  assert(event.jets);
-  float toppt2;
-  const Particle* Top2 = &event.topjets->at(1);
-  toppt2 = Top2->v4().pt();
-  TopPT2->Fill(toppt2, weight);
-  }
+  // //Top pT
+  // if((event.topjets->size())>0){
+  // assert(event.jets);
+  // float toppt1;
+  // const Particle* Top1 = &event.topjets->at(0);
+  // toppt1 = Top1->v4().pt();
+  // TopPT1->Fill(toppt1, weight);
+  // }
+  // if((event.topjets->size())>1){
+  // assert(event.jets);
+  // float toppt2;
+  // const Particle* Top2 = &event.topjets->at(1);
+  // toppt2 = Top2->v4().pt();
+  // TopPT2->Fill(toppt2, weight);
+  // }
   //
 
   //TopJetMass
-  if((event.topjets->size())>0){
-  assert(event.jets);
-  float mass1;
-  const Particle* Top1 = &event.topjets->at(0);
-  mass1 = Top1->v4().M();
-  TopJetMass->Fill(mass1, weight);
-  }
+  // if((event.topjets->size())>0){
+  // assert(event.jets);
+  // float mass1;
+  // const Particle* Top1 = &event.topjets->at(0);
+  // mass1 = Top1->v4().M();
+  // TopJetMass->Fill(mass1, weight);
+  // }
   //
 
   //TopJetMass M1 vs M2
-  if((event.topjets->size())>1){
-  assert(event.jets);
-  float mass1, mass2;
-  const Particle* Top1 = &event.topjets->at(0);
-  const Particle* Top2 = &event.topjets->at(1);
-  mass1 = Top1->v4().M();
-  mass2 = Top2->v4().M();
-  TopJetMass1_TopJetMass2->Fill(mass1, mass2, weight);
-  }
+  // if((event.topjets->size())>1){
+  // assert(event.jets);
+  // float mass1, mass2;
+  // const Particle* Top1 = &event.topjets->at(0);
+  // const Particle* Top2 = &event.topjets->at(1);
+  // mass1 = Top1->v4().M();
+  // mass2 = Top2->v4().M();
+  // TopJetMass1_TopJetMass2->Fill(mass1, mass2, weight);
+  //}
 }

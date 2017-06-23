@@ -1,6 +1,27 @@
 #include "UHH2/MTopJet/include/CombineXCone.h"
 
 // Get Primary Lepton
+
+bool CombineXCone::FindLepton(uhh2::Event & event){
+  bool lepton_in_event = false;
+  if(event.muons->size() > 0 || event.electrons->size() > 0) lepton_in_event = true;
+  return lepton_in_event;
+}
+
+bool CombineXCone::FindLepton_gen(uhh2::Event & event){
+  bool lepton_in_event = false;
+  int lep_counter = 0;
+  std::vector<GenParticle>* genparts = event.genparticles;
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle p = genparts->at(i);
+    if(abs(p.pdgId()) == 11 || abs(p.pdgId()) == 13 ) ++lep_counter;
+  }
+
+  if(lep_counter > 0) lepton_in_event = true;
+  return lepton_in_event;
+}
+
+
 Particle CombineXCone::GetLepton(uhh2::Event & event){
 
   Particle lepton;
@@ -102,35 +123,44 @@ bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<TopJet> jets = event.get(h_fatjets);
   std::auto_ptr<CombineXCone> combine(new CombineXCone);
-  Particle lepton = combine->GetLepton(event);
+  bool lepton_in_event = combine->FindLepton(event);
 
   //---------------------------------------------------------------------------------------
   //------------- define had and lep jet (deltaR) -----------------------------------------
   //---------------------------------------------------------------------------------------
   TopJet fathadjet, fatlepjet;
-  float dR1 = deltaR(lepton, jets.at(0));
-  float dR2 = deltaR(lepton, jets.at(1));
-  if(dR1 < dR2){
-    fatlepjet = jets.at(0);
-    fathadjet = jets.at(1);
+  if(lepton_in_event){
+    Particle lepton = combine->GetLepton(event);
+    float dR1 = deltaR(lepton, jets.at(0));
+    float dR2 = deltaR(lepton, jets.at(1));
+    if(dR1 < dR2){
+      fatlepjet = jets.at(0);
+      fathadjet = jets.at(1);
+    }
+    else{
+      fatlepjet = jets.at(1);
+      fathadjet = jets.at(0);
+    }
   }
   else{
     fatlepjet = jets.at(1);
     fathadjet = jets.at(0);
   }
+  
 
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of subjets and combine them ------------------------------
   //---------------------------------------------------------------------------------------
+  Jet lepjet, hadjet;
   std::vector<Jet> subjets_lep = fatlepjet.subjets();
   std::vector<Jet> subjets_had = fathadjet.subjets();
-  Jet lepjet = combine->AddSubjets(subjets_lep, 0);
-  Jet hadjet = combine->AddSubjets(subjets_had, 30);
+  lepjet = combine->AddSubjets(subjets_lep, 0);
+  hadjet = combine->AddSubjets(subjets_had, 30);
+
   vector<Jet> hadjets;
   vector<Jet> lepjets;
   hadjets.push_back(hadjet);
   lepjets.push_back(lepjet);
-
   //---------------------------------------------------------------------------------------
   //--------------------------------- Write Jets ------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -152,23 +182,29 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<GenTopJet> jets = event.get(h_GENfatjets);
   std::auto_ptr<CombineXCone> combine(new CombineXCone);
-  GenParticle lepton = combine->GetLepton_gen(event);
+  bool lepton_in_event = combine->FindLepton(event);
 
   //---------------------------------------------------------------------------------------
   //------------- define had and lep jet (deltaR) -----------------------------------------
   //---------------------------------------------------------------------------------------
   GenTopJet fathadjet, fatlepjet;
-  float dR1 = deltaR(lepton, jets.at(0));
-  float dR2 = deltaR(lepton, jets.at(1));
-  if(dR1 < dR2){
-    fatlepjet = jets.at(0);
-    fathadjet = jets.at(1);
+  if(lepton_in_event){
+    GenParticle lepton = combine->GetLepton_gen(event);
+    float dR1 = deltaR(lepton, jets.at(0));
+    float dR2 = deltaR(lepton, jets.at(1));
+    if(dR1 < dR2){
+      fatlepjet = jets.at(0);
+      fathadjet = jets.at(1);
+    }
+    else{
+      fatlepjet = jets.at(1);
+      fathadjet = jets.at(0);
+    }
   }
   else{
     fatlepjet = jets.at(1);
     fathadjet = jets.at(0);
   }
-
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of subjets and combine them ------------------------------
   //---------------------------------------------------------------------------------------
@@ -204,23 +240,30 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<GenTopJet> jets23 = event.get(h_GEN23fatjets);
   std::auto_ptr<CombineXCone> combine(new CombineXCone);
-  GenParticle lepton = combine->GetLepton_gen(event);
+  bool lepton_in_event = combine->FindLepton(event);
 
   //---------------------------------------------------------------------------------------
   //------------- define had and lep jet (deltaR) -----------------------------------------
   //---------------------------------------------------------------------------------------
   GenTopJet fathadjet, fatlepjet;
-  float dR1 = deltaR(lepton, jets23.at(0));
-  float dR2 = deltaR(lepton, jets23.at(1));
-  if(dR1 < dR2){
-    fatlepjet = jets23.at(0);
-    fathadjet = jets23.at(1);
+  if(lepton_in_event){
+    GenParticle lepton = combine->GetLepton_gen(event);
+
+    float dR1 = deltaR(lepton, jets23.at(0));
+    float dR2 = deltaR(lepton, jets23.at(1));
+    if(dR1 < dR2){
+      fatlepjet = jets23.at(0);
+      fathadjet = jets23.at(1);
+    }
+    else{
+      fatlepjet = jets23.at(1);
+      fathadjet = jets23.at(0);
+    }
   }
   else{
     fatlepjet = jets23.at(1);
     fathadjet = jets23.at(0);
   }
-
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of subjets and combine them ------------------------------
   //---------------------------------------------------------------------------------------

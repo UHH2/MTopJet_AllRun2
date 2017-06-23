@@ -26,6 +26,7 @@
 //
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
+#include <UHH2/MTopJet/include/GenSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 
 using namespace std;
@@ -49,8 +50,14 @@ class MTopJetPreSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> jet1_sel;
   std::unique_ptr<uhh2::Selection> jet2_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
+  std::unique_ptr<uhh2::Selection> SemiLepDecay;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+
+  // handles for output
+  Event::Handle<bool>h_recsel;
+  Event::Handle<bool>h_gensel;
+  Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
 
 
   // store Hist collection as member variables
@@ -63,7 +70,9 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   //// CONFIGURATION
   const bool isMC = (ctx.get("dataset_type") == "MC");
 
-
+  h_recsel = ctx.declare_event_output<bool>("passed_recsel");
+  h_gensel = ctx.declare_event_output<bool>("passed_gensel");
+  h_GENfatjets = ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
   ////
 
   //// COMMON MODULES
@@ -86,7 +95,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
 
 
-  //// EVENT SELECTION
+  //// EVENT SELECTION REC
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(50, 2.4))));
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(50, 2.4))));
   met_sel.reset(new METCut  (20, uhh2::infinity));
@@ -94,18 +103,16 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(40, 2.4))));
   ////
 
-  //// set up Hists classes:
-  // h_PreSel_event.reset(new EventHists(ctx, "01_PreSel_Event"));
-  // h_PreSel_event2.reset(new MTopJetHists(ctx, "01_PreSel_Event2"));
-  // h_PreSel_elec.reset(new ElectronHists(ctx, "01_PreSel_Elec"));
-  // h_PreSel_muon.reset(new MuonHists(ctx, "01_PreSel_Muon"));
-  // h_PreSel_jets.reset(new JetHists(ctx, "01_PreSel_Jets"));
-  // h_ttbar.reset(new TTbarGenHists(ctx, "TTbarHists"));
+  //// EVENTS SELECTION GEN
+  SemiLepDecay.reset(new TTbarSemilep(ctx));
+  ////
 }
 
 bool MTopJetPreSelectionModule::process(uhh2::Event& event){
 
-  //// COMMON MODULES
+
+  bool passed_recsel;
+  bool passed_gensel;
 
   if(!event.isRealData){
     /* GEN M-ttbar selection */
@@ -116,43 +123,63 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
 
   /* CMS-certified luminosity sections */
   if(event.isRealData){
-
     if(!lumi_sel->passes(event)) return false;
   }
 
 
 
   const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
-  if(!pass_lep1) return false;
-
-
-  /* JET selection */
-  /* 2nd AK4 jet selection */
   const bool pass_jet2 = jet2_sel->passes(event);
-  if(!pass_jet2) return false;
-
-  /* 1st AK4 jet selection */
   const bool pass_jet1 = jet1_sel->passes(event);
-  if(!pass_jet1) return false;
-
-
-  /* MET selection */
   const bool pass_met = met_sel->passes(event);
-  if(!pass_met) return false;
-
-
-  /* select min 1 Muon OR min 1 Electron */
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
-  if(!pass_lepsel) return false;
+  const bool pass_semilep = SemiLepDecay->passes(event);
 
+  // cut on GEN Jet PT
+  bool passed_genpt=false;
+  if(pass_semilep){
+    std::vector<GenTopJet> jets = event.get(h_GENfatjets);
+    GenParticle lepton;
+    std::vector<GenParticle>* genparts = event.genparticles;
 
-  // h_PreSel_event->fill(event);
-  // h_PreSel_event2->fill(event);
-  // h_PreSel_elec->fill(event);
-  // h_PreSel_muon->fill(event);
-  // h_PreSel_jets->fill(event);
-  // h_ttbar->fill(event);
- 
+    for (unsigned int i=0; i<(genparts->size()); ++i){
+      GenParticle p = genparts->at(i);
+      if(abs(p.pdgId()) == 13) lepton = p;
+      else if(abs(p.pdgId()) == 11) lepton = p;
+    }
+    float dR1 = deltaR(lepton, jets.at(0));
+    float dR2 = deltaR(lepton, jets.at(1));
+
+    std::vector<Particle> had_subjets;
+    if(dR2 < dR1) had_subjets = jets.at(0).subjets();
+    else had_subjets = jets.at(1).subjets();
+
+    double px=0, py=0, pz=0, E=0;
+    TLorentzVector jet_v4;
+    for(unsigned int i=0; i < had_subjets.size(); ++i){
+      px += had_subjets.at(i).v4().Px();
+      py += had_subjets.at(i).v4().Py();
+      pz += had_subjets.at(i).v4().Pz();
+      E += had_subjets.at(i).v4().E();
+    } 
+    jet_v4.SetPxPyPzE(px, py, pz, E);
+    double pt = jet_v4.Pt();
+
+    if(pt > 150) passed_genpt = true;
+  }
+  ///
+
+  if(pass_lep1 && pass_jet2 && pass_jet1 && pass_met && pass_lepsel) passed_recsel = true;
+  else passed_recsel = false;
+
+  if(pass_semilep && passed_genpt) passed_gensel = true;
+  else passed_gensel = false;
+
+  if(!passed_recsel && !passed_gensel) return false;
+
+  event.set(h_recsel, passed_recsel);
+  event.set(h_gensel, passed_gensel);
+
   return true;
 }
 

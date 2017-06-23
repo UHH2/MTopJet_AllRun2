@@ -21,6 +21,9 @@ using namespace uhh2;
 class CombineXCone{
 
  public:
+
+  bool FindLepton(uhh2::Event &);
+  bool FindLepton_gen(uhh2::Event &);
   Particle GetLepton(uhh2::Event &);
   Jet AddSubjets(vector<Jet> subjets, double ptmin);
   GenParticle GetLepton_gen(uhh2::Event &);

@@ -12,6 +12,8 @@
 #include <UHH2/common/include/MuonHists.h>
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGen.h>
+#include <UHH2/common/include/TopPtReweight.h>
+#include <UHH2/common/include/MCWeight.h>
 
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
@@ -29,7 +31,6 @@
 #include "UHH2/MTopJet/include/RecoGenHists_ak4.h"
 #include "UHH2/MTopJet/include/CorrectionHists_subjets.h"
 #include "UHH2/MTopJet/include/CorrectionFactor.h"
-
 
 #include <vector>
 
@@ -73,7 +74,12 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   // get weight (with all SF and weight applied in previous cycle)
   Event::Handle<double>h_weight;
 
+  // use top pt reweight module instead of derived sf?
+  std::unique_ptr<TopPtReweight> ttbar_reweight;
+
   // handles for output
+  Event::Handle<bool>h_gensel_2;
+  Event::Handle<bool>h_recsel_2;
   Event::Handle<bool>h_matched;
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel23;
@@ -89,21 +95,27 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<double>h_pt_gen33;
   Event::Handle<double>h_pt_gen23;
   Event::Handle<double>h_pt_rec;
+  Event::Handle<double>h_genweight;
+  Event::Handle<double>h_recweight;
   Event::Handle<std::vector<Jet>>h_recjets_had;
   Event::Handle<std::vector<Particle>>h_genjets23_had;
   Event::Handle<std::vector<Particle>>h_genjets33_had;
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
+  //scale variation
+  std::unique_ptr<AnalysisModule> scale_variation;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_Muon_PreSel, h_MTopJet_PreSel, h_Jets_PreSel;
+  std::unique_ptr<Hists> h_Muon_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
 
   std::unique_ptr<Hists> h_Muon, h_MTopJet;
   std::unique_ptr<Hists> h_CorrectionHists;
   std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
 
   std::unique_ptr<Hists> h_XCone_cor, h_XCone_jec, h_XCone_raw;
+  std::unique_ptr<Hists> h_XCone_cor_SF, h_XCone_jec_SF, h_XCone_raw_SF;
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
+  std::unique_ptr<Hists> h_XCone_cor_subjets_SF, h_XCone_jec_subjets_SF, h_XCone_raw_subjets_SF;
   std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_pt200, h_XCone_cor_Sel_pt300, h_XCone_cor_Sel_pt500;
 
   std::unique_ptr<Hists> h_XCone_cor_m, h_XCone_cor_u, h_XCone_cor_m_fat, h_XCone_cor_u_fat;
@@ -123,7 +135,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
-
+  int counter;
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
@@ -146,14 +158,24 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     throw std::runtime_error(log);
   }
 
+  counter = 0;
+
+  ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
+
+  //scale variation
+  scale_variation.reset(new MCScaleVariation(ctx));
+
+
   // get handle for weight
   h_weight=ctx.get_handle<double>("weight");
 
   // write output
+  h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
+  h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
   h_matched = ctx.declare_event_output<bool>("matched");
-  h_recsel = ctx.declare_event_output<bool>("passed_recsel");
-  h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23");
-  h_gensel33 = ctx.declare_event_output<bool>("passed_gensel33");
+  h_recsel = ctx.declare_event_output<bool>("passed_recsel_full");
+  h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23_full");
+  h_gensel33 = ctx.declare_event_output<bool>("passed_gensel33_full");
   h_pt200sel = ctx.declare_event_output<bool>("passed_pt200sel");
   h_pt300sel = ctx.declare_event_output<bool>("passed_pt300sel");
   h_pt500sel = ctx.declare_event_output<bool>("passed_pt500sel");
@@ -165,6 +187,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_pt_gen23 = ctx.declare_event_output<double>("Pt_Gen23");
   h_pt_gen33 = ctx.declare_event_output<double>("Pt_Gen33");
   h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
+  h_genweight = ctx.declare_event_output<double>("gen_weight");
+  h_recweight = ctx.declare_event_output<double>("rec_weight");
+
   h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
   if(isMC) h_genjets23_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone23_had_Combined");
   if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
@@ -201,11 +226,17 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_XCone_raw.reset(new RecoHists_xcone(ctx, "XCone_raw", "raw"));
   h_XCone_cor.reset(new RecoHists_xcone(ctx, "XCone_cor", "cor"));
   h_XCone_jec.reset(new RecoHists_xcone(ctx, "XCone_jec", "jec"));
+  h_XCone_raw_SF.reset(new RecoHists_xcone(ctx, "XCone_raw_SF", "raw"));
+  h_XCone_cor_SF.reset(new RecoHists_xcone(ctx, "XCone_cor_SF", "cor"));
+  h_XCone_jec_SF.reset(new RecoHists_xcone(ctx, "XCone_jec_SF", "jec"));
 
   // XCone Subjets
   h_XCone_jec_subjets.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets", "jec"));
   h_XCone_raw_subjets.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets", "raw"));
   h_XCone_cor_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets", "cor"));
+  h_XCone_jec_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets_SF", "jec"));
+  h_XCone_raw_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets_SF", "raw"));
+  h_XCone_cor_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets_SF", "cor"));
 
   // Different Selection applied
   h_XCone_cor_Sel_noSel.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noSel", "cor"));
@@ -235,6 +266,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_MTopJet_PreSel.reset(new MTopJetHists(ctx, "EventHists_PreSel"));
   h_Muon_PreSel.reset(new MuonHists(ctx, "MuonHits_PreSel"));
   h_Jets_PreSel.reset(new JetHists(ctx, "JetHits_PreSel"));
+  h_XCone_cor_PreSel.reset(new RecoHists_xcone(ctx, "XCone_cor_PreSel", "cor"));
 
   if(isMC){
     if(isTTbar) h_CorrectionHists.reset(new CorrectionHists_subjets(ctx, "CorrectionHists"));
@@ -274,13 +306,35 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
+  bool do_scale = true;
+
+  // split ttbar for unfolding tests
+  // 10& (90%) of all events that would be stored are rejected
+  // after running with both options two independent samples of ratio 10 - 90 are created 
+  bool split_ttbar = true;
+  bool small = true;
+  if(split_ttbar){
+    bool keep = true;
+    if(small && counter != 1) keep = false;
+    if(!small && counter == 1) keep = false;
+    ++counter;
+    if(counter == 10) counter = 0;
+    if(!keep) return false;
+  }
+
+  bool passed_recsel;
+  passed_recsel = event.get(h_recsel_2);
+  bool passed_gensel33;
+  passed_gensel33 = event.get(h_gensel_2);
+  bool passed_gensel23;
+  passed_gensel23 = event.get(h_gensel_2);
+
   // first check if event has one had and one lep jet
   if( !(njet_had->passes(event)) ) return false;
   if( !(njet_lep->passes(event)) ) return false;
 
   /***************************  some options ***************************************************************************************************************/ 
-  bool scale_ttbar = true;
-  double SF_tt = 0.75;
+ 
   /*************************** otion to split TTbar sample for closure test of unfolding *******************************************************************/ 
   // if(isTTbar && event.muons->at(0).phi() > 0) return false;
 
@@ -313,35 +367,53 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_pt_gen33, 0.);   // set gen pt to 0 for data
   }
 
-  /***************************  apply weight *****************************************************************************************************/ 
-  if(isTTbar && scale_ttbar) event.weight = SF_tt * event.get(h_weight);
-  else event.weight = event.get(h_weight);
+  /***************************  apply weight *****************************************************************************************************/
+  bool reweight_ttbar = false;
+  bool scale_ttbar = true;
+  double SF_tt = 0.75;
+  // get lumi weight = genweight (inkl scale variation)
+  if(do_scale) scale_variation->process(event);
+  double gen_weight = event.weight;
 
+  // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
+  event.weight = event.get(h_weight);
+  if(do_scale) scale_variation->process(event);
+
+  // rec weight is now:
+  if(reweight_ttbar) ttbar_reweight->process(event);
+  double rec_weight;
+  if(gen_weight==0)rec_weight = 0;
+  else rec_weight = (event.weight)/gen_weight;
+
+  if(passed_recsel){
+    h_MTopJet_PreSel->fill(event);
+    h_Muon_PreSel->fill(event);
+    h_Jets_PreSel->fill(event);
+    h_XCone_cor_PreSel->fill(event);
+  }
   /***************************  SubJet Corrector *****************************************************************************************************/ 
   // Correction->process(event);
 
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 */
-  bool passed_recsel;
-  if(pt_sel->passes(event) && mass_sel->passes(event)) passed_recsel = true;
-  else passed_recsel = false;
+
+
+  if(!pt_sel->passes(event))passed_recsel = false;
+  if(!mass_sel->passes(event)) passed_recsel = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
-  bool passed_gensel33;
-  if(isMC && mass_gensel->passes(event) && pt_gensel->passes(event) ) passed_gensel33 = true;
-  else passed_gensel33 = false;
-  bool passed_gensel23;
-  if(isMC && mass_gensel23->passes(event) && pt_gensel23->passes(event) ) passed_gensel23 = true;
-  else passed_gensel23 = false;
- 
+  if(isMC){
+    if(!mass_gensel->passes(event)) passed_gensel33 = false;
+    if(!pt_gensel->passes(event)) passed_gensel33 = false;
+    if(!mass_gensel23->passes(event)) passed_gensel23 = false;
+    if(!pt_gensel23->passes(event)) passed_gensel23 = false;
+  }
+
   /*************************** Pile Up bools  ***************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
   bool midPU = (event.pvs->size() > 10 && event.pvs->size() <= 20);
   bool highPU = (event.pvs->size() > 20);
 
   /*************************** fill hists with other sel applied ***********************************************************************************/ 
-  h_MTopJet_PreSel->fill(event);
-  h_Muon_PreSel->fill(event);
-  h_Jets_PreSel->fill(event);
 
   bool pass_pt200 = false;
   bool pass_pt300 = false;
@@ -362,7 +434,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
   /*************************** fill hists with reco sel applied ***********************************************************************************/ 
 
-
   bool is_matched_sub = false;
   bool is_matched_fat = false;
   if(passed_recsel){
@@ -374,8 +445,19 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_jec_subjets->fill(event);
     h_XCone_cor_subjets->fill(event);
 
+    if(isTTbar && scale_ttbar) event.weight *= SF_tt;
+
+    h_XCone_raw_SF->fill(event);
+    h_XCone_jec_SF->fill(event);
+    h_XCone_cor_SF->fill(event);
+
+    h_XCone_raw_subjets_SF->fill(event);
+    h_XCone_jec_subjets_SF->fill(event);
+    h_XCone_cor_subjets_SF->fill(event);
+
     h_MTopJet->fill(event);
     h_Muon->fill(event);
+
 
     if(lowPU){
       h_XCone_cor_PUlow_subjets->fill(event);
@@ -443,11 +525,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_pt200sel, pass_pt200);
   event.set(h_pt300sel, pass_pt300);
   event.set(h_pt500sel, pass_pt500);
+  event.set(h_genweight, gen_weight);
+  event.set(h_recweight, rec_weight);
 
-  
   /*************************** only store events that survive one of the selections ****************************************************************/
+
+
   if(!passed_recsel && !passed_gensel33 && !passed_gensel23) return false;
   else return true;
+  
 }
 
 UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPostSelectionModule)
