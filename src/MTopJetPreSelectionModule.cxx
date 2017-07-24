@@ -58,7 +58,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
   Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
-
+  bool isMC;
 
   // store Hist collection as member variables
   // std::unique_ptr<Hists> h_ttbar;
@@ -68,7 +68,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
 MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
-  const bool isMC = (ctx.get("dataset_type") == "MC");
+  isMC = (ctx.get("dataset_type") == "MC");
 
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
@@ -104,7 +104,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   ////
 
   //// EVENTS SELECTION GEN
-  SemiLepDecay.reset(new TTbarSemilep(ctx));
+  if(isMC) SemiLepDecay.reset(new TTbarSemilep(ctx));
   ////
 }
 
@@ -133,11 +133,13 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   const bool pass_jet1 = jet1_sel->passes(event);
   const bool pass_met = met_sel->passes(event);
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
-  const bool pass_semilep = SemiLepDecay->passes(event);
+  bool pass_semilep;
+  if(isMC)pass_semilep = SemiLepDecay->passes(event);
+  else pass_semilep=false;
 
   // cut on GEN Jet PT
   bool passed_genpt=false;
-  if(pass_semilep){
+  if(isMC && pass_semilep){
     std::vector<GenTopJet> jets = event.get(h_GENfatjets);
     GenParticle lepton;
     std::vector<GenParticle>* genparts = event.genparticles;

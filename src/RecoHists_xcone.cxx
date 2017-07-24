@@ -33,6 +33,8 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   number_hadjet = book<TH1F>("number_hadjet", "number", 10, 0, 10);
   number_lepjet = book<TH1F>("number_lepjet", "number", 10, 0, 10);
 
+  Mass_Vertices = book<TH2F>("Mass_Vertices", "x=Pile-up y=M_{jet}", 50, 0, 50, 50, 0, 500);
+
   // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
   // handle for clustered jets
@@ -121,6 +123,8 @@ void RecoHists_xcone::fill(const Event & event){
   HadJetMass_rebin->Fill(hadjet_v4.M(), weight);
   LepJetMass->Fill(lepjet_v4.M(), weight);
   HadMassLepMass->Fill(hadjet_v4.M() - lepjet_v4.M(), weight);
+
+  Mass_Vertices->Fill(event.pvs->size(), hadjet_v4.M(), weight);
 
   SoftdropMass_had->Fill(fatjets.at(nr_hadjet).softdropmass(), weight);
   SoftdropMass_lep->Fill(fatjets.at(nr_lepjet).softdropmass(), weight);

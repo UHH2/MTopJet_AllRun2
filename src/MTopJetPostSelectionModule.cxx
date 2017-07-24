@@ -306,12 +306,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
-  bool do_scale = true;
+  bool do_scale = false;
 
   // split ttbar for unfolding tests
   // 10& (90%) of all events that would be stored are rejected
   // after running with both options two independent samples of ratio 10 - 90 are created 
-  bool split_ttbar = true;
+  bool split_ttbar = false;
   bool small = true;
   if(split_ttbar){
     bool keep = true;
