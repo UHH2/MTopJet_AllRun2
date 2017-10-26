@@ -7,6 +7,8 @@ GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & 
   number_top = book<TH1F>("number_top", "number of tops", 10, 0, 10);
   hadtop_pt = book<TH1F>("hadtop_pt", "p_{T}", 100, 0, 1000);
   leptop_pt = book<TH1F>("leptop_pt", "p_{T}", 100, 0, 1000);
+  hadtop_mass = book<TH1F>("hadtop_mass", "Mass", 150, 100, 250);
+  leptop_mass = book<TH1F>("leptop_mass", "Mass", 150, 100, 250);
   hadtop_phi = book<TH1F>("hadtop_phi", "#Phi", 30, -6, 6);
   leptop_phi = book<TH1F>("leptop_phi", "#Phi", 30, -6, 6);
   lepton_pt = book<TH1F>("lepton_pt", "p_{T}", 100, 0, 1000);
@@ -79,6 +81,8 @@ void GenHists_particles::fill(const Event & event){
 
   hadtop_pt->Fill(tophad.pt(), weight);
   leptop_pt->Fill(toplep.pt(), weight);
+  hadtop_mass->Fill(tophad.v4().M(), weight);
+  leptop_mass->Fill(toplep.v4().M(), weight);
   lepton_pt->Fill(lepton.pt(), weight);
   hadtop_phi->Fill(tophad.phi(), weight);
   leptop_phi->Fill(toplep.phi(), weight);

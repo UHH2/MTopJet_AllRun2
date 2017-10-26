@@ -31,6 +31,7 @@
 #include "UHH2/MTopJet/include/RecoGenHists_ak4.h"
 #include "UHH2/MTopJet/include/CorrectionHists_subjets.h"
 #include "UHH2/MTopJet/include/CorrectionFactor.h"
+#include "UHH2/MTopJet/include/tt_width_reweight.h"
 
 #include <vector>
 
@@ -60,9 +61,8 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> njet_had;
   std::unique_ptr<uhh2::Selection> njet_lep;
   std::unique_ptr<uhh2::Selection> pt_sel;
-  std::unique_ptr<uhh2::Selection> pt200_sel;
-  std::unique_ptr<uhh2::Selection> pt300_sel;
-  std::unique_ptr<uhh2::Selection> pt500_sel;
+  std::unique_ptr<uhh2::Selection> pt350_gensel;
+  std::unique_ptr<uhh2::Selection> pt350_sel;
   std::unique_ptr<uhh2::Selection> mass_sel;
   std::unique_ptr<uhh2::Selection> pt_gensel;
   std::unique_ptr<uhh2::Selection> mass_gensel;
@@ -81,12 +81,11 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
   Event::Handle<bool>h_matched;
-  Event::Handle<bool>h_recsel;
+  Event::Handle<bool>h_measure_rec;
   Event::Handle<bool>h_gensel23;
-  Event::Handle<bool>h_gensel33;
-  Event::Handle<bool>h_pt200sel;
-  Event::Handle<bool>h_pt300sel;
-  Event::Handle<bool>h_pt500sel;
+  Event::Handle<bool>h_measure_gen;
+  Event::Handle<bool>h_pt350_gen;
+  Event::Handle<bool>h_pt350_rec;
   Event::Handle<bool>h_ttbar;
   Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen33;
@@ -102,6 +101,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<std::vector<Particle>>h_genjets33_had;
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
+  //width reweight
+  std::unique_ptr<AnalysisModule> width_reweight;
+
   //scale variation
   std::unique_ptr<AnalysisModule> scale_variation;
 
@@ -114,9 +116,10 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   std::unique_ptr<Hists> h_XCone_cor, h_XCone_jec, h_XCone_raw;
   std::unique_ptr<Hists> h_XCone_cor_SF, h_XCone_jec_SF, h_XCone_raw_SF;
+  std::unique_ptr<Hists> h_XCone_cor_pt350, h_XCone_cor_noptcut;
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
   std::unique_ptr<Hists> h_XCone_cor_subjets_SF, h_XCone_jec_subjets_SF, h_XCone_raw_subjets_SF;
-  std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_pt200, h_XCone_cor_Sel_pt300, h_XCone_cor_Sel_pt500;
+  std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_noMass_pt350;
 
   std::unique_ptr<Hists> h_XCone_cor_m, h_XCone_cor_u, h_XCone_cor_m_fat, h_XCone_cor_u_fat;
 
@@ -129,9 +132,10 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_RecGenHists_GenOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly_noJEC;
-  std::unique_ptr<Hists> h_RecGenHists_Both;
+  std::unique_ptr<Hists> h_RecGenHists_Both, h_RecGenHists_Both_corr;
   std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC, h_RecGenHists_subjets_corrected;
   std::unique_ptr<Hists> h_GenParticles_RecOnly, h_GenParticles_GenOnly, h_GenParticles_Both;
+  std::unique_ptr<Hists> h_GenParticles_SM, h_GenParticles_newWidth;
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
@@ -160,6 +164,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   counter = 0;
 
+  // Top width reweight
+  width_reweight.reset(new tt_width_reweight(ctx, 8.0));
+
+  // Top PT reweight
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
 
   //scale variation
@@ -173,12 +181,11 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
   h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
   h_matched = ctx.declare_event_output<bool>("matched");
-  h_recsel = ctx.declare_event_output<bool>("passed_recsel_full");
+  h_measure_rec = ctx.declare_event_output<bool>("passed_measurement_rec");
+  h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
+  h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
+  h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
   h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23_full");
-  h_gensel33 = ctx.declare_event_output<bool>("passed_gensel33_full");
-  h_pt200sel = ctx.declare_event_output<bool>("passed_pt200sel");
-  h_pt300sel = ctx.declare_event_output<bool>("passed_pt300sel");
-  h_pt500sel = ctx.declare_event_output<bool>("passed_pt500sel");
   h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
   h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
   h_mass_gen23 = ctx.declare_event_output<double>("Mass_Gen23");
@@ -205,13 +212,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   njet_had.reset(new NJetXCone(ctx, jet_label_had, 1));
   njet_lep.reset(new NJetXCone(ctx, jet_label_lep, 1));
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
-  pt500_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 500));
-  pt300_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 300));
-  pt200_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 200));
+  pt350_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 350));
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
   // GEN Selection
   pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
+  pt350_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 350));
   mass_gensel.reset(new MassCut_gen(ctx, "GEN_XCone33_had_Combined", "GEN_XCone33_lep_Combined"));
   pt_gensel23.reset(new LeadingJetPT_gen(ctx, "GEN_XCone23_had_Combined", 400));
   mass_gensel23.reset(new MassCut_gen(ctx, "GEN_XCone23_had_Combined", "GEN_XCone23_lep_Combined"));
@@ -230,6 +236,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_XCone_cor_SF.reset(new RecoHists_xcone(ctx, "XCone_cor_SF", "cor"));
   h_XCone_jec_SF.reset(new RecoHists_xcone(ctx, "XCone_jec_SF", "jec"));
 
+  h_XCone_cor_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_pt350", "cor"));
+  h_XCone_cor_noptcut.reset(new RecoHists_xcone(ctx, "XCone_cor_noptcut", "cor"));
+
   // XCone Subjets
   h_XCone_jec_subjets.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets", "jec"));
   h_XCone_raw_subjets.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets", "raw"));
@@ -241,9 +250,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   // Different Selection applied
   h_XCone_cor_Sel_noSel.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noSel", "cor"));
   h_XCone_cor_Sel_noMass.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass", "cor"));
-  h_XCone_cor_Sel_pt200.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt200", "cor"));
-  h_XCone_cor_Sel_pt300.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt300", "cor"));
-  h_XCone_cor_Sel_pt500.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt500", "cor"));
+  h_XCone_cor_Sel_noMass_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass_pt350", "cor"));
 
   // PU dependence
   h_XCone_cor_PUlow.reset(new RecoHists_xcone(ctx, "XCone_cor_PUlow", "cor"));
@@ -279,6 +286,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
     h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
 
+    h_GenParticles_SM.reset(new GenHists_particles(ctx, "GenParticles_SM"));
+    h_GenParticles_newWidth.reset(new GenHists_particles(ctx, "GenParticles_newWidth"));
+
     h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", "jec"));
     h_RecGenHists_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC", "raw"));
     h_RecGenHists_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_corrected", "cor"));
@@ -299,6 +309,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_RecGenHists_RecOnly_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC", "raw"));
     h_RecGenHists_RecOnly_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_corrected", "cor"));
     h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", "jec"));
+    h_RecGenHists_Both_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_corrected", "cor"));
+
   }
   /*********************************************************************************************************************************/ 
 
@@ -377,6 +389,17 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
+
+  if(isTTbar)h_GenParticles_SM->fill(event);
+
+  // choose if tt bar sample width should be reweighted
+  bool do_width_reweight = false;
+  if(do_width_reweight && isTTbar){
+    width_reweight->process(event);
+    gen_weight = event.weight; // store again as gen weight
+    h_GenParticles_newWidth->fill(event);
+  }
+
   if(do_scale) scale_variation->process(event);
 
   // rec weight is now:
@@ -396,47 +419,48 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 */
 
+  bool pass_measurement_rec;
+  bool pass_ptmigration_rec;
 
-  if(!pt_sel->passes(event))passed_recsel = false;
-  if(!mass_sel->passes(event)) passed_recsel = false;
+  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event)) pass_measurement_rec = true;
+  else pass_measurement_rec = false;
+
+  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && mass_sel->passes(event)) pass_ptmigration_rec = true;
+  else pass_ptmigration_rec = false;
+
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
+  bool pass_measurement_gen;
+  bool pass_ptmigration_gen;
+
   if(isMC){
-    if(!mass_gensel->passes(event)) passed_gensel33 = false;
-    if(!pt_gensel->passes(event)) passed_gensel33 = false;
-    if(!mass_gensel23->passes(event)) passed_gensel23 = false;
-    if(!pt_gensel23->passes(event)) passed_gensel23 = false;
+    if(passed_gensel33 && pt_gensel->passes(event) && mass_gensel->passes(event)) pass_measurement_gen = true;
+    else pass_measurement_gen = false;
+
+    if(passed_gensel33 && !pt_gensel->passes(event) && pt350_gensel->passes(event) && mass_gensel->passes(event)) pass_ptmigration_gen = true;
+    else pass_ptmigration_gen = false;
+
   }
 
+ 
   /*************************** Pile Up bools  ***************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
   bool midPU = (event.pvs->size() > 10 && event.pvs->size() <= 20);
   bool highPU = (event.pvs->size() > 20);
 
-  /*************************** fill hists with other sel applied ***********************************************************************************/ 
-
-  bool pass_pt200 = false;
-  bool pass_pt300 = false;
-  bool pass_pt500 = false;
-  h_XCone_cor_Sel_noSel->fill(event);
-  if(pt_sel->passes(event)) h_XCone_cor_Sel_noMass->fill(event);
-  if(pt200_sel->passes(event) && mass_sel->passes(event)) {
-    h_XCone_cor_Sel_pt200->fill(event);
-    pass_pt200 = true;
-  }
-  if(pt300_sel->passes(event) && mass_sel->passes(event)){
-    h_XCone_cor_Sel_pt300->fill(event);
-    pass_pt300 = false;
-  }
-  if(pt500_sel->passes(event) && mass_sel->passes(event)){
-    h_XCone_cor_Sel_pt500->fill(event);
-    pass_pt500 = false;
-  }
   /*************************** fill hists with reco sel applied ***********************************************************************************/ 
 
   bool is_matched_sub = false;
   bool is_matched_fat = false;
-  if(passed_recsel){
+
+  if(mass_sel->passes(event)) h_XCone_cor_noptcut->fill(event);
+  if(pass_ptmigration_rec) h_XCone_cor_pt350->fill(event);
+
+
+  if(passed_recsel && pt_sel->passes(event) && !mass_sel->passes(event)) h_XCone_cor_Sel_noMass->fill(event);
+  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && !mass_sel->passes(event)) h_XCone_cor_Sel_noMass_pt350->fill(event);
+
+  if(pass_measurement_rec){
     h_XCone_raw->fill(event);
     h_XCone_jec->fill(event);
     h_XCone_cor->fill(event);
@@ -502,36 +526,37 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
 
   /*************************** fill hists with gen sel applied *************************************************************************************/ 
-  if(passed_gensel33){
+  if(pass_measurement_gen){
     h_XCone_GEN_GenOnly->fill(event);
     if(isTTbar) h_GenParticles_GenOnly->fill(event);
     h_RecGenHists_GenOnly->fill(event);
   } 
 
   /*************************** fill hists with reco+gen selection applied **************************************************************************/ 
-  if(passed_recsel && passed_gensel33){
+  if(pass_measurement_rec && pass_measurement_gen){
     h_XCone_GEN_Both->fill(event);
     if(isTTbar) h_GenParticles_Both->fill(event);
     h_RecGenHists_Both->fill(event);
+    h_RecGenHists_Both_corr->fill(event);
   } 
 
   /*************************** write bools for passing selections **********************************************************************************/ 
   event.set(h_ttbar, isTTbar);
   event.set(h_matched, is_matched_sub);
   event.set(h_ttbar_SF, SF_tt);
-  event.set(h_recsel, passed_recsel);
-  event.set(h_gensel23, passed_gensel23);
-  event.set(h_gensel33, passed_gensel33);
-  event.set(h_pt200sel, pass_pt200);
-  event.set(h_pt300sel, pass_pt300);
-  event.set(h_pt500sel, pass_pt500);
   event.set(h_genweight, gen_weight);
   event.set(h_recweight, rec_weight);
+  event.set(h_gensel23, passed_gensel23);
 
-  /*************************** only store events that survive one of the selections ****************************************************************/
+  event.set(h_measure_rec, pass_measurement_rec);
+  event.set(h_measure_gen, pass_measurement_gen);
+  event.set(h_pt350_rec, pass_ptmigration_rec);
+  event.set(h_pt350_gen, pass_ptmigration_gen);
+
+  /*************************** only store events that survive one of the selections (use looser pt cut) ****************************************************************/
 
 
-  if(!passed_recsel && !passed_gensel33 && !passed_gensel23) return false;
+  if(!pass_measurement_rec && !pass_ptmigration_rec && !pass_measurement_gen && !pass_ptmigration_gen) return false;
   else return true;
   
 }

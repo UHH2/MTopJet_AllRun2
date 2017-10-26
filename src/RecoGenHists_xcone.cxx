@@ -138,15 +138,15 @@ void RecoGenHists_xcone::fill(const Event & event){
     RecGenPT->Fill(gen_jet1_v4.Pt(), rec_jet1_v4.Pt(), weight);
 
     // resolution binned in Mass
-    if(gen_jet1_v4.M() < 100) {
+    if(gen_jet1_v4.M() < 150) {
       PtReso_mass1->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
       MassReso_mass1->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
     }
-    if(gen_jet1_v4.M() >= 100 && gen_jet1_v4.M() < 150){
+    if(gen_jet1_v4.M() >= 150 && gen_jet1_v4.M() < 175){
       PtReso_mass2->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
       MassReso_mass2->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
     }
-    if(gen_jet1_v4.M() >= 150 && gen_jet1_v4.M() < 200){
+    if(gen_jet1_v4.M() >= 175 && gen_jet1_v4.M() < 200){
       PtReso_mass3->Fill((rec_jet1_v4.Pt() - gen_jet1_v4.Pt())/gen_jet1_v4.Pt(), weight );
       MassReso_mass3->Fill( (rec_jet1_v4.M() - gen_jet1_v4.M())/gen_jet1_v4.M(), weight );
     }
