@@ -293,6 +293,8 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
   }
   else return false;
 
+  return 0;
+
 }
 
 

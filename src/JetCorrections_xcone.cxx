@@ -43,6 +43,7 @@ bool JetCorrections_xcone::process(uhh2::Event & event){
     else if(event.run > runnr_FlateG)  jet_corrector_H->process(event);
     else throw runtime_error("Jet Correction: run number not covered by if-statements in process-routine.");
   }
+  return true;
 }
 
 // JER SMEARING for XCone Jets

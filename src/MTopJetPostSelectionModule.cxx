@@ -84,8 +84,11 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<bool>h_measure_rec;
   Event::Handle<bool>h_gensel23;
   Event::Handle<bool>h_measure_gen;
+  Event::Handle<bool>h_nomass_rec;
+  Event::Handle<bool>h_nomass_gen;
   Event::Handle<bool>h_pt350_gen;
   Event::Handle<bool>h_pt350_rec;
+  Event::Handle<bool>h_nobtag_rec;
   Event::Handle<bool>h_ttbar;
   Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen33;
@@ -119,7 +122,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_XCone_cor_pt350, h_XCone_cor_noptcut;
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
   std::unique_ptr<Hists> h_XCone_cor_subjets_SF, h_XCone_jec_subjets_SF, h_XCone_raw_subjets_SF;
-  std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_noMass_pt350;
+  std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_nobtag, h_XCone_cor_Sel_pt350;
 
   std::unique_ptr<Hists> h_XCone_cor_m, h_XCone_cor_u, h_XCone_cor_m_fat, h_XCone_cor_u_fat;
 
@@ -136,6 +139,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC, h_RecGenHists_subjets_corrected;
   std::unique_ptr<Hists> h_GenParticles_RecOnly, h_GenParticles_GenOnly, h_GenParticles_Both;
   std::unique_ptr<Hists> h_GenParticles_SM, h_GenParticles_newWidth;
+
+  std::unique_ptr<Hists> h_XCone_cor_migration_pt, h_XCone_cor_migration_pt350, h_XCone_cor_migration_mass, h_XCone_cor_migration_btag;
+
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
@@ -183,8 +189,11 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_matched = ctx.declare_event_output<bool>("matched");
   h_measure_rec = ctx.declare_event_output<bool>("passed_measurement_rec");
   h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
+  h_nomass_rec = ctx.declare_event_output<bool>("passed_massmigration_rec");
+  h_nomass_gen = ctx.declare_event_output<bool>("passed_massmigration_gen");
   h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
   h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
+  h_nobtag_rec = ctx.declare_event_output<bool>("passed_btagmigration_rec");
   h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23_full");
   h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
   h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
@@ -247,10 +256,17 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_XCone_raw_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets_SF", "raw"));
   h_XCone_cor_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets_SF", "cor"));
 
+  // migrations from not passing rec cuts
+  h_XCone_cor_migration_pt.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_pt", "cor"));
+  h_XCone_cor_migration_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_pt350", "cor"));
+  h_XCone_cor_migration_mass.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_mass", "cor"));
+  h_XCone_cor_migration_btag.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_btag", "cor"));
+
   // Different Selection applied
   h_XCone_cor_Sel_noSel.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noSel", "cor"));
   h_XCone_cor_Sel_noMass.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass", "cor"));
-  h_XCone_cor_Sel_noMass_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass_pt350", "cor"));
+  h_XCone_cor_Sel_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt350", "cor"));
+  h_XCone_cor_Sel_nobtag.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_nobtag", "cor"));
 
   // PU dependence
   h_XCone_cor_PUlow.reset(new RecoHists_xcone(ctx, "XCone_cor_PUlow", "cor"));
@@ -414,31 +430,52 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_Jets_PreSel->fill(event);
     h_XCone_cor_PreSel->fill(event);
   }
+
+  int jetbtagN(0);
+  bool passed_btag = false;
+  for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+  if(jetbtagN >= 1) passed_btag = true;
+
   /***************************  SubJet Corrector *****************************************************************************************************/ 
   // Correction->process(event);
 
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 */
 
   bool pass_measurement_rec;
+  bool pass_pt350migration_rec;
   bool pass_ptmigration_rec;
+  bool pass_massmigration_rec;
+  bool pass_btagmigration_rec;
 
-  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event)) pass_measurement_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && passed_btag) pass_measurement_rec = true;
   else pass_measurement_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && mass_sel->passes(event)) pass_ptmigration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_pt350migration_rec = true;
+  else pass_pt350migration_rec = false;
+
+  if(passed_recsel && !pt_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_ptmigration_rec = true;
   else pass_ptmigration_rec = false;
 
+  if(passed_recsel && pt_sel->passes(event) && !mass_sel->passes(event) && passed_btag) pass_massmigration_rec = true;
+  else pass_massmigration_rec = false;
+
+  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && !passed_btag) pass_btagmigration_rec = true;
+  else pass_btagmigration_rec = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
   bool pass_measurement_gen;
-  bool pass_ptmigration_gen;
+  bool pass_pt350migration_gen;
+  bool pass_massmigration_gen;
 
   if(isMC){
     if(passed_gensel33 && pt_gensel->passes(event) && mass_gensel->passes(event)) pass_measurement_gen = true;
     else pass_measurement_gen = false;
 
-    if(passed_gensel33 && !pt_gensel->passes(event) && pt350_gensel->passes(event) && mass_gensel->passes(event)) pass_ptmigration_gen = true;
-    else pass_ptmigration_gen = false;
+    if(passed_gensel33 && !pt_gensel->passes(event) && pt350_gensel->passes(event) && mass_gensel->passes(event)) pass_pt350migration_gen = true;
+    else pass_pt350migration_gen = false;
+
+    if(passed_gensel33 && pt_gensel->passes(event) && !mass_gensel->passes(event)) pass_massmigration_gen = true;
+    else pass_massmigration_gen = false;
 
   }
 
@@ -453,12 +490,23 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool is_matched_sub = false;
   bool is_matched_fat = false;
 
-  if(mass_sel->passes(event)) h_XCone_cor_noptcut->fill(event);
-  if(pass_ptmigration_rec) h_XCone_cor_pt350->fill(event);
+
+  // hists to see events that are generated in measurement phase-space, but reconstructed outside
+  if(pass_measurement_gen){
+    if(pass_pt350migration_rec) h_XCone_cor_migration_pt350->fill(event);
+    if(pass_ptmigration_rec)    h_XCone_cor_migration_pt->fill(event);
+    if(pass_massmigration_rec)  h_XCone_cor_migration_mass->fill(event);
+    if(pass_btagmigration_rec)  h_XCone_cor_migration_btag->fill(event);
+  }
+
+  // see all events reconstructed outside measurement phase-space
+  if(pass_ptmigration_rec) h_XCone_cor_noptcut->fill(event);
+  if(pass_pt350migration_rec) h_XCone_cor_pt350->fill(event);
+  if(pass_btagmigration_rec)  h_XCone_cor_Sel_nobtag->fill(event);
+  if(pass_pt350migration_rec) h_XCone_cor_Sel_pt350->fill(event);
+  if(pass_massmigration_rec)  h_XCone_cor_Sel_noMass->fill(event);
 
 
-  if(passed_recsel && pt_sel->passes(event) && !mass_sel->passes(event)) h_XCone_cor_Sel_noMass->fill(event);
-  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && !mass_sel->passes(event)) h_XCone_cor_Sel_noMass_pt350->fill(event);
 
   if(pass_measurement_rec){
     h_XCone_raw->fill(event);
@@ -550,13 +598,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   event.set(h_measure_rec, pass_measurement_rec);
   event.set(h_measure_gen, pass_measurement_gen);
-  event.set(h_pt350_rec, pass_ptmigration_rec);
-  event.set(h_pt350_gen, pass_ptmigration_gen);
+  event.set(h_pt350_rec, pass_pt350migration_rec);
+  event.set(h_pt350_gen, pass_pt350migration_gen);
+  event.set(h_nomass_rec, pass_massmigration_rec);
+  event.set(h_nomass_gen, pass_massmigration_gen);
+  event.set(h_nobtag_rec, pass_btagmigration_rec);
 
   /*************************** only store events that survive one of the selections (use looser pt cut) ****************************************************************/
 
 
-  if(!pass_measurement_rec && !pass_ptmigration_rec && !pass_measurement_gen && !pass_ptmigration_gen) return false;
+  if(!pass_measurement_rec && !pass_pt350migration_rec && !pass_measurement_gen && !pass_pt350migration_gen && !pass_massmigration_rec && !pass_massmigration_gen && !pass_btagmigration_rec) return false;
   else return true;
   
 }

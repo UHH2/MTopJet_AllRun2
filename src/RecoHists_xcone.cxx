@@ -4,14 +4,14 @@
 RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
 
-  HadJetMass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
-  HadJetMass_rebin = book<TH1F>("M_jet1_", "M_{jet}", 25, 0, 500);
-  LepJetMass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
-  HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
+  HadJetMass = book<TH1F>("M_jet1", "Leading Jet Mass [GeV]", 50, 0, 500);
+  HadJetMass_rebin = book<TH1F>("M_jet1_", "Leading Jet Mass [GeV]", 25, 0, 500);
+  LepJetMass = book<TH1F>("M_jet2", "m_{jet}", 50, 0, 500);
+  HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);
  
-  SoftdropMass_had = book<TH1F>("SoftdropMass_had", "M_{fat had jet}", 25, 0, 500);
-  SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "M_{fat had jet}", 25, 0, 500);
-  SoftdropMass_lep = book<TH1F>("SoftdropMass_lep", "M_{fat lep jet}", 25, 0, 500);
+  SoftdropMass_had = book<TH1F>("SoftdropMass_had", "Soft Drop Mass [GeV]", 25, 0, 500);
+  SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "Soft Drop Mass [GeV]", 25, 0, 500);
+  SoftdropMass_lep = book<TH1F>("SoftdropMass_lep", "m_{fat lep jet}", 25, 0, 500);
 
   HadJetPT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   LepJetPT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
@@ -26,14 +26,14 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   FatJetPT_lep = book<TH1F>("FatJetPT_lep", "p_{T, fat lep jet}", 50, 0, 1000);
 
   FatJetPTDiff_had = book<TH1F>("FatJetPTDiff_had", "p_{T, fat} - p_{T, jet1}", 50, -50, 200);
-  FatJetMassDiff_had = book<TH1F>("FatJetMassDiff_had", "M_{fat} - M_{jet1}", 50, -200, 200);
+  FatJetMassDiff_had = book<TH1F>("FatJetMassDiff_had", "M_{fat} - m_{jet1}", 50, -200, 200);
   FatJetPTDiff_lep = book<TH1F>("FatJetPTDiff_lep", "p_{T, fat} - p_{T, jet1}", 50, -50, 200);
-  FatJetMassDiff_lep = book<TH1F>("FatJetMassDiff_lep", "M_{fat} - M_{jet1}", 50, -200, 200);
+  FatJetMassDiff_lep = book<TH1F>("FatJetMassDiff_lep", "M_{fat} - m_{jet1}", 50, -200, 200);
 
   number_hadjet = book<TH1F>("number_hadjet", "number", 10, 0, 10);
   number_lepjet = book<TH1F>("number_lepjet", "number", 10, 0, 10);
 
-  Mass_Vertices = book<TH2F>("Mass_Vertices", "x=Pile-up y=M_{jet}", 50, 0, 50, 50, 0, 500);
+  Mass_Vertices = book<TH2F>("Mass_Vertices", "x=Pile-up y=m_{jet}", 50, 0, 50, 50, 0, 500);
 
   // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 

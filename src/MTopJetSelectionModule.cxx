@@ -467,9 +467,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       h_Side_lumi->fill(event);
     }
   }
-  if(passed_recsel && jetbtagN < 1) passed_recsel = false;
+
+  // if(passed_recsel && jetbtagN < 1) passed_recsel = false;
   BTagScaleFactors->process(event);
-  if(passed_recsel){
+  if(passed_recsel && jetbtagN < 1){
     h_bTag_event->fill(event);
     h_bTag_elec->fill(event);
     h_bTag_muon->fill(event);

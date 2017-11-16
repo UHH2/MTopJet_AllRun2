@@ -1,7 +1,7 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 
 
-uhh2::NJetXCone::NJetXCone(uhh2::Context& ctx, const std::string & name, int njet):
+uhh2::NJetXCone::NJetXCone(uhh2::Context& ctx, const std::string & name, unsigned int njet):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)),
   njet_(njet) {}
 

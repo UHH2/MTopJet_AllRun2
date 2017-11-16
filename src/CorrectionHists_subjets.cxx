@@ -2,7 +2,8 @@
 #include <vector>
 
 CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
-  // book all histograms here
+
+  // setup hists for every pt-eta bin
   unsigned int no_ptbins = 6; // rows
   unsigned int no_etabins = 12; // columns
   TH1F* initial_value;
@@ -11,11 +12,20 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
   pt_eta.resize(no_ptbins, std::vector<TH2F*>(no_etabins, initial_value_2d));
   event_count.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
 
+  /* 
+     TO DO
+
+     -add pt_rec[pt_bin][eta_bin]
+     -get pt_bins to pt_gen bins
+     -define arrays with binning -> set [pt_bin][eta_bin] in a loop
+
+  */
+
   for(unsigned int pt_bin = 0; pt_bin < no_ptbins; pt_bin++){
     for(unsigned int eta_bin = 0; eta_bin < no_etabins; eta_bin++){
       std::string pt_string = std::to_string(pt_bin);
       std::string eta_string = std::to_string(eta_bin);
-      pt_reso[pt_bin][eta_bin] = book<TH1F>("PtReso_"+pt_string +eta_string, "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+      pt_reso[pt_bin][eta_bin] = book<TH1F>("PtReso_"+pt_string +eta_string, "p^{rec}_{T, jet} / p^{gen}_{T, jet}", 90, -1.5, 1.5);
       pt_eta[pt_bin][eta_bin] = book<TH2F>("pt_eta_"+pt_string +eta_string, "x=pt y=eta",  50, 0, 500, 20, -4, 4);
       event_count[pt_bin][eta_bin] = book<TH1F>("Count_"+pt_string +eta_string, "a.u.", 1, 0.5, 1.5);
     }
@@ -100,7 +110,7 @@ void CorrectionHists_subjets::fill(const Event & event){
   double dR_temp;
   int nearest_j;
   double gen_pt;
-  double gen_eta;
+  //double gen_eta;
   double rec_pt;
   double rec_eta;
   double R;
@@ -118,12 +128,12 @@ void CorrectionHists_subjets::fill(const Event & event){
       }
     }
     gen_pt=gen_sub.at(nearest_j).v4().Pt();
-    gen_eta=gen_sub.at(nearest_j).v4().Eta();
+    //gen_eta=gen_sub.at(nearest_j).v4().Eta();
     rec_pt=rec_sub.at(i).v4().Pt();
     rec_eta=rec_sub.at(i).v4().Eta();
     R = rec_pt/gen_pt;
     if(nearest_j != 100 && dR <= 0.2){
-      // bins in pt_gen
+      // bins in pt_rec
       if(rec_pt <= 80) pt_bin = 0;
       if(rec_pt > 80 && rec_pt <= 130) pt_bin = 1;
       if(rec_pt > 130 && rec_pt <= 180) pt_bin = 2; 

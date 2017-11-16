@@ -32,6 +32,9 @@ protected:
     uhh2::Event::Handle<std::vector<GenTopJet>>h_genjets;
     uhh2::Event::Handle<std::vector<Particle>>h_hadgenjets;
 
+    std::vector<int> ptgen_binning;
+    std::vector<double> etarec_binning;
+
 };
 
 
