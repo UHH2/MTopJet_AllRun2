@@ -13,12 +13,21 @@ RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::strin
   PtReso_4 = book<TH1F>("PtResolution_4", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_5 = book<TH1F>("PtResolution_5", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_6 = book<TH1F>("PtResolution_6", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_7 = book<TH1F>("PtResolution_7", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_8 = book<TH1F>("PtResolution_8", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_9 = book<TH1F>("PtResolution_9", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_10 = book<TH1F>("PtResolution_10", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+
   PtReso_rec1 = book<TH1F>("PtResolution_rec1", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec2 = book<TH1F>("PtResolution_rec2", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec3 = book<TH1F>("PtResolution_rec3", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec4 = book<TH1F>("PtResolution_rec4", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec5 = book<TH1F>("PtResolution_rec5", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec6 = book<TH1F>("PtResolution_rec6", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_rec7 = book<TH1F>("PtResolution_rec7", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_rec8 = book<TH1F>("PtResolution_rec8", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_rec9 = book<TH1F>("PtResolution_rec9", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_rec10 = book<TH1F>("PtResolution_rec10", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
 
   min_mass_Wjet_rec = book<TH1F>("min_mass_Wjet_rec", "min M_{ij}", 60, 60, 120);
   min_mass_Wjet_gen = book<TH1F>("min_mass_Wjet_gen", "min M_{ij}", 60, 60, 120);
@@ -71,6 +80,9 @@ void RecoGenHists_subjets::fill(const Event & event){
     }
   }
 
+  if(rec_sub.size() < 1) return;
+  if(gen_sub.size() < 1) return;
+
   /* ******************************************************************************
      matching between gen and reco jets:
      - a rec jet is called isolated if the next jet is not within 2R. An isolated jet should be spherical and more simelar to an ak4 jet
@@ -97,6 +109,8 @@ void RecoGenHists_subjets::fill(const Event & event){
 	nearest_j = j;
       }
     }
+    
+    if(nearest_j == 100) return;
     gen_pt = gen_sub.at(nearest_j).v4().Pt();
     rec_pt = rec_sub.at(i).v4().Pt();
     R = (rec_pt - gen_pt) / gen_pt;
@@ -106,16 +120,25 @@ void RecoGenHists_subjets::fill(const Event & event){
       MassReso->Fill( (rec_sub.at(i).v4().M() - gen_sub.at(nearest_j).v4().M())/gen_sub.at(nearest_j).v4().M() , weight );
       if(gen_pt <= 50) PtReso_1->Fill( R, weight );
       if(gen_pt > 50 && gen_pt <= 100) PtReso_2->Fill( R, weight );
-      if(gen_pt > 100 && gen_pt <= 200) PtReso_3->Fill( R, weight );
-      if(gen_pt > 200 && gen_pt <= 300) PtReso_4->Fill( R, weight );
-      if(gen_pt > 300 && gen_pt <= 400) PtReso_5->Fill( R, weight );
-      if(gen_pt > 400) PtReso_6->Fill( R, weight );
+      if(gen_pt > 100 && gen_pt <= 150) PtReso_3->Fill( R, weight );
+      if(gen_pt > 150 && gen_pt <= 200) PtReso_4->Fill( R, weight );
+      if(gen_pt > 200 && gen_pt <= 250) PtReso_5->Fill( R, weight );
+      if(gen_pt > 250 && gen_pt <= 300) PtReso_6->Fill( R, weight );
+      if(gen_pt > 300 && gen_pt <= 350) PtReso_7->Fill( R, weight );
+      if(gen_pt > 350 && gen_pt <= 400) PtReso_8->Fill( R, weight );
+      if(gen_pt > 400 && gen_pt <= 450) PtReso_9->Fill( R, weight );
+      if(gen_pt > 450) PtReso_10->Fill( R, weight );
+
       if(rec_pt <= 50) PtReso_rec1->Fill( R, weight );
       if(rec_pt > 50 && rec_pt <= 100) PtReso_rec2->Fill( R, weight );
-      if(rec_pt > 100 && rec_pt <= 200) PtReso_rec3->Fill( R, weight );
-      if(rec_pt > 200 && rec_pt <= 300) PtReso_rec4->Fill( R, weight );
-      if(rec_pt > 300 && rec_pt <= 400) PtReso_rec5->Fill( R, weight );
-      if(rec_pt > 400) PtReso_rec6->Fill( R, weight );
+      if(rec_pt > 100 && rec_pt <= 150) PtReso_rec3->Fill( R, weight );
+      if(rec_pt > 150 && rec_pt <= 200) PtReso_rec4->Fill( R, weight );
+      if(rec_pt > 200 && rec_pt <= 250) PtReso_rec5->Fill( R, weight );
+      if(rec_pt > 250 && rec_pt <= 300) PtReso_rec6->Fill( R, weight );
+      if(rec_pt > 300 && rec_pt <= 350) PtReso_rec7->Fill( R, weight );
+      if(rec_pt > 350 && rec_pt <= 400) PtReso_rec8->Fill( R, weight );
+      if(rec_pt > 400 && rec_pt <= 450) PtReso_rec9->Fill( R, weight );
+      if(rec_pt > 450) PtReso_rec10->Fill( R, weight );
     }
 
   }

@@ -25,6 +25,7 @@
 #include <UHH2/common/include/LuminosityHists.h>
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
+#include <UHH2/MTopJet/include/CutHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
@@ -87,6 +88,9 @@ class MTopJetSelectionModule : public ModuleBASE {
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
+ 
+
+
   Event::Handle<std::vector<TopJet>>h_fatjets;
 
   // just for testing
@@ -112,6 +116,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_HTlep_event,  h_HTlep_elec, h_HTlep_muon, h_HTlep_jets, h_HTlep_lumi;
   std::unique_ptr<Hists> h_MET_event,  h_MET_elec, h_MET_muon, h_MET_jets, h_MET_lumi;
   std::unique_ptr<Hists> h_ttbar_reweight_event, h_ttbar_reweight_elec, h_ttbar_reweight_muon, h_ttbar_reweight_jets, h_ttbar_reweight_lumi;
+  std::unique_ptr<Hists> h_cuts_all, h_cuts_all_but_2D, h_cuts_all_but_met, h_cuts_all_but_btag;
 
 
   bool isMC; //define here to use it in "process" part
@@ -212,8 +217,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // scale factors
   BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
   BTag_variation = ctx.get("BTag_variation","central");
+
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID"));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger"));
+
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
 
   //// Obj Cleaning
@@ -234,6 +241,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   //
 
   //// set up Hists classes:
+  h_cuts_all.reset(new CutHists(ctx, "h_cuts_all"));
+  h_cuts_all_but_2D.reset(new CutHists(ctx, "h_cuts_all_but_2D"));
+  h_cuts_all_but_met.reset(new CutHists(ctx, "h_cuts_all_but_met"));
+  h_cuts_all_but_btag.reset(new CutHists(ctx, "h_cuts_all_but_btag"));
 
   h_PreSel_event.reset(new MTopJetHists(ctx, "00_PreSel_Event"));
   h_PreSel_elec.reset(new ElectronHists(ctx, "00_PreSel_Elec"));
@@ -370,8 +381,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 	if( !(trigger_sel_A->passes(event) || trigger_sel_B->passes(event)) ) passed_recsel = false;
       }
     }
-    muo_trigger_SF->process(event);
   }
+
+  if(channel_ == muon) muo_trigger_SF->process(event);
+
 
   if(passed_recsel){
     h_Trigger_event->fill(event);
@@ -384,55 +397,62 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(passed_recsel){
     const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
     if(!pass_lepsel) passed_recsel = false;
-    h_Lepton_event->fill(event);
-    h_Lepton_elec->fill(event);
-    h_Lepton_muon->fill(event);
-    h_Lepton_jets->fill(event);
-    h_Lepton_lumi->fill(event);
+    else{
+      h_Lepton_event->fill(event);
+      h_Lepton_elec->fill(event);
+      h_Lepton_muon->fill(event);
+      h_Lepton_jets->fill(event);
+      h_Lepton_lumi->fill(event);
+    }
   }
   ////
 
   /* *********** Jet Selection *********** */
+  bool pass_jetsel = false;
   if(passed_recsel){
-    const bool pass_jetsel = (jet_sel->passes(event));
+    pass_jetsel = (jet_sel->passes(event));
     if(!pass_jetsel) passed_recsel = false;
-    // h_Jet_event->fill(event);
-    h_Jet_elec->fill(event);
-    h_Jet_muon->fill(event);
-    h_Jet_jets->fill(event);
-    h_Jet_lumi->fill(event);
+    else{
+      h_Jet_elec->fill(event);
+      h_Jet_muon->fill(event);
+      h_Jet_jets->fill(event);
+      h_Jet_lumi->fill(event);
+    }
   }
+
+  bool presel = passed_recsel;
+
   /* *********** BTag Effi Hist *********** */
   if(passed_recsel){
     if(!event.isRealData) BTagEffHists->fill(event);
   }
   /* *********** lepton-2Dcut variables ***********  */
-  if(passed_recsel){
-    const bool pass_twodcut = twodcut_sel->passes(event); {
+  bool pass_twodcut  = twodcut_sel->passes(event); {
 
-      for(auto& muo : *event.muons){
+    for(auto& muo : *event.muons){
 
-	float    dRmin, pTrel;
-	std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
-
-	muo.set_tag(Muon::twodcut_dRmin, dRmin);
-	muo.set_tag(Muon::twodcut_pTrel, pTrel);
-      }
-
-      for(auto& ele : *event.electrons){
-
-	float    dRmin, pTrel;
-	std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
-
-	ele.set_tag(Electron::twodcut_dRmin, dRmin);
-	ele.set_tag(Electron::twodcut_pTrel, pTrel);
-      }
+      float    dRmin, pTrel;
+      std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
+      
+      muo.set_tag(Muon::twodcut_dRmin, dRmin);
+      muo.set_tag(Muon::twodcut_pTrel, pTrel);
     }
 
-    if(!pass_twodcut) passed_recsel = false;
-    jet_cleaner2->process(event);
-    sort_by_pt<Jet>(*event.jets);
+    for(auto& ele : *event.electrons){
 
+      float    dRmin, pTrel;
+      std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
+      
+      ele.set_tag(Electron::twodcut_dRmin, dRmin);
+      ele.set_tag(Electron::twodcut_pTrel, pTrel);
+    }
+  }
+
+  if(!pass_twodcut) passed_recsel = false;
+  jet_cleaner2->process(event);
+  sort_by_pt<Jet>(*event.jets);
+  
+  if(passed_recsel){
     h_TwoD_event->fill(event);
     h_TwoD_elec->fill(event);
     h_TwoD_muon->fill(event);
@@ -444,33 +464,37 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
 
   /* *********** MET selection *********** */
-  if(passed_recsel){
-    const bool pass_met = met_sel->passes(event);
-    if(!pass_met) passed_recsel = false;
+  bool pass_met = met_sel->passes(event);
+  if(!pass_met) passed_recsel = false;
 
+  if(passed_recsel){
     h_MET_event->fill(event);
     h_MET_elec->fill(event);
     h_MET_muon->fill(event);
     h_MET_jets->fill(event);
     h_MET_lumi->fill(event);
   }
-
   /* *********** b-tag counter *********** */
+  bool passed_btag = false;
   int jetbtagN(0);
-  if(passed_recsel){
-    for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
-    if(jetbtagN == 0){
+  for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+  if(jetbtagN == 0) passed_btag = false;
+  else passed_btag = true;
+
+  BTagScaleFactors->process(event);
+  
+  if(passed_recsel && !passed_btag){
       h_Side_event->fill(event);
       h_Side_elec->fill(event);
       h_Side_muon->fill(event);
       h_Side_jets->fill(event);
       h_Side_lumi->fill(event);
-    }
   }
 
-  // if(passed_recsel && jetbtagN < 1) passed_recsel = false;
-  BTagScaleFactors->process(event);
-  if(passed_recsel && jetbtagN < 1){
+  // dont put bool here, set it in PostSel
+  // if(!passed_btag) passed_recsel = false;
+
+  if(passed_recsel){
     h_bTag_event->fill(event);
     h_bTag_elec->fill(event);
     h_bTag_muon->fill(event);
@@ -478,6 +502,14 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_bTag_lumi->fill(event);
   }
 
+  if(presel && pass_twodcut && pass_met && passed_btag) h_cuts_all->fill(event);
+  if(presel && !pass_twodcut && pass_met && passed_btag) h_cuts_all_but_2D->fill(event);
+  if(presel && pass_twodcut && !pass_met && passed_btag) h_cuts_all_but_met->fill(event);
+  if(presel && pass_twodcut && pass_met && !passed_btag) h_cuts_all_but_btag->fill(event);
+
+
+
+  // only keep events that passed rec or gen solution
   if(!passed_gensel && !passed_recsel) return false;
 
 
@@ -497,6 +529,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     jetprod_gen23->process(event);
     jetprod_gen33->process(event);
   } 
+
   output->process(event);
 
   /* *********** just a check ****************************************** */

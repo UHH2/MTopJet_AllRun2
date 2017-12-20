@@ -1,14 +1,22 @@
 #include "UHH2/MTopJet/include/CorrectionHists_subjets.h"
 #include <vector>
 
-CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
+
+  // setup pt and eta bins
+  ptgen_binning = {0, 80, 130, 180, 250, 350, 10000};
+  ptrec_binning = {0, 80, 130, 180, 250, 350, 10000};
+  etarec_binning = {-10, -1.5, -1.0, -0.7, -0.4, -0.2, 0.0, 0.2, 0.4, 0.7, 1.0, 1.5, 10};
 
   // setup hists for every pt-eta bin
-  unsigned int no_ptbins = 6; // rows
+  unsigned int no_ptbins = 6; // rows                                                                                                                                                                      
   unsigned int no_etabins = 12; // columns
+
   TH1F* initial_value;
   TH2F* initial_value_2d;
   pt_reso.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
+  pt_rec.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
+  pt_gen.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
   pt_eta.resize(no_ptbins, std::vector<TH2F*>(no_etabins, initial_value_2d));
   event_count.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
 
@@ -25,7 +33,9 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
     for(unsigned int eta_bin = 0; eta_bin < no_etabins; eta_bin++){
       std::string pt_string = std::to_string(pt_bin);
       std::string eta_string = std::to_string(eta_bin);
-      pt_reso[pt_bin][eta_bin] = book<TH1F>("PtReso_"+pt_string +eta_string, "p^{rec}_{T, jet} / p^{gen}_{T, jet}", 90, -1.5, 1.5);
+      pt_reso[pt_bin][eta_bin] = book<TH1F>("PtReso_"+pt_string +eta_string, "p^{rec}_{T, jet} / p^{gen}_{T, jet}", 90, -1, 3);
+      pt_rec[pt_bin][eta_bin] = book<TH1F>("PtRec_"+pt_string +eta_string, "p^{rec}_{T, jet}", 100, 0, 1000);
+      pt_gen[pt_bin][eta_bin] = book<TH1F>("PtGen_"+pt_string +eta_string, "p^{gen}_{T, jet}", 100, 0, 1000);
       pt_eta[pt_bin][eta_bin] = book<TH2F>("pt_eta_"+pt_string +eta_string, "x=pt y=eta",  50, 0, 500, 20, -4, 4);
       event_count[pt_bin][eta_bin] = book<TH1F>("Count_"+pt_string +eta_string, "a.u.", 1, 0.5, 1.5);
     }
@@ -35,11 +45,17 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
 
 
   // handle for clustered jets
-  h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
   h_recjets_noJEC=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
   h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
   h_hadgenjets=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
+
+  if(type == "jec")     h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  else if(type == "raw")h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  else if(type == "cor")h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected");{
+ 
+}
+
 
 }
 
@@ -59,6 +75,25 @@ void CorrectionHists_subjets::fill(const Event & event){
 
   std::vector<GenTopJet> genjets = event.get(h_genjets);
   std::vector<Particle> hadgenjets = event.get(h_hadgenjets);
+
+  // do not continus if a jet collection is empty
+  if(recjets.size() < 1) return;
+  for(unsigned int i=0; i<recjets.size(); i++){
+    if(recjets.at(i).subjets().size() < 1) return;
+  }
+  if(recjets_noJEC.size() < 1) return;
+  for(unsigned int i=0; i<recjets_noJEC.size(); i++){
+    if(recjets_noJEC.at(i).subjets().size() < 1) return;
+  }
+  if(hadjets.size() < 1) return;
+  if(genjets.size() < 1) return;
+  for(unsigned int i=0; i<genjets.size(); i++){
+    if(genjets.at(i).subjets().size() < 1) return;
+  }
+  if(hadgenjets.size() < 1) return;
+
+
+
 
   // first find had. jet and only use those subjets (without using JEC)
   double dRrec = 100;
@@ -114,8 +149,9 @@ void CorrectionHists_subjets::fill(const Event & event){
   double rec_pt;
   double rec_eta;
   double R;
-  int pt_bin = 100;
-  int eta_bin = 100;
+  int ptrec_bin = 100;
+  int ptgen_bin = 100;
+  int etarec_bin = 100;
   // do matching
   for(unsigned int i=0; i<rec_sub.size(); i++){
     dR = 1000;
@@ -134,29 +170,23 @@ void CorrectionHists_subjets::fill(const Event & event){
     R = rec_pt/gen_pt;
     if(nearest_j != 100 && dR <= 0.2){
       // bins in pt_rec
-      if(rec_pt <= 80) pt_bin = 0;
-      if(rec_pt > 80 && rec_pt <= 130) pt_bin = 1;
-      if(rec_pt > 130 && rec_pt <= 180) pt_bin = 2; 
-      if(rec_pt > 180 && rec_pt <= 250) pt_bin = 3;
-      if(rec_pt > 250 && rec_pt <= 350) pt_bin = 4;
-      if(rec_pt > 350) pt_bin = 5;
-      // bins in eta_gen
-      if(rec_eta <= -1.5) eta_bin = 0;
-      if(rec_eta > -1.5 && rec_eta <= -1.0) eta_bin = 1;
-      if(rec_eta > -1.0 && rec_eta <= -0.7) eta_bin = 2; 
-      if(rec_eta > -0.7 && rec_eta <= -0.4) eta_bin = 3;
-      if(rec_eta > -0.4 && rec_eta <= -0.2) eta_bin = 4;
-      if(rec_eta > -0.2 && rec_eta <= -0.0) eta_bin = 5;
-      if(rec_eta > 0.0 && rec_eta <= 0.2) eta_bin = 6;
-      if(rec_eta > 0.2 && rec_eta <= 0.4) eta_bin = 7;
-      if(rec_eta > 0.4 && rec_eta <= 0.7) eta_bin = 8;
-      if(rec_eta > 0.7 && rec_eta <= 1.0) eta_bin = 9;
-      if(rec_eta > 1.0 && rec_eta <= 1.5) eta_bin = 10;
-      if(rec_eta > 1.5) eta_bin = 11;
-      if(pt_bin != 100 && eta_bin != 100){
-	pt_reso[pt_bin][eta_bin]->Fill(R, weight);
-	pt_eta[pt_bin][eta_bin]->Fill(rec_pt, rec_eta, weight);
-	event_count[pt_bin][eta_bin]->Fill(1, weight);
+      for(unsigned int i = 0; i < (ptrec_binning.size() - 1); i++){
+	if(rec_pt > ptrec_binning[i] && rec_pt <= ptrec_binning[i+1]) ptrec_bin = i;
+      }
+      for(unsigned int i = 0; i < (ptgen_binning.size() - 1); i++){
+        if(gen_pt > ptgen_binning[i] && gen_pt <= ptgen_binning[i+1]) ptgen_bin = i;
+      }
+
+      for(unsigned int i = 0; i < (etarec_binning.size() - 1); i++){
+        if(rec_eta > etarec_binning[i] && rec_eta< etarec_binning[i+1]) etarec_bin = i;
+      }
+
+      if(ptrec_bin != 100 && etarec_bin != 100){
+	pt_reso[ptgen_bin][etarec_bin]->Fill(R, weight);
+        pt_rec[ptgen_bin][etarec_bin]->Fill(rec_pt, weight);
+        pt_gen[ptgen_bin][etarec_bin]->Fill(gen_pt, weight);
+	pt_eta[ptgen_bin][etarec_bin]->Fill(rec_pt, rec_eta, weight);
+	event_count[ptgen_bin][etarec_bin]->Fill(1, weight);
 
       }
     }
@@ -166,7 +196,6 @@ void CorrectionHists_subjets::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
  
-
 }
 
 

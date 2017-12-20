@@ -32,5 +32,5 @@ private:
   double arr[6][12]; // values from table
   double par[12][3]; // values with function parameters in 12 eta bins
   double pt_bins[7] = {0, 80, 130, 180, 250, 350, 500};
-  double eta_bins[13] = {-4, -1.5, -1.0, -0.7, -0.4, -0.2, 0.0, 0.2, 0.4, 0.7, 1.0, 1.5, 4};
+  double eta_bins[13] = {-10, -1.5, -1.0, -0.7, -0.4, -0.2, 0.0, 0.2, 0.4, 0.7, 1.0, 1.5, 10};
 };

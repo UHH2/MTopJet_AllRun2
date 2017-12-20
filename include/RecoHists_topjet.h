@@ -24,7 +24,7 @@ public:
 protected:
 
     TH1F *RecoJetNumber, *NLepton;
-    TH1F *RecoJet1Mass, *RecoJet2Mass, *Mass1Mass2;
+    TH1F *RecoJet1Mass, *RecoJet1Mass_rebin, *RecoJet2Mass, *Mass1Mass2;
     TH1F *RecoJet1PT, *RecoJet2PT, *RecoJet1Jet2PT, *RecoJet3PT, *LeptonPT, *RecoJetPT;
     TH1F *RecoJet2Eta;
 

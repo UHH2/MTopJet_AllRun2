@@ -30,11 +30,12 @@ bool uhh2::MassCutReco_topjet::passes(const uhh2::Event& event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
+  else return false;
+
   TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4;
   bool pass_masscut = false;
 
   if(jets.size()>1){
- 
     jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy()); //v4 of first jet
     jet2_v4.SetPtEtaPhiE(jets.at(1).pt(),jets.at(1).eta(),jets.at(1).phi(),jets.at(1).energy()); //v4 of first jet
     lepton1_v4.SetPtEtaPhiE(lepton.pt(),lepton.eta(),lepton.phi(),lepton.energy()); //v4 of lepton
@@ -61,6 +62,8 @@ bool uhh2::DeltaRCutReco_topjet::passes(const uhh2::Event& event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
+  else return false;
+
   if(jets.size()>1){
     jet2 = jets.at(1);
     if(deltaR(lepton, jet2) < jetradius_) pass_deltaR = true;

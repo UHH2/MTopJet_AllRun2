@@ -9,6 +9,12 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   LepJetMass = book<TH1F>("M_jet2", "m_{jet}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);
  
+  HadJetEta = book<TH1F>("eta_jet1", "#eta", 50, -5, 5);
+  HadJetPhi = book<TH1F>("phi_jet1", "#phi", 50, -2*M_PI, 2*M_PI);
+  LepJetEta = book<TH1F>("eta_jet2", "#eta", 50, -5, 5);
+  LepJetPhi = book<TH1F>("phi_jet2", "#phi", 50, -2*M_PI, 2*M_PI);
+
+
   SoftdropMass_had = book<TH1F>("SoftdropMass_had", "Soft Drop Mass [GeV]", 25, 0, 500);
   SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "Soft Drop Mass [GeV]", 25, 0, 500);
   SoftdropMass_lep = book<TH1F>("SoftdropMass_lep", "m_{fat lep jet}", 25, 0, 500);
@@ -123,6 +129,11 @@ void RecoHists_xcone::fill(const Event & event){
   HadJetMass_rebin->Fill(hadjet_v4.M(), weight);
   LepJetMass->Fill(lepjet_v4.M(), weight);
   HadMassLepMass->Fill(hadjet_v4.M() - lepjet_v4.M(), weight);
+
+  HadJetEta->Fill(hadjet_v4.Eta(), weight);
+  HadJetPhi->Fill(hadjet_v4.Phi(), weight);
+  LepJetEta->Fill(lepjet_v4.Eta(), weight);
+  LepJetEta->Fill(lepjet_v4.Phi(), weight);
 
   Mass_Vertices->Fill(event.pvs->size(), hadjet_v4.M(), weight);
 

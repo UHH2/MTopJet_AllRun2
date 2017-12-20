@@ -15,7 +15,7 @@ using namespace uhh2;
 class CorrectionHists_subjets: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
-  CorrectionHists_subjets(uhh2::Context & ctx, const std::string & dirname);
+  CorrectionHists_subjets(uhh2::Context & ctx, const std::string & dirname,  const std::string & type);
     
     virtual void fill(const uhh2::Event & ev) override;
 
@@ -23,6 +23,8 @@ protected:
 
     /* std::vector<TH1F*> pt_reso; */
     std::vector<std::vector<TH1F*>> pt_reso;
+    std::vector<std::vector<TH1F*>> pt_rec;
+    std::vector<std::vector<TH1F*>> pt_gen;
     std::vector<std::vector<TH1F*>> event_count;
     std::vector<std::vector<TH2F*>> pt_eta;
 
@@ -33,6 +35,7 @@ protected:
     uhh2::Event::Handle<std::vector<Particle>>h_hadgenjets;
 
     std::vector<int> ptgen_binning;
+    std::vector<int> ptrec_binning;
     std::vector<double> etarec_binning;
 
 };

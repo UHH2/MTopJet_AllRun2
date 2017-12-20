@@ -29,7 +29,8 @@ void RecoGenHists_ak4::fill(const Event & event){
   std::vector<Jet> rec_jet = *event.jets;
   std::vector<Particle> gen_jet = *event.genjets;
 
-
+  if(rec_jet.size() < 1) return;
+  if(gen_jet.size() < 1) return;
 
   /* ******************************************************************************
      matching between gen and reco jets:

@@ -10,15 +10,6 @@
  <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon">
 
 
-<!-- =============================================== DATA =========================================================================== -->
-  <!ENTITY SingleMuonBv3  "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonBv3.root">
-  <!ENTITY SingleMuonC    "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonC.root">
-  <!ENTITY SingleMuonD    "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonD.root">
-  <!ENTITY SingleMuonE    "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonE.root">
-  <!ENTITY SingleMuonF    "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonF.root">
-  <!ENTITY SingleMuonG    "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonG.root">
-  <!ENTITY SingleMuonH    "&INdir;/uhh2.AnalysisModuleRunner.DATA.SingleMuonH.root">
-
 <!-- =============================================== ttbar =========================================================================== -->
   <!ENTITY TTbar_Mtt0000to0700    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700.root">
   <!ENTITY TTbar_Mtt0700to1000    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0700to1000.root">
@@ -41,24 +32,6 @@
   <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
 
 
-
-
-    <!-- ********DATA**************************************** -->
-
-    <!-- <InputData Version="SingleMuonBv3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonBv3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-    <!-- <InputData Version="SingleMuonC" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-    <!-- <InputData Version="SingleMuonD" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonD;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-    <!-- <InputData Version="SingleMuonE" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-    <!-- <InputData Version="SingleMuonF" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonF;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-    <!-- <InputData Version="SingleMuonG" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonG;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-    <!-- <InputData Version="SingleMuonH" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
-    <!-- <In FileName="&SingleMuonH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
       <!-- ********TTbar**************************************** -->
   
@@ -103,8 +76,8 @@
 	<!-- <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" /> -->
 	<Item Name="channel" Value="&channel;"/>
 
-	<Item Name="ScaleVariationMuR" Value="up"/>
-	<Item Name="ScaleVariationMuF" Value="up"/>
+	<Item Name="ScaleVariationMuR" Value="down"/>
+	<Item Name="ScaleVariationMuF" Value="down"/>
 
 	<Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
     </UserConfig>

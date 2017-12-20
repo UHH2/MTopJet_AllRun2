@@ -18,9 +18,17 @@ GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & 
   deltaR_lep_neu = book<TH1F>("deltaR_lep_neu", "#Delta R(lepton, neutrino)", 30, 0, 6);
   deltaR_hadtop_leptop = book<TH1F>("deltaR_hadtop_leptop", "#Delta R(had. top, lep. top)", 30, 0, 6);
   deltaPhi_hadtop_leptop = book<TH1F>("deltaPhi_hadtop_leptop", "#Delta #Phi(had. top, lep. top)", 60, 0, 6);
-
+  deltaR_hadtop_jet1 = book<TH1F>("deltaR_hadtop_jet1", "#Delta R(had. top, jet1)", 60, 0, 6);
+  deltaPT_hadtop_jet1 = book<TH1F>("deltaPT_hadtop_jet1", "p_{T,jet} - p_{T,top}", 50, -100, 100);
+  deltaR_hadtop_genjet1 = book<TH1F>("deltaR_hadtop_genjet1", "#Delta R(had. top, gen jet)", 60, 0, 6);
+  deltaPT_hadtop_genjet1 = book<TH1F>("deltaPT_hadtop_genjet1", "p_{T,gen jet} - p_{T,top}", 50, -100, 100);
   // handle for ttbargen class
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
+
+  // handle for jets
+  h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
+  h_hadjets_gen=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
+
 }
 
 
@@ -30,6 +38,10 @@ void GenHists_particles::fill(const Event & event){
   const auto & ttbargen = event.get(h_ttbargen);
   // get weight
   double weight = event.weight;
+
+  // get jets
+  std::vector<Jet> hadjets = event.get(h_hadjets);
+  std::vector<Particle> hadjets_gen = event.get(h_hadjets_gen);
 
   // cout tops
   int n_top = 0;
@@ -91,6 +103,15 @@ void GenHists_particles::fill(const Event & event){
   deltaR_lep_b->Fill(deltaR(lepton, bot_lep), weight);
   deltaR_lep_neu->Fill(deltaR(lepton, neutrino), weight);
   deltaR_hadtop_leptop->Fill(deltaR(tophad, toplep), weight);
+
+  if(hadjets.size()>0){
+    deltaR_hadtop_jet1->Fill(deltaR(tophad, hadjets.at(0)), weight);
+    deltaPT_hadtop_jet1->Fill(hadjets.at(0).pt() - tophad.pt(), weight);
+  }
+  if(hadjets_gen.size()>0){
+    deltaR_hadtop_genjet1->Fill(deltaR(tophad, hadjets_gen.at(0)), weight);
+    deltaPT_hadtop_genjet1->Fill(hadjets_gen.at(0).pt() - tophad.pt(), weight);
+  }
 
   double had_phi, lep_phi, delta_phi;
   had_phi = tophad.phi() + M_PI;

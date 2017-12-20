@@ -6,6 +6,8 @@ RecoHists_topjet::RecoHists_topjet(uhh2::Context & ctx, const std::string & dirn
   RecoJetNumber = book<TH1F>("number_jets", "number", 21, 0, 20);
 
   RecoJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
+  RecoJet1Mass_rebin = book<TH1F>("M_jet1_", "M_{jet}", 25, 0, 500);
+
   RecoJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
@@ -78,6 +80,7 @@ void RecoHists_topjet::fill(const Event & event){
 
   if((jets.size()) > 1){
     RecoJet1Mass->Fill(jet1_v4.M(),weight);
+    RecoJet1Mass_rebin->Fill(jet1_v4.M(),weight);
     RecoJet2Mass->Fill(jet2_v4.M(),weight);
     RecoJet1PT->Fill(jet1_v4.Pt(),weight);
     RecoJet2PT->Fill(jet2_v4.Pt(),weight);
