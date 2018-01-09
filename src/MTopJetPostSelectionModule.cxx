@@ -156,7 +156,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350;
 
-  bool isMC; //define here to use it in "process" part
+  bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
   int counter;
 };
@@ -450,12 +450,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else passed_btag = false;
   /**********************************/
 
-  if(passed_recsel && passed_btag){
-    h_MTopJet_PreSel->fill(event);
-    h_Muon_PreSel->fill(event);
-    h_Jets_PreSel->fill(event);
-    h_XCone_cor_PreSel->fill(event);
-  }
+  bool passed_presel_rec = (passed_recsel && passed_btag);
 
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 *******************************************************/
 
@@ -497,6 +492,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   }
 
+  /***************************  750GeV SELECTION ***********************************************************************************/
+  bool passes_750_ak8 = false;
+  bool passes_750_xcone = false;
+
+  if(passed_presel_rec && njet_ak8->passes(event)){
+    if(deltaR_ak8->passes(event) && pt_sel_ak8->passes(event) && mass_ak8->passes(event)) passes_750_ak8 = true;
+  }
+  if(pass_measurement_rec && pt750_sel->passes(event)) passes_750_xcone = true;
+  /******************************************************************************************************************************/
  
   /*************************** Pile Up bools  ***************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
@@ -507,6 +511,19 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   bool is_matched_sub = false;
   bool is_matched_fat = false;
+
+
+  // hists after PreSel on REC Level
+  if(passed_presel_rec){
+    h_MTopJet_PreSel->fill(event);
+    h_Muon_PreSel->fill(event);
+    h_Jets_PreSel->fill(event);
+    h_XCone_cor_PreSel->fill(event);
+  }
+
+  // Hists for 750GeV phase space
+  if(passes_750_ak8) h_750_ak8->fill(event);
+  if(passes_750_xcone) h_750_xcone->fill(event);
 
   // hists to see events that are generated in measurement phase-space, but reconstructed outside
   if(pass_measurement_gen){
@@ -527,17 +544,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(pass_measurement_gen)    h_XCone_GEN_Sel_measurement->fill(event);
   if(pass_pt350migration_gen) h_XCone_GEN_Sel_pt350->fill(event);
   if(pass_massmigration_gen)  h_XCone_GEN_Sel_noMass->fill(event);
-
-  /***************************  750GeV SELECTION ***********************************************************************************/
-  bool passes_ak8 = false;
-  if(passed_recsel && passed_btag && njet_ak8->passes(event)){
-    if(deltaR_ak8->passes(event) && pt_sel_ak8->passes(event) && mass_ak8->passes(event)) passes_ak8 = true;
-  }
-  if(passes_ak8){
-    h_750_ak8->fill(event);
-  }
-  if(pass_measurement_rec && pt750_sel->passes(event)) h_750_xcone->fill(event);
-  /******************************************************************************************************************************/
 
   if(pass_measurement_rec){
     h_XCone_raw->fill(event);
@@ -638,8 +644,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_nobtag_rec, pass_btagmigration_rec);
 
   /*************************** only store events that survive one of the selections (use looser pt cut) ****************************************************************/
+  bool in_migrationmatrix = (pass_measurement_rec || pass_measurement_gen || pass_pt350migration_rec || pass_pt350migration_gen || pass_massmigration_rec || pass_massmigration_gen || pass_btagmigration_rec);
 
-  if(!pass_measurement_rec && !pass_pt350migration_rec && !pass_measurement_gen && !pass_pt350migration_gen && !pass_massmigration_rec && !pass_massmigration_gen && !pass_btagmigration_rec) return false;
+  if(!in_migrationmatrix) return false;
   else return true;
   
 }
