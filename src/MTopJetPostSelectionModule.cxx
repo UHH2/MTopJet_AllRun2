@@ -193,32 +193,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   scale_variation.reset(new MCScaleVariation(ctx));
 
 
-  // get handle for weight
-  h_weight=ctx.get_handle<double>("weight");
-
-  // write output
-  h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
-  h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
-  h_matched = ctx.declare_event_output<bool>("matched");
-  h_measure_rec = ctx.declare_event_output<bool>("passed_measurement_rec");
-  h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
-  h_nomass_rec = ctx.declare_event_output<bool>("passed_massmigration_rec");
-  h_nomass_gen = ctx.declare_event_output<bool>("passed_massmigration_gen");
-  h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
-  h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
-  h_nobtag_rec = ctx.declare_event_output<bool>("passed_btagmigration_rec");
-  h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23_full");
-  h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
-  h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
-  h_mass_gen23 = ctx.declare_event_output<double>("Mass_Gen23");
-  h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
-  h_mass_rec = ctx.declare_event_output<double>("Mass_Rec");
-  h_pt_gen23 = ctx.declare_event_output<double>("Pt_Gen23");
-  h_pt_gen33 = ctx.declare_event_output<double>("Pt_Gen33");
-  h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
-  h_genweight = ctx.declare_event_output<double>("gen_weight");
-  h_recweight = ctx.declare_event_output<double>("rec_weight");
-
   h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
   if(isMC) h_genjets23_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone23_had_Combined");
   if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
@@ -356,8 +330,38 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_RecGenHists_RecOnly_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_corrected", "cor"));
     h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", "jec"));
     h_RecGenHists_Both_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_corrected", "cor"));
-
   }
+
+  // get handles 
+  h_weight = ctx.get_handle<double>("weight");
+  h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
+  h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
+
+  // undeclare event output (jet collections etc) to get small root files
+  ctx.undeclare_all_event_output();
+
+  // declare event output used for unfolding
+  h_matched = ctx.declare_event_output<bool>("matched");
+  h_measure_rec = ctx.declare_event_output<bool>("passed_measurement_rec");
+  h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
+  h_nomass_rec = ctx.declare_event_output<bool>("passed_massmigration_rec");
+  h_nomass_gen = ctx.declare_event_output<bool>("passed_massmigration_gen");
+  h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
+  h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
+  h_nobtag_rec = ctx.declare_event_output<bool>("passed_btagmigration_rec");
+  h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23_full");
+  h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
+  h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
+  h_mass_gen23 = ctx.declare_event_output<double>("Mass_Gen23");
+  h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
+  h_mass_rec = ctx.declare_event_output<double>("Mass_Rec");
+  h_pt_gen23 = ctx.declare_event_output<double>("Pt_Gen23");
+  h_pt_gen33 = ctx.declare_event_output<double>("Pt_Gen33");
+  h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
+  h_genweight = ctx.declare_event_output<double>("gen_weight");
+  h_recweight = ctx.declare_event_output<double>("rec_weight");
+  
+  
   /*********************************************************************************************************************************/ 
 
 }
@@ -412,7 +416,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /***************************  apply weight *****************************************************************************************************/
 
-  bool do_scale = false;             // change scales mu_R and mu_F?
+  bool do_scale = true;             // change scales mu_R and mu_F?
   bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
   double SF_tt = 0.75;
@@ -445,9 +449,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /** b-tagging *********************/
   int jetbtagN(0);
   bool passed_btag;
-  for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+  int jetbtagN_loose(0);
+  bool passed_btag_loose;
+  for(const auto& j : *event.jets){
+    if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+    if(CSVBTag(CSVBTag::WP_LOOSE)(j, event)) ++jetbtagN_loose;
+  }
   if(jetbtagN >= 1) passed_btag = true;
   else passed_btag = false;
+  if(jetbtagN_loose >= 1) passed_btag_loose = true;
+  else passed_btag_loose = false;
   /**********************************/
 
   bool passed_presel_rec = (passed_recsel && passed_btag);
@@ -472,7 +483,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_recsel && pt_sel->passes(event) && !mass_sel->passes(event) && passed_btag) pass_massmigration_rec = true;
   else pass_massmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && !passed_btag) pass_btagmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_loose) pass_btagmigration_rec = true;
   else pass_btagmigration_rec = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
