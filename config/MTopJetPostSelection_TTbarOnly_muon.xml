@@ -76,8 +76,8 @@
 	<!-- <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" /> -->
 	<Item Name="channel" Value="&channel;"/>
 
-	<Item Name="ScaleVariationMuR" Value="up"/>
-	<Item Name="ScaleVariationMuF" Value="up"/>
+	<Item Name="ScaleVariationMuR" Value="down"/>
+	<Item Name="ScaleVariationMuF" Value="down"/>
 
 	<Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
     </UserConfig>

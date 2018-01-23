@@ -110,6 +110,8 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<double>h_pt_rec;
   Event::Handle<double>h_genweight;
   Event::Handle<double>h_recweight;
+  Event::Handle<double>h_genweight_ttfactor;
+
   Event::Handle<std::vector<Jet>>h_recjets_had;
   Event::Handle<std::vector<Particle>>h_genjets23_had;
   Event::Handle<std::vector<Particle>>h_genjets33_had;
@@ -360,8 +362,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
   h_genweight = ctx.declare_event_output<double>("gen_weight");
   h_recweight = ctx.declare_event_output<double>("rec_weight");
-  
-  
+  h_genweight_ttfactor = ctx.declare_event_output<double>("gen_weight_ttfactor");
   /*********************************************************************************************************************************/ 
 
 }
@@ -414,8 +415,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_pt_gen33, 0.);   // set gen pt to 0 for data
   }
 
-  /***************************  apply weight *****************************************************************************************************/
 
+  /***************************  apply weight *****************************************************************************************************/
   bool do_scale = true;             // change scales mu_R and mu_F?
   bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
@@ -441,7 +442,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(do_scale) scale_variation->process(event);
 
   // rec weight is now:
-  if(reweight_ttbar) ttbar_reweight->process(event);
+  // if(reweight_ttbar) ttbar_reweight->process(event);
   double rec_weight;
   if(gen_weight==0)rec_weight = 0;
   else rec_weight = (event.weight)/gen_weight;
@@ -449,16 +450,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /** b-tagging *********************/
   int jetbtagN(0);
   bool passed_btag;
-  int jetbtagN_loose(0);
-  bool passed_btag_loose;
+  int jetbtagN_medium(0);
+  bool passed_btag_medium;
   for(const auto& j : *event.jets){
     if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
-    if(CSVBTag(CSVBTag::WP_LOOSE)(j, event)) ++jetbtagN_loose;
+    if(CSVBTag(CSVBTag::WP_MEDIUM)(j, event)) ++jetbtagN_medium;
   }
   if(jetbtagN >= 1) passed_btag = true;
   else passed_btag = false;
-  if(jetbtagN_loose >= 1) passed_btag_loose = true;
-  else passed_btag_loose = false;
+  if(jetbtagN_medium >= 1) passed_btag_medium = true;
+  else passed_btag_medium = false;
   /**********************************/
 
   bool passed_presel_rec = (passed_recsel && passed_btag);
@@ -483,7 +484,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_recsel && pt_sel->passes(event) && !mass_sel->passes(event) && passed_btag) pass_massmigration_rec = true;
   else pass_massmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_loose) pass_btagmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium) pass_btagmigration_rec = true;
   else pass_btagmigration_rec = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/ 
@@ -500,7 +501,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     if(passed_gensel33 && pt_gensel->passes(event) && !mass_gensel->passes(event)) pass_massmigration_gen = true;
     else pass_massmigration_gen = false;
-
+  }
+  if(!isMC){
+    pass_measurement_gen = false;
+    pass_pt350migration_gen = false;
+    pass_massmigration_gen = false;
   }
 
   /***************************  750GeV SELECTION ***********************************************************************************/
@@ -523,7 +528,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool is_matched_sub = false;
   bool is_matched_fat = false;
 
-
   // hists after PreSel on REC Level
   if(passed_presel_rec){
     h_MTopJet_PreSel->fill(event);
@@ -543,7 +547,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(pass_massmigration_rec)  h_XCone_cor_migration_mass->fill(event);
     if(pass_btagmigration_rec)  h_XCone_cor_migration_btag->fill(event);
   }
-
 
   // see all events reconstructed outside measurement phase-space
   if(pass_ptmigration_rec) h_XCone_cor_noptcut->fill(event);
@@ -637,6 +640,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_Both_corr->fill(event);
   } 
 
+
+  /*************************** also store factor from ttbar reweighting ****************************************************************************/
+  double ttfactor = 1.0;
+  if(isTTbar){
+    double weight_before = event.weight;
+    ttbar_reweight->process(event);
+    double weight_after = event.weight;
+    ttfactor = weight_after / weight_before;
+  }
+
   /*************************** write bools for passing selections **********************************************************************************/ 
 
   event.set(h_ttbar, isTTbar);
@@ -644,6 +657,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_ttbar_SF, SF_tt);
   event.set(h_genweight, gen_weight);
   event.set(h_recweight, rec_weight);
+  event.set(h_genweight_ttfactor, ttfactor);
   event.set(h_gensel23, passed_gensel23);
 
   event.set(h_measure_rec, pass_measurement_rec);
