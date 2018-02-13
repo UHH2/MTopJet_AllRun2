@@ -122,6 +122,7 @@ bool CombineXCone33::process(uhh2::Event & event){
   //--------------------------------- get subjets and lepton ------------------------------
   //---------------------------------------------------------------------------------------
   std::vector<TopJet> jets = event.get(h_fatjets);
+  if(jets.size() < 2) return false;
   std::auto_ptr<CombineXCone> combine(new CombineXCone);
   bool lepton_in_event = combine->FindLepton(event);
 
@@ -181,6 +182,7 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   //--------------------------------- get subjets and lepton ------------------------------
   //---------------------------------------------------------------------------------------
   std::vector<GenTopJet> jets = event.get(h_GENfatjets);
+  if(jets.size() < 2) return false;
   std::auto_ptr<CombineXCone> combine(new CombineXCone);
   bool lepton_in_event = combine->FindLepton(event);
 
@@ -239,6 +241,7 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   //--------------------------------- get subjets and lepton ------------------------------
   //---------------------------------------------------------------------------------------
   std::vector<GenTopJet> jets23 = event.get(h_GEN23fatjets);
+  if(jets23.size() < 2) return false;
   std::auto_ptr<CombineXCone> combine(new CombineXCone);
   bool lepton_in_event = combine->FindLepton(event);
 
@@ -248,7 +251,6 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   GenTopJet fathadjet, fatlepjet;
   if(lepton_in_event){
     GenParticle lepton = combine->GetLepton_gen(event);
-
     float dR1 = deltaR(lepton, jets23.at(0));
     float dR2 = deltaR(lepton, jets23.at(1));
     if(dR1 < dR2){
@@ -264,6 +266,7 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
     fatlepjet = jets23.at(1);
     fathadjet = jets23.at(0);
   }
+
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of subjets and combine them ------------------------------
   //---------------------------------------------------------------------------------------

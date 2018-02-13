@@ -111,6 +111,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<double>h_genweight;
   Event::Handle<double>h_recweight;
   Event::Handle<double>h_genweight_ttfactor;
+  Event::Handle<double>h_factor_2width;
+  Event::Handle<double>h_factor_4width;
+  Event::Handle<double>h_factor_8width;
 
   Event::Handle<std::vector<Jet>>h_recjets_had;
   Event::Handle<std::vector<Particle>>h_genjets23_had;
@@ -118,7 +121,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
   //width reweight
-  std::unique_ptr<AnalysisModule> width_reweight;
+  std::unique_ptr<tt_width_reweight> width2_reweight;
+  std::unique_ptr<tt_width_reweight> width4_reweight;
+  std::unique_ptr<tt_width_reweight> width8_reweight;
 
   //scale variation
   std::unique_ptr<AnalysisModule> scale_variation;
@@ -167,7 +172,16 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   /*************************** CONFIGURATION **********************************************************************************/ 
   isMC = (ctx.get("dataset_type") == "MC");
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || ctx.get("dataset_version") == "TTbar_Mtt1000toInft") isTTbar = true;
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000" || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft" ||
+     ctx.get("dataset_version") == "TTbar_mtop1665"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext1" ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext2" ||
+     ctx.get("dataset_version") == "TTbar_mtop1715"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1735"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1755"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1785"       ) isTTbar = true;
   else  isTTbar = false;
 
   // ttbar gen
@@ -185,8 +199,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   counter = 0;
 
-  // Top width reweight
-  width_reweight.reset(new tt_width_reweight(ctx, 8.0));
+  // Top width reweigh
+  width2_reweight.reset(new tt_width_reweight(ctx, 2.0));
+  width4_reweight.reset(new tt_width_reweight(ctx, 4.0));
+  width8_reweight.reset(new tt_width_reweight(ctx, 8.0));
 
   // Top PT reweight
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
@@ -363,6 +379,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_genweight = ctx.declare_event_output<double>("gen_weight");
   h_recweight = ctx.declare_event_output<double>("rec_weight");
   h_genweight_ttfactor = ctx.declare_event_output<double>("gen_weight_ttfactor");
+  h_factor_2width = ctx.declare_event_output<double>("factor_2width");
+  h_factor_4width = ctx.declare_event_output<double>("factor_4width");
+  h_factor_8width = ctx.declare_event_output<double>("factor_8width");
+
+
+
   /*********************************************************************************************************************************/ 
 
 }
@@ -418,7 +440,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /***************************  apply weight *****************************************************************************************************/
   bool do_scale = true;             // change scales mu_R and mu_F?
-  bool reweight_ttbar = false;       // apply ttbar reweight?
+  // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
   double SF_tt = 0.75;
 
@@ -432,11 +454,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isTTbar)h_GenParticles_SM->fill(event);
 
   // choose if tt bar sample width should be reweighted
-  bool do_width_reweight = false;
-  if(do_width_reweight && isTTbar){
-    width_reweight->process(event);
-    gen_weight = event.weight; // store again as gen weight
-    h_GenParticles_newWidth->fill(event);
+  double factor_2w, factor_4w, factor_8w;
+  if(isTTbar){
+    factor_2w = width2_reweight->get_factor(event);
+    factor_4w = width4_reweight->get_factor(event);
+    factor_8w = width8_reweight->get_factor(event);
+  }
+  else{
+    factor_2w = 1.0;
+    factor_4w = 1.0;
+    factor_8w = 1.0;
   }
 
   if(do_scale) scale_variation->process(event);
@@ -667,6 +694,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_nomass_rec, pass_massmigration_rec);
   event.set(h_nomass_gen, pass_massmigration_gen);
   event.set(h_nobtag_rec, pass_btagmigration_rec);
+
+
+  event.set(h_factor_2width, factor_2w);
+  event.set(h_factor_4width, factor_4w);
+  event.set(h_factor_8width, factor_8w);
 
   /*************************** only store events that survive one of the selections (use looser pt cut) ****************************************************************/
   bool in_migrationmatrix = (pass_measurement_rec || pass_measurement_gen || pass_pt350migration_rec || pass_pt350migration_gen || pass_massmigration_rec || pass_massmigration_gen || pass_btagmigration_rec);

@@ -110,7 +110,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
 bool MTopJetPreSelectionModule::process(uhh2::Event& event){
 
-
   bool passed_recsel;
   bool passed_gensel;
 
@@ -120,13 +119,10 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
     if(!genmttbar_sel->passes(event)) return false;
   }
 
-
   /* CMS-certified luminosity sections */
   if(event.isRealData){
     if(!lumi_sel->passes(event)) return false;
   }
-
-
 
   const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
   const bool pass_jet2 = jet2_sel->passes(event);
@@ -141,33 +137,33 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   bool passed_genpt=false;
   if(isMC && pass_semilep){
     std::vector<GenTopJet> jets = event.get(h_GENfatjets);
-    GenParticle lepton;
-    std::vector<GenParticle>* genparts = event.genparticles;
+    if(jets.size() > 1){
+      GenParticle lepton;
+      std::vector<GenParticle>* genparts = event.genparticles;
+      for (unsigned int i=0; i<(genparts->size()); ++i){
+	GenParticle p = genparts->at(i);
+	if(abs(p.pdgId()) == 13) lepton = p;
+	else if(abs(p.pdgId()) == 11) lepton = p;
+      }
+      float dR1 = deltaR(lepton, jets.at(0));
+      float dR2 = deltaR(lepton, jets.at(1));
 
-    for (unsigned int i=0; i<(genparts->size()); ++i){
-      GenParticle p = genparts->at(i);
-      if(abs(p.pdgId()) == 13) lepton = p;
-      else if(abs(p.pdgId()) == 11) lepton = p;
+      std::vector<Particle> had_subjets;
+      if(dR2 < dR1) had_subjets = jets.at(0).subjets();
+      else had_subjets = jets.at(1).subjets();
+      
+      double px=0, py=0, pz=0, E=0;
+      TLorentzVector jet_v4;
+      for(unsigned int i=0; i < had_subjets.size(); ++i){
+	px += had_subjets.at(i).v4().Px();
+	py += had_subjets.at(i).v4().Py();
+	pz += had_subjets.at(i).v4().Pz();
+	E += had_subjets.at(i).v4().E();
+      } 
+      jet_v4.SetPxPyPzE(px, py, pz, E);
+      double pt = jet_v4.Pt();
+      if(pt > 150) passed_genpt = true;
     }
-    float dR1 = deltaR(lepton, jets.at(0));
-    float dR2 = deltaR(lepton, jets.at(1));
-
-    std::vector<Particle> had_subjets;
-    if(dR2 < dR1) had_subjets = jets.at(0).subjets();
-    else had_subjets = jets.at(1).subjets();
-
-    double px=0, py=0, pz=0, E=0;
-    TLorentzVector jet_v4;
-    for(unsigned int i=0; i < had_subjets.size(); ++i){
-      px += had_subjets.at(i).v4().Px();
-      py += had_subjets.at(i).v4().Py();
-      pz += had_subjets.at(i).v4().Pz();
-      E += had_subjets.at(i).v4().E();
-    } 
-    jet_v4.SetPxPyPzE(px, py, pz, E);
-    double pt = jet_v4.Pt();
-
-    if(pt > 150) passed_genpt = true;
   }
   ///
 
@@ -183,6 +179,8 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   event.set(h_gensel, passed_gensel);
 
   return true;
+
+
 }
 
 UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPreSelectionModule)

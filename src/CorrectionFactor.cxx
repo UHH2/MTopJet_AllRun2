@@ -5,7 +5,7 @@ double CorrectionFactor::get_factor(double pt, double eta){
   // get eta bin
   int etabin = 0;
   int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
-  for(unsigned int i = 0; i < N_eta_bins; i++){
+  for(int i = 0; i < N_eta_bins; i++){
     if(eta > eta_bins[i]) etabin = i;
   }
 

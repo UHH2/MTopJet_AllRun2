@@ -92,6 +92,8 @@ class MTopJetSelectionModule : public ModuleBASE {
 
 
   Event::Handle<std::vector<TopJet>>h_fatjets;
+  Event::Handle<std::vector<GenTopJet>>h_gen33fatjets;
+  Event::Handle<std::vector<GenTopJet>>h_gen23fatjets;
 
   // just for testing
   std::unique_ptr<TopPtReweight> ttbar_reweight;
@@ -128,7 +130,16 @@ class MTopJetSelectionModule : public ModuleBASE {
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || ctx.get("dataset_version") == "TTbar_Mtt1000toInft") isTTbar = true;
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000" || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft" ||
+     ctx.get("dataset_version") == "TTbar_mtop1665"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext1" ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext2" ||
+     ctx.get("dataset_version") == "TTbar_mtop1715"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1735"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1755"      ||
+     ctx.get("dataset_version") == "TTbar_mtop1785"       ) isTTbar = true;
   else  isTTbar = false;
 
   if(isTTbar) h_gensel = ctx.get_handle<bool>("passed_gensel");
@@ -136,6 +147,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_gensel_2 = ctx.declare_event_output<bool>("passed_gensel_2");
   h_recsel_2 = ctx.declare_event_output<bool>("passed_recsel_2");
   h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  h_gen23fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone23TopJets");
+  h_gen33fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
   isMC = (ctx.get("dataset_type") == "MC");
 
@@ -370,6 +383,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_Cleaner_jets->fill(event);
     h_Cleaner_lumi->fill(event);
   }
+
   /* *********** Trigger *********** */
   // for DATA until run 274954 -> use only Trigger A
   // for MC and DATA from 274954 -> use "A || B"
@@ -382,9 +396,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       }
     }
   }
-
   if(channel_ == muon) muo_trigger_SF->process(event);
-
 
   if(passed_recsel){
     h_Trigger_event->fill(event);
@@ -426,6 +438,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(passed_recsel){
     if(!event.isRealData) BTagEffHists->fill(event);
   }
+
   /* *********** lepton-2Dcut variables ***********  */
   bool pass_twodcut  = twodcut_sel->passes(event); {
 
@@ -461,8 +474,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   }
   ////
 
-
-
   /* *********** MET selection *********** */
   bool pass_met = met_sel->passes(event);
   if(!pass_met) passed_recsel = false;
@@ -474,6 +485,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_MET_jets->fill(event);
     h_MET_lumi->fill(event);
   }
+
   /* *********** b-tag counter *********** */
   bool passed_btag = false;
   int jetbtagN(0);
@@ -507,8 +519,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(presel && pass_twodcut && !pass_met && passed_btag) h_cuts_all_but_met->fill(event);
   if(presel && pass_twodcut && pass_met && !passed_btag) h_cuts_all_but_btag->fill(event);
 
-
-
   // only keep events that passed rec or gen solution
   if(!passed_gensel && !passed_recsel) return false;
 
@@ -517,6 +527,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // store reco jets with and without JEC applied, and also copy uncorrected subjets
   std::vector<TopJet> jets = event.get(h_fatjets);
   if(jets.size() < 2) return false;
+  std::vector<GenTopJet> gen23jets = event.get(h_gen23fatjets);
+  if(gen23jets.size() < 2) return false;
+  std::vector<GenTopJet> gen33jets = event.get(h_gen33fatjets);
+  if(gen33jets.size() < 2) return false;
 
   jetprod_reco_noJEC->process(event);
   copy_jet->process(event);
@@ -524,6 +538,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   jetprod_reco->process(event);
   Correction->process(event);
   jetprod_reco_corrected->process(event);
+
 
   if(!event.isRealData){
     jetprod_gen23->process(event);
