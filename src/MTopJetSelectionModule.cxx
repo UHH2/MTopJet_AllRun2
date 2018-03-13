@@ -125,21 +125,26 @@ class MTopJetSelectionModule : public ModuleBASE {
   bool isTTbar; //define here to use it in "process" part
 
   string BTag_variation ="central";
+  string MuScale_variation ="central";
+  string MuTrigger_variation ="central";
+
 };
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || 
-     ctx.get("dataset_version") == "TTbar_Mtt0700to1000" || 
-     ctx.get("dataset_version") == "TTbar_Mtt1000toInft" ||
-     ctx.get("dataset_version") == "TTbar_mtop1665"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext1" ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext2" ||
-     ctx.get("dataset_version") == "TTbar_mtop1715"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1735"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1755"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1785"       ) isTTbar = true;
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1665"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext1"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext2"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1715"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1735"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1755"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1785"       ||
+     ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
+     ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
 
   if(isTTbar) h_gensel = ctx.get_handle<bool>("passed_gensel");
@@ -230,9 +235,11 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // scale factors
   BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
   BTag_variation = ctx.get("BTag_variation","central");
+  MuScale_variation = ctx.get("MuScale_variation","central");
+  MuTrigger_variation = ctx.get("MuTrigger_variation","central");
 
-  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID"));
-  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger"));
+  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
+  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
 
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
 

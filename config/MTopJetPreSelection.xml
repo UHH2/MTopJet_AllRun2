@@ -63,6 +63,9 @@
   <!ENTITY TTbar_mtop1755      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1755.xml"> 
   <!ENTITY TTbar_mtop1785      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1785.xml"> 
 
+  <!ENTITY TTbar_amcatnlo-pythia      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_amcatnlo.xml"> 
+  <!ENTITY TTbar_powheg-herwig        SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_powheg-herwig.xml"> 
+
  
 <!-- =============================================== W+jets =========================================================================== -->
 
@@ -127,7 +130,7 @@
 <!-- ================================================================================================================================== -->
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="3" />
+   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="5" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PreSel_workdir"/>
 -->
 
@@ -315,11 +318,18 @@
     <!-- <InputData Version="TTbar_mtop1735" Lumi="23346.319" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- &TTbar_mtop1735; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="TTbar_mtop1755" Lumi="35416.95" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &TTbar_mtop1755; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <!-- <InputData Version="TTbar_mtop1755" Lumi="35416.95" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &TTbar_mtop1755; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
     <!-- <InputData Version="TTbar_mtop1785" Lumi="19689.187" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- &TTbar_mtop1785; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+    <!-- <InputData Version="TTbar_amcatnlo-pythia" Lumi="53319.775" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &TTbar_amcatnlo-pythia; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+    <InputData Version="TTbar_powheg-herwig" Lumi="23747.699" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_powheg-herwig; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
 
     <!-- ********DYJets**************************************** -->
     <!-- <InputData Version="DYJetsToLL_LO_M50_HT0070to0100" Lumi="44562.437" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->

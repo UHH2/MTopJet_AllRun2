@@ -27,7 +27,7 @@ protected:
     TH1F *PT_HadJet23, *PT_LepJet23;
     TH1F *number_HadJet23, *number_LepJet23;
 
-    TH1F *Mass_HadJet33, *Mass_HadJet33_rebin, *Mass_LepJet33, *MassDiff33;
+    TH1F *Mass_HadJet33, *Mass_HadJet33_B, *Mass_HadJet33_C, *Mass_HadJet33_rebin, *Mass_HadJet33_unfold, *Mass_LepJet33, *MassDiff33;
     TH1F *PT_HadJet33, *PT_LepJet33;
     TH1F *number_HadJet33, *number_LepJet33;
 

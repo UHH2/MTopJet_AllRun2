@@ -16,7 +16,13 @@ GenHists_xcone::GenHists_xcone(uhh2::Context & ctx, const std::string & dirname)
   number_LepJet23 = book<TH1F>("number_LepJet23", "number", 10, 0, 10);
 
   Mass_HadJet33 = book<TH1F>("Mass_HadJet33", "M_{jet}", 50, 0, 500);
+  Mass_HadJet33_B = book<TH1F>("Mass_HadJet33_B", "M_{jet}", 100, 0, 500);
+  Mass_HadJet33_C = book<TH1F>("Mass_HadJet33_C", "M_{jet}", 500, 0, 500);
   Mass_HadJet33_rebin = book<TH1F>("Mass_HadJet33_rebin", "M_{jet}", 25, 0, 500);
+
+  Float_t xbins[] = {0, 127, 142, 157, 172, 187, 203, 218, 240, 270, 300, 500};
+  Mass_HadJet33_unfold = book<TH1F>("Mass_HadJet33_unfold", "M_{jet}", 11, xbins);
+
   Mass_LepJet33 = book<TH1F>("Mass_LepJet33", "M_{jet}", 50, 0, 500);
   MassDiff33 = book<TH1F>("MassDiff33", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
  
@@ -91,6 +97,11 @@ void GenHists_xcone::fill(const Event & event){
 
   Mass_HadJet33->Fill(had33.v4().M(), weight);
   Mass_HadJet33_rebin->Fill(had33.v4().M(), weight);
+  Mass_HadJet33_unfold->Fill(had33.v4().M(), weight);
+  Mass_HadJet33_B->Fill(had33.v4().M(), weight);
+  Mass_HadJet33_C->Fill(had33.v4().M(), weight);
+
+
   Mass_LepJet33->Fill(lep33.v4().M(), weight);
   MassDiff33->Fill(had33.v4().M() - lep33.v4().M(), weight); 
  

@@ -31,6 +31,13 @@ namespace uhh2 {
 
   };
 
+  class TTbarSemilep_herwig : public Selection { 
+
+  public: 
+    explicit TTbarSemilep_herwig(Context&);
+    virtual bool passes(const Event&) override;
+  };
+
   class TopHadPT : public Selection { 
 
   public: 

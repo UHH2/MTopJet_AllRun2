@@ -68,6 +68,10 @@ class MTopJetPreSelectionModule : public ModuleBASE {
 MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
+  bool isherwig;
+  if(ctx.get("dataset_version") == "TTbar_powheg-herwig") isherwig = true;
+  else isherwig = false;
+
   isMC = (ctx.get("dataset_type") == "MC");
 
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
@@ -104,7 +108,8 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   ////
 
   //// EVENTS SELECTION GEN
-  if(isMC) SemiLepDecay.reset(new TTbarSemilep(ctx));
+  if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
+  else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
   ////
 }
 

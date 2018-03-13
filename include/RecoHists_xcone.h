@@ -23,7 +23,7 @@ public:
 
 protected:
 
-    TH1F *HadJetMass, *HadJetMass_rebin, *LepJetMass, *HadMassLepMass, *SoftdropMass_had, *SoftdropMass_lep, *SoftdropMass_Sel;
+    TH1F *HadJetMass, *HadJetMass_rebin, *HadJetMass_B, *LepJetMass, *HadMassLepMass, *SoftdropMass_had, *SoftdropMass_lep, *SoftdropMass_Sel;
     TH1F *HadJetEta, *HadJetPhi, *LepJetEta, *LepJetPhi;
     TH1F *HadJetPT, *LepJetPT, *FatJetPT_had, *FatJetPT_lep;
     TH1F *DeltaRDiff;

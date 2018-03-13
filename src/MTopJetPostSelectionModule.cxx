@@ -172,16 +172,18 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   /*************************** CONFIGURATION **********************************************************************************/ 
   isMC = (ctx.get("dataset_type") == "MC");
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" || 
-     ctx.get("dataset_version") == "TTbar_Mtt0700to1000" || 
-     ctx.get("dataset_version") == "TTbar_Mtt1000toInft" ||
-     ctx.get("dataset_version") == "TTbar_mtop1665"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext1" ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext2" ||
-     ctx.get("dataset_version") == "TTbar_mtop1715"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1735"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1755"      ||
-     ctx.get("dataset_version") == "TTbar_mtop1785"       ) isTTbar = true;
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1665"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext1"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1695_ext2"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1715"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1735"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1755"       ||
+     ctx.get("dataset_version") == "TTbar_mtop1785"       ||
+     ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
+     ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
 
   // ttbar gen
