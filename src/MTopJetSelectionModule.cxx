@@ -66,6 +66,9 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<JetCorrections_xcone> JetCorrections;
   std::unique_ptr<uhh2::AnalysisModule> Correction;
 
+  // Btag efficiency hists
+  std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
+
   // selections
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
@@ -98,11 +101,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   // just for testing
   std::unique_ptr<TopPtReweight> ttbar_reweight;
 
-  // scale factors
-  std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
-  std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
-  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
-
+ 
   // write output
   std::unique_ptr<uhh2::AnalysisModule> output; 
 
@@ -123,10 +122,9 @@ class MTopJetSelectionModule : public ModuleBASE {
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
+  bool jecsys;
 
-  string BTag_variation ="central";
-  string MuScale_variation ="central";
-  string MuTrigger_variation ="central";
+  string corvar ="nominal";
 
 };
 
@@ -188,11 +186,15 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); // 8 TeV
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
 
+  jecsys = false;
+  // double jecsysfactor = 1.0;
+
+  corvar = ctx.get("JetCorrection_direction","nominal");
 
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
   JetCorrections->init(ctx, "XConeTopJets");
-  Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected"));
+  Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected", corvar));
 
   //// EVENT SELECTION
 
@@ -232,23 +234,13 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ////
 
 
-  // scale factors
-  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
-  BTag_variation = ctx.get("BTag_variation","central");
-  MuScale_variation = ctx.get("MuScale_variation","central");
-  MuTrigger_variation = ctx.get("MuTrigger_variation","central");
-
-  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
-  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
-
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
-
-  //// Obj Cleaning
+   //// Obj Cleaning
 
   common.reset(new CommonModules());
   common->set_HTjetid(jetid_cleaner);
   common->switch_jetlepcleaner(true);
   common->switch_metcorrection();
+  common->disable_mcpileupreweight(); // do this in PostSel
   common->init(ctx);
   
 
@@ -259,6 +251,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
 
   //
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
 
   //// set up Hists classes:
   h_cuts_all.reset(new CutHists(ctx, "h_cuts_all"));
@@ -382,7 +375,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   }
 
   /* *********** scale factor muon *********** */
-  muo_tight_noniso_SF->process(event);
+  // muo_tight_noniso_SF->process(event);
   if(passed_recsel){
     h_Cleaner_event->fill(event);
     h_Cleaner_elec->fill(event);
@@ -403,7 +396,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       }
     }
   }
-  if(channel_ == muon) muo_trigger_SF->process(event);
+  // if(channel_ == muon) muo_trigger_SF->process(event);
 
   if(passed_recsel){
     h_Trigger_event->fill(event);
@@ -500,7 +493,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(jetbtagN == 0) passed_btag = false;
   else passed_btag = true;
 
-  BTagScaleFactors->process(event);
+  // BTagScaleFactors->process(event);
   
   if(passed_recsel && !passed_btag){
       h_Side_event->fill(event);
@@ -527,6 +520,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(presel && pass_twodcut && pass_met && !passed_btag) h_cuts_all_but_btag->fill(event);
 
   // only keep events that passed rec or gen solution
+  if(jecsys){
+    if(!passed_recsel) return false;
+  }
   if(!passed_gensel && !passed_recsel) return false;
 
 
@@ -534,10 +530,12 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // store reco jets with and without JEC applied, and also copy uncorrected subjets
   std::vector<TopJet> jets = event.get(h_fatjets);
   if(jets.size() < 2) return false;
-  std::vector<GenTopJet> gen23jets = event.get(h_gen23fatjets);
-  if(gen23jets.size() < 2) return false;
-  std::vector<GenTopJet> gen33jets = event.get(h_gen33fatjets);
-  if(gen33jets.size() < 2) return false;
+  if(!event.isRealData){
+    std::vector<GenTopJet> gen23jets = event.get(h_gen23fatjets);
+    if(gen23jets.size() < 2) return false;
+    std::vector<GenTopJet> gen33jets = event.get(h_gen33fatjets);
+    if(gen33jets.size() < 2) return false;
+  }
 
   jetprod_reco_noJEC->process(event);
   copy_jet->process(event);

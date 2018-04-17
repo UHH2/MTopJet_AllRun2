@@ -11,32 +11,46 @@ double CorrectionFactor::get_factor(double pt, double eta){
 
   // get factor from function
   if(pt > 400) pt = 400;
-  double factor = par[etabin][0] + par[etabin][1] * pt + par[etabin][2] * pt * pt;
+  if(pt < 0)   pt = 0;
 
-  // cout << "Eta Bin     = " << etabin << endl;
-  // cout << "Parameter 0 = " << par[etabin][0] << endl;
-  // cout << "Parameter 1 = " << par[etabin][1] << endl;
-  // cout << "Parameter 2 = " << par[etabin][2] << endl;
-  // cout << "Parameter 3 = " << par[etabin][3] << endl;
-  // cout << "Factor      = " << factor << endl;
+
+  double factor;
+  if(CorUp || CorDown) factor = CorrectionGraphs[etabin]->Eval(pt);
+  else factor = CorrectionFunctions[etabin]->Eval(pt);
+
+  // cout << "Eta Bin = " << etabin << endl;
+  // cout << "PT      = " << pt << endl;
+  // cout << "Factor  = " << factor << endl;
 
   return factor;
 }
 
-void CorrectionFactor::get_values(){
-  // get factors in pt and eta bins from file
-  std::ifstream file("/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/CorrectionFactors_new.txt");
-  int eta;
-  double p0, p1, p2, p3;
-  while(file >> eta >> p0 >> p1 >> p2){
-    cout<< "eta = " << eta << "  p0 = " << p0 << "  p1 = " << p1 << "  p2 = " << p2 <<endl; 
-    par[eta][0] = p0;
-    par[eta][1] = p1;
-    par[eta][2] = p2;
-  }
-  file.close();
+void CorrectionFactor::get_function(){
 
-  return;
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
+  TString filename;
+  filename = dir + "Correction.root";
+  TFile *file = new TFile(filename);
+
+  TString histname;
+  int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
+  for(int i = 0; i < N_eta_bins; i++){
+    stringstream BinString;
+    BinString << i;
+    histname = BinString.str();
+    if(CorUp){
+      histname += "/Up";
+      CorrectionGraphs.push_back((TGraph*)file->Get(histname));
+    }
+    else if(CorDown){
+      histname += "/Down";
+      CorrectionGraphs.push_back((TGraph*)file->Get(histname));
+    }
+    else{
+      histname += "/Central";
+      CorrectionFunctions.push_back((TF1*)file->Get(histname));
+    }  
+  }
 }
 
 Particle GetLepton(uhh2::Event & event){
@@ -59,11 +73,17 @@ Particle GetLepton(uhh2::Event & event){
 }
 
 
-CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name):
+CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar):
   h_oldjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")),
   h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name))
 {
-  get_values(); // read file here, not in every event
+  CorUp = false;
+  CorDown=false;
+
+  if(corvar == "up")   CorUp = true;
+  else if(corvar == "down") CorDown = true;
+
+  get_function(); // read file here, not in every event
 }
 
 bool CorrectionFactor::process(uhh2::Event & event){
@@ -102,3 +122,4 @@ bool CorrectionFactor::process(uhh2::Event & event){
 
   return true;
 }
+

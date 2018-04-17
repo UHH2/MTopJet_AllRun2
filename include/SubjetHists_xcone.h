@@ -30,8 +30,10 @@ protected:
 
     TH1F *pt_had_combine, *pt_lep_combine;
     TH1F *mass_had_combine, *mass_had_combine_cut, *mass_lep_combine;
-    TH1F *min_mass_Wjet, *min_mass_Wjet_zoom, *all_mass_Wjet;
-
+    TH1F *min_mass_Wjet, *min_mass_Wjet_zoom, *min_mass_Wjet_ptlow, *min_mass_Wjet_pthigh, *min_mass_Wjet_ptmix, *all_mass_Wjet;
+    TH1F *pt_Wjet, *pt_Wjet_i, *pt_Wjet_j, *pt_Wjet_diff;
+    TH2F *pt_Wjets;
+    TH1F* Wjet_combination;
     TH1F *JEC_all_subjets, *JEC_L1_all_subjets, *JEC_L2L3_all_subjets;
     TH1F *JEC_ak4, *JEC_L1_ak4, *JEC_L2L3_ak4;
 

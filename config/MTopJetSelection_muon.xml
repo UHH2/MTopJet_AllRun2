@@ -88,7 +88,7 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="50000" LastBreak="0" FileSplit="0"/>
+   <ConfigParse NEventsBreak="70000" LastBreak="0" FileSplit="0"/>
    <ConfigSGE RAM="2" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/SelMu_workdir"/>
 -->
 
@@ -300,12 +300,9 @@
       <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
       <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" /> 
 
-      <Item Name="BTag_variation" Value="central" />
-      <Item Name="MuScale_variation" Value="central" />
-      <Item Name="MuTrigger_variation" Value="central" />
-
-
-
+      <Item Name="jecsmear_direction" Value="nominal" />    <!-- has to be: nominal, up or down! -->
+      <Item Name="jersmear_direction" Value="down" />   <!-- has to be: nominal, up or down! -->
+      <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
 
       <Item Name="AnalysisModule" Value="MTopJetSelectionModule"/>
     </UserConfig>

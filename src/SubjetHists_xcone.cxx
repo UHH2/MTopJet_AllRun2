@@ -35,9 +35,17 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   mass_had_combine_cut = book<TH1F>("mass_had_combine_cut", "M^{had combined}", 50, 0, 500);
 
   min_mass_Wjet = book<TH1F>("min_mass_Wjet", "min M_{ij}", 50, 50, 150);
+  min_mass_Wjet_ptlow = book<TH1F>("min_mass_Wjet_ptlow", "min M_{ij}", 50, 50, 150);
+  min_mass_Wjet_pthigh = book<TH1F>("min_mass_Wjet_pthigh", "min M_{ij}", 50, 50, 150);
   all_mass_Wjet = book<TH1F>("all_mass_Wjet", "all M_{ij}", 50, 50, 150);
 
   min_mass_Wjet_zoom = book<TH1F>("min_mass_Wjet_zoom", "min M_{ij}", 60, 60, 120);
+  pt_Wjet = book<TH1F>("pt_Wjet", "p_{T,ij}", 100, 0, 500);
+  pt_Wjet_i = book<TH1F>("pt_Wjet_i", "p_{T,i}", 100, 0, 500);
+  pt_Wjet_j = book<TH1F>("pt_Wjet_j", "p_{T,j}", 100, 0, 500);
+  pt_Wjet_diff = book<TH1F>("pt_Wjet_diff", "p_{T,i} - p_{T,j}", 200, -400, 400);
+  pt_Wjets = book<TH2F>("pt_Wjets", "x=p_{T,i} y=p_{T,j}", 100, 0, 500, 100, 0, 500);
+  Wjet_combination = book<TH1F>("Wjet_combination", "combination", 3, 0, 3);
 
   area_ak4 = book<TH1F>("area_ak4", "jet area (ak4)", 50, 0, 1);
   pt_ak4 = book<TH1F>("pt_ak4", "p_{T}^{ak4}", 100, 0, 500);
@@ -144,12 +152,46 @@ void SubjetHists_xcone::fill(const Event & event){
   Wjet23.SetPxPyPzE(px, py, pz, E);
 
   double M12, M13, M23, M_min = 1000;
+  double pt1, pt2, pt3;
+  pt1 = had_subjets.at(0).pt();
+  pt2 = had_subjets.at(1).pt();
+  pt3 = had_subjets.at(2).pt();
   M12 = Wjet12.M();
   M13 = Wjet13.M();
   M23 = Wjet23.M();
-  if(M12 < M13 && M12 < M23) M_min = M12;
-  if(M13 < M12 && M13 < M23) M_min = M13;
-  if(M23 < M12 && M23 < M13) M_min = M23;
+  if(M12 < M13 && M12 < M23){
+    M_min = M12;
+    if(pt1 <= 120 && pt2 <= 120) min_mass_Wjet_ptlow->Fill(M_min, weight);
+    if(pt1 > 120 && pt2 > 120) min_mass_Wjet_pthigh->Fill(M_min, weight);
+    pt_Wjet->Fill(Wjet12.Pt(), weight);
+    pt_Wjet_i->Fill(pt1, weight);
+    pt_Wjet_j->Fill(pt2, weight);
+    pt_Wjet_diff->Fill(pt1 - pt2, weight);
+    pt_Wjets->Fill(pt1, pt2, weight);
+    Wjet_combination->Fill(0.5, weight);
+  }
+  if(M13 < M12 && M13 < M23){
+    M_min = M13;
+    if(pt1 <= 120 && pt3 <= 120) min_mass_Wjet_ptlow->Fill(M_min, weight);
+    if(pt1 > 120 && pt3 > 120) min_mass_Wjet_pthigh->Fill(M_min, weight);
+    pt_Wjet->Fill(Wjet13.Pt(), weight);
+    pt_Wjet_i->Fill(pt1, weight);
+    pt_Wjet_j->Fill(pt3, weight);
+    pt_Wjet_diff->Fill(pt1 - pt3, weight);
+    pt_Wjets->Fill(pt1, pt3, weight);
+    Wjet_combination->Fill(1.5, weight);
+  }
+  if(M23 < M12 && M23 < M13){
+    M_min = M23;
+    if(pt2 <= 120 && pt3 <= 120) min_mass_Wjet_ptlow->Fill(M_min, weight);
+    if(pt2 > 120 && pt3 > 120) min_mass_Wjet_pthigh->Fill(M_min, weight);
+    pt_Wjet->Fill(Wjet23.Pt(), weight);
+    pt_Wjet_i->Fill(pt2, weight);
+    pt_Wjet_j->Fill(pt3, weight);
+    pt_Wjet_diff->Fill(pt2 - pt3, weight);
+    pt_Wjets->Fill(pt2, pt3, weight);
+    Wjet_combination->Fill(2.5, weight);
+  }
 
   if(M_min != 1000){
     min_mass_Wjet->Fill(M_min, weight);
@@ -158,6 +200,8 @@ void SubjetHists_xcone::fill(const Event & event){
   all_mass_Wjet->Fill(M12, weight);
   all_mass_Wjet->Fill(M13, weight);
   all_mass_Wjet->Fill(M23, weight);
+
+
 
   //---------------------------------------------------------------------------------------
   //--------------------------------- Fill Hists here -------------------------------------

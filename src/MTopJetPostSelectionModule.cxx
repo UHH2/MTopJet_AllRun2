@@ -127,6 +127,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 
   //scale variation
   std::unique_ptr<AnalysisModule> scale_variation;
+  std::unique_ptr<AnalysisModule> PUreweight;
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_Muon_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
@@ -166,6 +167,16 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
   int counter;
+
+  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
+  std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF, muon_trk_SF;
+
+  
+  string BTag_variation ="central";
+  string MuScale_variation ="nominal";
+  string MuTrigger_variation ="nominal";
+  string MuTrk_variation ="nominal";
+  string PU_variation ="nominal";
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
@@ -175,6 +186,24 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  || 
      ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || 
      ctx.get("dataset_version") == "TTbar_Mtt1000toInft"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_jecup"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_jecup"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_jecup"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_jecdown"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_jecdown"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_jecdown"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_jerup"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_jerup"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_jerup"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_jerdown"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_jerdown"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_jerdown"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_corup"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_corup"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_corup"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_cordown"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_cordown"  || 
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_cordown"  ||
      ctx.get("dataset_version") == "TTbar_mtop1665"       ||
      ctx.get("dataset_version") == "TTbar_mtop1695_ext1"  ||
      ctx.get("dataset_version") == "TTbar_mtop1695_ext2"  ||
@@ -211,6 +240,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   //scale variation
   scale_variation.reset(new MCScaleVariation(ctx));
+
+  // PU reweighting
+  PU_variation = ctx.get("PU_variation","central");
+  PUreweight.reset(new MCPileupReweight(ctx, PU_variation));
 
 
   h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
@@ -249,6 +282,18 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   pt_sel_ak8.reset(new LeadingRecoJetPT_topjet(ctx, 750));
   mass_ak8.reset(new MassCutReco_topjet(ctx));
   pt750_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 750));
+
+  // Scale factors
+  BTag_variation = ctx.get("BTag_variation","central");
+  MuScale_variation = ctx.get("MuScale_variation","nominal");
+  MuTrigger_variation = ctx.get("MuTrigger_variation","nominal");
+  MuTrk_variation = ctx.get("MuTrk_variation","nominal");
+
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
+  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
+  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
+ muon_trk_SF.reset(new MCMuonTrkScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Tracking_EfficienciesAndSF_BCDEFGH.root", 1, "track", MuTrk_variation, "muons"));
+
 
   /*************************** Set up Hists classes **********************************************************************************/
 
@@ -441,13 +486,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
 
   /***************************  apply weight *****************************************************************************************************/
-  bool do_scale = true;             // change scales mu_R and mu_F?
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
   double SF_tt = 0.75;
 
   // get lumi weight = genweight (inkl scale variation)
-  if(do_scale) scale_variation->process(event);
+  scale_variation->process(event); // here, it is only executed to be filled into the gen weight is has to be done again to appear in the event.weight
   double gen_weight = event.weight;
 
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
@@ -468,13 +512,17 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     factor_8w = 1.0;
   }
 
-  if(do_scale) scale_variation->process(event);
+  scale_variation->process(event); // do this again because scale variation should change gen weight and event.weight, but not rec weight!!!
+ 
+ // if(reweight_ttbar) ttbar_reweight->process(event);
 
-  // rec weight is now:
-  // if(reweight_ttbar) ttbar_reweight->process(event);
-  double rec_weight;
-  if(gen_weight==0)rec_weight = 0;
-  else rec_weight = (event.weight)/gen_weight;
+  /** PU Reweighting *********************/
+  PUreweight->process(event);
+
+  /** muon SF *********************/
+  muo_tight_noniso_SF->process(event);
+  muo_trigger_SF->process(event);
+  muon_trk_SF->process(event);
 
   /** b-tagging *********************/
   int jetbtagN(0);
@@ -489,8 +537,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else passed_btag = false;
   if(jetbtagN_medium >= 1) passed_btag_medium = true;
   else passed_btag_medium = false;
-  /**********************************/
+  BTagScaleFactors->process(event);
 
+  /** calculate recweight now *********************/
+  double rec_weight;
+  if(gen_weight==0)rec_weight = 0;
+  else rec_weight = (event.weight)/gen_weight;
+
+
+  /**********************************/
   bool passed_presel_rec = (passed_recsel && passed_btag);
 
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 *******************************************************/

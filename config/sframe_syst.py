@@ -15,24 +15,18 @@ sys_uncerts = {
      'SCALE_nonedown'        : {'ScaleVariationMuR':'none','ScaleVariationMuF':'down'},
      'SCALE_downnone'        : {'ScaleVariationMuR':'down','ScaleVariationMuF':'none'},
      'SCALE_downdown'        : {'ScaleVariationMuR':'down','ScaleVariationMuF':'down'},
-     'PU_up'                 : {'Systematic_PU':'up'},
-     'PU_down'               : {'Systematic_PU':'down'},
-     'MUID_up'               : {'Systematic_MuonID':'up'},
-     'MUID_down'             : {'Systematic_MuonID':'down'},
-     'MUTR_up'               : {'Systematic_MuonTrigger':'up'},
-     'MUTR_down'             : {'Systematic_MuonTrigger':'down'},
-     'MUISO_up'              : {'Systematic_MuonIso':'up'},
-     'MUISO_down'            : {'Systematic_MuonIso':'down'},
-     'MUTRK_up'              : {'Systematic_MuonTrk':'up'},
-     'MUTRK_down'            : {'Systematic_MuonTrk':'down'},
-     'BTAG_bc_up'            : {'Systematic_BTag':'up_bc'},
-     'BTAG_bc_down'          : {'Systematic_BTag':'down_bc'},
-     'BTAG_udsg_up'          : {'Systematic_BTag':'up_udsg'},
-     'BTAG_udsg_down'        : {'Systematic_BTag':'down_udsg'},
-     #'JEC_up'               : {'jecsmear_direction':'up'},
-     #'JEC_down'             : {'jecsmear_direction':'down'},
-     #'JER_up'               : {'jersmear_direction':'up'},
-     #'JER_down'             : {'jersmear_direction':'down'},
+     'PU_up'                 : {'PU_variation':'up'},
+     'PU_down'               : {'PU_variation':'down'},
+     'MUID_up'               : {'MuScale_variation':'up'},
+     'MUID_down'             : {'MuScale_variation':'down'},
+     'MUTR_up'               : {'MuTrigger_variation':'up'},
+     'MUTR_down'             : {'MuTrigger_variation':'down'},
+     'MUTRK_up'              : {'MuTrk_variation':'up'},
+     'MUTRK_down'            : {'MuTrk_variation':'down'},
+     'BTAG_bc_up'            : {'BTag_variation':'up_bc'},
+     'BTAG_bc_down'          : {'BTag_variation':'down_bc'},
+     'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
+     'BTAG_udsg_down'        : {'BTag_variation':'down_udsg'},
 }
 start_all_parallel = True
 
@@ -76,8 +70,8 @@ class MySFrameBatch(SFrame):
     def configure(self):
         self.xml_doctype = self.xml_doctype + """
 <!--
-   <ConfigParse NEventsBreak="100000" FileSplit="0" AutoResubmit="0" />
-   <ConfigSGE RAM ="2" DISK ="2" Mail="heiner@cern.de" Notification="as" Workdir="workdir"/>
+   <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
+   <ConfigSGE RAM="2" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PostSelMu_workdir"/> 
 -->
 """
         if os.path.exists(self.cwd + 'workdir'):

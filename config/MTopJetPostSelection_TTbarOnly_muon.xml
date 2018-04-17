@@ -68,16 +68,17 @@
 	<Item Name="use_sframe_weight" Value="true"/>
 	<Item Name="dometfilters" Value="true" />
 	<Item Name="dopvfilter" Value="true" />
-	<!-- <Item Name="lumi_file" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/> -->
-
-	<!-- <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root" /> -->
-	<!-- <Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root" /> -->
-	<!-- <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root" /> -->
-	<!-- <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" /> -->
 	<Item Name="channel" Value="&channel;"/>
 
-	<Item Name="ScaleVariationMuR" Value="down"/>
-	<Item Name="ScaleVariationMuF" Value="down"/>
+	<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
+	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" /> 
+
+
+	<Item Name="ScaleVariationMuR" Value="none"/>
+	<Item Name="ScaleVariationMuF" Value="none"/>
+	<Item Name="BTag_variation" Value="central" />
+	<Item Name="MuScale_variation" Value="central" />
+	<Item Name="MuTrigger_variation" Value="central" />
 
 	<Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
     </UserConfig>
