@@ -10,7 +10,7 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
 
   LepJetMass = book<TH1F>("M_jet2", "m_{jet}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);
- 
+
   HadJetEta = book<TH1F>("eta_jet1", "#eta", 50, -5, 5);
   HadJetPhi = book<TH1F>("phi_jet1", "#phi", 50, -2*M_PI, 2*M_PI);
   LepJetEta = book<TH1F>("eta_jet2", "#eta", 50, -5, 5);
@@ -115,7 +115,7 @@ void RecoHists_xcone::fill(const Event & event){
   hadjet_v4.SetPxPyPzE(pxhad, pyhad, pzhad, Ehad);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 
 
@@ -177,8 +177,6 @@ void RecoHists_xcone::fill(const Event & event){
   hadjet_v4.Delete();
   lepjet_v4.Delete();
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 }
-
-

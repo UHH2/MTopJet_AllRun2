@@ -147,7 +147,7 @@ bool CombineXCone33::process(uhh2::Event & event){
     fatlepjet = jets.at(1);
     fathadjet = jets.at(0);
   }
-  
+
 
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of subjets and combine them ------------------------------
@@ -167,7 +167,7 @@ bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   event.set(h_xcone33hadjets, hadjets);
   event.set(h_xcone33lepjets, lepjets);
-  
+
   return true;
 }
 

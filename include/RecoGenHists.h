@@ -11,10 +11,9 @@
 #include <iostream>
 
 using namespace uhh2;
- 
 
 /**  \brief Example class for booking and filling histograms
- * 
+ *
  * NOTE: This class uses the 'hist' method to retrieve histograms.
  * This requires a string lookup and is therefore slow if you have
  * many histograms. Therefore, it is recommended to use histogram
@@ -24,7 +23,7 @@ class RecoGenHists: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
   RecoGenHists(uhh2::Context & ctx, const std::string & dirname, const std::string & rec_label, const std::string & gen_label);
-    
+
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
@@ -37,5 +36,3 @@ protected:
     uhh2::Event::Handle<std::vector<Jet>>h_genjets;
 
 };
-
-

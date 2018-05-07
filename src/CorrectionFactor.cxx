@@ -29,7 +29,7 @@ void CorrectionFactor::get_function(){
 
   TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
-  filename = dir + "Correction.root";
+  filename = dir + "Correction_noCHS.root";
   TFile *file = new TFile(filename);
 
   TString histname;
@@ -49,7 +49,7 @@ void CorrectionFactor::get_function(){
     else{
       histname += "/Central";
       CorrectionFunctions.push_back((TF1*)file->Get(histname));
-    }  
+    }
   }
 }
 
@@ -122,4 +122,3 @@ bool CorrectionFactor::process(uhh2::Event & event){
 
   return true;
 }
-

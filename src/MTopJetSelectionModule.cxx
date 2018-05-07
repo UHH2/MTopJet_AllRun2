@@ -91,7 +91,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
- 
+
 
 
   Event::Handle<std::vector<TopJet>>h_fatjets;
@@ -101,9 +101,9 @@ class MTopJetSelectionModule : public ModuleBASE {
   // just for testing
   std::unique_ptr<TopPtReweight> ttbar_reweight;
 
- 
+
   // write output
-  std::unique_ptr<uhh2::AnalysisModule> output; 
+  std::unique_ptr<uhh2::AnalysisModule> output;
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_PreSel_event,  h_PreSel_elec, h_PreSel_muon, h_PreSel_jets, h_PreSel_lumi;
@@ -122,17 +122,18 @@ class MTopJetSelectionModule : public ModuleBASE {
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
-  bool jecsys;
+  bool recsel_only;
 
   string corvar ="nominal";
 
 };
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
+  recsel_only = false;
 
   //// CONFIGURATION
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  || 
-     ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  || 
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  ||
      ctx.get("dataset_version") == "TTbar_Mtt1000toInft"  ||
      ctx.get("dataset_version") == "TTbar_mtop1665"       ||
      ctx.get("dataset_version") == "TTbar_mtop1695_ext1"  ||
@@ -167,15 +168,15 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   }
 
   // combine XCone
-  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "XConeTopJets")); 
-  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "XConeTopJets" )); 
-  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "XConeTopJets_Corrected")); 
-  copy_jet.reset(new CopyJets(ctx, "XConeTopJets", "XConeTopJets_noJEC")); 
+  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "XConeTopJets"));
+  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "XConeTopJets" ));
+  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "XConeTopJets_Corrected"));
+  copy_jet.reset(new CopyJets(ctx, "XConeTopJets", "XConeTopJets_noJEC"));
 
   if(isMC){
     jetprod_gen23.reset(new CombineXCone23_gen(ctx));
     jetprod_gen33.reset(new CombineXCone33_gen(ctx));
-  }	
+  }
   ////
 
   // write output
@@ -186,14 +187,13 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); // 8 TeV
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
 
-  jecsys = false;
   // double jecsysfactor = 1.0;
 
   corvar = ctx.get("JetCorrection_direction","nominal");
 
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
-  JetCorrections->init(ctx, "XConeTopJets");
+  JetCorrections->init(ctx, "XConeTopJets", "genXCone33TopJets");
   Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected", corvar));
 
   //// EVENT SELECTION
@@ -242,7 +242,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   common->switch_metcorrection();
   common->disable_mcpileupreweight(); // do this in PostSel
   common->init(ctx);
-  
+
 
   muoSR_cleaner.reset(new     MuonCleaner(muid));
   eleSR_cleaner.reset(new ElectronCleaner(eleid));
@@ -316,8 +316,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_Side_event.reset(new MTopJetHists(ctx, "Side_Event"));
   h_Side_elec.reset(new ElectronHists(ctx, "Side_Elec"));
   h_Side_muon.reset(new MuonHists(ctx, "Side_Muon"));
-  h_Side_jets.reset(new JetHists(ctx, "Side_Jets")); 
-  h_Side_lumi.reset(new LuminosityHists(ctx, "Side_lumi")); 
+  h_Side_jets.reset(new JetHists(ctx, "Side_Jets"));
+  h_Side_lumi.reset(new LuminosityHists(ctx, "Side_lumi"));
 
   h_ttbar_reweight_event.reset(new MTopJetHists(ctx, "ttbar_reweight_Event"));
   h_ttbar_reweight_elec.reset(new ElectronHists(ctx, "ttbar_reweight_Elec"));
@@ -446,7 +446,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
       float    dRmin, pTrel;
       std::tie(dRmin, pTrel) = drmin_pTrel(muo, *event.jets);
-      
+
       muo.set_tag(Muon::twodcut_dRmin, dRmin);
       muo.set_tag(Muon::twodcut_pTrel, pTrel);
     }
@@ -455,7 +455,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
       float    dRmin, pTrel;
       std::tie(dRmin, pTrel) = drmin_pTrel(ele, *event.jets);
-      
+
       ele.set_tag(Electron::twodcut_dRmin, dRmin);
       ele.set_tag(Electron::twodcut_pTrel, pTrel);
     }
@@ -464,7 +464,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(!pass_twodcut) passed_recsel = false;
   jet_cleaner2->process(event);
   sort_by_pt<Jet>(*event.jets);
-  
+
   if(passed_recsel){
     h_TwoD_event->fill(event);
     h_TwoD_elec->fill(event);
@@ -494,7 +494,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   else passed_btag = true;
 
   // BTagScaleFactors->process(event);
-  
+
   if(passed_recsel && !passed_btag){
       h_Side_event->fill(event);
       h_Side_elec->fill(event);
@@ -520,7 +520,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(presel && pass_twodcut && pass_met && !passed_btag) h_cuts_all_but_btag->fill(event);
 
   // only keep events that passed rec or gen solution
-  if(jecsys){
+  if(recsel_only){
     if(!passed_recsel) return false;
   }
   if(!passed_gensel && !passed_recsel) return false;
@@ -548,7 +548,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(!event.isRealData){
     jetprod_gen23->process(event);
     jetprod_gen33->process(event);
-  } 
+  }
 
   output->process(event);
 
