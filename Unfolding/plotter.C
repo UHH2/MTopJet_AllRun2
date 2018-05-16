@@ -8,7 +8,9 @@ plotter::plotter(TString dir){
   gStyle->SetPadTickX(1);
 }
 
-void plotter::draw_matrix(TH2* hist, TString file_name, bool zlog){
+void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog){
+  TH1* hist = (TH1*) hist_->Clone("hist");
+
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetRightMargin(0.15); 
   gPad->SetLeftMargin(0.15); 
@@ -24,19 +26,17 @@ void plotter::draw_matrix(TH2* hist, TString file_name, bool zlog){
   delete c;
 }
 
-void plotter::draw_output(TH1* output, TH1D* truth, bool norm, TString file_name){
+void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_name){
   // std::vector<double> sys = get_sys_errors();
   // TH1* output_sys = add_error_bar(output, sys);
+
+  TH1* output = (TH1*) output_->Clone("output");
+  TH1D* truth = (TH1D*) truth_->Clone("truth");
 
   TCanvas *c = new TCanvas("c","",600,600);
   double ymax;
   gPad->SetLeftMargin(0.15); 
-  if(norm){
-    double norm_out = 1/output->Integral();
-    double norm_truth = 1/truth->Integral();
-    output->Scale(norm_out, "width");
-    truth->Scale(norm_truth, "width");
-  }
+
   if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
   else ymax = 1.1 * output->GetMaximum();
   TGaxis::SetMaxDigits(3);   
@@ -71,22 +71,26 @@ void plotter::draw_output(TH1* output, TH1D* truth, bool norm, TString file_name
   delete c;
 }
 
-void plotter::draw_output_mass(TH1* output, std::vector<TH1D*> mtop_templates, std::vector<bool> show, bool norm, TString file_name){
-  // std::vector<double> sys = get_sys_errors();
-  // TH1* output_sys = add_error_bar(output, sys);
+void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_, std::vector<bool> show, bool norm, TString file_name){
+
+  TH1* output = (TH1*) output_->Clone("output");
+  std::vector<TH1D*> mtop_templates;
+  for(unsigned int i = 0; i < mtop_templates_.size(); i++){
+    mtop_templates.push_back((TH1D*) mtop_templates_[i]->Clone(""));
+  }
 
   TCanvas *c = new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15); 
-  if(norm){
-    double norm_out = 1/output->Integral();
-    output->Scale(norm_out, "width");
-    for(unsigned int i = 0; i < mtop_templates.size(); i++){
-      double norm_truth = 1/mtop_templates[i]->Integral();
-      mtop_templates[i]->Scale(norm_truth, "width");
+
+  double max = output->GetMaximum();
+  for(unsigned int i = 0; i < mtop_templates.size(); i++){
+    if(show[i]){
+      double max_temp = mtop_templates[i]->GetMaximum();
+      if(max_temp > max) max = max_temp;
     }
   }
-  double ymax;
-  ymax = 1.1 * output->GetMaximum();
+  double ymax = 1.1 * max;
+
   TGaxis::SetMaxDigits(3);   
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
@@ -104,12 +108,14 @@ void plotter::draw_output_mass(TH1* output, std::vector<TH1D*> mtop_templates, s
   output->SetMarkerSize(1); 
   output->Draw("E1 SAME");
   gStyle->SetEndErrorSize(5);
-  mtop_templates[0]->SetLineColor(kBlue);
-  mtop_templates[1]->SetLineColor(kRed);
-  mtop_templates[2]->SetLineColor(kGreen-1);
-  mtop_templates[3]->SetLineColor(kAzure+7);
-  mtop_templates[4]->SetLineColor(kRed-2);
-  mtop_templates[5]->SetLineColor(798);
+
+  mtop_templates[0]->SetLineColor(kRed);
+  mtop_templates[1]->SetLineColor(kGreen);
+  mtop_templates[2]->SetLineColor(kOrange);
+  mtop_templates[3]->SetLineColor(13);
+  mtop_templates[4]->SetLineColor(kBlue);
+  mtop_templates[5]->SetLineColor(kMagenta);
+  mtop_templates[6]->SetLineColor(kAzure+7);
 
   for(unsigned int i = 0; i < mtop_templates.size(); i++){
     mtop_templates[i]->SetLineWidth(3);
@@ -123,9 +129,10 @@ void plotter::draw_output_mass(TH1* output, std::vector<TH1D*> mtop_templates, s
   if(show[0]) l->AddEntry(mtop_templates[0],"m_{top} = 166.5 GeV","pl");
   if(show[1]) l->AddEntry(mtop_templates[1],"m_{top} = 169.5 GeV","pl");
   if(show[2]) l->AddEntry(mtop_templates[2],"m_{top} = 171.5 GeV","pl");
-  if(show[3]) l->AddEntry(mtop_templates[3],"m_{top} = 173.5 GeV","pl");
-  if(show[4]) l->AddEntry(mtop_templates[4],"m_{top} = 175.5 GeV","pl");
-  if(show[5]) l->AddEntry(mtop_templates[5],"m_{top} = 178.5 GeV","pl");
+  if(show[3]) l->AddEntry(mtop_templates[3],"m_{top} = 172.5 GeV","pl");
+  if(show[4]) l->AddEntry(mtop_templates[4],"m_{top} = 173.5 GeV","pl");
+  if(show[5]) l->AddEntry(mtop_templates[5],"m_{top} = 175.5 GeV","pl");
+  if(show[6]) l->AddEntry(mtop_templates[6],"m_{top} = 178.5 GeV","pl");
   l->SetTextSize(0.04);
   l->Draw();
   c->SaveAs(directory + file_name + ".pdf");
@@ -154,7 +161,10 @@ void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_nam
   delete c;
 }
 
-void plotter::draw_projection(TH1D* proj, TH1D* compare, TString file_name ){ 
+void plotter::draw_projection(TH1D* proj_, TH1D* compare_, TString file_name ){ 
+  TH1D* proj = (TH1D*) proj_->Clone("proj");
+  TH1D* compare = (TH1D*) compare_->Clone("compare");
+
   TCanvas *c= new TCanvas("Projection Gen","",600,600);
   gPad->SetLeftMargin(0.15); 
   proj->Draw("HIST");
@@ -173,7 +183,11 @@ void plotter::draw_projection(TH1D* proj, TH1D* compare, TString file_name ){
 }
 
 
-void plotter::draw_rec(TH1D* data, TH1D* sig, TH1D* bgr, TString file_name){
+void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
+  TH1D* data = (TH1D*) data_->Clone("data");
+  TH1D* sig = (TH1D*) sig_->Clone("sig");
+  TH1D* bgr = (TH1D*) bgr_->Clone("bgr");
+
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15); 
   sig->Add(bgr, 1.);
@@ -206,7 +220,8 @@ void plotter::draw_rec(TH1D* data, TH1D* sig, TH1D* bgr, TString file_name){
   delete c;
 }
 
-  void plotter::draw_1D_hist(TH1D* hist, TString file_name){
+void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
+  TH1D* hist = (TH1D*) hist_->Clone("hist");
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15); 
   hist->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
@@ -223,96 +238,53 @@ void plotter::draw_rec(TH1D* data, TH1D* sig, TH1D* bgr, TString file_name){
 
 
 
-void plotter::draw_output_pseudo(std::vector<TH1*> output,std::vector<TH1D*> truth, std::vector<TH1D*> mc_truth, bool norm, TString file_name){
-
-  if(norm){
-    for(unsigned int i=0; i<truth.size(); i++){
-      double norm_truth = 1/truth[i]->Integral();
-      truth[i]->Scale(norm_truth, "width");
-    }
-    for(unsigned int i=0; i<mc_truth.size(); i++){
-      double norm_mctruth = 1/mc_truth[i]->Integral();
-      mc_truth[i]->Scale(norm_mctruth, "width");
-    }
-    for(unsigned int i=0; i<output.size(); i++){
-      double norm_out = 1/output[i]->Integral();
-      output[i]->Scale(norm_out, "width");
-    }
-  }
+void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth_, bool norm, TString file_name){
+    
+  TH1* output = (TH1*) output_->Clone("output");
+  TH1D* pseudotruth = (TH1D*) pseudotruth_->Clone("pseudotruth");
+  TH1D* mctruth = (TH1D*) mctruth_->Clone("mctruth");
 
   double ymax_temp = 0;
-  for(unsigned int i=0; i<truth.size(); i++){
-    if(truth[i]->GetMaximum() > ymax_temp) ymax_temp = truth[i]->GetMaximum();
-  }
-  for(unsigned int i=0; i<mc_truth.size(); i++){
-    if(mc_truth[i]->GetMaximum() > ymax_temp) ymax_temp = mc_truth[i]->GetMaximum();
-  }
-  for(unsigned int i=0; i<output.size(); i++){
-    if(output[i]->GetMaximum() > ymax_temp) ymax_temp = output[i]->GetMaximum();
-  }
+  if(pseudotruth->GetMaximum() > ymax_temp) ymax_temp = pseudotruth->GetMaximum();
+  if(mctruth->GetMaximum() > ymax_temp) ymax_temp = mctruth->GetMaximum();
+  if(output->GetMaximum() > ymax_temp) ymax_temp = output->GetMaximum();
   double ymax = 1.1 * ymax_temp;
 
 
-  truth[0]->SetTitle(" ");
-  truth[0]->GetYaxis()->SetRangeUser(0., ymax);
-  truth[0]->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
-  if(norm) truth[0]->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
-  else     truth[0]->GetYaxis()->SetTitle("events");
-  truth[0]->GetYaxis()->SetTitleOffset(1.1);
-  truth[0]->GetXaxis()->SetTitleOffset(0.9);
-  truth[0]->GetYaxis()->SetTitleSize(0.05);
-  truth[0]->GetXaxis()->SetTitleSize(0.05);
-  truth[0]->GetYaxis()->SetNdivisions(505);
+  pseudotruth->SetTitle(" ");
+  pseudotruth->GetYaxis()->SetRangeUser(0., ymax);
+  pseudotruth->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  if(norm) pseudotruth->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
+  else     pseudotruth->GetYaxis()->SetTitle("events");
+  pseudotruth->GetYaxis()->SetTitleOffset(1.1);
+  pseudotruth->GetXaxis()->SetTitleOffset(0.9);
+  pseudotruth->GetYaxis()->SetTitleSize(0.05);
+  pseudotruth->GetXaxis()->SetTitleSize(0.05);
+  pseudotruth->GetYaxis()->SetNdivisions(505);
 
-  for(unsigned int i=0; i<truth.size(); i++){
-    truth[i]->SetLineWidth(4);
-    truth[i]->SetLineColor(kRed);
-    mc_truth[i]->SetLineWidth(3);
-    mc_truth[i]->SetLineStyle(2);
-    mc_truth[i]->SetLineColor(kBlue);
-  }
-  int N_bins = output[0]->GetXaxis()->FindBin(5000) - 1;
-
-  std::vector<TGraphErrors*> output_new;
-
-  double x[N_bins];
-  double y[N_bins];
-  double err[N_bins];
-
-  for(unsigned int i=0; i<output.size(); i++){
-    TAxis* xaxis = output[i]->GetXaxis();
-    for(int j=1; j<=N_bins; j++){
-      x[j-1] = xaxis->GetBinCenter(j) + (- 0.4 + i*0.2666667) * xaxis->GetBinWidth(j);
-      y[j-1] = output[i]->GetBinContent(j);
-      err[j-1] = output[i]->GetBinError(j);
-    }
-    TGraphErrors* output_temp = new TGraphErrors(N_bins, x, y, 0, err);
-    output_new.push_back(output_temp);
-  }
-
-  for(unsigned int i=0; i<output_new.size(); i++){
-    output_new[i]->SetMarkerColor(kBlack);
-    output_new[i]->SetMarkerStyle(20 + i);
-    if(i==3)output_new[i]->SetMarkerStyle(33);
-  }
-
+  pseudotruth->SetLineWidth(4);
+  pseudotruth->SetLineColor(kRed);
+  mctruth->SetLineWidth(3);
+  mctruth->SetLineStyle(2);
+  mctruth->SetLineColor(kBlue);
+  
+  output->SetLineColor(kBlack);
+  output->SetMarkerColor(kBlack);
+  output->SetMarkerStyle(8);
+  output->SetMarkerSize(1); 
 
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15); 
-  gStyle->SetErrorX(0);
   TGaxis::SetMaxDigits(3);   
-  for(unsigned int i=0; i<truth.size(); i++) truth[i]->Draw("HIST SAME");
-  for(unsigned int i=0; i<mc_truth.size(); i++) mc_truth[i]->Draw("HIST SAME");
-  for(unsigned int i=0; i<output_new.size(); i++) output_new[i]->Draw("P");
+  pseudotruth->Draw("HIST SAME");
+  mctruth->Draw("HIST SAME");
+  output->Draw("E1 SAME");
   TLegend *l=new TLegend(0.5,0.6,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
-  for(unsigned int i=0; i<output.size(); i++){
-    TString label = "pseudo data " + std::to_string(i+1);
-    l->AddEntry(output_new[i],label,"pl");
-  }
-  l->AddEntry(truth[0],"pseudo data truth","pl");
-  l->AddEntry(mc_truth[0],"pseudo mc truth","pl");
+  l->AddEntry(output,"pseudo data","pl");
+  l->AddEntry(pseudotruth,"pseudo data truth","pl");
+  l->AddEntry(mctruth,"MC truth","pl");
   l->SetTextSize(0.04);
 
   l->Draw();
@@ -323,7 +295,9 @@ void plotter::draw_output_pseudo(std::vector<TH1*> output,std::vector<TH1D*> tru
 
 
 
-void plotter::draw_purity(TH1D* numerator, TH1D* denominator, TString file_name){
+void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_name){
+  TH1D* numerator = (TH1D*) numerator_->Clone("numerator");
+  TH1D* denominator = (TH1D*) denominator_->Clone("denominator");
 
   TH1D* purity = numerator; // just to set correct binning
   purity->Divide(numerator, denominator, 1., 1., "B");
@@ -362,7 +336,9 @@ TH1* plotter::add_error_bar(TH1* hist, std::vector<double> errors){
   }
 }
 
-TH1D* get_difference(TH1D* hist1, TH1D* hist2){
+TH1D* get_difference(TH1D* hist1_, TH1D* hist2_){
+  TH1D* hist1 = (TH1D*) hist1_->Clone("hist1");
+  TH1D* hist2 = (TH1D*) hist2_->Clone("hist2");
   int Nbins = hist1->GetSize() - 2;
   TH1D* h_diff;
   for(int i = 1; i<=Nbins; i++){
@@ -370,4 +346,31 @@ TH1D* get_difference(TH1D* hist1, TH1D* hist2){
     h_diff->Fill(i, diff);
   }
   return h_diff;
+}
+
+
+void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, TString file_name){
+  TF1 * fit = (TF1*)fit_->Clone("fit");
+  TVectorD masses(masses_.size());
+  TVectorD chi2(chi2_.size());
+  for(int i=0; i<masses_.size(); i++) masses[i] = masses_[i];
+  for(int i=0; i<chi2_.size(); i++) chi2[i] = chi2_[i];
+
+  TGraph* chi_hist = new TGraph(masses,chi2);
+  TCanvas *c = new TCanvas("Chi2", "", 600, 600);
+  gPad->SetLeftMargin(0.15); 
+  TGaxis::SetMaxDigits(3); 
+  chi_hist->SetTitle(" ");
+  chi_hist->GetXaxis()->SetTitle("m_{top} [GeV]");
+  chi_hist->GetYaxis()->SetTitle("#chi^{2}");
+  chi_hist->GetYaxis()->SetTitleOffset(1.5);
+  chi_hist->GetXaxis()->SetNdivisions(505);
+  chi_hist->GetYaxis()->SetNdivisions(505);
+  chi_hist->SetMarkerStyle(20);
+  chi_hist->SetMarkerSize(1.5);
+  chi_hist->SetLineColor(1);
+  chi_hist->Draw("AP");
+  fit->Draw("SAME");
+  c->SaveAs(directory + file_name + ".pdf");
+  return;
 }

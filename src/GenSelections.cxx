@@ -301,14 +301,10 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
     if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
     if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
     if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
-    
-    if(matched_q1 && matched_q2 && matched_bot) matched = true;
-    return matched;
   }
-  else return false;
 
-  return 0;
-
+  if(matched_q1 && matched_q2 && matched_bot) matched = true;
+  return matched;
 }
 
 

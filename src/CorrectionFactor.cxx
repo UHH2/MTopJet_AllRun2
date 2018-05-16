@@ -29,7 +29,8 @@ void CorrectionFactor::get_function(){
 
   TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
-  filename = dir + "Correction_noCHS.root";
+  // filename = dir + "Correction_noCHS.root";
+  filename = dir + "Correction.root";
   TFile *file = new TFile(filename);
 
   TString histname;

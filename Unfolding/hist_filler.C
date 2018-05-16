@@ -1,8 +1,8 @@
-#include "hist_filler.h"  
+#include "hist_filler.h"
 
 int main(int argc, char* argv[]){
 
- 
+
   bool fine;
   if(strcmp(argv[1], "fine") == 0) fine = true;
   else fine = false;
@@ -10,7 +10,7 @@ int main(int argc, char* argv[]){
   else     cout << "The large binning is selected" << endl;
 
 
- 
+
   if(strcmp(argv[2], "ttw") == 0) ttweight = true;
   else ttweight = false;
   if(ttweight) cout << "ttbar reweighting is applied" << endl;
@@ -66,26 +66,22 @@ int main(int argc, char* argv[]){
 
 
   //=======================================================
-  // create hists from binning
-  create_hists();
-
-  //=======================================================
-  // fill histograms 
+  // fill histograms
 
   // define directory
   TString prefix = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/uhh2.AnalysisModuleRunner.";
 
   TFile *data_File=new TFile(prefix+"DATA.DATA.root");
   fill_data((TTree *) data_File->Get("AnalysisTree"));
-  delete data_File;
 
-  // TFile *pseudodata_File=new TFile(prefix+"MC.TTbar.root");
-  // TTree *pseudodata_Tree=(TTree *) pseudodata_File->Get("AnalysisTree");
+  TFile *pseudodata_File=new TFile(prefix+"MC.TTbar_amcatnlo-pythia.root");
+  fill_matrix((TTree *) pseudodata_File->Get("AnalysisTree"), "pseudo1");
 
+  TFile *pseudodata2_File=new TFile(prefix+"MC.TTbar_powheg-herwig.root");
+  fill_matrix((TTree *) pseudodata2_File->Get("AnalysisTree"), "pseudo2");
 
   TFile *mc_matrix_File=new TFile(prefix+"MC.TTbar.root");
-  fill_matrix((TTree *) mc_matrix_File->Get("AnalysisTree"));
-  delete mc_matrix_File;
+  fill_matrix((TTree *) mc_matrix_File->Get("AnalysisTree"), "mc");
 
 
   // fill templates here
@@ -104,28 +100,29 @@ int main(int argc, char* argv[]){
   fill_template((TTree *) mc_truth_File[4]->Get("AnalysisTree"), "1755");
   fill_template((TTree *) mc_truth_File[5]->Get("AnalysisTree"), "1785");
 
- 
+
   TFile *mc_bgr_File=new TFile(prefix+"MC.Background_only.root");
   fill_background((TTree *) mc_bgr_File->Get("AnalysisTree"));
-  delete mc_bgr_File;
-
-  //=======================================================
-  // write file
-
-  outputFile->Write();
-  delete outputFile;
 
   return 0;
 }
 
 
-//=======================================================
-//================ fill data ============================
-//=======================================================
+/*
+███████ ██ ██      ██          ██████   █████  ████████  █████
+██      ██ ██      ██          ██   ██ ██   ██    ██    ██   ██
+█████   ██ ██      ██          ██   ██ ███████    ██    ███████
+██      ██ ██      ██          ██   ██ ██   ██    ██    ██   ██
+██      ██ ███████ ███████     ██████  ██   ██    ██    ██   ██
+*/
+
+
 
 void fill_data(TTree* tree){
   if(!tree) cout << "could not read 'data' tree\n";
   else      cout << "Filling Data Histograms...\n";
+
+  TH1* h_data = binning_rec->CreateHistogram("data");
 
   outputFile->cd();
 
@@ -153,68 +150,84 @@ void fill_data(TTree* tree){
        h_data->Fill(binNumber);
      }
   }
+
+  h_data->Write();
+  delete h_data;
+  return;
 }
 
-//=======================================================
-//================ fill template ========================
-//=======================================================
+/*
+███████ ██ ██      ██          ███    ███  █████  ███████ ███████     ████████ ███████ ███    ███ ██████
+██      ██ ██      ██          ████  ████ ██   ██ ██      ██             ██    ██      ████  ████ ██   ██
+█████   ██ ██      ██          ██ ████ ██ ███████ ███████ ███████        ██    █████   ██ ████ ██ ██████
+██      ██ ██      ██          ██  ██  ██ ██   ██      ██      ██        ██    ██      ██  ██  ██ ██
+██      ██ ███████ ███████     ██      ██ ██   ██ ███████ ███████        ██    ███████ ██      ██ ██
+*/
 
 void fill_template(TTree* tree, TString mtop){
   if(!tree) cout << "could not read 'data' tree\n";
   else      cout << "Filling Template Histograms...\n";
 
-  // create hist
+  TH1* h_mass_truth = measurement_gen->CreateHistogram("mc_mtop"+mtop+"_truth",kTRUE,0,0,"pt[C]");
+  TH1* h_mass_rec = measurement_rec->CreateHistogram("mc_mtop"+mtop+"_rec",kTRUE,0,0,"pt[C]");
 
   outputFile->cd();
 
   tree->ResetBranchAddresses();
   tree->SetBranchAddress("Mass_Gen33",&massGen);
   tree->SetBranchAddress("Mass_Rec",&massRec);
+  tree->SetBranchAddress("passed_measurement_rec",&passed_measurement_rec);
+  tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
+  tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
+  tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchAddress("passed_measurement_gen",&passed_measurement_gen);
   tree->SetBranchAddress("is_TTbar",&is_TTbar);
   tree->SetBranchAddress("gen_weight",&gen_weight);
   tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
   tree->SetBranchStatus("*",1);
- 
+
+
   for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
     if(tree->GetEntry(ievent)<=0) break;
     if(!is_TTbar){
       cout << "ERROR: non-ttbar event in signal sample!" << endl;
       break;
     }
- 
+
     if(ttweight) gen_weight *= gen_ttfactor;
     w_rec = rec_weight * gen_weight;
 
     if(passed_measurement_gen){
-      if(mtop == "1665") h_mc_mtop1665_truth->Fill(massGen, gen_weight);
-      if(mtop == "1695") h_mc_mtop1695_truth->Fill(massGen, gen_weight);
-      if(mtop == "1715") h_mc_mtop1715_truth->Fill(massGen, gen_weight);
-      if(mtop == "1735") h_mc_mtop1735_truth->Fill(massGen, gen_weight);
-      if(mtop == "1755") h_mc_mtop1755_truth->Fill(massGen, gen_weight);
-      if(mtop == "1785") h_mc_mtop1785_truth->Fill(massGen, gen_weight);
-      if(mtop == "1665") h_mc_mtop1665_rec->Fill(massRec, w_rec);
-      if(mtop == "1695") h_mc_mtop1695_rec->Fill(massRec, w_rec);
-      if(mtop == "1715") h_mc_mtop1715_rec->Fill(massRec, w_rec);
-      if(mtop == "1735") h_mc_mtop1735_rec->Fill(massRec, w_rec);
-      if(mtop == "1755") h_mc_mtop1755_rec->Fill(massRec, w_rec);
-      if(mtop == "1785") h_mc_mtop1785_rec->Fill(massRec, w_rec);
+      h_mass_truth->Fill(massGen, gen_weight);
+    }
+    if(passed_measurement_rec || passed_ptmigration_rec || passed_massmigration_rec || passed_btagmigration_rec){
+      h_mass_rec->Fill(massRec, w_rec);
     }
   }
+  h_mass_truth->Write();
+  h_mass_rec->Write();
+  delete h_mass_truth;
+  delete h_mass_rec;
+  return;
 }
 
+/*
+███████ ██ ██      ██          ██████   █████   ██████ ██   ██  ██████  ██████   ██████  ██    ██ ███    ██ ██████
+██      ██ ██      ██          ██   ██ ██   ██ ██      ██  ██  ██       ██   ██ ██    ██ ██    ██ ████   ██ ██   ██
+█████   ██ ██      ██          ██████  ███████ ██      █████   ██   ███ ██████  ██    ██ ██    ██ ██ ██  ██ ██   ██
+██      ██ ██      ██          ██   ██ ██   ██ ██      ██  ██  ██    ██ ██   ██ ██    ██ ██    ██ ██  ██ ██ ██   ██
+██      ██ ███████ ███████     ██████  ██   ██  ██████ ██   ██  ██████  ██   ██  ██████   ██████  ██   ████ ██████
+*/
 
-//=======================================================
-//================ fill background ======================
-//=======================================================
+
 
 void fill_background(TTree *tree){
   if(!tree) cout << "could not read 'mc bgr' tree\n";
   else      cout << "Filling Background Histograms...\n";
 
+  TH1* h_mc_bgr = binning_rec->CreateHistogram("mc_bgr");
+
   outputFile->cd();
-
-
 
   tree->ResetBranchAddresses();
   tree->SetBranchAddress("Mass_Rec",&massRec);
@@ -249,20 +262,37 @@ void fill_background(TTree *tree){
 
     if(passed_measurement_rec || passed_ptmigration_rec || passed_massmigration_rec || passed_btagmigration_rec){
       h_mc_bgr->Fill(recBin, w_bgr_rec);
-      h_mc_rec->Fill(recBin, w_bgr_rec);
     }
   }
+  h_mc_bgr->Write();
+  delete h_mc_bgr;
+  return;
 }
 
 
-//=======================================================
-//================ fill signal ==========================
-//=======================================================
+/*
+███████ ██ ██      ██          ███    ███  █████  ████████ ██████  ██ ██   ██
+██      ██ ██      ██          ████  ████ ██   ██    ██    ██   ██ ██  ██ ██
+█████   ██ ██      ██          ██ ████ ██ ███████    ██    ██████  ██   ███
+██      ██ ██      ██          ██  ██  ██ ██   ██    ██    ██   ██ ██  ██ ██
+██      ██ ███████ ███████     ██      ██ ██   ██    ██    ██   ██ ██ ██   ██
+*/
 
-void fill_matrix(TTree* tree){
+void fill_matrix(TTree* tree, TString prefix){
   if(!tree) cout<<"could not read 'mc signal' tree\n";
   else      cout << "Filling Matrix Histograms...\n";
 
+  // setup hists
+  TH1* h_purity_all = measurement_gen->CreateHistogram(prefix + "_purity_all",kTRUE,0,0,"pt[C]");
+  TH1* h_purity_samebin = measurement_gen->CreateHistogram(prefix + "_purity_samebin",kTRUE,0,0,"pt[C]");
+  TH1* h_purity_samebin_pt = measurement_gen->CreateHistogram(prefix + "_purity_samebin_pt",kTRUE,0,0,"pt[C]");
+
+  TH1* h_mc_sig = binning_rec->CreateHistogram(prefix + "_sig");
+  TH1* h_mc_gen = binning_gen->CreateHistogram(prefix + "_gen");
+  TH1* h_mc_truth = measurement_gen->CreateHistogram(prefix + "_truth",kTRUE,0,0,"pt[C]");
+  TH2* h_mc_matrix = TUnfoldBinning::CreateHistogramOfMigrations(binning_gen,binning_rec, prefix + "_matrix");
+
+  outputFile->cd();
   tree->ResetBranchAddresses();
   tree->SetBranchAddress("Mass_Rec",&massRec);
   tree->SetBranchAddress("Mass_Gen33",&massGen);
@@ -280,7 +310,7 @@ void fill_matrix(TTree* tree){
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
- 
+
 
   for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
     if(tree->GetEntry(ievent)<=0) break;
@@ -291,7 +321,7 @@ void fill_matrix(TTree* tree){
 
     if(ttweight) gen_weight *= gen_ttfactor;
 
-     // get weights for migration matrix
+    // get weights for migration matrix
     w_central = rec_weight * gen_weight;
     w_nogen = rec_weight * gen_weight;
     w_norec = gen_weight;
@@ -328,14 +358,13 @@ void fill_matrix(TTree* tree){
     if(gen_info) h_mc_gen->Fill(genBin, w_gen);
     if(rec_info){
       h_mc_sig->Fill(recBin, w_sig_rec);
-      h_mc_rec->Fill(recBin, w_sig_rec);
     }
 
     // Fill Matrix
     if( rec_info &&  gen_info) h_mc_matrix->Fill(genBin, recBin, w_central);
     if( rec_info && !gen_info) h_mc_matrix->Fill(genBin, recBin, w_nogen);
     if(!rec_info &&  gen_info) h_mc_matrix->Fill(genBin, recBin, w_norec);
-    if( rec_info &&  gen_info) h_mc_matrix->Fill(genBin,     0., w_correction); // this is needed because events that dont pass rec, have no rec_weight. 
+    if( rec_info &&  gen_info) h_mc_matrix->Fill(genBin,     0., w_correction); // this is needed because events that dont pass rec, have no rec_weight.
 
     //fill hists for purity
     int genBin_recInfo = 0;
@@ -343,44 +372,27 @@ void fill_matrix(TTree* tree){
     if(passed_measurement_gen && rec_info){
       genBin_recInfo = measurement_gen->GetGlobalBinNumber(massRec,ptGen);
       genBin_recInfo_pt = measurement_gen->GetGlobalBinNumber(massRec,ptRec);
-      
+
       h_purity_all->Fill(massGen, w_gen);
       if(genBin_recInfo == genBin) h_purity_samebin->Fill(massGen, w_gen);
       if(genBin_recInfo_pt == genBin) h_purity_samebin_pt->Fill(massGen, w_gen);
     }
   }
-}
+  h_purity_all->Write();
+  h_purity_samebin->Write();
+  h_purity_samebin_pt->Write();
+  h_mc_sig->Write();
+  h_mc_gen->Write();
+  h_mc_truth->Write();
+  h_mc_matrix->Write();
 
+  delete h_purity_all;
+  delete h_purity_samebin;
+  delete h_purity_samebin_pt;
+  delete h_mc_sig;
+  delete h_mc_gen;
+  delete h_mc_truth;
+  delete h_mc_matrix;
 
-
-
-void create_hists(){
-  h_purity_all = measurement_gen->CreateHistogram("purity_all",kTRUE,0,0,"pt[C]");
-  h_purity_samebin = measurement_gen->CreateHistogram("purity_samebin",kTRUE,0,0,"pt[C]");
-  h_purity_samebin_pt = measurement_gen->CreateHistogram("purity_samebin_pt",kTRUE,0,0,"pt[C]");
-
-
-  h_data = binning_rec->CreateHistogram("data");
-
-  h_mc_rec = binning_rec->CreateHistogram("mc_rec");
-  h_mc_bgr = binning_rec->CreateHistogram("mc_bgr");
-  h_mc_sig = binning_rec->CreateHistogram("mc_sig");
-  h_mc_gen = binning_gen->CreateHistogram("mc_gen");
-  h_mc_truth = measurement_gen->CreateHistogram("mc_truth",kTRUE,0,0,"pt[C]");
-
-  h_mc_matrix=TUnfoldBinning::CreateHistogramOfMigrations(binning_gen,binning_rec,"mc_matrix");
-
-  h_mc_mtop1665_truth = measurement_gen->CreateHistogram("mc_mtop1665_truth",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1695_truth = measurement_gen->CreateHistogram("mc_mtop1695_truth",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1715_truth = measurement_gen->CreateHistogram("mc_mtop1715_truth",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1735_truth = measurement_gen->CreateHistogram("mc_mtop1735_truth",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1755_truth = measurement_gen->CreateHistogram("mc_mtop1755_truth",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1785_truth = measurement_gen->CreateHistogram("mc_mtop1785_truth",kTRUE,0,0,"pt[C]");
-
-  h_mc_mtop1665_rec = measurement_rec->CreateHistogram("mc_mtop1665_rec",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1695_rec = measurement_rec->CreateHistogram("mc_mtop1695_rec",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1715_rec = measurement_rec->CreateHistogram("mc_mtop1715_rec",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1735_rec = measurement_rec->CreateHistogram("mc_mtop1735_rec",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1755_rec = measurement_rec->CreateHistogram("mc_mtop1755_rec",kTRUE,0,0,"pt[C]");
-  h_mc_mtop1785_rec = measurement_rec->CreateHistogram("mc_mtop1785_rec",kTRUE,0,0,"pt[C]");
+  return;
 }

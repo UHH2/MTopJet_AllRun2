@@ -3,14 +3,14 @@
 <!ENTITY NEVT "-1">
 
   <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
-  <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PreSel"> 
+  <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PreSel">
 
 
 <!-- ================================================================================================================================ -->
 <!-- =============================================== DATA =========================================================================== -->
 
   <!-- MUON DATA -->
-  
+
   <!ENTITY  SingleMUON_Run2016B             SYSTEM  "../../common/datasets/RunII_80X_v3/SingleMuonB.xml">
   <!ENTITY  SingleMUON_Run2016Bv3           SYSTEM  "../../common/datasets/RunII_80X_v3/SingleMuonB_v3.xml">
   <!ENTITY  SingleMUON_Run2016C             SYSTEM  "../../common/datasets/RunII_80X_v3/SingleMuonC.xml">
@@ -55,18 +55,17 @@
   <!ENTITY TTbar_Mtt1000toInft SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_Mtt-1000toInf.xml">
 
 <!-- =============================================== ttbar other samples ============================================================== -->
-  <!ENTITY TTbar_mtop1665      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1665.xml"> 
-  <!ENTITY TTbar_mtop1695_ext1 SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1695_ext1.xml"> 
-  <!ENTITY TTbar_mtop1695_ext2 SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1695_ext2.xml"> 
-  <!ENTITY TTbar_mtop1715      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1715.xml"> 
-  <!ENTITY TTbar_mtop1735      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1735.xml"> 
-  <!ENTITY TTbar_mtop1755      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1755.xml"> 
-  <!ENTITY TTbar_mtop1785      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1785.xml"> 
+  <!ENTITY TTbar_mtop1665      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1665.xml">
+  <!ENTITY TTbar_mtop1695_ext1 SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1695_ext1.xml">
+  <!ENTITY TTbar_mtop1695_ext2 SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1695_ext2.xml">
+  <!ENTITY TTbar_mtop1715      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1715.xml">
+  <!ENTITY TTbar_mtop1735      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1735.xml">
+  <!ENTITY TTbar_mtop1755      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1755.xml">
+  <!ENTITY TTbar_mtop1785      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_mtop1785.xml">
 
-  <!ENTITY TTbar_amcatnlo-pythia      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_amcatnlo.xml"> 
-  <!ENTITY TTbar_powheg-herwig        SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_powheg-herwig.xml"> 
+  <!ENTITY TTbar_amcatnlo-pythia      SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_amcatnlo.xml">
+  <!ENTITY TTbar_powheg-herwig        SYSTEM  "../../common/datasets/RunII_80X_v3/MC_TT_powheg-herwig.xml">
 
- 
 <!-- =============================================== W+jets =========================================================================== -->
 
   <!-- <!ENTITY  WJetsToLNu SYSTEM  "../../common/datasets/RunII_80X_v3/MC_WJetsToLNu.xml"> -->
@@ -130,13 +129,13 @@
 <!-- ================================================================================================================================== -->
 
 <!--
-   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="5" />
-   <ConfigSGE RAM ="2" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PreSel_workdir"/>
+   <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="10" />
+   <ConfigSGE RAM ="4" DISK ="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="PreSel_workdir"/>
 -->
 
 <JobConfiguration JobName="MTopJetPreSelectionJob" OutputLevel="INFO">
-    <Library Name="libSUHH2MTopJet"/>  
-    <Package Name="SUHH2MTopJet.par"/> 
+    <Library Name="libSUHH2MTopJet"/>
+    <Package Name="SUHH2MTopJet.par"/>
 
 
  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="1">
@@ -151,7 +150,7 @@
 <!-- ================================================================================================================================== -->
 <!-- ================================================================================================================================== -->
 
- 
+
     <!-- ********DATA**************************************** -->
 
     <!-- ****************** Run MuonB does not survive lumi selection, therefore only Bv3 is needed ************** -->
@@ -180,7 +179,7 @@
     <!-- <InputData Version="SingleMuonH" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- &SingleMUON_Run2016H_PromptReco; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <!-- new version -->    
+    <!-- new version -->
 
     <!-- <InputData Version="SingleMuonB_03Feb" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- &SingleMUON_Run2016B_03Feb; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
@@ -205,7 +204,7 @@
 
 
     <!-- ELEC -->
-    
+
     <!-- <InputData Version="SingleElectronB" Lumi="1" Type="Data" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- &SingleELEC_Run2016B; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
@@ -327,9 +326,8 @@
     <!-- <InputData Version="TTbar_amcatnlo-pythia" Lumi="53319.775" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
     <!-- &TTbar_amcatnlo-pythia; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="TTbar_powheg-herwig" Lumi="23747.699" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &TTbar_powheg-herwig; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
+    <!-- <InputData Version="TTbar_powheg-herwig" Lumi="23747.699" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
+    <!-- &TTbar_powheg-herwig; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
     <!-- ********DYJets**************************************** -->
     <!-- <InputData Version="DYJetsToLL_LO_M50_HT0070to0100" Lumi="44562.437" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
@@ -349,7 +347,7 @@
 
    <!--  <InputData Version="DYJetsToLL_LO_M50_HT0800to1200" Lumi="3441241.333" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
    <!--  &DYJetsToLL_LO_M50_HT0800to1200; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
- 
+
    <!-- <InputData Version="DYJetsToLL_LO_M50_HT1200to2500" Lumi="3199976.372" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
    <!--  &DYJetsToLL_LO_M50_HT1200to2500; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
@@ -420,32 +418,34 @@
 <!-- ====================================================== User Config =============================================================== -->
 <!-- ================================================================================================================================== -->
 
-      <UserConfig>
-        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
-        <Item Name="GenParticleCollection"   Value="GenParticles"/>
-        <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
-        <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
-        <Item Name="TauCollection"           Value="slimmedTaus"/>
+  <UserConfig>
+    <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+    <Item Name="GenParticleCollection"   Value="GenParticles"/>
+    <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+    <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+    <Item Name="TauCollection"           Value="slimmedTaus"/>
 
-        <Item Name="JetCollection"           Value="slimmedJets"/>
-        <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
-        <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
-	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
+    <Item Name="JetCollection"           Value="slimmedJets"/>
+    <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
+    <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
+	  <Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="XConeTopJets genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets"/>
+	  <Item Name="additionalBranches" Value="XConeTopJets genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets"/>
 
 
-	<!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
-        <Item Name="METName"                 Value="slimmedMETs"/>
+    <!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
+    <Item Name="METName"                 Value="slimmedMETs"/>
 
-        <Item Name="lumi_file" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
-	<Item Name="lumihists_lumi_per_bin" Value="200"/>
-        <Item Name="use_sframe_weight" Value="false"/>
+    <Item Name="lumi_file" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+    <Item Name="lumihists_lumi_per_bin" Value="200"/>
 
-        <Item Name="AnalysisModule" Value="MTopJetPreSelectionModule"/>
-      </UserConfig>
+    <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->
+    <Item Name="use_sframe_weight" Value="false"/> <!-- this does nothing becaus common modules is not called in the AnalysisModule -->
 
-    </Cycle>
+    <Item Name="AnalysisModule" Value="MTopJetPreSelectionModule"/>
+  </UserConfig>
+
+  </Cycle>
 </JobConfiguration>
 <!-- ================================================================================================================================== -->
 <!-- ================================================================================================================================== -->

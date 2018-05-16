@@ -9,8 +9,8 @@
 #include <TDOMParser.h>
 #include <TXMLDocument.h>
 #include "TUnfoldBinningXML.h"
-#include <time.h>  
-#include <vector>  
+#include <time.h>
+#include <vector>
 
 
 using namespace std;
@@ -19,8 +19,7 @@ using namespace std;
 void fill_data(TTree *);
 void fill_template(TTree *, TString);
 void fill_background(TTree *);
-void fill_matrix(TTree *);
-void create_hists();
+void fill_matrix(TTree *, TString);
 
 
 
@@ -40,35 +39,6 @@ const TUnfoldBinning *ptmigration_gen;
 const TUnfoldBinning *massmigration_rec;
 const TUnfoldBinning *massmigration_gen;
 const TUnfoldBinning *btagmigration_rec;
-
-
-// Hists
-TH1 *h_purity_samebin;
-TH1 *h_purity_samebin_pt;
-TH1 *h_purity_all;
-
-TH1 *h_data;
-TH1 *h_mc_rec;
-TH1 *h_mc_bgr;
-TH1 *h_mc_sig;
-TH1 *h_mc_gen;
-TH1 *h_mc_truth;
-
-TH2 *h_mc_matrix;
-
-TH1 *h_mc_mtop1665_truth;
-TH1 *h_mc_mtop1695_truth;
-TH1 *h_mc_mtop1715_truth;
-TH1 *h_mc_mtop1735_truth;
-TH1 *h_mc_mtop1755_truth;
-TH1 *h_mc_mtop1785_truth;
-TH1 *h_mc_mtop1665_rec;
-TH1 *h_mc_mtop1695_rec;
-TH1 *h_mc_mtop1715_rec;
-TH1 *h_mc_mtop1735_rec;
-TH1 *h_mc_mtop1755_rec;
-TH1 *h_mc_mtop1785_rec;
-
 
 // variables to store gen or rec info
 Double_t massRec, ptRec, massGen, ptGen; // variables
@@ -94,8 +64,3 @@ Double_t w_rec;
 Double_t w_gen_w2;
 Double_t w_gen_w4;
 Double_t w_gen_w8;
-
-
-
-
-

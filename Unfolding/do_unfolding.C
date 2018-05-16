@@ -8,8 +8,8 @@ int main(int argc, char* argv[])
   bool data = false;
   bool same = false;
   bool pseudo = false;
-  bool pseudo_up = false;
-  bool pseudo_down = false;
+  bool pseudo1 = false;
+  bool pseudo2 = false;
 
   bool fine;
   if(strcmp(argv[2], "fine") == 0) fine = true;
@@ -25,33 +25,32 @@ int main(int argc, char* argv[])
     directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Same/";
     output_file = "Results_same.root";
   }
-  else if(strcmp(argv[1], "pseudo") == 0){
+  else if(strcmp(argv[1], "pseudo1") == 0){
     pseudo = true;
+    pseudo1 = true;
     directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo/";
     output_file = "Results_pseudo.root";
   }
-  else if(strcmp(argv[1], "pseudo_up") == 0){
-    pseudo_up = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo_up/";
-    output_file = "Results_pseudo_up.root";
+  else if(strcmp(argv[1], "pseudo2") == 0){
+    pseudo = true;
+    pseudo2 = true;
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo/";
+    output_file = "Results_pseudo.root";
   }
-  else if(strcmp(argv[1], "pseudo_down") == 0){
-    pseudo_down = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo_down/";
-    output_file = "Results_pseudo_down.root";
-  }
+
   else {
-    cout << "select 'data', 'same', 'pseudo', 'pseudo_up' or 'pseudo_down'"<< endl;
+    cout << "select 'data', 'same', 'pseudo1', 'pseudo2'"<< endl;
     return 0;
   }
 
   cout << "Selected Mode: ";
   if(data) cout << "DATA" << endl;
   else if(same) cout << "SAME" << endl;
-  else if(pseudo) cout << "PSEUDO" << endl;
-  else if(pseudo_up) cout << "PSEUDO UP" << endl;
-  else if(pseudo_down) cout << "PSEUDO DOWN" << endl;
+  else if(pseudo1) cout << "PSEUDO1" << endl;
+  else if(pseudo2) cout << "PSEUDO2" << endl;
   else cout << "ERROR: None selected!" << endl;
+
+  if(fine) cout << "You Selected Fine Binning" << endl;
 
   TH1::SetDefaultSumw2();
 
@@ -102,97 +101,69 @@ int main(int argc, char* argv[])
   TH1D *hist_data_count400, *hist_data_count500;
   TH2 *histMCGenRec;
 
-
-
-  TH1D* h_data;
-  TH1D* h_gen;
-  TH1D* h_sig;
-  TH1D* h_truth;
-  TH1D* h_mc_truth;
-  TH2* h_matrix;
+  TH1D* h_pseudodata_truth;
 
   TH1D* h_pur_samebin, *h_pur_samebin_pt, *h_pur_all;
 
   TH1D* mc_mtop1665_truth;
-  TH1D* mc_mtop1695_truth; 
-  TH1D* mc_mtop1715_truth; 
-  TH1D* mc_mtop1735_truth; 
-  TH1D* mc_mtop1755_truth; 
+  TH1D* mc_mtop1695_truth;
+  TH1D* mc_mtop1715_truth;
+  TH1D* mc_mtop1725_truth;
+  TH1D* mc_mtop1735_truth;
+  TH1D* mc_mtop1755_truth;
   TH1D* mc_mtop1785_truth;
   std::vector<TH1D*> mc_mtop_templates;
 
-  std::vector<TH2*> histPseudoMCGenRec;
   std::vector<TH1D*> hist_PseudoData , hist_PseudoData_gen, hist_PseudoMC_sig, hist_PseudoData_truth, hist_PseudoMC_truth;
 
 
   inputFile->GetObject("data",hist_data);
   inputFile->GetObject("mc_gen",hist_mc_gen);
   inputFile->GetObject("mc_truth",hist_mc_truth);
+  if(pseudo1) inputFile->GetObject("pseudodata1_truth",h_pseudodata_truth);
+  if(pseudo2) inputFile->GetObject("pseudodata2_truth",h_pseudodata_truth);
   inputFile->GetObject("mc_mtop1665_truth",mc_mtop1665_truth);
   inputFile->GetObject("mc_mtop1695_truth",mc_mtop1695_truth);
   inputFile->GetObject("mc_mtop1715_truth",mc_mtop1715_truth);
   inputFile->GetObject("mc_mtop1735_truth",mc_mtop1735_truth);
   inputFile->GetObject("mc_mtop1755_truth",mc_mtop1755_truth);
   inputFile->GetObject("mc_mtop1785_truth",mc_mtop1785_truth);
+  mc_mtop1725_truth = (TH1D*)hist_mc_truth->Clone("mc_mtop1725_truth");
+
   mc_mtop_templates.push_back(mc_mtop1665_truth);
   mc_mtop_templates.push_back(mc_mtop1695_truth);
   mc_mtop_templates.push_back(mc_mtop1715_truth);
+  mc_mtop_templates.push_back(mc_mtop1725_truth);
   mc_mtop_templates.push_back(mc_mtop1735_truth);
   mc_mtop_templates.push_back(mc_mtop1755_truth);
   mc_mtop_templates.push_back(mc_mtop1785_truth);
-  std::vector<bool> show = {false, true, false, true, false, true}; // decides which masspoint is shown
+  std::vector<double> masses = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
+  std::vector<bool>     show = {true,  false, false,  true, false, false, true}; // decides which masspoint is shown
+  // std::vector<bool> show = {true, true, true, true, true, true, true};
 
   inputFile->GetObject("mc_bgr",hist_mc_bgr);
   inputFile->GetObject("mc_sig",hist_mc_sig);
-  inputFile->GetObject("mc_rec",hist_mc_rec);
+  hist_mc_rec = (TH1D*)hist_mc_sig->Clone();
+  hist_mc_rec->Add(hist_mc_bgr);
+
   inputFile->GetObject("mc_matrix",histMCGenRec);
 
-  inputFile->GetObject("purity_all",h_pur_all);
-  inputFile->GetObject("purity_samebin",h_pur_samebin);
-  inputFile->GetObject("purity_samebin_pt",h_pur_samebin_pt);
+  inputFile->GetObject("mc_purity_all",h_pur_all);
+  inputFile->GetObject("mc_purity_samebin",h_pur_samebin);
+  inputFile->GetObject("mc_purity_samebin_pt",h_pur_samebin_pt);
 
 
-  if(pseudo || pseudo_up || pseudo_down){
-    hist_mc_bgr->Reset();
 
-    for(int i = 1; i<=4; i++){
-      TString rec;
-      TString truth;
-      if(pseudo){
-	rec =  "hist_PseudoData" + std::to_string(i) + "_rec";
-	truth =  "hist_PseudoData" + std::to_string(i) + "_truth";
-      }
-      if(pseudo_up){
-	rec =  "hist_PseudoData" + std::to_string(i) + "_up_rec";
-	truth =  "hist_PseudoData" + std::to_string(i) + "_up_truth";
-      }
-      if(pseudo_down){
-	rec =  "hist_PseudoData" + std::to_string(i) + "_down_rec";
-	truth =  "hist_PseudoData" + std::to_string(i) + "_down_truth";
-      }
-      TString gen =  "hist_PseudoData" + std::to_string(i) + "_gen";
-      TString sig =  "hist_PseudoMC" + std::to_string(i) + "_rec";
-      TString mig =  "histPseudoGenRec" + std::to_string(i);
-      TString mc_truth =  "hist_PseudoMC" + std::to_string(i) + "_truth";
-      inputFile->GetObject(rec, h_data);
-      inputFile->GetObject(gen, h_gen);
-      inputFile->GetObject(sig, h_sig);
-      inputFile->GetObject(mig, h_matrix);
-      inputFile->GetObject(truth, h_truth);
-      inputFile->GetObject(mc_truth, h_mc_truth);
-
-      hist_PseudoData.push_back(h_data);
-      hist_PseudoData_gen.push_back(h_gen);
-      hist_PseudoMC_sig.push_back(h_sig);
-      hist_PseudoData_truth.push_back(h_truth);
-      hist_PseudoMC_truth.push_back(h_mc_truth);
-      histPseudoMCGenRec.push_back(h_matrix);
-    }
+  if(pseudo1){
+    inputFile->GetObject("pseudo1_matrix",histMCGenRec);
+    inputFile->GetObject("mc_sig",hist_data);
   }
-
-  if(same){
-    inputFile->GetObject("hist_mc_rec",hist_data);
+  if(pseudo2){
+    inputFile->GetObject("pseudo2_matrix",histMCGenRec);
+    inputFile->GetObject("mc_sig",hist_data);
   }
+  if(same) inputFile->GetObject("mc_sig",hist_data);
+  if(pseudo || same) hist_mc_bgr->Reset();
 
   hist_data->Write();
   hist_mc_gen->Write();
@@ -211,41 +182,33 @@ int main(int argc, char* argv[])
   int nscan = 100;
 
   TH2 *CovMatrix;
+  TH2 *CorMatrix;
   TH2 *ProbMatrix;
   TGraph *lcurve;
-  double lcurveX= 0;
-  double lcurveY= 0;
+  // double lcurveX= 0;
+  // double lcurveY= 0;
   TH1 *data_unfolded,*data_unfolded_all;
 
   if(same){
     unfolding unfold(hist_data, hist_mc_bgr, hist_mc_sig, histMCGenRec, binning_rec, binning_gen, true, 1);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
+    CorMatrix = unfold.get_cor_matrix();
     CovMatrix = unfold.get_cov_matrix();
     ProbMatrix = unfold.get_prob_matrix();
   }
 
 
-  if(data){
+  if(data || pseudo){
     unfolding unfold(hist_data, hist_mc_bgr, hist_mc_sig, histMCGenRec, binning_rec, binning_gen, false, nscan);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
+    CorMatrix = unfold.get_cor_matrix();
     CovMatrix = unfold.get_cov_matrix();
     ProbMatrix = unfold.get_prob_matrix();
-    lcurve = unfold.get_lcurve();
-    lcurveX= unfold.get_best_point("X");
-    lcurveY= unfold.get_best_point("Y");
-  }
-
-
-  std::vector<TH1*> output;
-  if(pseudo || pseudo_up || pseudo_down){
-    for(unsigned int i=0; i<4; i++){
-      unfolding unfold(hist_PseudoData[i], hist_mc_bgr, hist_PseudoMC_sig[i], histPseudoMCGenRec[i], binning_rec, binning_gen, false, nscan);
-      output.push_back(unfold.get_output(true));
-      CovMatrix = unfold.get_cov_matrix();
-      ProbMatrix = unfold.get_prob_matrix();
-    }
+    // lcurve = unfold.get_lcurve();
+    // lcurveX= unfold.get_best_point("X");
+    // lcurveY= unfold.get_best_point("Y");
   }
 
   // write_syserror("SYS_TEST.txt", output, hist_PseudoData_truth);
@@ -259,9 +222,9 @@ int main(int argc, char* argv[])
   for(int i = 1; i<= nrec; i++){
     if(rec_proj->GetBinContent(i) > 200){
       std::cout << "Bin Number " << i << std::endl;
-      std::cout <<  binning_rec->GetBinName(i)<< std::endl; 
+      std::cout <<  binning_rec->GetBinName(i)<< std::endl;
     }
-  } 
+  }
 
 
   // ======================================================================================================
@@ -314,39 +277,80 @@ int main(int argc, char* argv[])
   cout<< "Events in generated in measurement region = " << histMCGenRec->Integral(1, 16,0,nrec+1) << endl;
 
 
-  if(!pseudo && !pseudo_up && !pseudo_down){
-    data_unfolded->Write();
-    ProbMatrix->Write();
+  data_unfolded->Write();
+  ProbMatrix->Write();
+
+  // ======================================================================================================
+  // parameters for chi2 fit
+  double lower = 130;
+  double upper = 290;
+  bool NormToWidth = true;
+
+  // normalise unfolding output
+  Normalise * normData = new Normalise(data_unfolded, CovMatrix, lower, upper, NormToWidth);
+  TH1D* data_unfolded_norm = normData->GetHist();
+  TH2D* CovMatrix_norm = normData->GetMatrix();
+
+  // normalise mass samples
+  vector<TH1D*> mc_mtop_templates_norm;
+  vector<Normalise*> normMass;
+  for(unsigned int i=0; i<mc_mtop_templates.size(); i++){
+    normMass.push_back(new Normalise(mc_mtop_templates[i], lower, upper, NormToWidth));
+    mc_mtop_templates_norm.push_back(normMass[i]->GetHist());
+  }
+  // normalise mc truth
+  Normalise * normMC = new Normalise(hist_mc_truth, lower, upper, NormToWidth);
+  TH1D* hist_mc_truth_norm  = normMC->GetHist();
+  // normalise pseudo data truth
+  TH1D* h_pseudodata_truth_norm;
+  if(pseudo){
+    Normalise * normPseudo = new Normalise(h_pseudodata_truth, lower, upper, NormToWidth);
+    h_pseudodata_truth_norm  = normPseudo->GetHist();
   }
 
+  // perform chi2 fit
+  chi2fit * chi2 = new chi2fit(data_unfolded_norm, CovMatrix_norm, mc_mtop_templates_norm, masses, lower, upper, NormToWidth);
+  chi2->CalculateChi2();
+  std::vector<double> chi2values = chi2->GetChi2Values();
+  TF1* chi2fit = chi2->GetChi2Fit();
+  cout << " MASS = " << chi2->GetMass() << " +- " << chi2->GetUncertainty() << std::endl;
 
   // ======================================================================================================
   // make plots
 
   plotter * plot = new plotter(directory);
-  if(!pseudo && !pseudo_up && !pseudo_down){
-    plot->draw_matrix(ProbMatrix, "Prob_Matrix", true);
-    plot->draw_matrix(CovMatrix, "Cov_Matrix", false);
-    plot->draw_matrix(histMCGenRec, "Migration_Matrix", true);
-    plot->draw_output(data_unfolded, hist_mc_truth, false, "Unfold");
-    plot->draw_output(data_unfolded, hist_mc_truth, true, "Unfold_norm");
-    plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
-    plot->draw_output_mass(data_unfolded, mc_mtop_templates, show, true, "Unfold_masspoints");
-    plot->draw_projection(gen_proj, hist_mc_gen, "Projection_gen");
-    plot->draw_projection(rec_proj, hist_mc_sig, "Projection_rec");
-    plot->draw_1D_hist(hist_mc_gen, "Gen");
-    plot->draw_rec(hist_data, hist_mc_sig, hist_mc_bgr, "Rec");
-    plot->draw_purity(h_pur_samebin, h_pur_all, "Purity");
-    plot->draw_purity(h_pur_samebin_pt, h_pur_all, "Purity_pt");
-  }
-
-  if(pseudo || pseudo_up || pseudo_down){
-    plot->draw_output_pseudo(output, hist_PseudoData_truth, hist_PseudoMC_truth, false, "Unfold");
-    plot->draw_output_pseudo(output, hist_PseudoData_truth, hist_PseudoMC_truth, true, "Unfold_norm");
-    plot->draw_matrix(ProbMatrix, "Prob_Matrix", false);
-    plot->draw_matrix(CovMatrix, "Cov_Matrix", false);
-  }
+  plot->draw_chi2(chi2fit, masses, chi2values, "chi2fit");
+  plot->draw_matrix(ProbMatrix, "Prob_Matrix", true);
+  plot->draw_matrix(CorMatrix, "Cor_Matrix", false);
+  plot->draw_matrix(CovMatrix, "Cov_Matrix", false);
+  plot->draw_matrix(histMCGenRec, "Migration_Matrix", true);
+  if(pseudo) plot->draw_output_pseudo(data_unfolded, h_pseudodata_truth, hist_mc_truth, false, "Unfold_pseudo");
+  if(pseudo) plot->draw_output_pseudo(data_unfolded_norm, h_pseudodata_truth_norm, hist_mc_truth_norm, true, "Unfold_pseudo_norm");
+  plot->draw_output(data_unfolded, hist_mc_truth, false, "Unfold");
+  plot->draw_output(data_unfolded_norm, hist_mc_truth_norm, true, "Unfold_norm");
+  plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
+  plot->draw_output_mass(data_unfolded_norm, mc_mtop_templates_norm, show, true, "Unfold_masspoints_norm");
+  plot->draw_output_mass(data_unfolded, mc_mtop_templates, show, false, "Unfold_masspoints");
+  plot->draw_projection(gen_proj, hist_mc_gen, "Projection_gen");
+  plot->draw_projection(rec_proj, hist_mc_sig, "Projection_rec");
+  plot->draw_1D_hist(hist_mc_gen, "Gen");
+  plot->draw_rec(hist_data, hist_mc_sig, hist_mc_bgr, "Rec");
+  plot->draw_purity(h_pur_samebin, h_pur_all, "Purity");
+  plot->draw_purity(h_pur_samebin_pt, h_pur_all, "Purity_pt");
 
   cout << "finished" << endl;
   return 0;
+}
+
+
+
+// get diagonal Cov Matrix from hist errors
+TH2D* Tools::GetDiagonalCovMatrix(TH1D* hist){
+  int nbins = hist->GetSize();
+  TH2D* cov = new TH2D("cov", "", nbins, 1, nbins+1, nbins, 1, nbins+1);
+  for(int i=1; i <= nbins; i++){
+    double error = hist->GetBinError(i) * hist->GetBinError(i);
+    cov->SetBinContent(i,i,error);
+  }
+  return cov;
 }

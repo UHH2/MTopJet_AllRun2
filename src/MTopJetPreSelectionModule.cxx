@@ -23,6 +23,7 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGenHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
+#include <UHH2/MTopJet/include/PseudoXConeHists.h>
 //
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
@@ -61,6 +62,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
   bool isMC;
 
   // store Hist collection as member variables
+  std::unique_ptr<Hists> h_pseudoxcone;
   // std::unique_ptr<Hists> h_ttbar;
   // std::unique_ptr<Hists> h_PreSel_event, h_PreSel_event2, h_PreSel_elec, h_PreSel_muon, h_PreSel_jets;
 };
@@ -111,6 +113,9 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
   else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
   ////
+
+
+  h_pseudoxcone.reset(new PseudoXConeHists(ctx, "PseudoXCone"));
 }
 
 bool MTopJetPreSelectionModule::process(uhh2::Event& event){
@@ -156,7 +161,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
       std::vector<Particle> had_subjets;
       if(dR2 < dR1) had_subjets = jets.at(0).subjets();
       else had_subjets = jets.at(1).subjets();
-      
+
       double px=0, py=0, pz=0, E=0;
       TLorentzVector jet_v4;
       for(unsigned int i=0; i < had_subjets.size(); ++i){
@@ -164,7 +169,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
 	py += had_subjets.at(i).v4().Py();
 	pz += had_subjets.at(i).v4().Pz();
 	E += had_subjets.at(i).v4().E();
-      } 
+      }
       jet_v4.SetPxPyPzE(px, py, pz, E);
       double pt = jet_v4.Pt();
       if(pt > 150) passed_genpt = true;
@@ -183,6 +188,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
 
+  h_pseudoxcone->fill(event);
   return true;
 
 

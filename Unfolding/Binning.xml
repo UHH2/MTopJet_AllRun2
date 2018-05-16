@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE TUnfoldBinning SYSTEM "tunfoldbinning.dtd">
+<TUnfoldBinning>
+<BinningNode name="binning_rec" firstbin="1" factor="1">
+ <BinningNode name="measurement_rec" firstbin="1" factor="1">
+  <Axis name="mass" lowEdge="123">
+   <Bin location="underflow" width="15" center="115.5" />
+   <Bin width="15" center="130.5" />
+   <Bin width="9" center="142.5" />
+   <Bin width="6" center="150" />
+   <Bin repeat="2" width="4" center="155" />
+   <Bin repeat="9" width="3" center="162.5" />
+   <Bin width="4" center="190" />
+   <Bin width="5" center="194.5" />
+   <Bin width="6" center="200" />
+   <Bin width="10" center="208" />
+   <Bin width="11" center="218.5" />
+   <Bin width="16" center="232" />
+   <Bin width="23" center="251.5" />
+   <Bin width="30" center="278" />
+   <Bin width="107" center="346.5" />
+   <Bin location="overflow" width="107" center="453.5"/>
+   <Axis name="pt" lowEdge="400">
+    <Bin width="50" center="425" />
+    <Bin width="80" center="490" />
+    <Bin width="9470" center="5265" />
+   </Axis>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="ptmigration_rec" firstbin="76" factor="1">
+  <Axis name="mass" lowEdge="100">
+   <Bin location="underflow" width="23" center="88.5" />
+   <Bin width="23" center="111.5" />
+   <Bin width="15" center="130.5" />
+   <Bin width="9" center="142.5" />
+   <Bin width="6" center="150" />
+   <Bin repeat="2" width="4" center="155" />
+   <Bin repeat="9" width="3" center="162.5" />
+   <Bin width="4" center="190" />
+   <Bin width="5" center="194.5" />
+   <Bin width="6" center="200" />
+   <Bin width="10" center="208" />
+   <Bin width="11" center="218.5" />
+   <Bin width="16" center="232" />
+   <Bin width="23" center="251.5" />
+   <Bin width="30" center="278" />
+   <Bin width="107" center="346.5" />
+   <Bin location="overflow" width="107" center="453.5"/>
+   <Axis name="pt" lowEdge="350">
+    <Bin width="30" center="365" />
+    <Bin width="20" center="390" />
+   </Axis>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="massmigration_rec" firstbin="128" factor="1">
+  <Axis name="mass" lowEdge="100">
+   <Bin location="underflow" width="23" center="88.5" />
+   <Bin width="23" center="111.5" />
+   <Bin width="15" center="130.5" />
+   <Bin width="9" center="142.5" />
+   <Bin width="6" center="150" />
+   <Bin repeat="2" width="4" center="155" />
+   <Bin repeat="9" width="3" center="162.5" />
+   <Bin width="4" center="190" />
+   <Bin width="5" center="194.5" />
+   <Bin width="6" center="200" />
+   <Bin width="10" center="208" />
+   <Bin width="11" center="218.5" />
+   <Bin width="16" center="232" />
+   <Bin width="23" center="251.5" />
+   <Bin width="30" center="278" />
+   <Bin width="107" center="346.5" />
+   <Bin location="overflow" width="107" center="453.5"/>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="btagmigration_rec" firstbin="154" factor="1">
+  <Axis name="mass" lowEdge="100">
+   <Bin location="underflow" width="23" center="88.5" />
+   <Bin width="23" center="111.5" />
+   <Bin width="15" center="130.5" />
+   <Bin width="9" center="142.5" />
+   <Bin width="6" center="150" />
+   <Bin repeat="2" width="4" center="155" />
+   <Bin repeat="9" width="3" center="162.5" />
+   <Bin width="4" center="190" />
+   <Bin width="5" center="194.5" />
+   <Bin width="6" center="200" />
+   <Bin width="10" center="208" />
+   <Bin width="11" center="218.5" />
+   <Bin width="16" center="232" />
+   <Bin width="23" center="251.5" />
+   <Bin width="30" center="278" />
+   <Bin width="107" center="346.5" />
+   <Bin location="overflow" width="107" center="453.5"/>
+  </Axis>
+ </BinningNode>
+</BinningNode>
+<BinningNode name="binning_gen" firstbin="1" factor="1">
+ <BinningNode name="measurement_gen" firstbin="1" factor="1">
+  <Axis name="mass" lowEdge="120">
+   <Bin location="underflow" width="30" center="105" />
+   <Bin repeat="6" width="30" center="135" />
+   <Bin location="overflow" width="30" center="315"/>
+   <Axis name="pt" lowEdge="400">
+    <Bin width="100" center="450" />
+    <Bin width="9500" center="5250" />
+   </Axis>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="ptmigration_gen" firstbin="17" factor="1">
+  <Axis name="mass" lowEdge="120">
+   <Bin location="underflow" width="30" center="105" />
+   <Bin repeat="6" width="30" center="135" />
+   <Bin location="overflow" width="30" center="315"/>
+   <Axis name="pt" lowEdge="350">
+    <Bin width="50" center="375" />
+   </Axis>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="massmigration_gen" firstbin="25" factor="1">
+  <Axis name="mass" lowEdge="50">
+   <Bin location="underflow" width="40" center="30" />
+   <Bin width="40" center="70" />
+   <Bin repeat="7" width="30" center="105" />
+   <Bin location="overflow" width="30" center="315"/>
+  </Axis>
+ </BinningNode>
+</BinningNode>
+</TUnfoldBinning>

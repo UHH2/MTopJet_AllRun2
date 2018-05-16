@@ -57,7 +57,6 @@ unfolding::unfolding(TH1D* input, TH1D* background, TH1D* signal, TH2* migration
   if(do_lcurve) unfold.ScanLcurve(nscan,0.,0.,&lcurve,&logTauX,&logTauY);
 
   // rho scan
-  // if(!do_lcurve) unfold.ScanTau(nscan,0.0001,100.,&rhoLogTau, TUnfoldDensity::kEScanTauRhoAvg, SCAN_DISTRIBUTION,SCAN_AXISSTEERING, &lcurve,&logTauX,&logTauY);
   if(!do_lcurve) unfold.ScanTau(nscan,0.0001,100.,&rhoLogTau, TUnfoldDensity::kEScanTauRhoAvgSys, SCAN_DISTRIBUTION,SCAN_AXISSTEERING, &lcurve,&logTauX,&logTauY);
 
   tau=unfold.GetTau();
@@ -68,10 +67,9 @@ unfolding::unfolding(TH1D* input, TH1D* background, TH1D* signal, TH2* migration
   // write hists
   output = unfold.GetOutput("output",0,"measurement_gen","pt[C]",kTRUE);
   output_all = unfold.GetOutput("output_all",0,0,0,kFALSE);
-  CorM = unfold.GetRhoIJtotal("CorM", 0, "measurement_gen","pt[C]",kTRUE);
+  CovM = unfold.GetRhoIJtotal("CovM", 0, "measurement_gen","pt[C]",kTRUE);
   ProbM = unfold.GetProbabilityMatrix("ProbM", 0, kTRUE);
-  CovM = unfold.GetEmatrixTotal("CovM", 0, "measurement_gen","pt[C]", kTRUE);
-  
+
 }
 
 TH1* unfolding::get_output(bool merged){
@@ -85,10 +83,6 @@ TH2* unfolding::get_prob_matrix(){
 
 TH2* unfolding::get_cov_matrix(){
   return CovM;
-}
-
-TH2* unfolding::get_cor_matrix(){
-  return CorM;
 }
 
 TGraph* unfolding::get_lcurve(){

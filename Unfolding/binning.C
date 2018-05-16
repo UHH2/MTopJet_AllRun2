@@ -55,12 +55,12 @@ int main(int argc, char* argv[])
 
   // 1. set-up binning in vectors
   std::vector<Double_t> MASS;
-  // if(fine) MASS = {120, 140, 160, 180, 200, 220, 240, 260, 280, 300};
-  if(fine) MASS = {120, 135, 150, 165, 180, 195, 210, 225, 240, 270, 300};
+  if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270};
+  // if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270, 300};
   else     MASS = {120, 150, 180, 210, 240, 270, 300};
 
   std::vector<Double_t> MASS_MASSMIGRATION;
-  if(fine) MASS_MASSMIGRATION = {50, 120, 135, 150, 165, 180, 195, 210, 225, 240, 255, 270, 300};
+  if(fine) MASS_MASSMIGRATION = {50, 120, 135, 150, 165, 180, 195, 210, 225, 240, 270, 300};
   else     MASS_MASSMIGRATION = {50, 90, 120, 150, 180, 210, 240, 270, 300};
 
   std::vector<Double_t> MASS_PTMIGRATION;

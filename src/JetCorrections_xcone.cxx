@@ -49,20 +49,21 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
 
   // setup JEC for XCone
   isMC = (ctx.get("dataset_type") == "MC");
-  jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PF_MC, jet_collection_rec));
-  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PF_DATA, jet_collection_rec));
-  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PF_DATA, jet_collection_rec));
-  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PF_DATA, jet_collection_rec));
-  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PF_DATA, jet_collection_rec));
-  //   jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, jet_collection));
-  //   jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection));
-  //   jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection));
-  //   jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection));
-  //   jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA, jet_collection));
+  // jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PF_MC, jet_collection_rec));
+  // jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PF_DATA, jet_collection_rec));
+  // jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PF_DATA, jet_collection_rec));
+  // jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PF_DATA, jet_collection_rec));
+  // jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PF_DATA, jet_collection_rec));
+  jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, jet_collection_rec));
+  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection_rec));
+  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection_rec));
+  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection_rec));
+  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA, jet_collection_rec));
 
   // setup JER for XCone
-  TString ResolutionFileName = "Summer16_25nsV1_MC_SF_AK4PF.txt";
+  TString ResolutionFileName = "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt";
   JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, true, SF_13TeV_updated, ResolutionFileName));
+  // JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, true, SF_13TeV_updated));
 }
 
 bool JetCorrections_xcone::process(uhh2::Event & event){

@@ -29,6 +29,7 @@ class unfolding{
   unfolding(TH1D* input, TH1D* background, TH1D* signal, TH2* migration_matrix, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan);
   TH1* get_output(bool);
   TH2* get_prob_matrix();
+  TH2* get_cor_matrix();
   TH2* get_cov_matrix();
   TGraph* get_lcurve();
   double get_best_point(TString xy);
@@ -38,6 +39,7 @@ class unfolding{
  private:
   TH1 *output;
   TH1 *output_all;
+  TH2 *CorM;
   TH2 *CovM;
   TH2 *ProbM;
   TGraph *lcurve = 0;
