@@ -19,21 +19,27 @@ int main(int argc, char* argv[]){
   // switch on histogram errors
   TH1::SetDefaultSumw2();
 
-  //=======================================================
-  // Step 1: open file to save histograms and binning schemes
+  /*
+   ██████ ██████  ███████  █████  ████████ ███████      ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ██ ██      ███████
+  ██      ██   ██ ██      ██   ██    ██    ██          ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██      ██ ██      ██
+  ██      ██████  █████   ███████    ██    █████       ██    ██ ██    ██    ██    ██████  ██    ██    ██        █████   ██ ██      █████
+  ██      ██   ██ ██      ██   ██    ██    ██          ██    ██ ██    ██    ██    ██      ██    ██    ██        ██      ██ ██      ██
+   ██████ ██   ██ ███████ ██   ██    ██    ███████      ██████   ██████     ██    ██       ██████     ██        ██      ██ ███████ ███████
+  */
 
   std::string filename;
   if(fine) filename = "Histograms_fine.root";
   else     filename = "Histograms.root";
   outputFile=new TFile(filename.c_str(),"recreate");
-
-
- //=======================================================
-  // Step 2: read binning from XML
-  //         and save them to output file
-
-
   outputFile->cd();
+
+  /*
+  ██████  ███████  █████  ██████      ██████  ██ ███    ██ ███    ██ ██ ███    ██  ██████
+  ██   ██ ██      ██   ██ ██   ██     ██   ██ ██ ████   ██ ████   ██ ██ ████   ██ ██
+  ██████  █████   ███████ ██   ██     ██████  ██ ██ ██  ██ ██ ██  ██ ██ ██ ██  ██ ██   ███
+  ██   ██ ██      ██   ██ ██   ██     ██   ██ ██ ██  ██ ██ ██  ██ ██ ██ ██  ██ ██ ██    ██
+  ██   ██ ███████ ██   ██ ██████      ██████  ██ ██   ████ ██   ████ ██ ██   ████  ██████
+  */
 
   // read binning schemes in XML format
   TDOMParser parser;
@@ -64,34 +70,49 @@ int main(int argc, char* argv[]){
 
   btagmigration_rec = binning_rec->FindNode("btagmigration_rec");
 
-
-  //=======================================================
-  // fill histograms
+  /*
+  ███████ ██ ██      ██          ██   ██ ██ ███████ ████████  ██████   ██████  ██████   █████  ███    ███ ███████
+  ██      ██ ██      ██          ██   ██ ██ ██         ██    ██    ██ ██       ██   ██ ██   ██ ████  ████ ██
+  █████   ██ ██      ██          ███████ ██ ███████    ██    ██    ██ ██   ███ ██████  ███████ ██ ████ ██ ███████
+  ██      ██ ██      ██          ██   ██ ██      ██    ██    ██    ██ ██    ██ ██   ██ ██   ██ ██  ██  ██      ██
+  ██      ██ ███████ ███████     ██   ██ ██ ███████    ██     ██████   ██████  ██   ██ ██   ██ ██      ██ ███████
+  */
 
   // define directory
-  TString prefix = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/uhh2.AnalysisModuleRunner.";
+  TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/";
+  TString prefix = "/uhh2.AnalysisModuleRunner.";
 
-  TFile *data_File=new TFile(prefix+"DATA.DATA.root");
+  // fill data
+  TFile *data_File=new TFile(dir+prefix+"DATA.DATA.root");
   fill_data((TTree *) data_File->Get("AnalysisTree"));
-
-  TFile *pseudodata_File=new TFile(prefix+"MC.TTbar_amcatnlo-pythia.root");
+  // fill ttbar
+  TFile *mc_matrix_File=new TFile(dir+prefix+"MC.TTbar.root");
+  fill_matrix((TTree *) mc_matrix_File->Get("AnalysisTree"), "mc");
+  // fill TTbar_amcatnlo
+  TFile *pseudodata_File=new TFile(dir+prefix+"MC.TTbar_amcatnlo-pythia.root");
   fill_matrix((TTree *) pseudodata_File->Get("AnalysisTree"), "pseudo1");
-
-  TFile *pseudodata2_File=new TFile(prefix+"MC.TTbar_powheg-herwig.root");
+  //fill TTbar_powheg
+  TFile *pseudodata2_File=new TFile(dir+prefix+"MC.TTbar_powheg-herwig.root");
   fill_matrix((TTree *) pseudodata2_File->Get("AnalysisTree"), "pseudo2");
 
-  TFile *mc_matrix_File=new TFile(prefix+"MC.TTbar.root");
-  fill_matrix((TTree *) mc_matrix_File->Get("AnalysisTree"), "mc");
+  // fill SYS
+  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown"};
+  vector<TString> subdir = {"JEC_up", "JEC_down", "JER_up", "JER_down"};
 
+  for(unsigned int i=0; i<sys_name.size(); i++){
+    TFile *file = new TFile(dir+subdir[i]+prefix+"MC.TTbar.root");
+    fill_matrix((TTree *) file->Get("AnalysisTree"), sys_name[i]);
+    delete file;
+  }
 
-  // fill templates here
+  // fill mass templates
   std::vector<TFile *> mc_truth_File;
-  mc_truth_File.push_back(new TFile(prefix+"MC.TTbar_mtop1665.root"));
-  mc_truth_File.push_back(new TFile(prefix+"MC.TTbar_mtop1695_ext2.root"));
-  mc_truth_File.push_back(new TFile(prefix+"MC.TTbar_mtop1715.root"));
-  mc_truth_File.push_back(new TFile(prefix+"MC.TTbar_mtop1735.root"));
-  mc_truth_File.push_back(new TFile(prefix+"MC.TTbar_mtop1755.root"));
-  mc_truth_File.push_back(new TFile(prefix+"MC.TTbar_mtop1785.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1665.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1695_ext2.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1715.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1735.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1755.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1785.root"));
 
   fill_template((TTree *) mc_truth_File[0]->Get("AnalysisTree"), "1665");
   fill_template((TTree *) mc_truth_File[1]->Get("AnalysisTree"), "1695");
@@ -100,9 +121,13 @@ int main(int argc, char* argv[]){
   fill_template((TTree *) mc_truth_File[4]->Get("AnalysisTree"), "1755");
   fill_template((TTree *) mc_truth_File[5]->Get("AnalysisTree"), "1785");
 
-
-  TFile *mc_bgr_File=new TFile(prefix+"MC.Background_only.root");
-  fill_background((TTree *) mc_bgr_File->Get("AnalysisTree"));
+  // fill background
+  vector<TString> bkg_name = {"WJets", "SingleTop", "other"};
+  for(unsigned int i=0; i<bkg_name.size(); i++){
+    TFile *file = new TFile(dir+prefix+"MC."+bkg_name[i]+".root");
+    fill_background((TTree *) file->Get("AnalysisTree"), bkg_name[i]);
+    delete file;
+  }
 
   return 0;
 }
@@ -137,18 +162,18 @@ void fill_data(TTree* tree){
   tree->SetBranchStatus("*",1);
 
   for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
-     if(tree->GetEntry(ievent)<=0) break;
+    if(tree->GetEntry(ievent)<=0) break;
 
-     Int_t binNumber = 0;
-     if     (passed_measurement_rec)    binNumber = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
-     else if(passed_ptmigration_rec)    binNumber = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
-     else if(passed_massmigration_rec)  binNumber = massmigration_rec->GetGlobalBinNumber(massRec);
-     else if(passed_btagmigration_rec)  binNumber = btagmigration_rec->GetGlobalBinNumber(massRec);
+    Int_t binNumber = 0;
+    if     (passed_measurement_rec)    binNumber = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_ptmigration_rec)    binNumber = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_massmigration_rec)  binNumber = massmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_btagmigration_rec)  binNumber = btagmigration_rec->GetGlobalBinNumber(massRec);
 
 
-     if(passed_measurement_rec || passed_ptmigration_rec || passed_massmigration_rec || passed_btagmigration_rec){
-       h_data->Fill(binNumber);
-     }
+    if(passed_measurement_rec || passed_ptmigration_rec || passed_massmigration_rec || passed_btagmigration_rec){
+      h_data->Fill(binNumber);
+    }
   }
 
   h_data->Write();
@@ -221,11 +246,11 @@ void fill_template(TTree* tree, TString mtop){
 
 
 
-void fill_background(TTree *tree){
+void fill_background(TTree *tree, TString prefix){
   if(!tree) cout << "could not read 'mc bgr' tree\n";
   else      cout << "Filling Background Histograms...\n";
 
-  TH1* h_mc_bgr = binning_rec->CreateHistogram("mc_bgr");
+  TH1* h_mc_bgr = binning_rec->CreateHistogram("BKG_"+prefix);
 
   outputFile->cd();
 
@@ -280,7 +305,7 @@ void fill_background(TTree *tree){
 
 void fill_matrix(TTree* tree, TString prefix){
   if(!tree) cout<<"could not read 'mc signal' tree\n";
-  else      cout << "Filling Matrix Histograms...\n";
+  else      cout << "Filling Matrix Histograms ("+prefix+") ...\n";
 
   // setup hists
   TH1* h_purity_all = measurement_gen->CreateHistogram(prefix + "_purity_all",kTRUE,0,0,"pt[C]");

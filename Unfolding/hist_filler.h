@@ -18,7 +18,7 @@ using namespace std;
 
 void fill_data(TTree *);
 void fill_template(TTree *, TString);
-void fill_background(TTree *);
+void fill_background(TTree *, TString);
 void fill_matrix(TTree *, TString);
 
 

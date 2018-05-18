@@ -8,12 +8,22 @@ plotter::plotter(TString dir){
   gStyle->SetPadTickX(1);
 }
 
+/*
+███    ███  █████  ████████ ██████  ██ ██   ██
+████  ████ ██   ██    ██    ██   ██ ██  ██ ██
+██ ████ ██ ███████    ██    ██████  ██   ███
+██  ██  ██ ██   ██    ██    ██   ██ ██  ██ ██
+██      ██ ██   ██    ██    ██   ██ ██ ██   ██
+*/
+
+
+
 void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog){
   TH1* hist = (TH1*) hist_->Clone("hist");
 
   TCanvas *c= new TCanvas("c","",600,600);
-  gPad->SetRightMargin(0.15); 
-  gPad->SetLeftMargin(0.15); 
+  gPad->SetRightMargin(0.15);
+  gPad->SetLeftMargin(0.15);
   if(zlog) gPad->SetLogz();
   hist->SetTitle(" ");
   hist->GetXaxis()->SetTitleOffset(1.1);
@@ -26,6 +36,14 @@ void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog){
   delete c;
 }
 
+/*
+ ██████  ██    ██ ████████ ██████  ██    ██ ████████
+██    ██ ██    ██    ██    ██   ██ ██    ██    ██
+██    ██ ██    ██    ██    ██████  ██    ██    ██
+██    ██ ██    ██    ██    ██      ██    ██    ██
+ ██████   ██████     ██    ██       ██████     ██
+*/
+
 void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_name){
   // std::vector<double> sys = get_sys_errors();
   // TH1* output_sys = add_error_bar(output, sys);
@@ -35,11 +53,11 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
 
   TCanvas *c = new TCanvas("c","",600,600);
   double ymax;
-  gPad->SetLeftMargin(0.15); 
+  gPad->SetLeftMargin(0.15);
 
   if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
   else ymax = 1.1 * output->GetMaximum();
-  TGaxis::SetMaxDigits(3);   
+  TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
   output->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
@@ -53,7 +71,7 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   output->SetLineColor(kBlack);
   output->SetMarkerColor(kBlack);
   output->SetMarkerStyle(8);
-  output->SetMarkerSize(1); 
+  output->SetMarkerSize(1);
   output->Draw("E1 SAME");
   gStyle->SetEndErrorSize(5);
   truth->SetLineWidth(3);
@@ -70,6 +88,13 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+/*
+ ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███    ███  █████  ███████ ███████
+██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ████  ████ ██   ██ ██      ██
+██    ██ ██    ██    ██    ██████  ██    ██    ██        ██ ████ ██ ███████ ███████ ███████
+██    ██ ██    ██    ██    ██      ██    ██    ██        ██  ██  ██ ██   ██      ██      ██
+ ██████   ██████     ██    ██       ██████     ██        ██      ██ ██   ██ ███████ ███████
+*/
 
 void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_, std::vector<bool> show, bool norm, TString file_name){
 
@@ -80,7 +105,7 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   }
 
   TCanvas *c = new TCanvas("c","",600,600);
-  gPad->SetLeftMargin(0.15); 
+  gPad->SetLeftMargin(0.15);
 
   double max = output->GetMaximum();
   for(unsigned int i = 0; i < mtop_templates.size(); i++){
@@ -91,7 +116,7 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   }
   double ymax = 1.1 * max;
 
-  TGaxis::SetMaxDigits(3);   
+  TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
   output->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
@@ -105,7 +130,7 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   output->SetLineColor(kBlack);
   output->SetMarkerColor(kBlack);
   output->SetMarkerStyle(8);
-  output->SetMarkerSize(1); 
+  output->SetMarkerSize(1);
   output->Draw("E1 SAME");
   gStyle->SetEndErrorSize(5);
 
@@ -138,6 +163,14 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+/*
+██           ██████ ██    ██ ██████  ██    ██ ███████
+██          ██      ██    ██ ██   ██ ██    ██ ██
+██          ██      ██    ██ ██████  ██    ██ █████
+██          ██      ██    ██ ██   ██  ██  ██  ██
+███████      ██████  ██████  ██   ██   ████   ███████
+*/
+
 
 void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_name){
   TCanvas *c = new TCanvas("c","",600,600);
@@ -160,18 +193,38 @@ void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_nam
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+/*
+██████  ██████   ██████       ██ ███████  ██████ ████████ ██  ██████  ███    ██
+██   ██ ██   ██ ██    ██      ██ ██      ██         ██    ██ ██    ██ ████   ██
+██████  ██████  ██    ██      ██ █████   ██         ██    ██ ██    ██ ██ ██  ██
+██      ██   ██ ██    ██ ██   ██ ██      ██         ██    ██ ██    ██ ██  ██ ██
+██      ██   ██  ██████   █████  ███████  ██████    ██    ██  ██████  ██   ████
+*/
 
-void plotter::draw_projection(TH1D* proj_, TH1D* compare_, TString file_name ){ 
+
+void plotter::draw_projection(TH1D* proj_, TH1D* compare_, TString file_name ){
   TH1D* proj = (TH1D*) proj_->Clone("proj");
   TH1D* compare = (TH1D*) compare_->Clone("compare");
 
+  // check if distribution agrees with Matrix projection
+  // since there are some numerical effects involved in the projection,
+  // the warning is only printed if both distributions do not agree within 1%
+  int nbins = proj->GetSize() - 2;
+  for(int i=1; i<= nbins; i++){
+    double nproj = proj->GetBinContent(i);
+    double ncomp = compare->GetBinContent(i);
+    if(nproj < ncomp * 0.99 && nproj > ncomp * 1.01){
+      std::cout << "Projection and Distribution in " << file_name << " do not agree in bin " << i << std::endl;
+    }
+  }
+
   TCanvas *c= new TCanvas("Projection Gen","",600,600);
-  gPad->SetLeftMargin(0.15); 
+  gPad->SetLeftMargin(0.15);
+  proj->SetLineColor(kAzure+7);
   proj->Draw("HIST");
-  compare->SetMarkerColor(kBlack);
-  compare->SetMarkerStyle(8);
-  compare->SetMarkerSize(1); 
-  compare->Draw("E1 SAME");
+  compare->SetLineColor(kRed);
+  compare->SetLineStyle(7);
+  compare->Draw("HIST SAME");
   TLegend *l=new TLegend(0.55,0.65,0.85,0.8);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
@@ -182,6 +235,13 @@ void plotter::draw_projection(TH1D* proj_, TH1D* compare_, TString file_name ){
   delete c;
 }
 
+/*
+██████  ███████  ██████
+██   ██ ██      ██
+██████  █████   ██
+██   ██ ██      ██
+██   ██ ███████  ██████
+*/
 
 void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   TH1D* data = (TH1D*) data_->Clone("data");
@@ -189,7 +249,7 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   TH1D* bgr = (TH1D*) bgr_->Clone("bgr");
 
   TCanvas *c= new TCanvas("c","",600,600);
-  gPad->SetLeftMargin(0.15); 
+  gPad->SetLeftMargin(0.15);
   sig->Add(bgr, 1.);
   sig->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
   sig->GetYaxis()->SetTitle("events");
@@ -215,15 +275,23 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   l->AddEntry(sig,"t#bar{t}","f");
   l->AddEntry(bgr,"Background","f");
   l->Draw();
-  gPad->RedrawAxis(); 
+  gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+/*
+ ██ ██████      ██   ██ ██ ███████ ████████
+███ ██   ██     ██   ██ ██ ██         ██
+ ██ ██   ██     ███████ ██ ███████    ██
+ ██ ██   ██     ██   ██ ██      ██    ██
+ ██ ██████      ██   ██ ██ ███████    ██
+*/
+
 
 void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
   TH1D* hist = (TH1D*) hist_->Clone("hist");
   TCanvas *c= new TCanvas("Particle Level","",600,600);
-  gPad->SetLeftMargin(0.15); 
+  gPad->SetLeftMargin(0.15);
   hist->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
   hist->GetYaxis()->SetTitle("events");
   hist->GetYaxis()->SetTitleOffset(1.5);
@@ -231,15 +299,46 @@ void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
   hist->SetFillColor(810);
   hist->SetLineColor(810);
   hist->Draw("HIST");
-  gPad->RedrawAxis(); 
+  gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+/*
+██████  ███████ ██   ████████  █████
+██   ██ ██      ██      ██    ██   ██
+██   ██ █████   ██      ██    ███████
+██   ██ ██      ██      ██    ██   ██
+██████  ███████ ███████ ██    ██   ██
+*/
+
+
+void plotter::draw_delta(TH1* hist_, TString file_name){
+  TH1* hist = (TH1*) hist_->Clone("hist");
+  TCanvas *c= new TCanvas("Particle Level","",600,600);
+  gPad->SetLeftMargin(0.15);
+  hist->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  hist->GetYaxis()->SetTitle("#Delta events");
+  hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->SetFillColor(810);
+  hist->SetLineColor(810);
+  hist->Draw("HIST");
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+/*
+ ██████  ██    ██ ████████ ██████  ██    ██ ████████     ██████  ███████ ███████ ██    ██ ██████   ██████
+██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██   ██ ██      ██      ██    ██ ██   ██ ██    ██
+██    ██ ██    ██    ██    ██████  ██    ██    ██        ██████  ███████ █████   ██    ██ ██   ██ ██    ██
+██    ██ ██    ██    ██    ██      ██    ██    ██        ██           ██ ██      ██    ██ ██   ██ ██    ██
+ ██████   ██████     ██    ██       ██████     ██        ██      ███████ ███████  ██████  ██████   ██████
+*/
 
 
 
 void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth_, bool norm, TString file_name){
-    
+
   TH1* output = (TH1*) output_->Clone("output");
   TH1D* pseudotruth = (TH1D*) pseudotruth_->Clone("pseudotruth");
   TH1D* mctruth = (TH1D*) mctruth_->Clone("mctruth");
@@ -267,15 +366,15 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
   mctruth->SetLineWidth(3);
   mctruth->SetLineStyle(2);
   mctruth->SetLineColor(kBlue);
-  
+
   output->SetLineColor(kBlack);
   output->SetMarkerColor(kBlack);
   output->SetMarkerStyle(8);
-  output->SetMarkerSize(1); 
+  output->SetMarkerSize(1);
 
   TCanvas *c= new TCanvas("Particle Level","",600,600);
-  gPad->SetLeftMargin(0.15); 
-  TGaxis::SetMaxDigits(3);   
+  gPad->SetLeftMargin(0.15);
+  TGaxis::SetMaxDigits(3);
   pseudotruth->Draw("HIST SAME");
   mctruth->Draw("HIST SAME");
   output->Draw("E1 SAME");
@@ -288,12 +387,18 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
   l->SetTextSize(0.04);
 
   l->Draw();
-  gPad->RedrawAxis(); 
+  gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
 
-
+/*
+██████  ██    ██ ██████  ██ ████████ ██    ██
+██   ██ ██    ██ ██   ██ ██    ██     ██  ██
+██████  ██    ██ ██████  ██    ██      ████
+██      ██    ██ ██   ██ ██    ██       ██
+██       ██████  ██   ██ ██    ██       ██
+*/
 
 void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_name){
   TH1D* numerator = (TH1D*) numerator_->Clone("numerator");
@@ -319,13 +424,55 @@ void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_nam
   purity->SetLineColor(1);
 
   TCanvas *c= new TCanvas("Purity","",600,600);
-  gPad->SetLeftMargin(0.15); 
-  TGaxis::SetMaxDigits(3);   
+  gPad->SetLeftMargin(0.15);
+  TGaxis::SetMaxDigits(3);
   purity->Draw("E1");
-  gPad->RedrawAxis(); 
+  gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+
+/*
+ ██████ ██   ██ ██     ██████
+██      ██   ██ ██          ██
+██      ███████ ██      █████
+██      ██   ██ ██     ██
+ ██████ ██   ██ ██     ███████
+*/
+
+void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, TString file_name){
+  TF1 * fit = (TF1*)fit_->Clone("fit");
+  TVectorD masses(masses_.size());
+  TVectorD chi2(chi2_.size());
+  for(int i=0; i<masses_.size(); i++) masses[i] = masses_[i];
+  for(int i=0; i<chi2_.size(); i++) chi2[i] = chi2_[i];
+
+  TGraph* chi_hist = new TGraph(masses,chi2);
+  TCanvas *c = new TCanvas("Chi2", "", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  TGaxis::SetMaxDigits(3);
+  chi_hist->SetTitle(" ");
+  chi_hist->GetXaxis()->SetTitle("m_{top} [GeV]");
+  chi_hist->GetYaxis()->SetTitle("#chi^{2}");
+  chi_hist->GetYaxis()->SetTitleOffset(1.5);
+  chi_hist->GetXaxis()->SetNdivisions(505);
+  chi_hist->GetYaxis()->SetNdivisions(505);
+  chi_hist->SetMarkerStyle(20);
+  chi_hist->SetMarkerSize(1.5);
+  chi_hist->SetLineColor(1);
+  chi_hist->Draw("AP");
+  fit->Draw("SAME");
+  c->SaveAs(directory + file_name + ".pdf");
+  return;
+}
+
+/*
+██   ██ ███████ ██      ██████  ███████ ██████
+██   ██ ██      ██      ██   ██ ██      ██   ██
+███████ █████   ██      ██████  █████   ██████
+██   ██ ██      ██      ██      ██      ██   ██
+██   ██ ███████ ███████ ██      ███████ ██   ██
+*/
 
 
 TH1* plotter::add_error_bar(TH1* hist, std::vector<double> errors){
@@ -346,31 +493,4 @@ TH1D* get_difference(TH1D* hist1_, TH1D* hist2_){
     h_diff->Fill(i, diff);
   }
   return h_diff;
-}
-
-
-void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, TString file_name){
-  TF1 * fit = (TF1*)fit_->Clone("fit");
-  TVectorD masses(masses_.size());
-  TVectorD chi2(chi2_.size());
-  for(int i=0; i<masses_.size(); i++) masses[i] = masses_[i];
-  for(int i=0; i<chi2_.size(); i++) chi2[i] = chi2_[i];
-
-  TGraph* chi_hist = new TGraph(masses,chi2);
-  TCanvas *c = new TCanvas("Chi2", "", 600, 600);
-  gPad->SetLeftMargin(0.15); 
-  TGaxis::SetMaxDigits(3); 
-  chi_hist->SetTitle(" ");
-  chi_hist->GetXaxis()->SetTitle("m_{top} [GeV]");
-  chi_hist->GetYaxis()->SetTitle("#chi^{2}");
-  chi_hist->GetYaxis()->SetTitleOffset(1.5);
-  chi_hist->GetXaxis()->SetNdivisions(505);
-  chi_hist->GetYaxis()->SetNdivisions(505);
-  chi_hist->SetMarkerStyle(20);
-  chi_hist->SetMarkerSize(1.5);
-  chi_hist->SetLineColor(1);
-  chi_hist->Draw("AP");
-  fit->Draw("SAME");
-  c->SaveAs(directory + file_name + ".pdf");
-  return;
 }

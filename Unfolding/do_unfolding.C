@@ -54,14 +54,25 @@ int main(int argc, char* argv[])
 
   TH1::SetDefaultSumw2();
 
-  //==============================================
-  // step 1 : open output file
+  /*
+   ██████ ██████  ███████  █████  ████████ ███████     ███████ ██ ██      ███████ ███████
+  ██      ██   ██ ██      ██   ██    ██    ██          ██      ██ ██      ██      ██
+  ██      ██████  █████   ███████    ██    █████       █████   ██ ██      █████   ███████
+  ██      ██   ██ ██      ██   ██    ██    ██          ██      ██ ██      ██           ██
+   ██████ ██   ██ ███████ ██   ██    ██    ███████     ██      ██ ███████ ███████ ███████
+  */
+
   cout << "Open Files" << endl;
 
   TFile *outputFile=new TFile(output_file,"recreate");
 
-  //==============================================
-  // step 2 : read binning schemes and input histograms
+  /*
+  ██████  ███████  █████  ██████      ██████  ██ ███    ██ ███    ██ ██ ███    ██  ██████
+  ██   ██ ██      ██   ██ ██   ██     ██   ██ ██ ████   ██ ████   ██ ██ ████   ██ ██
+  ██████  █████   ███████ ██   ██     ██████  ██ ██ ██  ██ ██ ██  ██ ██ ██ ██  ██ ██   ███
+  ██   ██ ██      ██   ██ ██   ██     ██   ██ ██ ██  ██ ██ ██  ██ ██ ██ ██  ██ ██ ██    ██
+  ██   ██ ███████ ██   ██ ██████      ██████  ██ ██   ████ ██   ████ ██ ██   ████  ██████
+  */
 
   if(fine) input_file = "Histograms_fine.root";
   else     input_file = "Histograms.root";
@@ -96,9 +107,15 @@ int main(int argc, char* argv[])
 
   cout << "Get Histograms" << endl;
 
-  // read histograms
+  /*
+██████  ███████  █████  ██████      ██   ██ ██ ███████ ████████  ██████   ██████  ██████   █████  ███    ███ ███████
+██   ██ ██      ██   ██ ██   ██     ██   ██ ██ ██         ██    ██    ██ ██       ██   ██ ██   ██ ████  ████ ██
+██████  █████   ███████ ██   ██     ███████ ██ ███████    ██    ██    ██ ██   ███ ██████  ███████ ██ ████ ██ ███████
+██   ██ ██      ██   ██ ██   ██     ██   ██ ██      ██    ██    ██    ██ ██    ██ ██   ██ ██   ██ ██  ██  ██      ██
+██   ██ ███████ ██   ██ ██████      ██   ██ ██ ███████    ██     ██████   ██████  ██   ██ ██   ██ ██      ██ ███████
+*/
+
   TH1D *hist_data,*hist_mc_gen,*hist_mc_bgr,*hist_mc_sig,*hist_mc_rec, *hist_mc_truth;
-  TH1D *hist_data_count400, *hist_data_count500;
   TH2 *histMCGenRec;
 
   TH1D* h_pseudodata_truth;
@@ -118,10 +135,17 @@ int main(int argc, char* argv[])
 
 
   inputFile->GetObject("data",hist_data);
-  inputFile->GetObject("mc_gen",hist_mc_gen);
+  if(pseudo1)      inputFile->GetObject("pseudo1_gen",hist_mc_gen);
+  else if(pseudo2) inputFile->GetObject("pseudo2_gen",hist_mc_gen);
+  else             inputFile->GetObject("mc_gen",hist_mc_gen);
+
+  if(pseudo1)      inputFile->GetObject("pseudo1_sig",hist_mc_sig);
+  else if(pseudo2) inputFile->GetObject("pseudo2_sig",hist_mc_sig);
+  else             inputFile->GetObject("mc_sig",hist_mc_sig);
+
   inputFile->GetObject("mc_truth",hist_mc_truth);
-  if(pseudo1) inputFile->GetObject("pseudodata1_truth",h_pseudodata_truth);
-  if(pseudo2) inputFile->GetObject("pseudodata2_truth",h_pseudodata_truth);
+  if(pseudo1) inputFile->GetObject("pseudo1_truth",h_pseudodata_truth);
+  if(pseudo2) inputFile->GetObject("pseudo2_truth",h_pseudodata_truth);
   inputFile->GetObject("mc_mtop1665_truth",mc_mtop1665_truth);
   inputFile->GetObject("mc_mtop1695_truth",mc_mtop1695_truth);
   inputFile->GetObject("mc_mtop1715_truth",mc_mtop1715_truth);
@@ -141,18 +165,37 @@ int main(int argc, char* argv[])
   std::vector<bool>     show = {true,  false, false,  true, false, false, true}; // decides which masspoint is shown
   // std::vector<bool> show = {true, true, true, true, true, true, true};
 
-  inputFile->GetObject("mc_bgr",hist_mc_bgr);
-  inputFile->GetObject("mc_sig",hist_mc_sig);
+  // read backgrounds
+  vector<TString> bgr_name = {"WJets", "SingleTop", "other"};
+  vector<TH1D*> backgrounds;
+  for(unsigned int i=0; i<bgr_name.size(); i++){
+    backgrounds.push_back((TH1D*)inputFile->Get("BKG_"+bgr_name[i]));
+    if(i==0) hist_mc_bgr = (TH1D*)backgrounds[0]->Clone();
+    else hist_mc_bgr->Add(backgrounds[i]);
+  }
+  if(!data) hist_mc_bgr->Reset();
+
   hist_mc_rec = (TH1D*)hist_mc_sig->Clone();
-  hist_mc_rec->Add(hist_mc_bgr);
+  if(data) hist_mc_rec->Add(hist_mc_bgr);
 
   inputFile->GetObject("mc_matrix",histMCGenRec);
 
-  inputFile->GetObject("mc_purity_all",h_pur_all);
-  inputFile->GetObject("mc_purity_samebin",h_pur_samebin);
-  inputFile->GetObject("mc_purity_samebin_pt",h_pur_samebin_pt);
-
-
+  // purity
+  if(pseudo1){
+    inputFile->GetObject("pseudo1_purity_all",h_pur_all);
+    inputFile->GetObject("pseudo1_purity_samebin",h_pur_samebin);
+    inputFile->GetObject("pseudo1_purity_samebin_pt",h_pur_samebin_pt);
+  }
+  else if(pseudo2){
+    inputFile->GetObject("pseudo2_purity_all",h_pur_all);
+    inputFile->GetObject("pseudo2_purity_samebin",h_pur_samebin);
+    inputFile->GetObject("pseudo2_purity_samebin_pt",h_pur_samebin_pt);
+  }
+  else{
+    inputFile->GetObject("mc_purity_all",h_pur_all);
+    inputFile->GetObject("mc_purity_samebin",h_pur_samebin);
+    inputFile->GetObject("mc_purity_samebin_pt",h_pur_samebin_pt);
+  }
 
   if(pseudo1){
     inputFile->GetObject("pseudo1_matrix",histMCGenRec);
@@ -163,7 +206,14 @@ int main(int argc, char* argv[])
     inputFile->GetObject("mc_sig",hist_data);
   }
   if(same) inputFile->GetObject("mc_sig",hist_data);
-  if(pseudo || same) hist_mc_bgr->Reset();
+
+  // read migrations from variations
+  vector<TH2*> sys_matrix;
+  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown"};
+  for(unsigned int i=0; i<sys_name.size(); i++){
+    sys_matrix.push_back((TH2*)inputFile->Get(sys_name[i] + "_matrix"));
+  }
+
 
   hist_data->Write();
   hist_mc_gen->Write();
@@ -176,21 +226,30 @@ int main(int argc, char* argv[])
      cout<<"problem to read input histograms\n";
   }
 
-  // ======================================================================================================
-  // unfolding here
+  /*
+██    ██ ███    ██ ███████  ██████  ██      ██████  ██ ███    ██  ██████
+██    ██ ████   ██ ██      ██    ██ ██      ██   ██ ██ ████   ██ ██
+██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██ ██ ██ ██  ██ ██   ███
+██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██ ██ ██  ██ ██ ██    ██
+ ██████  ██   ████ ██       ██████  ███████ ██████  ██ ██   ████  ██████
+ */
+
 
   int nscan = 100;
 
   TH2 *CovMatrix;
   TH2 *CorMatrix;
   TH2 *ProbMatrix;
+  vector<TH2*> SYS_COV;
+  vector<TH1*> SYS_DELTA;
+
   TGraph *lcurve;
   // double lcurveX= 0;
   // double lcurveY= 0;
   TH1 *data_unfolded,*data_unfolded_all;
 
   if(same){
-    unfolding unfold(hist_data, hist_mc_bgr, hist_mc_sig, histMCGenRec, binning_rec, binning_gen, true, 1);
+    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, 1);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
     CorMatrix = unfold.get_cor_matrix();
@@ -200,15 +259,19 @@ int main(int argc, char* argv[])
 
 
   if(data || pseudo){
-    unfolding unfold(hist_data, hist_mc_bgr, hist_mc_sig, histMCGenRec, binning_rec, binning_gen, false, nscan);
+    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
     CorMatrix = unfold.get_cor_matrix();
     CovMatrix = unfold.get_cov_matrix();
     ProbMatrix = unfold.get_prob_matrix();
-    // lcurve = unfold.get_lcurve();
-    // lcurveX= unfold.get_best_point("X");
-    // lcurveY= unfold.get_best_point("Y");
+    SYS_COV = unfold.get_sys_matrix();
+    SYS_DELTA = unfold.get_delta();
+    // TODO
+    // 1. CHOOSE UP or DOWN VARIATION
+    // 2. GET CORRESPONDING Cov
+    // 3. ADD UP ALL SYSCOV and STAT COV
+    // 4. APPLY ERROR of TOT COV TO UNFOLDED DISTRIBUTION
   }
 
   // write_syserror("SYS_TEST.txt", output, hist_PseudoData_truth);
@@ -229,28 +292,6 @@ int main(int argc, char* argv[])
 
   // ======================================================================================================
   // some counting
-
-  // count events in data input (for proper binning)
-  int n_bins = hist_data_count400->GetSize() - 2;
-  double n_events = 0;
-  int lower_bin = 0;
-  int upper_bin = 0;
-  int events_min = 150;
-  int bin_nr = 0;
-
-  cout << endl;
-  while(upper_bin < n_bins){
-    while(n_events < events_min && upper_bin < n_bins){
-      upper_bin ++;
-      n_events = hist_data_count400->Integral(lower_bin, upper_bin);
-    }
-    bin_nr ++;
-    cout << n_events << " between bin " << lower_bin << " and bin " << upper_bin << endl;
-    lower_bin = upper_bin + 1;
-    upper_bin += 2;
-    n_events = 0;
-  }
-  cout << "total number of bins: " << bin_nr << endl << endl;
 
   // cout << "total Sum of Weights: " << ProbMatrix->GetSumOfWeights() << endl;
   // cout << "total incl overflow/underflow: " << ProbMatrix->Integral(0,ngen+1,0,nrec+1) << endl;
@@ -280,7 +321,14 @@ int main(int argc, char* argv[])
   data_unfolded->Write();
   ProbMatrix->Write();
 
-  // ======================================================================================================
+  /*
+   ██████ ██   ██ ██     ██████
+  ██      ██   ██ ██          ██
+  ██      ███████ ██      █████
+  ██      ██   ██ ██     ██
+   ██████ ██   ██ ██     ███████
+  */
+
   // parameters for chi2 fit
   double lower = 130;
   double upper = 290;
@@ -301,6 +349,7 @@ int main(int argc, char* argv[])
   // normalise mc truth
   Normalise * normMC = new Normalise(hist_mc_truth, lower, upper, NormToWidth);
   TH1D* hist_mc_truth_norm  = normMC->GetHist();
+
   // normalise pseudo data truth
   TH1D* h_pseudodata_truth_norm;
   if(pseudo){
@@ -315,8 +364,13 @@ int main(int argc, char* argv[])
   TF1* chi2fit = chi2->GetChi2Fit();
   cout << " MASS = " << chi2->GetMass() << " +- " << chi2->GetUncertainty() << std::endl;
 
-  // ======================================================================================================
-  // make plots
+  /*
+  ██████  ██       ██████  ████████
+  ██   ██ ██      ██    ██    ██
+  ██████  ██      ██    ██    ██
+  ██      ██      ██    ██    ██
+  ██      ███████  ██████     ██
+  */
 
   plotter * plot = new plotter(directory);
   plot->draw_chi2(chi2fit, masses, chi2values, "chi2fit");
@@ -324,6 +378,12 @@ int main(int argc, char* argv[])
   plot->draw_matrix(CorMatrix, "Cor_Matrix", false);
   plot->draw_matrix(CovMatrix, "Cov_Matrix", false);
   plot->draw_matrix(histMCGenRec, "Migration_Matrix", true);
+
+  for(unsigned int i=0; i<sys_name.size(); i++){
+    plot->draw_matrix(SYS_COV[i], "COV_"+sys_name[i], false);
+    plot->draw_delta(SYS_DELTA[i], "DELTA_"+sys_name[i]);
+  }
+
   if(pseudo) plot->draw_output_pseudo(data_unfolded, h_pseudodata_truth, hist_mc_truth, false, "Unfold_pseudo");
   if(pseudo) plot->draw_output_pseudo(data_unfolded_norm, h_pseudodata_truth_norm, hist_mc_truth_norm, true, "Unfold_pseudo_norm");
   plot->draw_output(data_unfolded, hist_mc_truth, false, "Unfold");

@@ -24,6 +24,7 @@ class plotter{
   void draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_name);
   void draw_projection(TH1D* proj, TH1D* compare, TString file_name );
   void draw_1D_hist(TH1D* hist, TString file_name);
+  void draw_delta(TH1* hist, TString file_name);
   void draw_rec(TH1D* data, TH1D* sig, TH1D* bgr, TString file_name);
   void draw_purity(TH1D* numerator, TH1D* denominator, TString file_name);
   TH1D* get_difference(TH1D* hist1, TH1D* hist2);
