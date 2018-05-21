@@ -2,8 +2,21 @@
 
 using namespace std;
 
+TH1* SetSysError(TH1* data_unfolded, TH2* COV_TOT);
+
+
 int main(int argc, char* argv[])
 {
+  if(argc != 3){
+    cout << "ERROR: WRONG USAGE!" << endl;
+    cout << endl;
+    cout << "CORRECT WAY: ./do_unfolding option1 option2" << endl;
+    cout << endl;
+    cout << "           option1 = data/pseudo1/pseudo2/same" << endl;
+    cout << "           option2 = fine/no" << endl;
+
+    return 0;
+  }
 
   bool data = false;
   bool same = false;
@@ -37,7 +50,6 @@ int main(int argc, char* argv[])
     directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo/";
     output_file = "Results_pseudo.root";
   }
-
   else {
     cout << "select 'data', 'same', 'pseudo1', 'pseudo2'"<< endl;
     return 0;
@@ -209,7 +221,7 @@ int main(int argc, char* argv[])
 
   // read migrations from variations
   vector<TH2*> sys_matrix;
-  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown"};
+  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "mutrkup", "mutrkdown"};
   for(unsigned int i=0; i<sys_name.size(); i++){
     sys_matrix.push_back((TH2*)inputFile->Get(sys_name[i] + "_matrix"));
   }
@@ -240,13 +252,14 @@ int main(int argc, char* argv[])
   TH2 *CovMatrix;
   TH2 *CorMatrix;
   TH2 *ProbMatrix;
+  TH2* COV_TOT;
   vector<TH2*> SYS_COV;
   vector<TH1*> SYS_DELTA;
 
   TGraph *lcurve;
   // double lcurveX= 0;
   // double lcurveY= 0;
-  TH1 *data_unfolded,*data_unfolded_all;
+  TH1 *data_unfolded,*data_unfolded_sys,*data_unfolded_all;
 
   if(same){
     unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, 1);
@@ -267,11 +280,27 @@ int main(int argc, char* argv[])
     ProbMatrix = unfold.get_prob_matrix();
     SYS_COV = unfold.get_sys_matrix();
     SYS_DELTA = unfold.get_delta();
+
+
     // TODO
     // 1. CHOOSE UP or DOWN VARIATION
     // 2. GET CORRESPONDING Cov
     // 3. ADD UP ALL SYSCOV and STAT COV
     // 4. APPLY ERROR of TOT COV TO UNFOLDED DISTRIBUTION
+
+    // for now, just use up variations (thus uneven i)
+    vector<bool> ChooseVariation;
+    for(unsigned int i=0; i<SYS_COV.size(); i++){
+      int mod = i%2; // check if i is even or uneven
+      if(mod > 0) ChooseVariation.push_back(true);
+      else        ChooseVariation.push_back(false);
+    }
+
+    COV_TOT = (TH2*) CovMatrix->Clone();
+    for(unsigned int i=0; i<SYS_COV.size(); i++){
+      if(ChooseVariation[i]) COV_TOT->Add(SYS_COV[i]);
+    }
+    data_unfolded_sys = SetSysError(data_unfolded, COV_TOT);
   }
 
   // write_syserror("SYS_TEST.txt", output, hist_PseudoData_truth);
@@ -335,7 +364,7 @@ int main(int argc, char* argv[])
   bool NormToWidth = true;
 
   // normalise unfolding output
-  Normalise * normData = new Normalise(data_unfolded, CovMatrix, lower, upper, NormToWidth);
+  Normalise * normData = new Normalise(data_unfolded, COV_TOT, lower, upper, NormToWidth);
   TH1D* data_unfolded_norm = normData->GetHist();
   TH2D* CovMatrix_norm = normData->GetMatrix();
 
@@ -376,7 +405,8 @@ int main(int argc, char* argv[])
   plot->draw_chi2(chi2fit, masses, chi2values, "chi2fit");
   plot->draw_matrix(ProbMatrix, "Prob_Matrix", true);
   plot->draw_matrix(CorMatrix, "Cor_Matrix", false);
-  plot->draw_matrix(CovMatrix, "Cov_Matrix", false);
+  plot->draw_matrix(CovMatrix, "COV_STAT", false);
+  plot->draw_matrix(COV_TOT, "COV_TOT", false);
   plot->draw_matrix(histMCGenRec, "Migration_Matrix", true);
 
   for(unsigned int i=0; i<sys_name.size(); i++){
@@ -387,6 +417,7 @@ int main(int argc, char* argv[])
   if(pseudo) plot->draw_output_pseudo(data_unfolded, h_pseudodata_truth, hist_mc_truth, false, "Unfold_pseudo");
   if(pseudo) plot->draw_output_pseudo(data_unfolded_norm, h_pseudodata_truth_norm, hist_mc_truth_norm, true, "Unfold_pseudo_norm");
   plot->draw_output(data_unfolded, hist_mc_truth, false, "Unfold");
+  plot->draw_output(data_unfolded_sys, hist_mc_truth, false, "Unfold_SYS");
   plot->draw_output(data_unfolded_norm, hist_mc_truth_norm, true, "Unfold_norm");
   plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
   plot->draw_output_mass(data_unfolded_norm, mc_mtop_templates_norm, show, true, "Unfold_masspoints_norm");
@@ -402,6 +433,24 @@ int main(int argc, char* argv[])
   return 0;
 }
 
+/*
+██   ██ ███████ ██      ██████  ███████ ██████  ███████
+██   ██ ██      ██      ██   ██ ██      ██   ██ ██
+███████ █████   ██      ██████  █████   ██████  ███████
+██   ██ ██      ██      ██      ██      ██   ██      ██
+██   ██ ███████ ███████ ██      ███████ ██   ██ ███████
+*/
+
+// set uncert from cov to 1d hist
+TH1* SetSysError(TH1* data_unfolded, TH2* COV_TOT){
+  TH1* hist = (TH1*) data_unfolded->Clone();
+  int nbins = hist->GetXaxis()->GetNbins();
+  for(int i=1; i<=nbins; i++){
+    double error = sqrt(COV_TOT->GetBinContent(i,i));
+    hist->SetBinError(i, error);
+  }
+  return hist;
+}
 
 
 // get diagonal Cov Matrix from hist errors

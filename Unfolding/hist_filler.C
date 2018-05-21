@@ -96,8 +96,8 @@ int main(int argc, char* argv[]){
   fill_matrix((TTree *) pseudodata2_File->Get("AnalysisTree"), "pseudo2");
 
   // fill SYS
-  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown"};
-  vector<TString> subdir = {"JEC_up", "JEC_down", "JER_up", "JER_down"};
+  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "mutrkup", "mutrkdown"};
+  vector<TString> subdir = {"JEC_up", "JEC_down", "JER_up", "JER_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "MUTRK_up", "MUTRK_down"};
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     TFile *file = new TFile(dir+subdir[i]+prefix+"MC.TTbar.root");

@@ -86,6 +86,7 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
     SysDelta.push_back(unfold.GetDeltaSysSource(sys_name[i], "delta_"+sys_name[i],0,"measurement_gen","pt[C]",kTRUE));
   }
   for(unsigned int i=0; i<SysDelta.size(); i++){
+    cout << " ====================== " << sys_name[i] << " ====================== " << endl;
     SysCov.push_back(CreateCovMatrixFromDelta(SysDelta[i]));
   }
 
@@ -133,10 +134,11 @@ double unfolding::get_tau(){
 TH2* unfolding::CreateCovMatrixFromDelta(TH1* delta){
   TH2* cov = (TH2*) CovM->Clone();
   cov->Reset();
-  int nbins = delta->GetXaxis()->GetNbins() - 2;
+  int nbins = delta->GetXaxis()->GetNbins();
   for(int i=1; i<=nbins; i++){
     for(int j=1; j<=nbins; j++){
       double entry = delta->GetBinContent(i) * delta->GetBinContent(j);
+      cout << i << ", " << j << ", " << entry << endl;
       cov->SetBinContent(i,j,entry);
     }
   }
