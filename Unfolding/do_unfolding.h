@@ -3,7 +3,7 @@
 #include "sys_handler.h"
 #include "chi2fit.h"
 #include "normalise.h"
-
+#include "modelsys.h"
 
 TString directory;
 TString input_file;

@@ -60,7 +60,7 @@ void Normalise::Norm(){
 
 TH2D* Normalise::CalcMatrix(){
   int nbins = upper_;
-  TH2D* cov = new TH2D("cov", "cov", nbins, 1, upper_+1, nbins, 1, upper_+1); 
+  TH2D* cov = new TH2D("cov", "cov", nbins, 1, upper_+1, nbins, 1, upper_+1);
   for(int i=1; i <= upper_; i++){
     double error = hist_->GetBinError(i);
     cov->Fill(i,i, error * error);
@@ -71,7 +71,7 @@ TH2D* Normalise::CalcMatrix(){
 
 TH2D* Normalise::MatrixErrorPropagation(TH2*old_cov){
   int nbins = upper_;
-  TH2D* new_cov = new TH2D("new_cov", "new_cov", nbins, 1, upper_+1, nbins, 1, upper_+1); 
+  TH2D* new_cov = new TH2D("new_cov", "new_cov", nbins, 1, upper_+1, nbins, 1, upper_+1);
   double integral = hist_->Integral(lower_, upper_);
   for(int i=1; i <= upper_; i++){
     for(int j=1; j <= upper_; j++){
@@ -102,8 +102,9 @@ TH2D* Normalise::MatrixErrorPropagation(TH2*old_cov){
 }
 
 void Normalise::UpdateHist(){
-  for(int i=0; i<=upper_; i++){
-    if(i < lower_){
+  int nbins = hist_->GetXaxis()->GetNbins();
+  for(int i=0; i<=nbins; i++){
+    if(i < lower_ || i > upper_){
       hist_->SetBinContent(i, 0.0);
       hist_->SetBinError(i, 0.0);
     }

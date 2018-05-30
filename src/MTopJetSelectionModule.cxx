@@ -150,7 +150,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_recsel = ctx.get_handle<bool>("passed_recsel");
   h_gensel_2 = ctx.declare_event_output<bool>("passed_gensel_2");
   h_recsel_2 = ctx.declare_event_output<bool>("passed_recsel_2");
-  h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   h_gen23fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone23TopJets");
   h_gen33fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
@@ -168,10 +168,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   }
 
   // combine XCone
-  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "XConeTopJets"));
-  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "XConeTopJets" ));
-  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "XConeTopJets_Corrected"));
-  copy_jet.reset(new CopyJets(ctx, "XConeTopJets", "XConeTopJets_noJEC"));
+  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
+  jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "xconeCHS" ));
+  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
+  copy_jet.reset(new CopyJets(ctx, "xconeCHS", "xconeCHS_noJEC"));
 
   if(isMC){
     jetprod_gen23.reset(new CombineXCone23_gen(ctx));
@@ -193,8 +193,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
-  JetCorrections->init(ctx, "XConeTopJets", "genXCone33TopJets");
-  Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected", corvar));
+  JetCorrections->init(ctx, "xconeCHS", "genXCone33TopJets");
+  Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar));
 
   //// EVENT SELECTION
 

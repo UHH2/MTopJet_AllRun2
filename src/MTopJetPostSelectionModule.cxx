@@ -179,6 +179,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   string MuTrigger_variation ="nominal";
   string MuTrk_variation ="nominal";
   string PU_variation ="nominal";
+
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
@@ -261,7 +262,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
 
   /*************************** Setup Subjet Corrector **********************************************************************************/
-  // Correction.reset(new CorrectionFactor(ctx, "XConeTopJets_Corrected"));
+  // Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected"));
   /*************************** Setup Selections **********************************************************************************/
   // RECO Selection
   // chose: XCone33_had_Combined_Corrected,  XCone33_had_Combined_noJEC,  XCone33_had_Combined
@@ -302,7 +303,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
- muon_trk_SF.reset(new MCMuonTrkScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Tracking_EfficienciesAndSF_BCDEFGH.root", 1, "track", MuTrk_variation, "muons"));
+  muon_trk_SF.reset(new MCMuonTrkScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Tracking_EfficienciesAndSF_BCDEFGH.root", 1, "track", MuTrk_variation, "muons"));
 
 
   /*************************** Set up Hists classes **********************************************************************************/

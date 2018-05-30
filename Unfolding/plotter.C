@@ -89,6 +89,68 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   delete c;
 }
 /*
+ ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ████████  █████  ████████
+██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██         ██    ██   ██    ██
+██    ██ ██    ██    ██    ██████  ██    ██    ██        ███████    ██    ███████    ██
+██    ██ ██    ██    ██    ██      ██    ██    ██             ██    ██    ██   ██    ██
+ ██████   ██████     ██    ██       ██████     ██        ███████    ██    ██   ██    ██
+*/
+
+
+void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm, TString file_name){
+  // std::vector<double> sys = get_sys_errors();
+  // TH1* output_sys = add_error_bar(output, sys);
+
+  TH1* output = (TH1*) output_->Clone("output");
+  TH1* stat = (TH1*) stat_->Clone("stat");
+  TH1D* truth = (TH1D*) truth_->Clone("truth");
+
+  TCanvas *c = new TCanvas("c","",600,600);
+  double ymax;
+  gPad->SetLeftMargin(0.15);
+
+  if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
+  else ymax = 1.1 * output->GetMaximum();
+  TGaxis::SetMaxDigits(3);
+  output->SetTitle(" ");
+  output->GetYaxis()->SetRangeUser(0., ymax);
+  output->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
+  else output->GetYaxis()->SetTitle("events");
+  output->GetYaxis()->SetTitleOffset(1.1);
+  output->GetXaxis()->SetTitleOffset(0.9);
+  output->GetYaxis()->SetTitleSize(0.05);
+  output->GetXaxis()->SetTitleSize(0.05);
+  output->GetYaxis()->SetNdivisions(505);
+  output->SetLineColor(kBlack);
+  output->SetMarkerColor(kBlack);
+  output->SetMarkerStyle(8);
+  output->SetMarkerSize(1);
+  output->Draw("E1");
+  stat->SetLineColor(kBlack);
+  stat->SetMarkerColor(kBlack);
+  stat->SetMarkerStyle(8);
+  stat->SetMarkerSize(1);
+  gStyle->SetEndErrorSize(5);
+  truth->SetLineWidth(3);
+  truth->SetLineColor(kRed);
+  truth->SetLineStyle(2);
+  truth->Draw("HIST SAME");
+  stat->Draw("E1 SAME");
+  output->Draw("E1 SAME");
+
+  TLegend *l=new TLegend(0.5,0.65,0.85,0.85);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  l->AddEntry(output,"data unfolded","pl");
+  l->AddEntry(truth,"MC particle level","pl");
+  l->SetTextSize(0.04);
+  l->Draw();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+/*
  ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███    ███  █████  ███████ ███████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ████  ████ ██   ██ ██      ██
 ██    ██ ██    ██    ██    ██████  ██    ██    ██        ██ ████ ██ ███████ ███████ ███████
@@ -327,6 +389,52 @@ void plotter::draw_delta(TH1* hist_, TString file_name){
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+
+void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString file_name){
+  TH1* total = (TH1*) total_->Clone();
+  std::vector<TH1*> delta;
+  for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
+    delta.push_back( (TH1*) MODEL_DELTA[i]->Clone() );
+  }
+
+  TCanvas *c= new TCanvas("c","",600,600);
+  gPad->SetLeftMargin(0.15);
+  total->SetTitle("");
+  total->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  total->GetYaxis()->SetTitle("relative uncertainty [%]");
+  total->GetYaxis()->SetTitleOffset(1.5);
+  total->GetYaxis()->SetNdivisions(505);
+  total->GetYaxis()->SetRangeUser(0, 1.5*total->GetMaximum());
+  total->SetFillColor(13);
+  total->SetFillStyle(3144);
+  total->SetLineColor(13);
+  total->SetMarkerStyle(-1);
+  total->Draw("HIST");
+
+  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, 12};
+  int i=0;
+  for(auto hist: delta){
+    gPad->SetLeftMargin(0.15);
+    hist->SetLineColor(col[i]);
+    hist->SetLineWidth(4);
+    hist->SetMarkerStyle(0);
+    hist->Draw("PX SAME");
+    i++;
+  }
+
+  // LEGEND
+  TLegend *leg = new TLegend(0.63,0.6,0.88,0.88);
+  leg->AddEntry(total, "exp. sys combined", "f");
+  for(unsigned int i=0; i<delta.size(); i++) leg->AddEntry(delta[i],UncertNames[i],"l");
+  leg->Draw();
+
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+
+
 /*
  ██████  ██    ██ ████████ ██████  ██    ██ ████████     ██████  ███████ ███████ ██    ██ ██████   ██████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██   ██ ██      ██      ██    ██ ██   ██ ██    ██

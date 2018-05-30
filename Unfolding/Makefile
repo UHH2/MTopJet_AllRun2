@@ -55,7 +55,7 @@ SRC=$(shell ls TUnfold*$(TUNFOLDCODEVER).cxx)
 
 MY_MACRO=$(shell ls unfold_code*.C) # include my macros
 OBJ_binning = binning.o
-OBJ_unfold = do_unfolding.o unfold.o plotter.o sys_handler.o chi2fit.o normalise.o
+OBJ_unfold = do_unfolding.o unfold.o plotter.o sys_handler.o chi2fit.o normalise.o modelsys.o
 OBJ_hist = hist_filler.o
 
 ## this is for changing the code version

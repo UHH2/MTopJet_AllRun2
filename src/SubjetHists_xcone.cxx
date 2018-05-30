@@ -55,9 +55,9 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   JEC_L2L3_ak4 = book<TH1F>("JEC_L2L3_ak4", "JEC factor L2L3", 100, 0, 2);
 
   // handle for jets
-  if(type == "raw") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
-  else if(type == "jec") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
-  else if(type == "cor") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected");
+  if(type == "raw") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
+  else if(type == "jec") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
+  else if(type == "cor") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
 }
 
 

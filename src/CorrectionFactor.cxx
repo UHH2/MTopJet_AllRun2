@@ -75,7 +75,7 @@ Particle GetLepton(uhh2::Event & event){
 
 
 CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar):
-  h_oldjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets")),
+  h_oldjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS")),
   h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name))
 {
   CorUp = false;

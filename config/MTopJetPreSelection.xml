@@ -33,6 +33,7 @@
 
   <!-- ELECTRON DATA -->
 
+  <!--
   <!ENTITY  SingleELEC_Run2016B             SYSTEM  "../../common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016Bv3_23Sep.xml">
   <!ENTITY  SingleELEC_Run2016C             SYSTEM  "../../common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016C_23Sep.xml">
   <!ENTITY  SingleELEC_Run2016D             SYSTEM  "../../common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016D_23Sep.xml">
@@ -40,6 +41,7 @@
   <!ENTITY  SingleELEC_Run2016F             SYSTEM  "../../common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016F_23Sep.xml">
   <!ENTITY  SingleELEC_Run2016G             SYSTEM  "../../common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016G_23Sep.xml">
   <!ENTITY  SingleELEC_Run2016H             SYSTEM  "../../common/datasets/RunII_80X_v3/DATA_SingleElectron_Run2016H_23Sep.xml">
+ -->
 
 <!-- =============================================== Single Top ===================================================================== -->
   <!ENTITY ST_t-channel_antitop SYSTEM  "../../common/datasets/RunII_80X_v3/MC_ST_t-channel_antitop_4f_inclusiveDecays.xml">
@@ -104,6 +106,7 @@
 
 <!-- =============================================== QCD EM =========================================================================== -->
 
+  <!--
   <!ENTITY QCD_Pt-0020to0030_EMEnriched     SYSTEM  "../../common/datasets/RunII_80X_v3/MC_QCD_Pt20to30_EMEnriched.xml">
   <!ENTITY QCD_Pt-0030to0050_EMEnriched     SYSTEM  "../../common/datasets/RunII_80X_v3/MC_QCD_Pt30to50_EMEnriched.xml">
   <!ENTITY QCD_Pt-0050to0080_EMEnriched     SYSTEM  "../../common/datasets/RunII_80X_v3/MC_QCD_Pt50to80_EMEnriched.xml">
@@ -111,6 +114,7 @@
   <!ENTITY QCD_Pt-0120to0170_EMEnriched     SYSTEM  "../../common/datasets/RunII_80X_v3/MC_QCD_Pt120to170_EMEnriched.xml">
   <!ENTITY QCD_Pt-0170to0300_EMEnriched     SYSTEM  "../../common/datasets/RunII_80X_v3/MC_QCD_Pt170to300_EMEnriched.xml">
   <!ENTITY QCD_Pt-0300toInft_EMEnriched     SYSTEM  "../../common/datasets/RunII_80X_v3/MC_QCD_Pt300toInf_EMEnriched.xml">
+ -->
 
 <!-- =============================================== Z+jets =========================================================================== -->
   <!ENTITY DYJetsToLL_LO_M50_HT0070to0100 SYSTEM  "../../common/datasets/RunII_80X_v3/MC_DYJetsToLL_M-50_HT-70to100.xml">
@@ -430,7 +434,7 @@
     <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	  <Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	  <Item Name="additionalBranches" Value="XConeTopJets genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets"/>
+	  <Item Name="additionalBranches" Value="xconeCHS xconePUPPI genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets"/>
 
 
     <!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->

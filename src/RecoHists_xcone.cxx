@@ -49,17 +49,17 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   if(type == "jec"){
     h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
     h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
-    h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+    h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   }
   else if(type == "raw"){
     h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
     h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_noJEC");
-    h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+    h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
   }
   else if(type == "cor"){
     h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
     h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_Corrected");
-    h_fatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected");
+    h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   }
 }
 

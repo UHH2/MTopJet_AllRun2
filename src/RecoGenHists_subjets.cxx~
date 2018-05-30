@@ -24,8 +24,8 @@ RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::strin
   PtReso_iso_6 = book<TH1F>("PtResolution_iso_6", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
 
   // handle for clustered jets
-  if(use_JEC) h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
-  else h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  if(use_JEC) h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
+  else h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
 
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 

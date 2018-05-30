@@ -88,7 +88,7 @@
         <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
-	<Item Name="additionalBranches" Value="weight XConeTopJets XConeTopJets_noJEC XConeTopJets_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined passed_gensel_2 passed_recsel_2"/>
+	<Item Name="additionalBranches" Value="weight xconeCHS xconeCHS_noJEC xconeCHS_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined passed_gensel_2 passed_recsel_2"/>
  
 	<Item Name="METName" Value="slimmedMETs"/>
 

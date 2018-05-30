@@ -228,7 +228,7 @@ bool uhh2::Matching_XCone23::passes(const uhh2::Event& event){
 
 
 uhh2::Matching_XCone33::Matching_XCone33(uhh2::Context& ctx, bool subjet_matching_):
-  h_fatjets(ctx.get_handle<std::vector<TopJet>>("XConeTopJets_Corrected")),
+  h_fatjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected")),
   h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
   subjet_matching(subjet_matching_){}
 

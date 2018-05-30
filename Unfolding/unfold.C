@@ -3,7 +3,7 @@
 using namespace std;
 
 
-unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr_name, TH1D* signal, TH2* migration_matrix, vector<TH2*>sys_matrix, vector<TString>sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan){
+unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr_name, TH1D* signal, TH2* migration_matrix, vector< vector<TH2*> > sys_matrix, vector< vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan){
   cout << "Do unfolding" << endl;
   cout << "   -->  You selected: ";
   if(do_lcurve) cout << "L-Curve Scan" << endl;
@@ -54,8 +54,14 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
 
   unfold.SetInput(input, scale);
 
+  // handle backgrounds
   for(unsigned int i=0; i<bgr_name.size(); i++){
-    unfold.SubtractBackground(backgrounds[i], bgr_name[i], 1.0, 0.0);
+    double scale_error = 0;
+    if(bgr_name[i] == "WJets") scale_error = 0.19;
+    else if(bgr_name[i] == "SingleTop") scale_error = 0.23;
+    else if(bgr_name[i] == "other") scale_error = 1.0;
+    else cout << "!!!!!ATTENTION!!!!! Background not known (from unfold.C)" << endl;
+    unfold.SubtractBackground(backgrounds[i], bgr_name[i], 1.0, scale_error);
   }
 
 
@@ -74,21 +80,48 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   lcurveY=logTauY->Eval(logTau);
 
   // write hists before including sys uncertainties
-  output = unfold.GetOutput("output",0,"measurement_gen","pt[C]",kTRUE);
-  output_all = unfold.GetOutput("output_all",0,0,0,kFALSE);
-  CorM = unfold.GetRhoIJtotal("CorM", 0, "measurement_gen","pt[C]",kTRUE);
-  ProbM = unfold.GetProbabilityMatrix("ProbM", 0, kTRUE);
-  CovM = unfold.GetEmatrixTotal("CovM", 0, "measurement_gen","pt[C]", kTRUE); // this has to stay, beacuse
+  output = unfold.GetOutput("",0,"measurement_gen","pt[C]",kTRUE);
+  output_all = unfold.GetOutput("",0,0,0,kFALSE);
+  CorM = unfold.GetRhoIJtotal("", 0, "measurement_gen","pt[C]",kTRUE);
+  ProbM = unfold.GetProbabilityMatrix("", 0, kTRUE);
+
+  // Statistical uncertainties of input distribution
+  CovInputStat = unfold.GetEmatrixInput("", 0, "measurement_gen","pt[C]", kTRUE);
+  // Statistical ucertainties of matrix
+  CovMatrixStat = unfold.GetEmatrixSysUncorr("", 0, "measurement_gen","pt[C]", kTRUE);
+
+  for(unsigned int i=0; i<bgr_name.size(); i++){
+    // Statistical uncertainties from Background
+    CovBgrStat.push_back(unfold.GetEmatrixSysBackgroundUncorr(bgr_name[i], "", 0, "measurement_gen","pt[C]", kTRUE));
+    // Sys uncertainties from background scale (delta)
+    BgrDelta.push_back(unfold.GetDeltaSysBackgroundScale(bgr_name[i], "",0,"measurement_gen","pt[C]",kTRUE));
+  }
+  for(unsigned int i=0; i<BgrDelta.size(); i++){
+    // Sys uncertainties from background scale (cov matrix)
+    CovBgrScale.push_back(CreateCovMatrixFromDelta(BgrDelta[i]));
+  }
+
 
   // treat sys uncertainties
   for(unsigned int i=0; i<sys_name.size(); i++){
-    unfold.AddSysError(sys_matrix[i], sys_name[i], TUnfold::kHistMapOutputHoriz, TUnfoldDensity::kSysErrModeMatrix);
-    SysDelta.push_back(unfold.GetDeltaSysSource(sys_name[i], "delta_"+sys_name[i],0,"measurement_gen","pt[C]",kTRUE));
+    vector<TH1*> dummy1;
+    SysDelta.push_back(dummy1);
+    for(unsigned int j=0; j<sys_name[i].size(); j++){
+      unfold.AddSysError(sys_matrix[i][j], sys_name[i][j], TUnfold::kHistMapOutputHoriz, TUnfoldDensity::kSysErrModeMatrix);
+      SysDelta[i].push_back(unfold.GetDeltaSysSource(sys_name[i][j], "",0,"measurement_gen","pt[C]",kTRUE));
+    }
   }
   for(unsigned int i=0; i<SysDelta.size(); i++){
-    cout << " ====================== " << sys_name[i] << " ====================== " << endl;
-    SysCov.push_back(CreateCovMatrixFromDelta(SysDelta[i]));
+    vector<TH2*> dummy2;
+    SysCov.push_back(dummy2);
+    for(unsigned int j=0; j<SysDelta[i].size(); j++){
+      SysCov[i].push_back(CreateCovMatrixFromDelta(SysDelta[i][j]));
+    }
   }
+
+  // CovTotal = unfold.GetEmatrixTotal("", 0, "measurement_gen","pt[C]", kTRUE);
+
+
 
 }
 
@@ -102,20 +135,40 @@ TH2* unfolding::get_prob_matrix(){
   return ProbM;
 }
 
-TH2* unfolding::get_cov_matrix(){
-  return CovM;
+TH2* unfolding::GetInputStatCov(){
+  return CovInputStat;
+}
+
+TH2* unfolding::GetMatrixStatCov(){
+  return CovMatrixStat;
+}
+
+vector<TH2*> unfolding::GetBgrStatCov(){
+  return CovBgrStat;
+}
+
+vector<TH2*> unfolding::GetBgrScaleCov(){
+  return CovBgrScale;
+}
+
+// TH2* unfolding::GetTotalCov(){
+//   return CovTotal;
+// }
+
+vector< vector<TH2*> > unfolding::GetSysCov(){
+  return SysCov;
+}
+
+vector< vector<TH1*> > unfolding::get_sys_delta(){
+  return SysDelta;
 }
 
 TH2* unfolding::get_cor_matrix(){
   return CorM;
 }
 
-vector<TH1*> unfolding::get_delta(){
-  return SysDelta;
-}
-
-vector<TH2*> unfolding::get_sys_matrix(){
-  return SysCov;
+vector<TH1*> unfolding::get_bgr_delta(){
+  return BgrDelta;
 }
 
 TGraph* unfolding::get_lcurve(){
@@ -132,13 +185,12 @@ double unfolding::get_tau(){
 }
 
 TH2* unfolding::CreateCovMatrixFromDelta(TH1* delta){
-  TH2* cov = (TH2*) CovM->Clone();
+  TH2* cov = (TH2*) CovInputStat->Clone();
   cov->Reset();
   int nbins = delta->GetXaxis()->GetNbins();
   for(int i=1; i<=nbins; i++){
     for(int j=1; j<=nbins; j++){
       double entry = delta->GetBinContent(i) * delta->GetBinContent(j);
-      cout << i << ", " << j << ", " << entry << endl;
       cov->SetBinContent(i,j,entry);
     }
   }

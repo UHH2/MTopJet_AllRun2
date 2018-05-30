@@ -23,8 +23,8 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
 
 
   // handle for clustered jets
-  h_recjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
-  h_recjets_noJEC=ctx.get_handle<std::vector<TopJet>>("XConeTopJets_noJEC");
+  h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
+  h_recjets_noJEC=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
   h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
   h_hadgenjets=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");

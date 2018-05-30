@@ -15,7 +15,7 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
 
 
   // handle for jets
-  h_recfatjets=ctx.get_handle<std::vector<TopJet>>("XConeTopJets");
+  h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
 }
 
 

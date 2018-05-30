@@ -96,13 +96,30 @@ int main(int argc, char* argv[]){
   fill_matrix((TTree *) pseudodata2_File->Get("AnalysisTree"), "pseudo2");
 
   // fill SYS
-  vector<TString> sys_name = {"jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "mutrkup", "mutrkdown"};
-  vector<TString> subdir = {"JEC_up", "JEC_down", "JER_up", "JER_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "MUTRK_up", "MUTRK_down"};
+  vector<TString> sys_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown", "jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "mutrkup", "mutrkdown", "puup", "pudown"};
+  vector<TString> subdir = {"BTAG_bc_up", "BTAG_bc_down", "BTAG_udsg_up", "BTAG_udsg_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "MUTRK_up", "MUTRK_down", "PU_up", "PU_down"};
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     TFile *file = new TFile(dir+subdir[i]+prefix+"MC.TTbar.root");
     fill_matrix((TTree *) file->Get("AnalysisTree"), sys_name[i]);
     delete file;
+  }
+
+  // fill model SYS
+  std::vector<TFile*> model_file;
+  model_file.push_back(new TFile(dir+prefix+"MC.TTbar_powheg-herwig.root"));
+  model_file.push_back(new TFile(dir+prefix+"MC.TTbar_amcatnlo-pythia.root"));
+  model_file.push_back(new TFile(dir+"SCALE_upup"+prefix+"MC.TTbar.root"));
+  model_file.push_back(new TFile(dir+"SCALE_downdown"+prefix+"MC.TTbar.root"));
+
+  std::vector<TString> model_name = {"Shower", "Generator", "SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
+
+  for(unsigned int i=0; i<model_name.size(); i++){
+    TFile * file;
+    if(model_name[i] == "Shower")          file = new TFile(dir+prefix+"MC.TTbar_powheg-herwig.root");
+    else if (model_name[i] == "Generator") file = new TFile(dir+prefix+"MC.TTbar_amcatnlo-pythia.root");
+    else                                   file = new TFile(dir+model_name[i]+prefix+"MC.TTbar.root");
+    fill_modelsys((TTree *) file->Get("AnalysisTree"), model_name[i]);
   }
 
   // fill mass templates
@@ -418,6 +435,83 @@ void fill_matrix(TTree* tree, TString prefix){
   delete h_mc_gen;
   delete h_mc_truth;
   delete h_mc_matrix;
+
+  return;
+}
+
+/*
+███████ ██ ██      ██          ███    ███  ██████  ██████  ███████ ██
+██      ██ ██      ██          ████  ████ ██    ██ ██   ██ ██      ██
+█████   ██ ██      ██          ██ ████ ██ ██    ██ ██   ██ █████   ██
+██      ██ ██      ██          ██  ██  ██ ██    ██ ██   ██ ██      ██
+██      ██ ███████ ███████     ██      ██  ██████  ██████  ███████ ███████
+*/
+
+void fill_modelsys(TTree* tree, TString prefix){
+  if(!tree) cout<<"could not read 'mc signal' tree\n";
+  else      cout << "Filling Model SYS Histograms ("+prefix+") ...\n";
+
+  // setup hists
+  TH1* h_mc_sig = binning_rec->CreateHistogram(prefix + "_sig");
+  TH1* h_mc_truth = measurement_gen->CreateHistogram(prefix + "_truth",kTRUE,0,0,"pt[C]");
+
+  outputFile->cd();
+  tree->ResetBranchAddresses();
+  tree->SetBranchAddress("Mass_Rec",&massRec);
+  tree->SetBranchAddress("Mass_Gen33",&massGen);
+  tree->SetBranchAddress("Pt_Rec",&ptRec);
+  tree->SetBranchAddress("Pt_Gen33",&ptGen);
+  tree->SetBranchAddress("passed_measurement_rec",&passed_measurement_rec);
+  tree->SetBranchAddress("passed_measurement_gen",&passed_measurement_gen);
+  tree->SetBranchAddress("is_TTbar",&is_TTbar);
+  tree->SetBranchAddress("rec_weight",&rec_weight);
+  tree->SetBranchAddress("gen_weight",&gen_weight);
+  tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
+  tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
+  tree->SetBranchAddress("passed_ptmigration_gen",&passed_ptmigration_gen);
+  tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
+  tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
+  tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
+  tree->SetBranchStatus("*",1);
+
+
+  for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
+    if(tree->GetEntry(ievent)<=0) break;
+    if(!is_TTbar){
+      cout << "ERROR: non-ttbar event in signal sample!" << endl;
+      break;
+    }
+
+    if(ttweight) gen_weight *= gen_ttfactor;
+
+    // get weight for gen and rec hists
+    w_sig_rec = rec_weight * gen_weight;
+    w_gen = gen_weight;
+
+
+    // get global bins
+    Int_t recBin;
+    if     (passed_measurement_rec)    recBin = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
+    else                               recBin = 0;
+
+    bool rec_info = false;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_btagmigration_rec) rec_info = true;
+
+
+    // Fill 1D Hists (for truth distribution only use gen selection)
+    if(passed_measurement_gen) h_mc_truth->Fill(massGen, w_gen);
+    if(rec_info) h_mc_sig->Fill(recBin, w_sig_rec);
+
+  }
+
+  h_mc_sig->Write();
+  h_mc_truth->Write();
+
+  delete h_mc_sig;
+  delete h_mc_truth;
 
   return;
 }
