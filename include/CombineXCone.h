@@ -11,7 +11,7 @@
 #include "UHH2/core/include/AnalysisModule.h"
 
 #include <vector>
-#include <iostream> 
+#include <iostream>
 #include <math.h>
 
 using namespace std;
@@ -25,9 +25,9 @@ class CombineXCone{
   bool FindLepton(uhh2::Event &);
   bool FindLepton_gen(uhh2::Event &);
   Particle GetLepton(uhh2::Event &);
-  Jet AddSubjets(vector<Jet> subjets, double ptmin);
+  TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin);
   GenParticle GetLepton_gen(uhh2::Event &);
-  Particle AddSubjets_gen(vector<Particle> subjets, double ptmin);
+  GenTopJet CreateTopJetFromSubjets_gen(vector<Particle> subjets, double ptmin);
 };
 
 
@@ -35,12 +35,12 @@ class CombineXCone33: public uhh2::AnalysisModule{
 public:
 
   explicit CombineXCone33(uhh2::Context &,  const std::string &, const std::string & , const std::string &);
-  virtual bool process(uhh2::Event & ) override; 
-    
+  virtual bool process(uhh2::Event & ) override;
+
 private:
 
-  uhh2::Event::Handle<std::vector<Jet>>h_xcone33hadjets;
-  uhh2::Event::Handle<std::vector<Jet>>h_xcone33lepjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_xcone33hadjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_xcone33lepjets;
   uhh2::Event::Handle<std::vector<TopJet>>h_fatjets;
 
 };
@@ -49,12 +49,12 @@ class CombineXCone33_gen: public uhh2::AnalysisModule{
 public:
 
   explicit CombineXCone33_gen(uhh2::Context &);
-  virtual bool process(uhh2::Event & ) override; 
-    
+  virtual bool process(uhh2::Event & ) override;
+
 private:
 
-  uhh2::Event::Handle<std::vector<Particle>>h_GENxcone33hadjets;
-  uhh2::Event::Handle<std::vector<Particle>>h_GENxcone33lepjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone33hadjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone33lepjets;
   uhh2::Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
 
 };
@@ -68,8 +68,8 @@ public:
 
 private:
 
-  uhh2::Event::Handle<std::vector<Particle>>h_GENxcone23hadjets;
-  uhh2::Event::Handle<std::vector<Particle>>h_GENxcone23lepjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone23hadjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone23lepjets;
   uhh2::Event::Handle<std::vector<GenTopJet>>h_GEN23fatjets;
 
 };
