@@ -30,6 +30,7 @@ protected:
   TH1F *FatJetPTDiff_had, *FatJetMassDiff_had, *FatJetPTDiff_lep, *FatJetMassDiff_lep;
   TH1F *RhoA, *RhoA_fat, *RhoA_diff, *E_diff;
   TH2F *Mass_Vertices;
+  TH1F *JER_factor; 
 
   uhh2::Event::Handle<std::vector<Jet>>h_hadjets;
   uhh2::Event::Handle<std::vector<Jet>>h_lepjets;

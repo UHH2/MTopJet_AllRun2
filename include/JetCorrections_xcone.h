@@ -18,7 +18,7 @@ class JetCorrections_xcone : public uhh2::AnalysisModule {
 
  public:
   JetCorrections_xcone();
-  void init(uhh2::Context & ctx, const std::string& jet_collection_rec, const std::string& jet_collection_gen);
+  void init(uhh2::Context & ctx, const std::string& jet_collection_rec);
   virtual bool process(uhh2::Event & event) override;
 
  private:
@@ -29,5 +29,16 @@ class JetCorrections_xcone : public uhh2::AnalysisModule {
   const int runnr_FlateG = 280385;
   bool isMC;
   Event::Handle<std::vector<TopJet>>h_topjets;
-  Event::Handle<std::vector<GenTopJet>>h_GENtopjets;
+};
+
+
+class JER_Smearer_xcone : public uhh2::AnalysisModule {
+
+ public:
+  JER_Smearer_xcone();
+  void init(uhh2::Context & ctx, const std::string& jet_collection_rec, const std::string& jet_collection_gen);
+  virtual bool process(uhh2::Event & event) override;
+
+ private:
+  std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
 };

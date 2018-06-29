@@ -43,6 +43,8 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
 
   Mass_Vertices = book<TH2F>("Mass_Vertices", "x=Pile-up y=m_{jet}", 50, 0, 50, 50, 0, 500);
 
+  JER_factor = book<TH1F>("JER_factor", "JER factor", 100, 0, 2);
+
   // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
   // handle for clustered jets
@@ -167,6 +169,9 @@ void RecoHists_xcone::fill(const Event & event){
   RhoA_diff->Fill(rhoa_fat - rhoa, weight);
   E_diff->Fill((fatjets.at(nr_hadjet).v4().E() - hadjet_v4.E()), weight);
 
+
+  double JER_f = 1./(hadjets.at(0).JER_factor_raw());
+  JER_factor->Fill(JER_f, weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 

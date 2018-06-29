@@ -18,10 +18,6 @@ double CorrectionFactor::get_factor(double pt, double eta){
   if(CorUp || CorDown) factor = CorrectionGraphs[etabin]->Eval(pt);
   else factor = CorrectionFunctions[etabin]->Eval(pt);
 
-  // cout << "Eta Bin = " << etabin << endl;
-  // cout << "PT      = " << pt << endl;
-  // cout << "Factor  = " << factor << endl;
-
   return factor;
 }
 
@@ -29,7 +25,6 @@ void CorrectionFactor::get_function(){
 
   TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
-  // filename = dir + "Correction_noCHS.root";
   filename = dir + "Correction.root";
   TFile *file = new TFile(filename);
 
@@ -113,9 +108,9 @@ bool CorrectionFactor::process(uhh2::Event & event){
   for(unsigned int i=0; i < oldsubjets.size(); i++){
     factor = get_factor(oldsubjets.at(i).pt(), oldsubjets.at(i).eta());
     newjet_v4 = oldsubjets.at(i).v4() * factor;
-    newjet.set_v4(newjet_v4);
+    newjet = oldsubjets.at(i); // this acutally is not required
+    newjet.set_v4(newjet_v4);  // Because of this, all JEC factors are set to the defaul value of 1
     newsubjets.push_back(newjet);
-    // cout << "factor: " << factor << endl;
   }
 
   newjets.at(had_nr).set_subjets(newsubjets);

@@ -64,6 +64,7 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<JetCleaner> jet_cleaner1;
   std::unique_ptr<JetCleaner> jet_cleaner2;
   std::unique_ptr<JetCorrections_xcone> JetCorrections;
+  std::unique_ptr<JER_Smearer_xcone> JERSmearing;
   std::unique_ptr<uhh2::AnalysisModule> Correction;
 
   // Btag efficiency hists
@@ -193,7 +194,11 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
-  JetCorrections->init(ctx, "xconeCHS", "genXCone33TopJets");
+  JetCorrections->init(ctx, "xconeCHS");
+  // smear jets after Correction
+  JERSmearing.reset(new JER_Smearer_xcone());
+  // JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
+  JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
   Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar));
 
   //// EVENT SELECTION
@@ -537,18 +542,20 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     if(gen33jets.size() < 2) return false;
   }
 
-  jetprod_reco_noJEC->process(event);
-  copy_jet->process(event);
-  JetCorrections->process(event);
-  jetprod_reco->process(event);
-  Correction->process(event);
-  jetprod_reco_corrected->process(event);
-
-
   if(!event.isRealData){
     jetprod_gen23->process(event);
     jetprod_gen33->process(event);
   }
+
+  // Here all the Correction is happening
+  jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
+  copy_jet->process(event);                // copy 'raw' TopJets (with subjets) and name one copy 'noJEC'
+  JetCorrections->process(event);          // apply AK4 JEC/JER to subjets of the original TopJet Collection
+  jetprod_reco->process(event);            // now store sum of 'jec' subjets
+  Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
+  jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
+  JERSmearing->process(event);             // apply JER smearing on final jets
+  ////
 
   output->process(event);
 

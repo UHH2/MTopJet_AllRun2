@@ -1,7 +1,5 @@
 #include "UHH2/MTopJet/include/CombineXCone.h"
 
-// Get Primary Lepton
-
 bool CombineXCone::FindLepton(uhh2::Event & event){
   bool lepton_in_event = false;
   if(event.muons->size() > 0 || event.electrons->size() > 0) lepton_in_event = true;

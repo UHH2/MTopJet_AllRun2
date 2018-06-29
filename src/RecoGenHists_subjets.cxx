@@ -34,7 +34,7 @@ RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::strin
   WMassReso = book<TH1F>("WMassResolution", "(M^{rec}_{W} - M^{gen}_{W}) / M^{gen}_{W}) ", 90, -1.5, 1.5);
 
   // handle for clustered jets
- if(type == "jec"){
+  if(type == "jec"){
     h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
     h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   }
@@ -84,12 +84,12 @@ void RecoGenHists_subjets::fill(const Event & event){
   if(gen_sub.size() < 1) return;
 
   /* ******************************************************************************
-     matching between gen and reco jets:
-     - a rec jet is called isolated if the next jet is not within 2R. An isolated jet should be spherical and more simelar to an ak4 jet
-     - for each reco jet, calc distance to all other gen jets
-     - gen jet with lowest distance is a match if distance is < 0.2
-     - then calculate resolution with reco jet and matched gen jet
-     - to do: account for double counting
+  matching between gen and reco jets:
+  - a rec jet is called isolated if the next jet is not within 2R. An isolated jet should be spherical and more simelar to an ak4 jet
+  - for each reco jet, calc distance to all other gen jets
+  - gen jet with lowest distance is a match if distance is < 0.2
+  - then calculate resolution with reco jet and matched gen jet
+  - to do: account for double counting
   ********************************************************************************* */
 
   double dR;
@@ -105,11 +105,11 @@ void RecoGenHists_subjets::fill(const Event & event){
     for(unsigned int j=0; j<gen_sub.size(); j++){
       dR_temp = uhh2::deltaR(rec_sub.at(i), gen_sub.at(j));
       if(dR_temp < dR){
-	dR = dR_temp;
-	nearest_j = j;
+        dR = dR_temp;
+        nearest_j = j;
       }
     }
-    
+
     if(nearest_j == 100) return;
     gen_pt = gen_sub.at(nearest_j).v4().Pt();
     rec_pt = rec_sub.at(i).v4().Pt();
@@ -119,26 +119,26 @@ void RecoGenHists_subjets::fill(const Event & event){
       PtReso->Fill( R, weight );
       MassReso->Fill( (rec_sub.at(i).v4().M() - gen_sub.at(nearest_j).v4().M())/gen_sub.at(nearest_j).v4().M() , weight );
       if(gen_pt <= 50) PtReso_1->Fill( R, weight );
-      if(gen_pt > 50 && gen_pt <= 100) PtReso_2->Fill( R, weight );
-      if(gen_pt > 100 && gen_pt <= 150) PtReso_3->Fill( R, weight );
-      if(gen_pt > 150 && gen_pt <= 200) PtReso_4->Fill( R, weight );
-      if(gen_pt > 200 && gen_pt <= 250) PtReso_5->Fill( R, weight );
-      if(gen_pt > 250 && gen_pt <= 300) PtReso_6->Fill( R, weight );
-      if(gen_pt > 300 && gen_pt <= 350) PtReso_7->Fill( R, weight );
-      if(gen_pt > 350 && gen_pt <= 400) PtReso_8->Fill( R, weight );
-      if(gen_pt > 400 && gen_pt <= 450) PtReso_9->Fill( R, weight );
-      if(gen_pt > 450) PtReso_10->Fill( R, weight );
+      if(gen_pt > 50 && gen_pt <= 80) PtReso_2->Fill( R, weight );
+      if(gen_pt > 80 && gen_pt <= 120) PtReso_3->Fill( R, weight );
+      if(gen_pt > 120 && gen_pt <= 170) PtReso_4->Fill( R, weight );
+      if(gen_pt > 170 && gen_pt <= 220) PtReso_5->Fill( R, weight );
+      if(gen_pt > 220 && gen_pt <= 270) PtReso_6->Fill( R, weight );
+      if(gen_pt > 270 && gen_pt <= 320) PtReso_7->Fill( R, weight );
+      if(gen_pt > 320 && gen_pt <= 370) PtReso_8->Fill( R, weight );
+      if(gen_pt > 370 && gen_pt <= 420) PtReso_9->Fill( R, weight );
+      if(gen_pt > 420) PtReso_10->Fill( R, weight );
 
       if(rec_pt <= 50) PtReso_rec1->Fill( R, weight );
-      if(rec_pt > 50 && rec_pt <= 100) PtReso_rec2->Fill( R, weight );
-      if(rec_pt > 100 && rec_pt <= 150) PtReso_rec3->Fill( R, weight );
-      if(rec_pt > 150 && rec_pt <= 200) PtReso_rec4->Fill( R, weight );
-      if(rec_pt > 200 && rec_pt <= 250) PtReso_rec5->Fill( R, weight );
-      if(rec_pt > 250 && rec_pt <= 300) PtReso_rec6->Fill( R, weight );
-      if(rec_pt > 300 && rec_pt <= 350) PtReso_rec7->Fill( R, weight );
-      if(rec_pt > 350 && rec_pt <= 400) PtReso_rec8->Fill( R, weight );
-      if(rec_pt > 400 && rec_pt <= 450) PtReso_rec9->Fill( R, weight );
-      if(rec_pt > 450) PtReso_rec10->Fill( R, weight );
+      if(rec_pt > 50 && rec_pt <= 80) PtReso_rec2->Fill( R, weight );
+      if(rec_pt > 80 && rec_pt <= 120) PtReso_rec3->Fill( R, weight );
+      if(rec_pt > 120 && rec_pt <= 170) PtReso_rec4->Fill( R, weight );
+      if(rec_pt > 170 && rec_pt <= 220) PtReso_rec5->Fill( R, weight );
+      if(rec_pt > 220 && rec_pt <= 270) PtReso_rec6->Fill( R, weight );
+      if(rec_pt > 270 && rec_pt <= 320) PtReso_rec7->Fill( R, weight );
+      if(rec_pt > 320 && rec_pt <= 370) PtReso_rec8->Fill( R, weight );
+      if(rec_pt > 370 && rec_pt <= 420) PtReso_rec9->Fill( R, weight );
+      if(rec_pt > 420) PtReso_rec10->Fill( R, weight );
     }
 
   }
@@ -152,13 +152,13 @@ void RecoGenHists_subjets::fill(const Event & event){
   for(unsigned int i=0; i<rec.at(0).subjets().size(); i++){
     for(unsigned int j=0; j<rec.at(0).subjets().size(); j++){
       if(i != j){
-	px = rec.at(0).subjets().at(i).v4().Px() + rec.at(0).subjets().at(j).v4().Px();
-	py = rec.at(0).subjets().at(i).v4().Py() + rec.at(0).subjets().at(j).v4().Py();
-	pz = rec.at(0).subjets().at(i).v4().Pz() + rec.at(0).subjets().at(j).v4().Pz();
-	E = rec.at(0).subjets().at(i).v4().E() + rec.at(0).subjets().at(j).v4().E();
-	Wjet_rec.SetPxPyPzE(px, py, pz, E);
-	M_temp = Wjet_rec.M();
-	if(M_temp < M_min_rec) M_min_rec = M_temp;
+        px = rec.at(0).subjets().at(i).v4().Px() + rec.at(0).subjets().at(j).v4().Px();
+        py = rec.at(0).subjets().at(i).v4().Py() + rec.at(0).subjets().at(j).v4().Py();
+        pz = rec.at(0).subjets().at(i).v4().Pz() + rec.at(0).subjets().at(j).v4().Pz();
+        E = rec.at(0).subjets().at(i).v4().E() + rec.at(0).subjets().at(j).v4().E();
+        Wjet_rec.SetPxPyPzE(px, py, pz, E);
+        M_temp = Wjet_rec.M();
+        if(M_temp < M_min_rec) M_min_rec = M_temp;
       }
     }
   }
@@ -167,13 +167,13 @@ void RecoGenHists_subjets::fill(const Event & event){
   for(unsigned int i=0; i<gen.at(0).subjets().size(); i++){
     for(unsigned int j=0; j<gen.at(0).subjets().size(); j++){
       if(i != j){
-	px = gen.at(0).subjets().at(i).v4().Px() + gen.at(0).subjets().at(j).v4().Px();
-	py = gen.at(0).subjets().at(i).v4().Py() + gen.at(0).subjets().at(j).v4().Py();
-	pz = gen.at(0).subjets().at(i).v4().Pz() + gen.at(0).subjets().at(j).v4().Pz();
-	E = gen.at(0).subjets().at(i).v4().E() + gen.at(0).subjets().at(j).v4().E();
-	Wjet_gen.SetPxPyPzE(px, py, pz, E);
-	M_temp = Wjet_gen.M();
-	if(M_temp < M_min_gen) M_min_gen = M_temp;
+        px = gen.at(0).subjets().at(i).v4().Px() + gen.at(0).subjets().at(j).v4().Px();
+        py = gen.at(0).subjets().at(i).v4().Py() + gen.at(0).subjets().at(j).v4().Py();
+        pz = gen.at(0).subjets().at(i).v4().Pz() + gen.at(0).subjets().at(j).v4().Pz();
+        E = gen.at(0).subjets().at(i).v4().E() + gen.at(0).subjets().at(j).v4().E();
+        Wjet_gen.SetPxPyPzE(px, py, pz, E);
+        M_temp = Wjet_gen.M();
+        if(M_temp < M_min_gen) M_min_gen = M_temp;
       }
     }
   }
@@ -182,8 +182,6 @@ void RecoGenHists_subjets::fill(const Event & event){
   WMassReso->Fill( (M_min_rec - M_min_gen) / M_min_gen, weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 }
-
-

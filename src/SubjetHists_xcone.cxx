@@ -6,6 +6,7 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   pt_had_subjets = book<TH1F>("pt_had_subjets", "p_{T}^{had subjets}", 50, 0, 500);
   pt_had_subjets_fine = book<TH1F>("pt_had_subjets_fine", "p_{T}^{had subjets}", 100, 0, 500);
   eta_had_subjets = book<TH1F>("eta_had_subjets", "#eta^{had subjets}", 100, -5, 5);
+  eta_abs_had_subjets = book<TH1F>("eta_abs_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 5);
   area_had1_subjet = book<TH1F>("area_had1_subjet", "jet area (had subjet 1)", 100, 0, 5);
   area_had2_subjet = book<TH1F>("area_had2_subjet", "jet area (had subjet 2)", 100, 0, 5);
@@ -19,9 +20,28 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   area_all_subjets = book<TH1F>("area_all_subjets", "jet area (all subjets)", 50, 0, 1);
   pt_all_subjets = book<TH1F>("pt_all_subjets", "p_{T}^{all subjets}", 100, 0, 500);
   eta_all_subjets = book<TH1F>("eta_all_subjets", "#eta^{all subjets}", 100, -5, 5);
+
+  // Because the v4 is set again in 'cor' jets, the JEC factor ist set to the default value 1
+  // So, in lep jets the JEC factor should not change from 'jec' to 'cor'
+  // for had jets the factors are 1 in 'cor' jets
   JEC_all_subjets = book<TH1F>("JEC_all_subjets", "JEC factor", 100, 0, 2);
   JEC_L1_all_subjets = book<TH1F>("JEC_L1_all_subjets", "JEC factor L1", 100, 0, 2);
   JEC_L2L3_all_subjets = book<TH1F>("JEC_L2L3_all_subjets", "JEC factor L2L3", 100, 0, 2);
+
+  JEC_had_subjets = book<TH1F>("JEC_had_subjets", "JEC factor", 100, 0, 2);
+  JEC_L1_had_subjets = book<TH1F>("JEC_L1_had_subjets", "JEC factor L1", 100, 0, 2);
+  JEC_L2L3_had_subjets = book<TH1F>("JEC_L2L3_had_subjets", "JEC factor L2L3", 100, 0, 2);
+
+  JEC_lep_subjets = book<TH1F>("JEC_lep_subjets", "JEC factor", 100, 0, 2);
+  JEC_L1_lep_subjets = book<TH1F>("JEC_L1_lep_subjets", "JEC factor L1", 100, 0, 2);
+  JEC_L2L3_lep_subjets = book<TH1F>("JEC_L2L3_lep_subjets", "JEC factor L2L3", 100, 0, 2);
+
+  JEC_L1_had_subjets_ETA_00to05 = book<TH1F>("JEC_L1_had_subjets_ETA_00to05", "JEC factor", 100, 0, 2);
+  JEC_L1_had_subjets_ETA_05to10 = book<TH1F>("JEC_L1_had_subjets_ETA_05to10", "JEC factor", 100, 0, 2);
+  JEC_L1_had_subjets_ETA_10to24 = book<TH1F>("JEC_L1_had_subjets_ETA_10to24", "JEC factor", 100, 0, 2);
+  JEC_L1_had_subjets_ETA_24to28 = book<TH1F>("JEC_L1_had_subjets_ETA_24to28", "JEC factor", 100, 0, 2);
+  JEC_L1_had_subjets_ETA_28to40 = book<TH1F>("JEC_L1_had_subjets_ETA_28to40", "JEC factor", 100, 0, 2);
+  ////
 
   pt_check = book<TH1F>("pt_check", "p_{T}^{all subjets} * 1/JEC_SF", 100, 0, 500);
 
@@ -206,7 +226,7 @@ void SubjetHists_xcone::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------- Fill Hists here -------------------------------------
   //---------------------------------------------------------------------------------------
-  double JEC_factor,JEC_L1factor;
+  double JEC_factor,JEC_L1factor,JER_factor;
   for(unsigned int i=0; i<event.jets->size(); i++){
     pt_ak4->Fill(event.jets->at(i).pt(), weight);
     eta_ak4->Fill(event.jets->at(i).eta(), weight);
@@ -231,9 +251,23 @@ void SubjetHists_xcone::fill(const Event & event){
     tot_area += had_subjets.at(i).jetArea();
     JEC_factor = 1./(had_subjets.at(i).JEC_factor_raw());
     JEC_L1factor = had_subjets.at(i).JEC_L1factor_raw();
+
     JEC_all_subjets->Fill(JEC_factor, weight);
     JEC_L1_all_subjets->Fill(JEC_L1factor, weight);
     JEC_L2L3_all_subjets->Fill(JEC_factor/JEC_L1factor, weight);
+    JEC_had_subjets->Fill(JEC_factor, weight);
+    JEC_L1_had_subjets->Fill(JEC_L1factor, weight);
+    JEC_L2L3_had_subjets->Fill(JEC_factor/JEC_L1factor, weight);
+
+    double eta = sqrt(had_subjets.at(i).eta() * had_subjets.at(i).eta());
+    eta_abs_had_subjets->Fill(eta, weight);
+    if(eta > 0.0 && eta < 0.5) JEC_L1_had_subjets_ETA_00to05->Fill(JEC_L1factor, weight);
+    if(eta > 0.5 && eta < 1.0) JEC_L1_had_subjets_ETA_05to10->Fill(JEC_L1factor, weight);
+    if(eta > 1.0 && eta < 2.4) JEC_L1_had_subjets_ETA_10to24->Fill(JEC_L1factor, weight);
+    if(eta > 2.4 && eta < 2.8) JEC_L1_had_subjets_ETA_24to28->Fill(JEC_L1factor, weight);
+    if(eta > 2.8 && eta < 4.0) JEC_L1_had_subjets_ETA_28to40->Fill(JEC_L1factor, weight);
+
+
     pt_check->Fill((had_subjets.at(i).JEC_factor_raw()) * had_subjets.at(i).pt(), weight);
   }
   area_final->Fill(tot_area, weight);
@@ -249,9 +283,15 @@ void SubjetHists_xcone::fill(const Event & event){
 
     JEC_factor = 1./(lep_subjets.at(i).JEC_factor_raw());
     JEC_L1factor = lep_subjets.at(i).JEC_L1factor_raw();
+
     JEC_all_subjets->Fill(JEC_factor, weight);
     JEC_L1_all_subjets->Fill(JEC_L1factor, weight);
     JEC_L2L3_all_subjets->Fill(JEC_factor/JEC_L1factor, weight);
+
+    JEC_lep_subjets->Fill(JEC_factor, weight);
+    JEC_L1_lep_subjets->Fill(JEC_L1factor, weight);
+    JEC_L2L3_lep_subjets->Fill(JEC_factor/JEC_L1factor, weight);
+
     pt_check->Fill((lep_subjets.at(i).JEC_factor_raw()) * lep_subjets.at(i).pt(), weight);
   }
   area_had1_subjet->Fill(had_subjets.at(0).jetArea(), weight);
@@ -267,8 +307,6 @@ void SubjetHists_xcone::fill(const Event & event){
   mass_lep_combine->Fill(lep_jet_v4.M(), weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 }
-
-

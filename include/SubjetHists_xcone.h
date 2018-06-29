@@ -10,19 +10,19 @@
 #include <iostream>
 
 using namespace uhh2;
- 
+
 class SubjetHists_xcone: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
   SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type);
-    
+
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
 
 
     TH1F *pt_had_subjets, *pt_had_subjets_fine, *pt_lep_subjets;
-    TH1F *eta_had_subjets, *eta_lep_subjets;
+    TH1F *eta_had_subjets, *eta_lep_subjets, *eta_abs_had_subjets;
     TH1F *area_had_subjets, *area_had1_subjet, *area_had2_subjet, *area_had3_subjet;
     TH1F *area_lep_subjets, *area_lep1_subjet, *area_lep2_subjet, *area_lep3_subjet;
     TH1F *area_all_subjets, *pt_all_subjets, *eta_all_subjets;
@@ -34,8 +34,18 @@ protected:
     TH1F *pt_Wjet, *pt_Wjet_i, *pt_Wjet_j, *pt_Wjet_diff;
     TH2F *pt_Wjets;
     TH1F* Wjet_combination;
+
     TH1F *JEC_all_subjets, *JEC_L1_all_subjets, *JEC_L2L3_all_subjets;
+    TH1F *JEC_had_subjets, *JEC_L1_had_subjets, *JEC_L2L3_had_subjets;
+    TH1F *JEC_lep_subjets, *JEC_L1_lep_subjets, *JEC_L2L3_lep_subjets;
     TH1F *JEC_ak4, *JEC_L1_ak4, *JEC_L2L3_ak4;
+
+    TH1F *JEC_L1_had_subjets_ETA_00to05;
+    TH1F *JEC_L1_had_subjets_ETA_05to10;
+    TH1F *JEC_L1_had_subjets_ETA_10to24;
+    TH1F *JEC_L1_had_subjets_ETA_24to28;
+    TH1F *JEC_L1_had_subjets_ETA_28to40;
+
 
     TH1F *pt_check;
     TH1F *area_final;
@@ -44,5 +54,3 @@ protected:
     uhh2::Event::Handle<std::vector<TopJet>>h_recfatjets;
 
 };
-
-
