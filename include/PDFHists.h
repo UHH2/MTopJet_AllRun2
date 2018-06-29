@@ -17,6 +17,6 @@ class PDFHists: public uhh2::Hists {
     std::vector< std::string > hist_names2;
     std::vector< std::string > hist_names3;
     bool isTTbar;
-    uhh2::Event::Handle<std::vector<Jet>>h_hadjets;
+    uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;
 
 };

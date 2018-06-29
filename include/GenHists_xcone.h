@@ -18,7 +18,7 @@ class GenHists_xcone: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
   GenHists_xcone(uhh2::Context & ctx, const std::string & dirname);
-    
+
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
@@ -37,9 +37,9 @@ protected:
     TH1F *SoftDropMass;
 
 
-    uhh2::Event::Handle<std::vector<Particle>>h_hadjets23;
-    uhh2::Event::Handle<std::vector<Particle>>h_lepjets23;
-    uhh2::Event::Handle<std::vector<Particle>>h_hadjets33;
-    uhh2::Event::Handle<std::vector<Particle>>h_lepjets33;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_hadjets23;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_lepjets23;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_hadjets33;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_lepjets33;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_softdrop;
 };

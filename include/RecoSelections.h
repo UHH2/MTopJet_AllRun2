@@ -29,31 +29,31 @@
 
 namespace uhh2 {
 
- class NJetXCone : public Selection { 
+ class NJetXCone : public Selection {
 
-  public: 
+  public:
     explicit NJetXCone(Context&, const std::string &, unsigned int);
     virtual bool passes(const Event&) override;
 
   private:
-    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<std::vector<TopJet>> h_jets;
     unsigned int njet_;
   };
 
- class LeadingRecoJetPT : public Selection { 
+ class LeadingRecoJetPT : public Selection {
 
-  public: 
+  public:
     explicit LeadingRecoJetPT(Context&, const std::string &, float);
     virtual bool passes(const Event&) override;
 
   private:
-    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<std::vector<TopJet>> h_jets;
     float ptcut_;
   };
 
- class MassCutReco : public Selection { 
+ class MassCutReco : public Selection {
 
-  public: 
+  public:
     explicit MassCutReco(Context&, const std::string &);
     virtual bool passes(const Event&) override;
 
@@ -61,32 +61,32 @@ namespace uhh2 {
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
   };
 
- class MassCutXCone : public Selection { 
+ class MassCutXCone : public Selection {
 
-  public: 
+  public:
     explicit MassCutXCone(Context&, const std::string &, const std::string &);
     virtual bool passes(const Event&) override;
 
   private:
-    uhh2::Event::Handle<std::vector<Jet>> h_hadjets;
-    uhh2::Event::Handle<std::vector<Jet>> h_lepjets;
+    uhh2::Event::Handle<std::vector<TopJet>> h_hadjets;
+    uhh2::Event::Handle<std::vector<TopJet>> h_lepjets;
   };
 
 
- class DeltaRCutReco : public Selection { 
+ class DeltaRCutReco : public Selection {
 
-  public: 
+  public:
     explicit DeltaRCutReco(Context&, const std::string &, float);
     virtual bool passes(const Event&) override;
 
   private:
-    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<std::vector<TopJet>> h_jets;
     float jetradius_;
   };
 
- class NRecoJets : public Selection { 
+ class NRecoJets : public Selection {
 
-  public: 
+  public:
     explicit NRecoJets(Context&, const std::string &, float min_pt = 0, float min = 0, float max = 9999);
     virtual bool passes(const Event&) override;
 
@@ -97,28 +97,28 @@ namespace uhh2 {
     float max_;
   };
 
- class RecoJetLeptonCleaner : public uhh2::AnalysisModule { 
+ class RecoJetLeptonCleaner : public uhh2::AnalysisModule {
 
-  public: 
+  public:
     explicit RecoJetLeptonCleaner(Context&, const std::string &, float);
     virtual bool process(Event& ) override;
 
   private:
     uhh2::Event::Handle<std::vector<Jet>> h_jets;
-    float jetradius_; 
+    float jetradius_;
   };
- 
- class RecoTopJetLeptonCleaner : public uhh2::AnalysisModule { 
 
-  public: 
+ class RecoTopJetLeptonCleaner : public uhh2::AnalysisModule {
+
+  public:
     explicit RecoTopJetLeptonCleaner(Context&, float);
     virtual bool process(Event& ) override;
 
   private:
     uhh2::Event::Handle<std::vector<TopJet>> h_topjets;
-    float jetradius_; 
+    float jetradius_;
   };
- 
+
   ////
   /* class TTbarGenSemilep : public Selection { */
 
@@ -164,10 +164,10 @@ namespace uhh2 {
   class Jet2Cut : public Selection {
   public:
     explicit Jet2Cut(float min_pt=0);
-    virtual bool passes(const Event&) override;   
+    virtual bool passes(const Event&) override;
 
    private:
-    float min_pt_; 
+    float min_pt_;
   };
   ////
 

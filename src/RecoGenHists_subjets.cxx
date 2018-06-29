@@ -35,15 +35,15 @@ RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::strin
 
   // handle for clustered jets
   if(type == "jec"){
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined");
     h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   }
   else if(type == "raw"){
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
     h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
   }
   else if(type == "cor"){
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
     h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   }
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
@@ -61,7 +61,7 @@ void RecoGenHists_subjets::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   // define all objects needed
   std::vector<TopJet> rec = event.get(h_recjets);
-  std::vector<Jet> had = event.get(h_hadjets);
+  std::vector<TopJet> had = event.get(h_hadjets);
   std::vector<GenTopJet> gen = event.get(h_genjets);
   std::vector<Jet> rec_sub;
   std::vector<Particle> gen_sub;

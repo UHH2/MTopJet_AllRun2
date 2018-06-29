@@ -26,8 +26,8 @@ GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & 
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
 
   // handle for jets
-  h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
-  h_hadjets_gen=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
+  h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
+  h_hadjets_gen=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
 
 }
 
@@ -40,8 +40,8 @@ void GenHists_particles::fill(const Event & event){
   double weight = event.weight;
 
   // get jets
-  std::vector<Jet> hadjets = event.get(h_hadjets);
-  std::vector<Particle> hadjets_gen = event.get(h_hadjets_gen);
+  std::vector<TopJet> hadjets = event.get(h_hadjets);
+  std::vector<GenTopJet> hadjets_gen = event.get(h_hadjets_gen);
 
   // cout tops
   int n_top = 0;
@@ -121,5 +121,3 @@ void GenHists_particles::fill(const Event & event){
 
   return;
 }
-
-

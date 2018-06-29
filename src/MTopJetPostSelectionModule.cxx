@@ -117,9 +117,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   Event::Handle<double>h_factor_4width;
   Event::Handle<double>h_factor_8width;
 
-  Event::Handle<std::vector<Jet>>h_recjets_had;
-  Event::Handle<std::vector<Particle>>h_genjets23_had;
-  Event::Handle<std::vector<Particle>>h_genjets33_had;
+  Event::Handle<std::vector<TopJet>>h_recjets_had;
+  Event::Handle<std::vector<GenTopJet>>h_genjets23_had;
+  Event::Handle<std::vector<GenTopJet>>h_genjets33_had;
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
   //width reweight
@@ -258,9 +258,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   PUreweight.reset(new MCPileupReweight(ctx, PU_variation));
 
 
-  h_recjets_had = ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
-  if(isMC) h_genjets23_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone23_had_Combined");
-  if(isMC) h_genjets33_had = ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
+  h_recjets_had = ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
+  if(isMC) h_genjets23_had = ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone23_had_Combined");
+  if(isMC) h_genjets33_had = ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
 
   /*************************** Setup Subjet Corrector **********************************************************************************/
   // Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected"));
@@ -485,15 +485,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /***************************  get jets to write mass *****************************************************************************************************/
 
-  std::vector<Jet> rec_hadjets = event.get(h_recjets_had);
+  std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
   double mass_rec = rec_hadjets.at(0).v4().M();
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
 
   if(isMC){
-    std::vector<Particle> gen_hadjets23 = event.get(h_genjets23_had);
-    std::vector<Particle> gen_hadjets33 = event.get(h_genjets33_had);
+    std::vector<GenTopJet> gen_hadjets23 = event.get(h_genjets23_had);
+    std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
     double mass_gen23 = gen_hadjets23.at(0).v4().M();
     double mass_gen33 = gen_hadjets33.at(0).v4().M();
     double pt_gen23 = gen_hadjets23.at(0).v4().Pt();

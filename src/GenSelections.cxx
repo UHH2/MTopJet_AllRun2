@@ -58,7 +58,7 @@ bool uhh2::Matching::passes(const uhh2::Event& event){
     if(jets.size()>0) jet1 = jets.at(0);
     bool matched = false;
     // get stable particles from ttbar decay and sort them into leptonic and hadronic
-    GenParticle bot, q1, q2; 
+    GenParticle bot, q1, q2;
     if(jets.size() > 0){
       if(ttbargen.IsTopHadronicDecay()){
 	bot = ttbargen.bTop();
@@ -90,7 +90,7 @@ bool uhh2::Matching_HOTVR::passes(const uhh2::Event& event){
     if(jets.size()>0) jet1 = jets.at(0);
     bool matched = false;
     // get stable particles from ttbar decay and sort them into leptonic and hadronic
-    GenParticle bot, q1, q2; 
+    GenParticle bot, q1, q2;
     if(jets.size() > 0){
       if(ttbargen.IsTopHadronicDecay()){
 	bot = ttbargen.bTop();
@@ -133,7 +133,7 @@ bool uhh2::Matching_XCone::passes(const uhh2::Event& event){
     bool matched_q2 = false;
     bool matched_bot = false;
     // get stable particles from ttbar decay and sort them into leptonic and hadronic
-    GenParticle bot, q1, q2, lep1, lep2, lepton; 
+    GenParticle bot, q1, q2, lep1, lep2, lepton;
     if(jets.size() > 0){
       if(ttbargen.IsTopHadronicDecay()){
 	bot = ttbargen.bTop();
@@ -172,7 +172,7 @@ bool uhh2::Matching_XCone::passes(const uhh2::Event& event){
       if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet3) < 0.4 || deltaR(q1, jet4) < 0.4) matched_q1 = true;
       if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet3) < 0.4 || deltaR(q2, jet4) < 0.4) matched_q2 = true;
       if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet3) < 0.4 || deltaR(bot, jet4) < 0.4) matched_bot = true;
-    }    
+    }
     if(dR3 < dR1 && dR3 < dR2 && dR3 < dR4){
       if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet4) < 0.4) matched_q1 = true;
       if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet4) < 0.4) matched_q2 = true;
@@ -205,7 +205,7 @@ bool uhh2::Matching_XCone23::passes(const uhh2::Event& event){
     bool matched_q2 = false;
     bool matched_bot = false;
     // get stable particles from ttbar decay and sort them into leptonic and hadronic
-    GenParticle bot, q1, q2, lep1, lep2, lepton; 
+    GenParticle bot, q1, q2, lep1, lep2, lepton;
     if(ttbargen.IsTopHadronicDecay()){
       bot = ttbargen.bTop();
       q1 = ttbargen.Wdecay1();
@@ -216,12 +216,12 @@ bool uhh2::Matching_XCone23::passes(const uhh2::Event& event){
       q1 = ttbargen.WMinusdecay1();
       q2 = ttbargen.WMinusdecay2();
     }
-    
+
 
     if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
     if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
     if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
-    
+
     if(matched_q1 && matched_q2 && matched_bot) matched = true;
     return matched;
 }
@@ -256,7 +256,7 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
   const auto & ttbargen = event.get(h_ttbargen);
 
   // get stable particles from ttbar decay and sort them into leptonic and hadronic
-  GenParticle bot, q1, q2; 
+  GenParticle bot, q1, q2;
   if(ttbargen.IsTopHadronicDecay()){
     bot = ttbargen.bTop();
     q1 = ttbargen.Wdecay1();
@@ -268,7 +268,7 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
     q2 = ttbargen.WMinusdecay2();
   }
   else return false;
-    
+
   TopJet fathadjet;
   float dR1 = deltaR(lepton, fatjets.at(0));
   float dR2 = deltaR(lepton, fatjets.at(1));
@@ -283,9 +283,9 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
   bool matched_q1 = false;
   bool matched_q2 = false;
   bool matched_bot = false;
-  
+
   // if merging is selected, only confirm if top decay products are inside R=1.2 cone of fatjets.
- 
+
   if(!subjet_matching){
     if(deltaR(q1, fathadjet) < 1.2) matched_q1 = true;
     if(deltaR(q2, fathadjet) < 1.2) matched_q2 = true;
@@ -317,7 +317,7 @@ bool uhh2::Matching_XCone_botlep_lep::passes(const uhh2::Event& event){
     const auto & ttbargen = event.get(h_ttbargen);
     bool botlep_lep = false;
     // get stable particles from ttbar decay and sort them into leptonic and hadronic
-    GenParticle bot, bot_lep, lep1, lep2, lepton, q1, q2; 
+    GenParticle bot, bot_lep, lep1, lep2, lepton, q1, q2;
     if(ttbargen.IsTopHadronicDecay()){
       bot = ttbargen.bTop();
       bot_lep = ttbargen.bAntitop();
@@ -340,7 +340,7 @@ bool uhh2::Matching_XCone_botlep_lep::passes(const uhh2::Event& event){
     else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
       lepton = lep2;
     }
-    
+
 
     // claculate distance to Lepton
     double dR_lep_bot, dR_lep_botlep, dR_lep_q1, dR_lep_q2;
@@ -369,7 +369,7 @@ bool uhh2::Matching_top::passes(const uhh2::Event& event){
     if(jets.size()>0) jet1 = jets.at(0);
     bool matched = false;
     // get stable particles from ttbar decay and sort them into leptonic and hadronic
-    GenParticle bot, q1, q2; 
+    GenParticle bot, q1, q2;
     if(jets.size() > 0){
       if(ttbargen.IsTopHadronicDecay()){
 	bot = ttbargen.bTop();
@@ -404,13 +404,13 @@ bool uhh2::LeadingJetPT::passes(const uhh2::Event& event){
 }
 
 uhh2::LeadingJetPT_gen::LeadingJetPT_gen(uhh2::Context& ctx, const std::string & name, float ptcut):
-  h_jets(ctx.get_handle<std::vector<Particle>>(name)),
+  h_jets(ctx.get_handle<std::vector<GenTopJet>>(name)),
   ptcut_(ptcut) {}
 
 bool uhh2::LeadingJetPT_gen::passes(const uhh2::Event& event){
   bool pass_jetpt = false;
-  std::vector<Particle> jets = event.get(h_jets);
-  Particle jet1;
+  std::vector<GenTopJet> jets = event.get(h_jets);
+  GenTopJet jet1;
   if(jets.size()>0){
     jet1 = jets.at(0);
     float pt = jet1.pt();
@@ -475,13 +475,13 @@ bool uhh2::MassCut::passes(const uhh2::Event& event){
 }
 
 uhh2::MassCut_gen::MassCut_gen(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
-  h_hadjets(ctx.get_handle<std::vector<Particle>>(hadname)),
-  h_lepjets(ctx.get_handle<std::vector<Particle>>(lepname)){}
+  h_hadjets(ctx.get_handle<std::vector<GenTopJet>>(hadname)),
+  h_lepjets(ctx.get_handle<std::vector<GenTopJet>>(lepname)){}
 
 bool uhh2::MassCut_gen::passes(const uhh2::Event& event){
-  std::vector<Particle> hadjets = event.get(h_hadjets);
-  std::vector<Particle> lepjets = event.get(h_lepjets);
-  Particle jet1, jet2;
+  std::vector<GenTopJet> hadjets = event.get(h_hadjets);
+  std::vector<GenTopJet> lepjets = event.get(h_lepjets);
+  GenTopJet jet1, jet2;
   TLorentzVector jet1_v4, jet2_v4;
   bool pass_masscut = false;
   if(hadjets.size()>0 && lepjets.size()>0){
@@ -560,7 +560,7 @@ bool uhh2::DeltaPhiCut::passes(const uhh2::Event& event){
     else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
       lepton = lep2;
     }
-    
+
     if(abs(lepton.phi() - jet2.phi()) < jetradius_) pass_deltaR = true;
   }
   return pass_deltaR;
@@ -594,7 +594,7 @@ bool uhh2::DeltaRCut::passes(const uhh2::Event& event){
     else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
       lepton = lep2;
     }
-    
+
     if(deltaR(lepton, jet2) < jetradius_) pass_deltaR = true;
   }
   return pass_deltaR;
@@ -669,7 +669,7 @@ bool uhh2::DeltaRCut_top::passes(const uhh2::Event& event){
     else if(abs(lep2.pdgId()) == 11 || abs(lep2.pdgId()) == 13){
       lepton = lep2;
     }
-    
+
     if(deltaR(lepton, jet2) < jetradius_) pass_deltaR = true;
   }
   return pass_deltaR;
@@ -753,7 +753,7 @@ bool GenJetLeptonCleaner::process(uhh2::Event& event){
       // std::cout<<"pt before: "<< jet.pt()<<std::endl;
 
      jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
-     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E());
      jetlep_v4 = jet_v4 - lepton_v4;
 
      jet.set_pt(jetlep_v4.Pt());
@@ -813,7 +813,7 @@ bool GenTopJetLeptonCleaner::process(uhh2::Event& event){
       // std::cout<<"pt before: "<< jet.pt()<<std::endl;
 
      jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
-     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E());
      jetlep_v4 = jet_v4 - lepton_v4;
 
      jet.set_pt(jetlep_v4.Pt());
@@ -847,12 +847,12 @@ bool MassCutGen1::passes(const uhh2::Event& event){
 }
 
 uhh2::MassCutGen_XCone::MassCutGen_XCone(uhh2::Context& ctx, float M_min, float M_max):
-  h_jets(ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined")),
+  h_jets(ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined")),
   M_min_(M_min),
   M_max_(M_max) {}
 
 bool MassCutGen_XCone::passes(const uhh2::Event& event){
-  std::vector<Particle> jets = event.get(h_jets);
+  std::vector<GenTopJet> jets = event.get(h_jets);
   TLorentzVector jet1_v4;
   jet1_v4.SetPxPyPzE(jets.at(0).v4().Px(), jets.at(0).v4().Py(), jets.at(0).v4().Pz(), jets.at(0).v4().E());
   return (M_min_ < jet1_v4.M() && jet1_v4.M() < M_max_);

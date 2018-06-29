@@ -57,20 +57,20 @@ RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & 
 
   // handle for clustered jets
   if(type == "jec"){
-    h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
-    h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
+    h_recjets_had=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined");
+    h_recjets_lep=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined");
   }
   else if(type == "raw"){
-    h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
-    h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_noJEC");
+    h_recjets_had=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
+    h_recjets_lep=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_noJEC");
   }
   else if(type == "cor"){
-    h_recjets_had=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
-    h_recjets_lep=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_Corrected");
+    h_recjets_had=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
+    h_recjets_lep=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
   }
 
-  h_genjets_had=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
-  h_genjets_lep=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_lep_Combined");
+  h_genjets_had=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
+  h_genjets_lep=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined");
 
 }
 
@@ -83,15 +83,15 @@ void RecoGenHists_xcone::fill(const Event & event){
   //--------------------------------- define needed objects-----------------------------------
   //---------------------------------------------------------------------------------------
  // define all objects needed
-  std::vector<Jet> rec_hadjets = event.get(h_recjets_had);
-  std::vector<Jet> rec_lepjets = event.get(h_recjets_lep);
-  std::vector<Particle> gen_hadjets = event.get(h_genjets_had);
-  std::vector<Particle> gen_lepjets = event.get(h_genjets_lep);
+  std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
+  std::vector<TopJet> rec_lepjets = event.get(h_recjets_lep);
+  std::vector<GenTopJet> gen_hadjets = event.get(h_genjets_had);
+  std::vector<GenTopJet> gen_lepjets = event.get(h_genjets_lep);
 
 
   TLorentzVector rec_jet1_v4, rec_jet2_v4, gen_jet1_v4, gen_jet2_v4;
-  Jet rec_jet1, rec_jet2;
-  Particle gen_jet1, gen_jet2;
+  TopJet rec_jet1, rec_jet2;
+  GenTopJet gen_jet1, gen_jet2;
   if(rec_hadjets.size()>0){
     rec_jet1 = rec_hadjets.at(0);
     rec_jet1_v4.SetPxPyPzE(rec_jet1.v4().Px(), rec_jet1.v4().Py(), rec_jet1.v4().Pz(), rec_jet1.v4().E());
@@ -103,11 +103,11 @@ void RecoGenHists_xcone::fill(const Event & event){
 
   if(rec_lepjets.size()>0){
     rec_jet2 = rec_lepjets.at(0);
-    rec_jet2_v4.SetPxPyPzE(rec_jet2.v4().Px(), rec_jet2.v4().Py(), rec_jet2.v4().Pz(), rec_jet2.v4().E()); 
+    rec_jet2_v4.SetPxPyPzE(rec_jet2.v4().Px(), rec_jet2.v4().Py(), rec_jet2.v4().Pz(), rec_jet2.v4().E());
   }
   if(gen_lepjets.size()>0){
     gen_jet2 = gen_lepjets.at(0);
-    gen_jet2_v4.SetPxPyPzE(gen_jet2.v4().Px(), gen_jet2.v4().Py(), gen_jet2.v4().Pz(), gen_jet2.v4().E()); 
+    gen_jet2_v4.SetPxPyPzE(gen_jet2.v4().Px(), gen_jet2.v4().Py(), gen_jet2.v4().Pz(), gen_jet2.v4().E());
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -216,8 +216,6 @@ void RecoGenHists_xcone::fill(const Event & event){
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 }
-
-

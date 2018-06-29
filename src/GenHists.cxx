@@ -10,7 +10,7 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   GenJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   GenJet2LepMass = book<TH1F>("GenJet2LepMass", "M_{jet2 + lepton}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
- 
+
   GenJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   GenJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
   GenJet1Jet2PT = book<TH1F>("pt_jet1-pt_jet2", "p_{T,jet1} - p_{T,jet2}", 80, -400, 400);
@@ -44,7 +44,7 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   deltaR_q2_jet2 = book<TH1F>("deltaR_q2_jet2", "#Delta R(q2,2nd Jet)", 80, 0, 4.0);
   deltaR_tophad_jet2 = book<TH1F>("deltaR_tophad_jet2", "#Delta R(had Top, 2nd Jet)", 80, 0, 4.0);
   deltaR_toplep_jet2 = book<TH1F>("deltaR_toplep_jet2", "#Delta R(lep Top, 2nd Jet)", 80, 0, 4.0);
- 
+
   deltaPhi_lep1_jet1 = book<TH1F>("deltaPhi_lep1_jet1", "#Delta #Phi(lep1,1st Jet)", 80, 0, 4.0);
   deltaPhi_lep1_jet2 = book<TH1F>("deltaPhi_lep1_jet2", "#Delta #Phi(lep1,2nd Jet)", 80, 0, 4.0);
 
@@ -105,7 +105,7 @@ GenHists::GenHists(uhh2::Context & ctx, const std::string & dirname, const std::
   // handle for TTbarGen class
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
   // handle for clustered jets
-  h_jets=ctx.get_handle<std::vector<Jet>>(jetname);
+  h_jets=ctx.get_handle<std::vector<TopJet>>(jetname);
 }
 
 
@@ -123,7 +123,7 @@ void GenHists::fill(const Event & event){
   //    cout<<"ID of genparticle nr. " << i <<" : "<< id << endl;
   // }
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 
   //---------------------------------------------------------------------------------------
@@ -131,9 +131,9 @@ void GenHists::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   const auto & ttbargen = event.get(h_ttbargen);
   // define all objects needed
-  std::vector<Jet> jets = event.get(h_jets);
+  std::vector<TopJet> jets = event.get(h_jets);
   TLorentzVector jet1_v4, jet2_v4, lepton1_v4, jet2_lep_v4, topjet1_v4, topjet2_v4;
-  Jet jet1,jet2,jet3,jet4,jet5,jet6;
+  TopJet jet1,jet2,jet3,jet4,jet5,jet6;
   if(jets.size()>0) jet1 = jets.at(0);
   if(jets.size()>1) jet2 = jets.at(1);
   // if(jets.size()>2) jet3 = jets.at(2);
@@ -180,7 +180,7 @@ void GenHists::fill(const Event & event){
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  
+
 
 
   //---------------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ void GenHists::fill(const Event & event){
    }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 
 
@@ -238,7 +238,7 @@ void GenHists::fill(const Event & event){
   GenParticle tophad = ttbargen.TopHad();
   double tophadpt = tophad.pt();
   TopHadPT->Fill(tophadpt, weight);
-  
+
   // pT of lep. top
   GenParticle toplep = ttbargen.TopLep();
   double topleppt = toplep.pt();
@@ -276,19 +276,19 @@ void GenHists::fill(const Event & event){
 
   dR_GenParts_q1_q2->Fill(deltaR(q1,q2), weight);
   dR_GenParts_bot_q1->Fill(deltaR(bot,q1), weight);
-  dR_GenParts_bot_q2->Fill(deltaR(bot,q2), weight); 
-  
+  dR_GenParts_bot_q2->Fill(deltaR(bot,q2), weight);
+
   dR_GenParts_q1_q2_toppt->Fill(tophadpt, deltaR(q1,q2), weight);
   dR_GenParts_bot_q1_toppt->Fill(tophadpt, deltaR(bot,q1), weight);
   dR_GenParts_bot_q2_toppt->Fill(tophadpt, deltaR(bot,q2), weight);
 
   double dR_high, dR_low;
   dR_low = deltaR(q1,q2);
-  if(deltaR(bot,q1) < dR_low) dR_low = deltaR(bot,q1); 
-  if(deltaR(bot,q2) < dR_low) dR_low = deltaR(bot,q2); 
+  if(deltaR(bot,q1) < dR_low) dR_low = deltaR(bot,q1);
+  if(deltaR(bot,q2) < dR_low) dR_low = deltaR(bot,q2);
   dR_high = deltaR(q1,q2);
-  if(deltaR(bot,q1) > dR_high) dR_high = deltaR(bot,q1); 
-  if(deltaR(bot,q2) > dR_high) dR_high = deltaR(bot,q2); 
+  if(deltaR(bot,q1) > dR_high) dR_high = deltaR(bot,q1);
+  if(deltaR(bot,q2) > dR_high) dR_high = deltaR(bot,q2);
 
   dR_GenParts_highest->Fill(dR_high, weight);
   dR_GenParts_lowest->Fill(dR_low, weight);
@@ -357,8 +357,6 @@ void GenHists::fill(const Event & event){
   lepton1_v4.Delete();
   jet2_lep_v4.Delete();
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 }
-
-

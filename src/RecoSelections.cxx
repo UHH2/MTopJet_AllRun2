@@ -2,25 +2,25 @@
 
 
 uhh2::NJetXCone::NJetXCone(uhh2::Context& ctx, const std::string & name, unsigned int njet):
-  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_jets(ctx.get_handle<std::vector<TopJet>>(name)),
   njet_(njet) {}
 
 bool uhh2::NJetXCone::passes(const uhh2::Event& event){
   bool pass_njet = false;
-  std::vector<Jet> jets = event.get(h_jets);
+  std::vector<TopJet> jets = event.get(h_jets);
   if(jets.size() >= njet_) pass_njet = true;
   return pass_njet;
 }
 ////////////////////////////////////////////////////////
 
 uhh2::LeadingRecoJetPT::LeadingRecoJetPT(uhh2::Context& ctx, const std::string & name, float ptcut):
-  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_jets(ctx.get_handle<std::vector<TopJet>>(name)),
   ptcut_(ptcut) {}
 
 bool uhh2::LeadingRecoJetPT::passes(const uhh2::Event& event){
   bool pass_jetpt = false;
-  std::vector<Jet> jets = event.get(h_jets);
-  Jet jet1;
+  std::vector<TopJet> jets = event.get(h_jets);
+  TopJet jet1;
   if(jets.size()>0){
     jet1 = jets.at(0);
     float pt = jet1.pt();
@@ -46,7 +46,7 @@ bool uhh2::MassCutReco::passes(const uhh2::Event& event){
   bool pass_masscut = false;
 
   if(jets.size()>1){
- 
+
     jet1_v4.SetPtEtaPhiE(jets.at(0).pt(),jets.at(0).eta(),jets.at(0).phi(),jets.at(0).energy()); //v4 of first jet
     jet2_v4.SetPtEtaPhiE(jets.at(1).pt(),jets.at(1).eta(),jets.at(1).phi(),jets.at(1).energy()); //v4 of first jet
     lepton1_v4.SetPtEtaPhiE(lepton.pt(),lepton.eta(),lepton.phi(),lepton.energy()); //v4 of lepton
@@ -59,12 +59,12 @@ bool uhh2::MassCutReco::passes(const uhh2::Event& event){
 ////////////////////////////////////////////////////////
 
 uhh2::MassCutXCone::MassCutXCone(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
-  h_hadjets(ctx.get_handle<std::vector<Jet>>(hadname)),
-  h_lepjets(ctx.get_handle<std::vector<Jet>>(lepname)){}
+  h_hadjets(ctx.get_handle<std::vector<TopJet>>(hadname)),
+  h_lepjets(ctx.get_handle<std::vector<TopJet>>(lepname)){}
 
 bool uhh2::MassCutXCone::passes(const uhh2::Event& event){
-  std::vector<Jet> hadjets = event.get(h_hadjets);
-  std::vector<Jet> lepjets = event.get(h_lepjets);
+  std::vector<TopJet> hadjets = event.get(h_hadjets);
+  std::vector<TopJet> lepjets = event.get(h_lepjets);
 
   bool pass_masscut = false;
   TLorentzVector jet1_v4, jet2_v4;
@@ -73,19 +73,19 @@ bool uhh2::MassCutXCone::passes(const uhh2::Event& event){
     jet2_v4.SetPtEtaPhiE(lepjets.at(0).pt(),lepjets.at(0).eta(),lepjets.at(0).phi(),lepjets.at(0).energy()); //v4 of first jet
     if(jet1_v4.M() > jet2_v4.M()) pass_masscut = true;
   }
-  
+
   return pass_masscut;
 }
 
 ////////////////////////////////////////////////////////
 
 uhh2::DeltaRCutReco::DeltaRCutReco(uhh2::Context& ctx, const std::string & name, float jetradius):
-  h_jets(ctx.get_handle<std::vector<Jet>>(name)),
+  h_jets(ctx.get_handle<std::vector<TopJet>>(name)),
   jetradius_(jetradius) {}
 
 bool uhh2::DeltaRCutReco::passes(const uhh2::Event& event){
-  std::vector<Jet> jets = event.get(h_jets);
-  Jet jet2;
+  std::vector<TopJet> jets = event.get(h_jets);
+  TopJet jet2;
   bool pass_deltaR = false;
   Particle lepton;
   if(event.muons->size() > 0){
@@ -151,7 +151,7 @@ bool RecoJetLeptonCleaner::process(uhh2::Event& event){
       // std::cout<<"pt before: "<< jet.pt()<<std::endl;
 
      jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
-     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E());
      jetlep_v4 = jet_v4 - lepton_v4;
 
      jet.set_pt(jetlep_v4.Pt());
@@ -201,7 +201,7 @@ bool RecoTopJetLeptonCleaner::process(uhh2::Event& event){
       // std::cout<<"pt before: "<< jet.pt()<<std::endl;
 
      jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
-     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E());
      jetlep_v4 = jet_v4 - lepton_v4;
 
      jet.set_pt(jetlep_v4.Pt());
@@ -251,7 +251,7 @@ bool uhh2::deltaRCut::passes(const uhh2::Event& event){
     return false;
   }
 
-  float dR=100;  
+  float dR=100;
   if(event.muons->size()!=0){
     dR = deltaR(event.muons->at(0), event.topjets->at(1));
   }
@@ -273,8 +273,8 @@ bool uhh2::deltaRCutAK4::passes(const uhh2::Event& event){
     return false;
   }
 
-  float dR1=100;  
-  float dR2=100;  
+  float dR1=100;
+  float dR2=100;
   float dR=100;
   if(event.muons->size()!=0){
     dR1 = deltaR(event.muons->at(0), event.jets->at(0));
@@ -302,7 +302,7 @@ uhh2::Jet2Cut::Jet2Cut(float min_pt):
 bool uhh2::Jet2Cut::passes(const uhh2::Event& event){
     const Particle* jet2 = &event.jets->at(1);
     float jet_pt = jet2->pt();
-    
+
     return jet_pt > min_pt_;
 
 }
@@ -314,7 +314,7 @@ uhh2::HTlepCut::HTlepCut(float min_htlep, float max_htlep):
   min_htlep_(min_htlep), max_htlep_(max_htlep) {}
 
 bool uhh2::HTlepCut::passes(const uhh2::Event& event){
-  
+
   auto met = event.met->pt();
   double htlep = 0.0;
   double ht_elec = 0.0;
@@ -345,30 +345,30 @@ bool uhh2::METCut::passes(const uhh2::Event& event){
 
 //!! uhh2::TTbarNJetSelection::TTbarNJetSelection(const float jet1_pt, const float jet2_pt, const float tjet1_pt):
 //!!   jet1_pt_(jet1_pt), jet2_pt_(jet2_pt), tjet1_pt_(tjet1_pt) {
-//!! 
+//!!
 //!!   h_jets_    = ctx.get_handle<std::vector<Jet>   >("jets");
 //!!   h_topjets_ = ctx.get_handle<std::vector<TopJet>>("topjets");
-//!! 
+//!!
 //!! }
-//!! 
+//!!
 //!! bool uhh2::TTbarNJetSelection::passes(const uhh2::Event& event){
-//!! 
+//!!
 //!!   const std::vector<Jet>&       jets = event.get(h_jets_);
 //!!   const std::vector<TopJet>& topjets = event.get(h_topjets_);
-//!! 
+//!!
 //!!   int jetN_1(0), jetN_2(0);
 //!!   for(const auto& j : jets){
-//!! 
+//!!
 //!!     if(j.pt() > jet1_pt_) ++jetN_1;
 //!!     if(j.pt() > jet2_pt_) ++jetN_2;
 //!!   }
-//!! 
+//!!
 //!!   int tjetN_1(0);
 //!!   for(const auto& tj : topjets){
-//!! 
+//!!
 //!!     if(tj.pt() > tjet1_pt_) ++tjetN_1;
 //!!   }
-//!! 
+//!!
 //!!   return (njet >= nmin) && (njet <= nmax);
 //!! }
 //!! ////////////////////////////////////////////////////////
@@ -423,7 +423,7 @@ bool uhh2::TwoDCut::passes(const uhh2::Event& event){
     return false;
   }
 
-  float drmin, ptrel;  
+  float drmin, ptrel;
   if(event.muons->size()) std::tie(drmin, ptrel) = drmin_pTrel(event.muons->at(0), *event.jets);
   else std::tie(drmin, ptrel) = drmin_pTrel(event.electrons->at(0), *event.jets);
 
@@ -489,7 +489,7 @@ bool uhh2::TriangularCutsELE::passes(const uhh2::Event& event){
 uhh2::DiLeptonSelection::DiLeptonSelection(const std::string& channel, const bool opposite_charge, const bool veto_other_flavor):
   channel_(channel), opposite_charge_(opposite_charge), veto_other_flavor_(veto_other_flavor) {}
 
-bool uhh2::DiLeptonSelection::passes(const uhh2::Event& event){ 
+bool uhh2::DiLeptonSelection::passes(const uhh2::Event& event){
 
   bool pass(false);
 
@@ -518,7 +518,7 @@ bool uhh2::DiLeptonSelection::passes(const uhh2::Event& event){
 uhh2::TopJetPlusJetEventSelection::TopJetPlusJetEventSelection(const float topjet_minDR_jet, const float jet_min_pt):
   topjet_minDR_jet_(topjet_minDR_jet), jet_min_pt_(jet_min_pt) {}
 
-bool uhh2::TopJetPlusJetEventSelection::passes(const uhh2::Event& event){ 
+bool uhh2::TopJetPlusJetEventSelection::passes(const uhh2::Event& event){
 
   if(event.topjets->size() != 1) return false;
 
@@ -539,7 +539,7 @@ uhh2::TopTagEventSelection::TopTagEventSelection(const TopJetId& tjetID, const f
   topjet1_sel_.reset(new NTopJetSelection(1, -1, topjetID_));
 }
 
-bool uhh2::TopTagEventSelection::passes(const uhh2::Event& event){ 
+bool uhh2::TopTagEventSelection::passes(const uhh2::Event& event){
 
   if(!topjet1_sel_->passes(event)) return false;
 
@@ -596,7 +596,7 @@ uhh2::GenFlavorSelection::GenFlavorSelection(const std::string& flav_key){
     throw std::runtime_error("GenFlavorSelection::GenFlavorSelection -- undefined key for parton flavor (must be 'l', 'c' or 'b'): "+flavor_key_);
 }
 
-bool uhh2::GenFlavorSelection::passes(const uhh2::Event& event){ 
+bool uhh2::GenFlavorSelection::passes(const uhh2::Event& event){
 
   bool pass(false);
 
@@ -632,7 +632,7 @@ uhh2::JetFlavorSelection::JetFlavorSelection(const std::string& flav_key){
     throw std::runtime_error("JetFlavorSelection::JetFlavorSelection -- undefined key for jet flavor (must be 'l', 'c' or 'b'): "+flavor_key_);
 }
 
-bool uhh2::JetFlavorSelection::passes(const uhh2::Event& event){ 
+bool uhh2::JetFlavorSelection::passes(const uhh2::Event& event){
 
   bool pass(false);
 

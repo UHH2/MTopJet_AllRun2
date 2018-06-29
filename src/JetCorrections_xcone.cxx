@@ -49,7 +49,6 @@ bool JetCorrections_xcone::process(uhh2::Event & event){
 }
 
 
-// this hast to be updated. In the moment, the original fat jets are smeared and not the subjets!!!!
 JER_Smearer_xcone::JER_Smearer_xcone(){}
 
 void JER_Smearer_xcone::init(uhh2::Context & ctx, const std::string& jet_collection_rec, const std::string& jet_collection_gen){

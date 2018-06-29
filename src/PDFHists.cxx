@@ -34,14 +34,14 @@ PDFHists::PDFHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx,
     book<TH1F>(name2, "Leading-jet m_{jet} [GeV]", 50, 0, 500);
     book<TH1F>(name3, "Leading-jet m_{jet} [GeV]", 100, 0, 500);
 
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
 
   }
 }
 
 void PDFHists::fill(const Event & event){
   double weight = event.weight;
-  std::vector<Jet> hadjets = event.get(h_hadjets);
+  std::vector<TopJet> hadjets = event.get(h_hadjets);
   TLorentzVector hadjet_v4;
   double pxhad, pyhad, pzhad, Ehad;
   pxhad = hadjets.at(0).v4().Px();

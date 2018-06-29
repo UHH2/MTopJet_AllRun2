@@ -9,7 +9,7 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
   etarec_binning = {-10, -1.5, -1.0, -0.7, -0.4, -0.2, 0.0, 0.2, 0.4, 0.7, 1.0, 1.5, 10};
 
   // setup hists for every pt-eta bin
-  unsigned int no_ptbins = 6; // rows                                                                                                                                                                      
+  unsigned int no_ptbins = 6; // rows
   unsigned int no_etabins = 12; // columns
 
   TH1F* initial_value;
@@ -20,12 +20,12 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
   pt_eta.resize(no_ptbins, std::vector<TH2F*>(no_etabins, initial_value_2d));
   event_count.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
 
-  /* 
-     TO DO
+  /*
+  TO DO
 
-     -add pt_rec[pt_bin][eta_bin]
-     -get pt_bins to pt_gen bins
-     -define arrays with binning -> set [pt_bin][eta_bin] in a loop
+  -add pt_rec[pt_bin][eta_bin]
+  -get pt_bins to pt_gen bins
+  -define arrays with binning -> set [pt_bin][eta_bin] in a loop
 
   */
 
@@ -41,20 +41,20 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
     }
   }
 
- book<TH2F>("TopJetMass1_TopJetMass2", "x=M_Top1 y=M_Top2", 30, 0, 300., 30, 0, 300.);
+  book<TH2F>("TopJetMass1_TopJetMass2", "x=M_Top1 y=M_Top2", 30, 0, 300., 30, 0, 300.);
 
 
   // handle for clustered jets
   h_recjets_noJEC=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
-  h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
+  h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
-  h_hadgenjets=ctx.get_handle<std::vector<Particle>>("GEN_XCone33_had_Combined");
+  h_hadgenjets=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
 
   if(type == "jec")     h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   else if(type == "raw")h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
   else if(type == "cor")h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");{
- 
-}
+
+  }
 
 
 }
@@ -71,10 +71,10 @@ void CorrectionHists_subjets::fill(const Event & event){
   // define all objects needed
   std::vector<TopJet> recjets = event.get(h_recjets);
   std::vector<TopJet> recjets_noJEC = event.get(h_recjets_noJEC);
-  std::vector<Jet> hadjets = event.get(h_hadjets);
+  std::vector<TopJet> hadjets = event.get(h_hadjets);
 
   std::vector<GenTopJet> genjets = event.get(h_genjets);
-  std::vector<Particle> hadgenjets = event.get(h_hadgenjets);
+  std::vector<GenTopJet> hadgenjets = event.get(h_hadgenjets);
 
   // do not continus if a jet collection is empty
   if(recjets.size() < 1) return;
@@ -133,12 +133,12 @@ void CorrectionHists_subjets::fill(const Event & event){
 
 
   /* ******************************************************************************
-     matching between gen and reco jets:
-     - a rec jet is called isolated if the next jet is not within 2R. An isolated jet should be spherical and more simelar to an ak4 jet
-     - for each reco jet, calc distance to all other gen jets
-     - gen jet with lowest distance is a match if distance is < 0.2
-     - then calculate resolution with reco jet and matched gen jet
-     - to do: account for double counting
+  matching between gen and reco jets:
+  - a rec jet is called isolated if the next jet is not within 2R. An isolated jet should be spherical and more simelar to an ak4 jet
+  - for each reco jet, calc distance to all other gen jets
+  - gen jet with lowest distance is a match if distance is < 0.2
+  - then calculate resolution with reco jet and matched gen jet
+  - to do: account for double counting
   ********************************************************************************* */
 
   double dR;
@@ -159,8 +159,8 @@ void CorrectionHists_subjets::fill(const Event & event){
     for(unsigned int j=0; j<gen_sub.size(); j++){
       dR_temp = uhh2::deltaR(rec_sub.at(i), gen_sub.at(j));
       if(dR_temp < dR){
-	dR = dR_temp;
-	nearest_j = j;
+        dR = dR_temp;
+        nearest_j = j;
       }
     }
     gen_pt=gen_sub.at(nearest_j).v4().Pt();
@@ -171,7 +171,7 @@ void CorrectionHists_subjets::fill(const Event & event){
     if(nearest_j != 100 && dR <= 0.2){
       // bins in pt_rec
       for(unsigned int i = 0; i < (ptrec_binning.size() - 1); i++){
-	if(rec_pt > ptrec_binning[i] && rec_pt <= ptrec_binning[i+1]) ptrec_bin = i;
+        if(rec_pt > ptrec_binning[i] && rec_pt <= ptrec_binning[i+1]) ptrec_bin = i;
       }
       for(unsigned int i = 0; i < (ptgen_binning.size() - 1); i++){
         if(gen_pt > ptgen_binning[i] && gen_pt <= ptgen_binning[i+1]) ptgen_bin = i;
@@ -182,11 +182,11 @@ void CorrectionHists_subjets::fill(const Event & event){
       }
 
       if(ptrec_bin != 100 && etarec_bin != 100){
-	pt_reso[ptgen_bin][etarec_bin]->Fill(R, weight);
+        pt_reso[ptgen_bin][etarec_bin]->Fill(R, weight);
         pt_rec[ptgen_bin][etarec_bin]->Fill(rec_pt, weight);
         pt_gen[ptgen_bin][etarec_bin]->Fill(gen_pt, weight);
-	pt_eta[ptgen_bin][etarec_bin]->Fill(rec_pt, rec_eta, weight);
-	event_count[ptgen_bin][etarec_bin]->Fill(1, weight);
+        pt_eta[ptgen_bin][etarec_bin]->Fill(rec_pt, rec_eta, weight);
+        event_count[ptgen_bin][etarec_bin]->Fill(1, weight);
 
       }
     }
@@ -195,7 +195,5 @@ void CorrectionHists_subjets::fill(const Event & event){
 
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 }
-
-

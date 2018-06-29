@@ -10,12 +10,12 @@
 #include <iostream>
 
 using namespace uhh2;
- 
+
 class RecoGenHists_xcone: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:
   RecoGenHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type);
-    
+
     virtual void fill(const uhh2::Event & ev) override;
 
 protected:
@@ -31,11 +31,9 @@ protected:
     TH1F *PtReso_pt1_rec, *PtReso_pt2_rec, *PtReso_pt3_rec, *PtReso_pt4_rec, *PtReso_pt5_rec, *PtReso_pt6_rec;
     TH1F *MassReso_pt1_rec, *MassReso_pt2_rec, *MassReso_pt3_rec, *MassReso_pt4_rec, *MassReso_pt5_rec, *MassReso_pt6_rec;
 
-    uhh2::Event::Handle<std::vector<Jet>>h_recjets_had;
-    uhh2::Event::Handle<std::vector<Jet>>h_recjets_lep;
-    uhh2::Event::Handle<std::vector<Particle>>h_genjets_had;
-    uhh2::Event::Handle<std::vector<Particle>>h_genjets_lep;
- 
+    uhh2::Event::Handle<std::vector<TopJet>>h_recjets_had;
+    uhh2::Event::Handle<std::vector<TopJet>>h_recjets_lep;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_genjets_had;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_genjets_lep;
+
 };
-
-

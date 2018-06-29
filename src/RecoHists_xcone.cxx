@@ -49,18 +49,18 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
 
   // handle for clustered jets
   if(type == "jec"){
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
-    h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined");
+    h_lepjets=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined");
     h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   }
   else if(type == "raw"){
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_noJEC");
-    h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_noJEC");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
+    h_lepjets=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_noJEC");
     h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
   }
   else if(type == "cor"){
-    h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined_Corrected");
-    h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined_Corrected");
+    h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
+    h_lepjets=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
     h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   }
 }
@@ -72,8 +72,8 @@ void RecoHists_xcone::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------- get jets and lepton ---------------------------------
   //---------------------------------------------------------------------------------------
-  std::vector<Jet> hadjets = event.get(h_hadjets);
-  std::vector<Jet> lepjets = event.get(h_lepjets);
+  std::vector<TopJet> hadjets = event.get(h_hadjets);
+  std::vector<TopJet> lepjets = event.get(h_lepjets);
   std::vector<TopJet> fatjets = event.get(h_fatjets);
   double rho = event.rho;
   // Particle lepton;
