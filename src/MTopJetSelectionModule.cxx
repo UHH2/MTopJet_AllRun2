@@ -72,6 +72,7 @@ class MTopJetSelectionModule : public ModuleBASE {
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_pupppi;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
@@ -170,6 +171,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // combine XCone
   jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
+  //jetprod_reco_pupppi.reset(new CombineXCone33(ctx, "XCone33_had_Combined_puppi", "XCone33_lep_Combined_puppi", "xconePuppi"));
   jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "xconeCHS" ));
   jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
   copy_jet.reset(new CopyJets(ctx, "xconeCHS", "xconeCHS_noJEC"));
@@ -197,7 +199,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   JetCorrections->init(ctx, "xconeCHS");
   // smear jets after Correction
   JERSmearing.reset(new JER_Smearer_xcone());
-  // JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
   JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
   Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar));
 
@@ -547,10 +548,13 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     jetprod_gen33->process(event);
   }
 
+  // produce puppi jets
+  //jetprod_reco_pupppi->process(event);
+
   // Here all the Correction is happening
   jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
-  copy_jet->process(event);                // copy 'raw' TopJets (with subjets) and name one copy 'noJEC'
-  JetCorrections->process(event);          // apply AK4 JEC/JER to subjets of the original TopJet Collection
+  copy_jet->process(event);                // copy 'raw' Fatets (with subjets) and name one copy 'noJEC'
+  JetCorrections->process(event);          // apply AK4 JEC/JER to subjets of the original Fatjet Collection
   jetprod_reco->process(event);            // now store sum of 'jec' subjets
   Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets

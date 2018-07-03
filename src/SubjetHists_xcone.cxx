@@ -7,17 +7,17 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   pt_had_subjets_fine = book<TH1F>("pt_had_subjets_fine", "p_{T}^{had subjets}", 100, 0, 500);
   eta_had_subjets = book<TH1F>("eta_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   eta_abs_had_subjets = book<TH1F>("eta_abs_had_subjets", "#eta^{had subjets}", 100, -5, 5);
-  area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 5);
-  area_had1_subjet = book<TH1F>("area_had1_subjet", "jet area (had subjet 1)", 100, 0, 5);
-  area_had2_subjet = book<TH1F>("area_had2_subjet", "jet area (had subjet 2)", 100, 0, 5);
-  area_had3_subjet = book<TH1F>("area_had3_subjet", "jet area (had subjet 3)", 100, 0, 5);
+  area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 2);
+  area_had1_subjet = book<TH1F>("area_had1_subjet", "jet area (had subjet 1)", 100, 0, 2);
+  area_had2_subjet = book<TH1F>("area_had2_subjet", "jet area (had subjet 2)", 100, 0, 2);
+  area_had3_subjet = book<TH1F>("area_had3_subjet", "jet area (had subjet 3)", 100, 0, 2);
   pt_lep_subjets = book<TH1F>("pt_lep_subjets", "p_{T}^{lep subjets}", 100, 0, 500);
   eta_lep_subjets = book<TH1F>("eta_lep_subjets", "#eta^{lep subjets}", 100, -5, 5);
-  area_lep_subjets = book<TH1F>("area_lep_subjets", "jet area (lep subjets)", 100, 0, 5);
-  area_lep1_subjet = book<TH1F>("area_lep1_subjet", "jet area (lep subjet 1)", 100, 0, 5);
-  area_lep2_subjet = book<TH1F>("area_lep2_subjet", "jet area (lep subjet 2)", 100, 0, 5);
-  area_lep3_subjet = book<TH1F>("area_lep3_subjet", "jet area (lep subjet 3)", 100, 0, 5);
-  area_all_subjets = book<TH1F>("area_all_subjets", "jet area (all subjets)", 50, 0, 1);
+  area_lep_subjets = book<TH1F>("area_lep_subjets", "jet area (lep subjets)", 100, 0, 2);
+  area_lep1_subjet = book<TH1F>("area_lep1_subjet", "jet area (lep subjet 1)", 100, 0, 2);
+  area_lep2_subjet = book<TH1F>("area_lep2_subjet", "jet area (lep subjet 2)", 100, 0, 2);
+  area_lep3_subjet = book<TH1F>("area_lep3_subjet", "jet area (lep subjet 3)", 100, 0, 2);
+  area_all_subjets = book<TH1F>("area_all_subjets", "jet area (all subjets)", 100, 0, 2);
   pt_all_subjets = book<TH1F>("pt_all_subjets", "p_{T}^{all subjets}", 100, 0, 500);
   eta_all_subjets = book<TH1F>("eta_all_subjets", "#eta^{all subjets}", 100, -5, 5);
 
@@ -67,7 +67,7 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   pt_Wjets = book<TH2F>("pt_Wjets", "x=p_{T,i} y=p_{T,j}", 100, 0, 500, 100, 0, 500);
   Wjet_combination = book<TH1F>("Wjet_combination", "combination", 3, 0, 3);
 
-  area_ak4 = book<TH1F>("area_ak4", "jet area (ak4)", 50, 0, 1);
+  area_ak4 = book<TH1F>("area_ak4", "jet area (ak4)", 100, 0, 2);
   pt_ak4 = book<TH1F>("pt_ak4", "p_{T}^{ak4}", 100, 0, 500);
   eta_ak4 = book<TH1F>("eta_ak4", "#eta^{ak4}", 100, -5, 5);
   JEC_ak4 = book<TH1F>("JEC_ak4", "JEC factor", 100, 0, 2);

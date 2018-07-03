@@ -22,6 +22,7 @@
 #include <UHH2/MTopJet/include/RecoSelections_topjet.h>
 #include <UHH2/MTopJet/include/GenSelections.h>
 #include <UHH2/MTopJet/include/RecoHists_xcone.h>
+#include <UHH2/MTopJet/include/RecoHists_puppi.h>
 #include <UHH2/MTopJet/include/RecoHists_topjet.h>
 #include <UHH2/MTopJet/include/PDFHists.h>
 
@@ -139,6 +140,7 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
 
   std::unique_ptr<Hists> h_XCone_cor, h_XCone_jec, h_XCone_raw;
+  std::unique_ptr<Hists> h_XCone_puppi;
   std::unique_ptr<Hists> h_XCone_cor_SF, h_XCone_jec_SF, h_XCone_raw_SF;
   std::unique_ptr<Hists> h_XCone_cor_pt350, h_XCone_cor_noptcut;
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
@@ -322,6 +324,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   h_XCone_cor_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_pt350", "cor"));
   h_XCone_cor_noptcut.reset(new RecoHists_xcone(ctx, "XCone_cor_noptcut", "cor"));
+
+  h_XCone_puppi.reset(new RecoHists_puppi(ctx, "XCone_puppi"));
 
   // XCone Subjets
   h_XCone_jec_subjets.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets", "jec"));
@@ -675,6 +679,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_raw->fill(event);
     h_XCone_jec->fill(event);
     h_XCone_cor->fill(event);
+    h_XCone_puppi->fill(event);
 
     h_XCone_raw_subjets->fill(event);
     h_XCone_jec_subjets->fill(event);

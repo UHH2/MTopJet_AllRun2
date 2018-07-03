@@ -65,7 +65,7 @@ TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin){
   for(unsigned int i=0; i < subjets.size(); ++i){
     if(subjets.at(i).pt() < ptmin) good_jet = false;
   }
-  if(good_jet){
+  if(good_jet && subjets.size() >= 3){
     for(unsigned int i=0; i < subjets.size(); ++i){
       if(subjets.at(i).pt() < ptmin) continue;
       px += subjets.at(i).v4().Px();
@@ -123,7 +123,7 @@ bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<TopJet> jets = event.get(h_fatjets);
   if(jets.size() < 2) return false;
-  std::auto_ptr<CombineXCone> combine(new CombineXCone);
+  CombineXCone* combine = new CombineXCone();
   bool lepton_in_event = combine->FindLepton(event);
 
   //---------------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<GenTopJet> jets = event.get(h_GENfatjets);
   if(jets.size() < 2) return false;
-  std::auto_ptr<CombineXCone> combine(new CombineXCone);
+  CombineXCone* combine = new CombineXCone();
   bool lepton_in_event = combine->FindLepton(event);
 
   //---------------------------------------------------------------------------------------
@@ -242,7 +242,7 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<GenTopJet> jets23 = event.get(h_GEN23fatjets);
   if(jets23.size() < 2) return false;
-  std::auto_ptr<CombineXCone> combine(new CombineXCone);
+  CombineXCone* combine = new CombineXCone();
   bool lepton_in_event = combine->FindLepton(event);
 
   //---------------------------------------------------------------------------------------
