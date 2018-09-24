@@ -1,0 +1,52 @@
+ ( INFO  )  SCycleController   : Initializing
+ ( INFO  )  SCycleController   : Deleting all analysis cycle algorithms from memory
+ ( INFO  )  SCycleController   : Reading xml file: 'QCD_Pt-0030to0050_MuEnrichedPt5_101.xml'
+ ( INFO  )  SCycleController   : Created cycle 'uhh2::AnalysisModuleRunner'
+ ( INFO  )  SCycleBaseExec     : Initializing from configuration
+ ( INFO  )  SCycleBaseExec     : Reading SInputData: MC - QCD_Pt-0030to0050_MuEnrichedPt5
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleConfig       :                     Cycle configuration
+ ( INFO  )  SCycleConfig       :   - Running mode: LOCAL
+ ( INFO  )  SCycleConfig       :   - Target luminosity: 1
+ ( INFO  )  SCycleConfig       :   - Output directory: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel//PreSel_workdir/
+ ( INFO  )  SCycleConfig       :   - Post-fix: _100
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SInputData         :  Type               : MC
+ ( INFO  )  SInputData         :  Version            : QCD_Pt-0030to0050_MuEnrichedPt5
+ ( INFO  )  SInputData         :  Total luminosity   : 18.009pb-1
+ ( INFO  )  SInputData         :  NEventsMax         : -1
+ ( INFO  )  SInputData         :  NEventsSkip        : 0
+ ( INFO  )  SInputData         :  Cacheable          : No
+ ( INFO  )  SInputData         :  Skip validation    : No
+ ( INFO  )  SInputData         :  Skip file lookup   : No
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_21_Jun_18/180621_043053/0004/Ntuple_4027.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_21_Jun_18/180621_043053/0004/Ntuple_4028.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat input tree' (type)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat output tree' (type)
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleController   : Job 'MTopJetPreSelectionJob' configured
+ ( INFO  )  SCycleController   : Time needed for initialisation:   0.45 s
+ ( INFO  )  SCycleController   : Entering ExecuteAllCycles()
+ ( INFO  )  SInputData         : Input type "MC" version "QCD_Pt-0030to0050_MuEnrichedPt5" : 14005 events
+ ( INFO  )  SCycleController   : Executing Cycle #0 ('uhh2::AnalysisModuleRunner') locally
+ ( INFO  )  SCycleController   : Processing input data type: MC version: QCD_Pt-0030to0050_MuEnrichedPt5
+ ( INFO  )  SCycleBaseExec     : Initialised InputData "MC" (Version:QCD_Pt-0030to0050_MuEnrichedPt5) on worker node
+ ( INFO  )  SCycleBaseExec     : Processing entry: 999 (999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1999 (1999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2999 (2999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3999 (3999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4999 (4999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5999 (5999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6999 (6999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 703 (7999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1703 (8999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2703 (9999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3703 (10999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4703 (11999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5703 (12999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6703 (13999 / 14005 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Terminated InputData "MC" (Version:QCD_Pt-0030to0050_MuEnrichedPt5) on worker node
+ ( INFO  )  SCycleController   : Writing output of "uhh2::AnalysisModuleRunner" to: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel//PreSel_workdir/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0030to0050_MuEnrichedPt5_100.root
+ ( INFO  )  SCycleController   : Overall cycle statistics:
+ ( INFO  )  SCycleController   :      14005 Events - Real time   5.44 s  -  2573 Hz | CPU time   3.85 s  -  3638 Hz

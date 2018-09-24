@@ -96,8 +96,8 @@ int main(int argc, char* argv[]){
   fill_matrix((TTree *) pseudodata2_File->Get("AnalysisTree"), "pseudo2");
 
   // fill SYS
-  vector<TString> sys_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown", "jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "mutrkup", "mutrkdown", "puup", "pudown"};
-  vector<TString> subdir = {"BTAG_bc_up", "BTAG_bc_down", "BTAG_udsg_up", "BTAG_udsg_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "MUTRK_up", "MUTRK_down", "PU_up", "PU_down"};
+  vector<TString> sys_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown", "jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "puup", "pudown"};
+  vector<TString> subdir = {"BTAG_bc_up", "BTAG_bc_down", "BTAG_udsg_up", "BTAG_udsg_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "PU_up", "PU_down"};
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     TFile *file = new TFile(dir+subdir[i]+prefix+"MC.TTbar.root");
@@ -106,12 +106,6 @@ int main(int argc, char* argv[]){
   }
 
   // fill model SYS
-  std::vector<TFile*> model_file;
-  model_file.push_back(new TFile(dir+prefix+"MC.TTbar_powheg-herwig.root"));
-  model_file.push_back(new TFile(dir+prefix+"MC.TTbar_amcatnlo-pythia.root"));
-  model_file.push_back(new TFile(dir+"SCALE_upup"+prefix+"MC.TTbar.root"));
-  model_file.push_back(new TFile(dir+"SCALE_downdown"+prefix+"MC.TTbar.root"));
-
   std::vector<TString> model_name = {"Shower", "Generator", "SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
 
   for(unsigned int i=0; i<model_name.size(); i++){
@@ -125,7 +119,7 @@ int main(int argc, char* argv[]){
   // fill mass templates
   std::vector<TFile *> mc_truth_File;
   mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1665.root"));
-  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1695_ext2.root"));
+  mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1695.root"));
   mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1715.root"));
   mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1735.root"));
   mc_truth_File.push_back(new TFile(dir+prefix+"MC.TTbar_mtop1755.root"));

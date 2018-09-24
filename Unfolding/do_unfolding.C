@@ -46,13 +46,13 @@ int main(int argc, char* argv[])
   else if(strcmp(argv[1], "pseudo1") == 0){
     pseudo = true;
     pseudo1 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo/";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1/";
     output_file = "Results_pseudo.root";
   }
   else if(strcmp(argv[1], "pseudo2") == 0){
     pseudo = true;
     pseudo2 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo/";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo2/";
     output_file = "Results_pseudo.root";
   }
   else {
@@ -72,11 +72,11 @@ int main(int argc, char* argv[])
   TH1::SetDefaultSumw2();
 
   /*
-  ██████ ██████  ███████  █████  ████████ ███████     ███████ ██ ██      ███████ ███████
+   ██████ ██████  ███████  █████  ████████ ███████     ███████ ██ ██      ███████ ███████
   ██      ██   ██ ██      ██   ██    ██    ██          ██      ██ ██      ██      ██
   ██      ██████  █████   ███████    ██    █████       █████   ██ ██      █████   ███████
   ██      ██   ██ ██      ██   ██    ██    ██          ██      ██ ██      ██           ██
-  ██████ ██   ██ ███████ ██   ██    ██    ███████     ██      ██ ███████ ███████ ███████
+   ██████ ██   ██ ███████ ██   ██    ██    ███████     ██      ██ ███████ ███████ ███████
   */
 
   cout << "Open Files" << endl;
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
   mc_mtop_templates.push_back(mc_mtop1755_truth);
   mc_mtop_templates.push_back(mc_mtop1785_truth);
   std::vector<double> masses = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
-  std::vector<bool>     show = {true,  false, false,  true, false, false, true}; // decides which masspoint is shown
+  std::vector<bool>     show = {false,  true, false,  true, false,  true, false}; // decides which masspoint is shown
   // std::vector<bool> show = {true, true, true, true, true, true, true};
 
   // read backgrounds
@@ -216,7 +216,6 @@ int main(int argc, char* argv[])
   if(pseudo2){
     inputFile->GetObject("pseudo1_sig",hist_data);
     hist_data->Add(hist_mc_bgr);
-
   }
   if(same){
     inputFile->GetObject("mc_sig",hist_data);
@@ -229,10 +228,9 @@ int main(int argc, char* argv[])
   vector<TString> jer_name = {"jerup", "jerdown"};
   vector<TString> muid_name = {"muidup", "muiddown"};
   vector<TString> mutr_name = {"mutrup", "mutrdown"};
-  vector<TString> mutrk_name = {"mutrkup", "mutrkdown"};
   vector<TString> pu_name = {"puup", "pudown"};
-  vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, muid_name, mutr_name, mutrk_name, pu_name};
-  vector<TString> sys_rel_name = {"b-tagging", "jec", "jer", "MuID", "MuTrigger", "MuTrk", "pile-up"}; // used for comparison plot
+  vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, muid_name, mutr_name, pu_name};
+  vector<TString> sys_rel_name = {"b-tagging", "jec", "jer", "MuID", "MuTrigger", "pile-up"}; // used for comparison plot
   vector< vector<TH2*> > sys_matrix;
   for(unsigned int i=0; i<sys_name.size(); i++){
     vector<TH2*> dummy;
@@ -256,7 +254,6 @@ int main(int argc, char* argv[])
     model_truth.push_back(dummy);
     for(unsigned int j=0; j<model_name[i].size(); j++){
       TH1D* input = (TH1D*)inputFile->Get(model_name[i][j] + "_sig");
-      input->Add(hist_mc_bgr);
       model_input[i].push_back(input);
       model_truth[i].push_back((TH1D*)inputFile->Get(model_name[i][j] + "_truth"));
     }
@@ -298,6 +295,8 @@ int main(int argc, char* argv[])
 
   vector< vector<TH2*> > CovModel;
   vector< vector<TH1*> > MODEL_DELTA;
+  vector< vector<TH1*> > MODEL_BIAS;
+  vector< vector<TH1*> > MODEL_OUTPUT;
   vector< TH1* > MODEL_rel;
   TH1 *MODEL_rel_total;
 
@@ -311,7 +310,7 @@ int main(int argc, char* argv[])
   TH2 *ProbMatrix;
 
   TH1 *data_unfolded,*data_unfolded_sys,*data_unfolded_stat,*data_unfolded_all;
-
+  TH1 * pseudodata_bias;
 
   if(same){
     unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, 1);
@@ -328,7 +327,7 @@ int main(int argc, char* argv[])
     data_unfolded_all = unfold.get_output(false);
     CorMatrix = unfold.get_cor_matrix();
     ProbMatrix = unfold.get_prob_matrix();
-
+    pseudodata_bias = unfold.GetBiasDistribution();
     CovInputStat = unfold.GetInputStatCov();
     CovMatrixStat = unfold.GetMatrixStatCov();
     CovBgrStat = unfold.GetBgrStatCov();
@@ -341,19 +340,26 @@ int main(int argc, char* argv[])
     // now unfold every model variation, get difference to truth and fill cov matrices
     for(unsigned int i=0; i<model_name.size(); i++){
       vector<TH1*> dummy;
+      MODEL_OUTPUT.push_back(dummy);
       MODEL_DELTA.push_back(dummy);
+      MODEL_BIAS.push_back(dummy);
       vector<TH2*> dummy2;
       CovModel.push_back(dummy2);
       for(unsigned int j=0; j<model_name[i].size(); j++){
         cout << "***********************" << endl;
         cout << " UNFOLDING OF " << model_name[i][j] << endl;
-        unfolding* unfold_model = new unfolding(model_input[i][j], backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan);
+        vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
+        for(auto i: background_dummy) i->Reset();
+        unfolding* unfold_model = new unfolding(model_input[i][j], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan);
         TH1* output = unfold_model->get_output(true);
+        MODEL_OUTPUT[i].push_back(output);
         TH1* delta = GetModelDelta(output, model_truth[i][j]);
         MODEL_DELTA[i].push_back(delta);
+        TH1* bias = unfold_model->GetBiasDistribution();
+        MODEL_BIAS[i].push_back(bias);
         TH2* cov = CreateCovFromDelta(delta, CovInputStat);
         CovModel[i].push_back(cov);
-        delete output;
+        //delete output;
         delete unfold_model;
         cout << "unfolding finished" << endl;
       }
@@ -389,13 +395,16 @@ int main(int argc, char* argv[])
     CovTotal->Add(CovLumi);
 
     // then add model cov
+    bool do_model = true;
+    if(!do_model) cout << "!!!! ATTENTION: MODEL UNCERTAINTIES SWITCHED OFF!!!!! " <<endl;
     cout << "sum up model sys cov matrices" << endl;
     for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
       int j = FindLargestVariation(MODEL_DELTA[i]);
-      CovTotal->Add(CovModel[i][j]);
+      if(do_model) CovTotal->Add(CovModel[i][j]);
       MODEL_rel.push_back(ConvertToRelative(MODEL_DELTA[i][j], data_unfolded));
       cout << "using " << model_name[i][j] << endl;
     }
+
     MODEL_rel_total = AddSys(MODEL_rel);
 
 
@@ -460,11 +469,14 @@ int main(int argc, char* argv[])
   */
 
   // parameters for chi2 fit
-  double lower = 130;
-  double upper = 290;
+  double lower = 120;
+  double upper = 250;
   bool NormToWidth = true;
 
   // normalise unfolding output
+  Normalise * normData_stat = new Normalise(data_unfolded, CovStat, lower, upper, NormToWidth);
+  TH1D* data_unfolded_stat_norm = normData_stat->GetHist(); // this hist is just for plotting
+
   Normalise * normData = new Normalise(data_unfolded, CovTotal, lower, upper, NormToWidth);
   TH1D* data_unfolded_norm = normData->GetHist();
   TH2D* CovMatrix_norm = normData->GetMatrix();
@@ -487,8 +499,18 @@ int main(int argc, char* argv[])
     h_pseudodata_truth_norm  = normPseudo->GetHist();
   }
 
+  // write a new vector for masses used in the chi2 fit
+  vector<TH1D*> chi2_MassSamples;
+  std::vector<double> chi2_masses;
+  for(unsigned int i=0; i<mc_mtop_templates_norm.size(); i++){
+    if(i != 0 && i != mc_mtop_templates_norm.size()-1){
+      chi2_MassSamples.push_back(mc_mtop_templates_norm[i]);
+      chi2_masses.push_back(masses[i]);
+    }
+  }
+
   // perform chi2 fit
-  chi2fit * chi2 = new chi2fit(data_unfolded_norm, CovMatrix_norm, mc_mtop_templates_norm, masses, lower, upper, NormToWidth);
+  chi2fit * chi2 = new chi2fit(data_unfolded_norm, CovMatrix_norm, chi2_MassSamples, chi2_masses, lower, upper, NormToWidth);
   chi2->CalculateChi2();
   std::vector<double> chi2values = chi2->GetChi2Values();
   TF1* chi2fit = chi2->GetChi2Fit();
@@ -503,7 +525,7 @@ int main(int argc, char* argv[])
   */
 
   plotter * plot = new plotter(directory);
-  plot->draw_chi2(chi2fit, masses, chi2values, "chi2fit");
+  plot->draw_chi2(chi2fit, chi2_masses, chi2values, chi2->GetMass(), chi2->GetUncertainty(), "chi2fit");
   plot->draw_matrix(ProbMatrix, "Prob_Matrix", true);
   plot->draw_matrix(CorMatrix, "Cor_Matrix", false);
   plot->draw_matrix(CovStat, "COV_STAT", false);
@@ -519,7 +541,7 @@ int main(int argc, char* argv[])
       plot->draw_delta(SYS_DELTA[i][j], "DELTA_"+sys_name[i][j]);
     }
   }
-  plot->draw_delta_comparison(SYS_rel_total, SYS_rel, sys_rel_name, "SYS_EXP_COMPARISION");
+  plot->draw_delta_comparison(SYS_rel_total, SYS_rel, sys_rel_name, "exp", "SYS_EXP_COMPARISION");
 
   plot->draw_matrix(CovLumi, "COV_Lumi", false);
   plot->draw_delta(DeltaLumi, "DELTA_Lumi");
@@ -528,9 +550,10 @@ int main(int argc, char* argv[])
     for(unsigned int j=0; j<model_name[i].size(); j++){
       plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false);
       plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);
+      plot->draw_bias(MODEL_OUTPUT[i][j], model_truth[i][j], MODEL_BIAS[i][j], "BIAS_"+model_name[i][j]);
     }
   }
-  plot->draw_delta_comparison(MODEL_rel_total, MODEL_rel, model_rel_name, "SYS_MODEL_COMPARISION");
+  plot->draw_delta_comparison(MODEL_rel_total, MODEL_rel, model_rel_name, "model", "SYS_MODEL_COMPARISION");
 
   for(unsigned int i=0; i<bgr_name.size(); i++){
     plot->draw_matrix(CovBgrStat[i], "COV_"+bgr_name[i]+"_stat", false);
@@ -540,9 +563,10 @@ int main(int argc, char* argv[])
 
   if(pseudo) plot->draw_output_pseudo(data_unfolded, h_pseudodata_truth, hist_mc_truth, false, "Unfold_pseudo");
   if(pseudo) plot->draw_output_pseudo(data_unfolded_norm, h_pseudodata_truth_norm, hist_mc_truth_norm, true, "Unfold_pseudo_norm");
+  if(pseudo) plot->draw_bias(data_unfolded, h_pseudodata_truth, pseudodata_bias, "Unfold_pseudo_bias");
   plot->draw_output_stat(data_unfolded_sys, data_unfolded_stat, hist_mc_truth, false, "Unfold");
   plot->draw_output(data_unfolded_sys, hist_mc_truth, false, "Unfold_SYS");
-  plot->draw_output(data_unfolded_norm, hist_mc_truth_norm, true, "Unfold_norm");
+  plot->draw_output_stat(data_unfolded_norm, data_unfolded_stat_norm, hist_mc_truth_norm, true, "Unfold_norm");
   plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
   plot->draw_output_mass(data_unfolded_norm, mc_mtop_templates_norm, show, true, "Unfold_masspoints_norm");
   plot->draw_output_mass(data_unfolded, mc_mtop_templates, show, false, "Unfold_masspoints");

@@ -174,13 +174,12 @@ class MTopJetPostSelectionModule : public ModuleBASE {
   int counter;
 
   std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
-  std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF, muon_trk_SF;
+  std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
 
 
   string BTag_variation ="central";
   string MuScale_variation ="nominal";
   string MuTrigger_variation ="nominal";
-  string MuTrk_variation ="nominal";
   string PU_variation ="nominal";
 
 };
@@ -219,8 +218,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
      ctx.get("dataset_version") == "TTbar_Mtt0700to1000_cordown"  ||
      ctx.get("dataset_version") == "TTbar_Mtt1000toInft_cordown"  ||
      ctx.get("dataset_version") == "TTbar_mtop1665"       ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext1"  ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext2"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1695"       ||
      ctx.get("dataset_version") == "TTbar_mtop1715"       ||
      ctx.get("dataset_version") == "TTbar_mtop1735"       ||
      ctx.get("dataset_version") == "TTbar_mtop1755"       ||
@@ -301,12 +299,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   BTag_variation = ctx.get("BTag_variation","central");
   MuScale_variation = ctx.get("MuScale_variation","nominal");
   MuTrigger_variation = ctx.get("MuTrigger_variation","nominal");
-  MuTrk_variation = ctx.get("MuTrk_variation","nominal");
 
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
-  muon_trk_SF.reset(new MCMuonTrkScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Tracking_EfficienciesAndSF_BCDEFGH.root", 1, "track", MuTrk_variation, "muons"));
 
   /*************************** Set up Hists classes **********************************************************************************/
 
@@ -552,7 +548,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /** muon SF *********************/
   muo_tight_noniso_SF->process(event);
   muo_trigger_SF->process(event);
-  muon_trk_SF->process(event);
 
   /** b-tagging *********************/
   int jetbtagN(0);

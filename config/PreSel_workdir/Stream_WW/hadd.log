@@ -1,0 +1,25 @@
+hadd Target file: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.WW.root
+hadd compression setting for all ouput: 1
+hadd Source file 1: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_0.root
+hadd Source file 2: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_1.root
+hadd Source file 3: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_2.root
+hadd Source file 4: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_3.root
+hadd Source file 5: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_4.root
+hadd Source file 6: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_5.root
+hadd Source file 7: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_6.root
+hadd Source file 8: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_7.root
+hadd Source file 9: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_8.root
+hadd Source file 10: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_9.root
+hadd Source file 11: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_10.root
+hadd Source file 12: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_11.root
+hadd Source file 13: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_12.root
+hadd Source file 14: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_13.root
+hadd Source file 15: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_14.root
+hadd Source file 16: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_15.root
+hadd Source file 17: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_16.root
+hadd Source file 18: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_17.root
+hadd Source file 19: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_18.root
+hadd Source file 20: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_19.root
+hadd Source file 21: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.WW_20.root
+hadd Target path: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.WW.root:/
+hadd Target path: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.WW.root:/SFrame

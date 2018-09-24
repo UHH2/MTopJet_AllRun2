@@ -51,12 +51,12 @@ int main(int argc, char* argv[])
   int N_BINS_REC_MASS_BTAGMIGRATION = sizeof(BINS_REC_MASS_BTAGMIGRATION)/sizeof(BINS_REC_MASS_BTAGMIGRATION[0]) - 1;
 
   /******************* GEN BINNING ************************************/
-  // here some actions with arrays are needed to have different possible array sizes 
+  // here some actions with arrays are needed to have different possible array sizes
 
   // 1. set-up binning in vectors
   std::vector<Double_t> MASS;
-  if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270};
-  // if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270, 300};
+  if(fine) MASS = {120, 142, 157, 172, 187, 220, 250};
+  // if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270};
   else     MASS = {120, 150, 180, 210, 240, 270, 300};
 
   std::vector<Double_t> MASS_MASSMIGRATION;
@@ -95,11 +95,11 @@ int main(int argc, char* argv[])
   //
   TUnfoldBinning *measurement_rec = binning_rec->AddBinning("measurement_rec");
   measurement_rec->AddAxis("mass",N_BINS_REC_MASS,BINS_REC_MASS,
-                                true, // underflow bin 
+                                true, // underflow bin
                                 true // overflow bin
                                 );
   measurement_rec->AddAxis("pt",N_BINS_REC_PT,BINS_REC_PT,
-                                false, // no underflow bin 
+                                false, // no underflow bin
                                 false // overflow bin
                                 );
 
@@ -108,11 +108,11 @@ int main(int argc, char* argv[])
   //
   TUnfoldBinning *ptmigration_rec = binning_rec->AddBinning("ptmigration_rec");
   ptmigration_rec->AddAxis("mass",N_BINS_REC_MASS_PTMIGRATION,BINS_REC_MASS_PTMIGRATION,
-                                true, // underflow bin 
+                                true, // underflow bin
                                 true // overflow bin
                                 );
   ptmigration_rec->AddAxis("pt",N_BINS_REC_PT_PTMIGRATION,BINS_REC_PT_PTMIGRATION,
-                                false, // no underflow bin 
+                                false, // no underflow bin
                                 false // overflow bin
                                 );
 
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   //
   TUnfoldBinning *massmigration_rec = binning_rec->AddBinning("massmigration_rec");
   massmigration_rec->AddAxis("mass",N_BINS_REC_MASS_MASSMIGRATION,BINS_REC_MASS_MASSMIGRATION,
-                                true, // underflow bin 
+                                true, // underflow bin
                                 true // overflow bin
                                 );
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
   //
   TUnfoldBinning *btagmigration_rec = binning_rec->AddBinning("btagmigration_rec");
   btagmigration_rec->AddAxis("mass",N_BINS_REC_MASS_BTAGMIGRATION,BINS_REC_MASS_BTAGMIGRATION,
-                                true, // underflow bin 
+                                true, // underflow bin
                                 true // overflow bin
                                 );
 
@@ -146,25 +146,25 @@ int main(int argc, char* argv[])
   //
   TUnfoldBinning *measurement_gen = binning_gen->AddBinning("measurement_gen");
   measurement_gen->AddAxis("mass",N_BINS_GEN_MASS,BINS_GEN_MASS,
-                                true, // no underflow bin 
+                                true, // no underflow bin
                                 true // overflow bin
                                 );
   measurement_gen->AddAxis("pt",N_BINS_GEN_PT,BINS_GEN_PT,
-                                false, // no underflow bin 
+                                false, // no underflow bin
                                 false // overflow bin
                                 );
 
- 
+
   //
   // define sideband: migration from lower pt region
   //
   TUnfoldBinning *ptmigration_gen = binning_gen->AddBinning("ptmigration_gen");
   ptmigration_gen->AddAxis("mass",N_BINS_GEN_MASS_PTMIGRATION,BINS_GEN_MASS_PTMIGRATION,
-                                true, // no underflow bin 
+                                true, // no underflow bin
                                 true // overflow bin
                                 );
   ptmigration_gen->AddAxis("pt",N_BINS_GEN_PT_PTMIGRATION,BINS_GEN_PT_PTMIGRATION,
-                                false, // no underflow bin 
+                                false, // no underflow bin
                                 false // overflow bin
                                 );
 
@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
   //
   TUnfoldBinning *massmigration_gen = binning_gen->AddBinning("massmigration_gen");
   massmigration_gen->AddAxis("mass",N_BINS_GEN_MASS_MASSMIGRATION,BINS_GEN_MASS_MASSMIGRATION,
-                                true, // no underflow bin 
+                                true, // no underflow bin
                                 true // overflow bin
                                 );
 

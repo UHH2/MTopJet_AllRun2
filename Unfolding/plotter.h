@@ -13,6 +13,7 @@
 #include <TVectorD.h>
 #include <TF1.h>
 #include <vector>
+#include <TLatex.h>
 
 class plotter{
 
@@ -30,8 +31,9 @@ class plotter{
   void draw_rec(TH1D* data, TH1D* sig, TH1D* bgr, TString file_name);
   void draw_purity(TH1D* numerator, TH1D* denominator, TString file_name);
   TH1D* get_difference(TH1D* hist1, TH1D* hist2);
-  void draw_chi2(TF1 * fit, std::vector<double> masses, std::vector<double> chi2, TString file_name);
-  void draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString file_name);
+  void draw_chi2(TF1 * fit, std::vector<double> masses, std::vector<double> chi2, double mass, double uncert, TString file_name);
+  void draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString category, TString file_name);
+  void draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_name);
 
  private:
   TH1* add_error_bar(TH1* hist, std::vector<double> errors);

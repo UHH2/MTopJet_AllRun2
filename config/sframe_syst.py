@@ -21,8 +21,6 @@ sys_uncerts = {
      'MUID_down'             : {'MuScale_variation':'down'},
      'MUTR_up'               : {'MuTrigger_variation':'up'},
      'MUTR_down'             : {'MuTrigger_variation':'down'},
-     'MUTRK_up'              : {'MuTrk_variation':'up'},
-     'MUTRK_down'            : {'MuTrk_variation':'down'},
      'BTAG_bc_up'            : {'BTag_variation':'up_bc'},
      'BTAG_bc_down'          : {'BTag_variation':'down_bc'},
      'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
@@ -71,7 +69,7 @@ class MySFrameBatch(SFrame):
         self.xml_doctype = self.xml_doctype + """
 <!--
    <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
-   <ConfigSGE RAM="2" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PostSelMu_workdir"/> 
+   <ConfigSGE RAM="2" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/schwarzd/PostSelMu_workdir"/>
 -->
 """
         if os.path.exists(self.cwd + 'workdir'):
@@ -90,7 +88,7 @@ sframe_tools = ToolChain(
             xml_tree_callback=set_uncert_func(uncert),
             name='SFrame_' + uncert,
             halt_on_exception=False,
-        ) 
+        )
         for uncert in sys_uncerts
     )
 )

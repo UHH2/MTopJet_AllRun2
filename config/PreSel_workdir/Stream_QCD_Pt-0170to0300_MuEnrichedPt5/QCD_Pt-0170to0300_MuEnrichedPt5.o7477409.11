@@ -1,0 +1,161 @@
+ ( INFO  )  SCycleController   : Initializing
+ ( INFO  )  SCycleController   : Deleting all analysis cycle algorithms from memory
+ ( INFO  )  SCycleController   : Reading xml file: 'QCD_Pt-0170to0300_MuEnrichedPt5_12.xml'
+ ( INFO  )  SCycleController   : Created cycle 'uhh2::AnalysisModuleRunner'
+ ( INFO  )  SCycleBaseExec     : Initializing from configuration
+ ( INFO  )  SCycleBaseExec     : Reading SInputData: MC - QCD_Pt-0170to0300_MuEnrichedPt5
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleConfig       :                     Cycle configuration
+ ( INFO  )  SCycleConfig       :   - Running mode: LOCAL
+ ( INFO  )  SCycleConfig       :   - Target luminosity: 1
+ ( INFO  )  SCycleConfig       :   - Output directory: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel//PreSel_workdir/
+ ( INFO  )  SCycleConfig       :   - Post-fix: _11
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SInputData         :  Type               : MC
+ ( INFO  )  SInputData         :  Version            : QCD_Pt-0170to0300_MuEnrichedPt5
+ ( INFO  )  SInputData         :  Total luminosity   : 2018.16pb-1
+ ( INFO  )  SInputData         :  NEventsMax         : -1
+ ( INFO  )  SInputData         :  NEventsSkip        : 0
+ ( INFO  )  SInputData         :  Cacheable          : No
+ ( INFO  )  SInputData         :  Skip validation    : No
+ ( INFO  )  SInputData         :  Skip file lookup   : No
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-148.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-149.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-15.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-150.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-151.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-152.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-153.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-154.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-155.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-156.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-157.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-158.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-159.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-16.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-160.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-161.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-162.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-163.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-164.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-165.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-166.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-167.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-168.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-169.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-17.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-170.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-171.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-172.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-173.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-174.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-175.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-176.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-177.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-178.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-179.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-18.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-180.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-181.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-182.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/crab_QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8_80Xv5_13_Jun_18/180613_115705/0000/Ntuple_3-183.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat input tree' (type)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat output tree' (type)
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleController   : Job 'MTopJetPreSelectionJob' configured
+ ( INFO  )  SCycleController   : Time needed for initialisation:   0.17 s
+ ( INFO  )  SCycleController   : Entering ExecuteAllCycles()
+ ( INFO  )  SInputData         : Input type "MC" version "QCD_Pt-0170to0300_MuEnrichedPt5" : 85011 events
+ ( INFO  )  SCycleController   : Executing Cycle #0 ('uhh2::AnalysisModuleRunner') locally
+ ( INFO  )  SCycleController   : Processing input data type: MC version: QCD_Pt-0170to0300_MuEnrichedPt5
+ ( INFO  )  SCycleBaseExec     : Initialised InputData "MC" (Version:QCD_Pt-0170to0300_MuEnrichedPt5) on worker node
+ ( INFO  )  SCycleBaseExec     : Processing entry: 999 (999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1999 (1999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 804 (2999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1804 (3999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 702 (4999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1702 (5999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 562 (6999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1562 (7999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 479 (8999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1479 (9999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 337 (10999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1337 (11999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 221 (12999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1221 (13999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 151 (14999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1151 (15999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2151 (16999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 911 (17999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1911 (18999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 878 (19999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1878 (20999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 800 (21999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1800 (22999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 741 (23999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1741 (24999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 538 (25999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1538 (26999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 431 (27999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1431 (28999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 280 (29999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1280 (30999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 292 (31999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1292 (32999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 299 (33999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1299 (34999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 286 (35999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1286 (36999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 178 (37999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1178 (38999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 30 (39999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1030 (40999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2030 (41999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 807 (42999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1807 (43999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 721 (44999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1721 (45999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 556 (46999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1556 (47999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 510 (48999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1510 (49999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 332 (50999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1332 (51999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 105 (52999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1105 (53999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2105 (54999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 871 (55999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1871 (56999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 706 (57999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1706 (58999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 576 (59999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1576 (60999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 332 (61999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1332 (62999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 226 (63999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1226 (64999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 75 (65999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1075 (66999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2075 (67999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 932 (68999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1932 (69999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 835 (70999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1835 (71999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 577 (72999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1577 (73999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 474 (74999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1474 (75999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 232 (76999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1232 (77999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 189 (78999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1189 (79999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 146 (80999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1146 (81999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 98 (82999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1098 (83999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2098 (84999 / 85011 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Terminated InputData "MC" (Version:QCD_Pt-0170to0300_MuEnrichedPt5) on worker node
+ ( INFO  )  SCycleController   : Writing output of "uhh2::AnalysisModuleRunner" to: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel//PreSel_workdir/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0170to0300_MuEnrichedPt5_11.root
+ ( INFO  )  SCycleController   : Overall cycle statistics:
+ ( INFO  )  SCycleController   :      85011 Events - Real time  71.62 s  -  1187 Hz | CPU time  34.78 s  -  2444 Hz

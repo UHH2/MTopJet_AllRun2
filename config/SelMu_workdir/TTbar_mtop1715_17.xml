@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
+  <!ENTITY NEVT "-1">
+
+  <!ENTITY channel "muon">
+
+ <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
+ <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PreSel">
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon">
+
+
+<!-- =============================================== DATA =========================================================================== -->
+  <!ENTITY SingleMuonB    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonB.root">
+  <!ENTITY SingleMuonC    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonC.root">
+  <!ENTITY SingleMuonD    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonD.root">
+  <!ENTITY SingleMuonE    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonE.root">
+  <!ENTITY SingleMuonF    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonF.root">
+  <!ENTITY SingleMuonG    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonG.root">
+  <!ENTITY SingleMuonH    "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleMuonH.root">
+
+<!-- =============================================== Single Top ===================================================================== -->
+  <!ENTITY ST_t-channel_antitop    "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_t-channel_antitop.root">
+  <!ENTITY ST_t-channel_top        "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_t-channel_top.root">
+  <!ENTITY ST_s-channel            "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_s-channel.root">
+  <!ENTITY ST_tW_antitop           "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_tW_antitop.root">
+  <!ENTITY ST_tW_top               "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_tW_top.root">
+
+<!-- =============================================== ttbar =========================================================================== -->
+  <!ENTITY TTbar_Mtt0000to0700    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700.root">
+  <!ENTITY TTbar_Mtt0700to1000    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0700to1000.root">
+  <!ENTITY TTbar_Mtt1000toInft    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt1000toInft.root">
+<!-- =============================================== ttbar other samples ============================================================= -->
+  <!ENTITY TTbar_mtop1665    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665.root">
+  <!ENTITY TTbar_mtop1695    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695.root">
+  <!ENTITY TTbar_mtop1715    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715.root">
+  <!ENTITY TTbar_mtop1735    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735.root">
+  <!ENTITY TTbar_mtop1755    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755.root">
+  <!ENTITY TTbar_mtop1785    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785.root">
+
+  <!ENTITY  TTbar_amcatnlo-pythia   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root">
+  <!ENTITY  TTbar_powheg-herwig   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_powheg-herwig.root">
+
+
+<!-- =============================================== DiBoson =========================================================================== -->
+  <!ENTITY  WW    "&INdir;/uhh2.AnalysisModuleRunner.MC.WW.root">
+  <!ENTITY  WZ    "&INdir;/uhh2.AnalysisModuleRunner.MC.WZ.root">
+  <!ENTITY  ZZ    "&INdir;/uhh2.AnalysisModuleRunner.MC.ZZ.root">
+<!-- =============================================== QCD Mu =========================================================================== -->
+  <!ENTITY  QCD_Pt-0015to0020_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0015to0020_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0020to0030_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0020to0030_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0030to0050_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0030to0050_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0050to0080_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0050to0080_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0080to0120_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0080to0120_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0120to0170_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0120to0170_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0170to0300_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0170to0300_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0300to0470_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0300to0470_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0470to0600_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0470to0600_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0600to0800_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0600to0800_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-0800to1000_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0800to1000_MuEnrichedPt5.root">
+  <!ENTITY  QCD_Pt-1000toInft_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-1000toInft_MuEnrichedPt5.root">
+<!-- =============================================== W+jets =========================================================================== -->
+  <!ENTITY  WJetsToLNu_Pt0100to0250   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_Pt0100to0250.root">
+  <!ENTITY  WJetsToLNu_Pt0250to0400   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_Pt0250to0400.root">
+  <!ENTITY  WJetsToLNu_Pt0400to0600   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_Pt0400to0600.root">
+  <!ENTITY  WJetsToLNu_Pt0600toInft   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_Pt0600toInft.root">
+<!-- =============================================== Z+jets =========================================================================== -->
+  <!ENTITY DYJetsToLL_LO_M50_HT0070to0100    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0070to0100.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT0100to0200    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0100to0200.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT0200to0400    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT0400to0600    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0400to0600.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT0600to0800    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0600to0800.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT0800to1200    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0800to1200.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT1200to2500    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT1200to2500.root">
+  <!ENTITY DYJetsToLL_LO_M50_HT2500toInft    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT2500toInft.root">
+
+]>
+
+<!--
+   <ConfigParse NEventsBreak="250000" LastBreak="0" FileSplit="0"/>
+   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="SelMu_workdir"/>
+-->
+
+<JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
+	<Library Name="libSUHH2MTopJet"/>
+	<Package Name="libSUHH2MTopJet"/>
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon//SelMu_workdir/" PostFix="_16" TargetLumi="35867">
+		<InputData Cacheable="False" Lumi="95561.646" NEventsMax="250000" NEventsSkip="4000000" Type="MC" Version="TTbar_mtop1715">
+			<In FileName="/nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715.root" Lumi="0.0"/>
+			<OutputTree Name="AnalysisTree"/>
+			<InputTree Name="AnalysisTree"/>
+		</InputData>
+		<UserConfig>
+			<Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+			<Item Name="GenParticleCollection" Value="GenParticles"/>
+			<Item Name="ElectronCollection" Value="slimmedElectronsUSER"/>
+			<Item Name="MuonCollection" Value="slimmedMuonsUSER"/>
+			<Item Name="TauCollection" Value="slimmedTaus"/>
+			<Item Name="JetCollection" Value="slimmedJets"/>
+			<Item Name="GenJetCollection" Value="slimmedGenJets"/>
+			<Item Name="TopJetCollection" Value="slimmedJetsAK8_SoftDrop"/>
+			<Item Name="GenTopJetCollection" Value="ak8GenJetsSoftDrop"/>
+			<Item Name="additionalBranches" Value="xconePuppi xconeCHS genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets passed_gensel passed_recsel"/>
+			<Item Name="METName" Value="slimmedMETs"/>
+			<Item Name="use_sframe_weight" Value="false"/>
+			<Item Name="dometfilters" Value="true"/>
+			<Item Name="dopvfilter" Value="true"/>
+			<Item Name="lumi_file" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+			<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root"/>
+			<Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root"/>
+			<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root"/>
+			<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root"/>
+			<Item Name="channel" Value="muon"/>
+			<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
+			<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv"/>
+			<Item Name="jecsmear_direction" Value="nominal"/>
+			<Item Name="jersmear_direction" Value="nominal"/>
+			<Item Name="JetCorrection_direction" Value="nominal"/>
+			<Item Name="AnalysisModule" Value="MTopJetSelectionModule"/>
+		</UserConfig>
+	</Cycle>
+</JobConfiguration>

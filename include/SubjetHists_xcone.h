@@ -37,6 +37,8 @@ protected:
 
     TH1F *JEC_all_subjets, *JEC_L1_all_subjets, *JEC_L2L3_all_subjets;
     TH1F *JEC_had_subjets, *JEC_L1_had_subjets, *JEC_L2L3_had_subjets;
+    TH1F *JEC_had_bjet, *JEC_L1_had_bjet, *JEC_L2L3_had_bjet;
+    TH1F *JEC_had_lightjets, *JEC_L1_had_lightjets, *JEC_L2L3_had_lightjets;
     TH1F *JEC_lep_subjets, *JEC_L1_lep_subjets, *JEC_L2L3_lep_subjets;
     TH1F *JEC_ak4, *JEC_L1_ak4, *JEC_L2L3_ak4;
 

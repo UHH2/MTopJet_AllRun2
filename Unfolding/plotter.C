@@ -60,7 +60,7 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
-  output->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
   output->GetYaxis()->SetTitleOffset(1.1);
@@ -114,7 +114,7 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
-  output->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
   output->GetYaxis()->SetTitleOffset(1.1);
@@ -181,7 +181,7 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
-  output->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
   output->GetYaxis()->SetTitleOffset(1.1);
@@ -197,11 +197,11 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   gStyle->SetEndErrorSize(5);
 
   mtop_templates[0]->SetLineColor(kRed);
-  mtop_templates[1]->SetLineColor(kGreen);
-  mtop_templates[2]->SetLineColor(kOrange);
+  mtop_templates[1]->SetLineColor(kRed);
+  mtop_templates[2]->SetLineColor(kRed);
   mtop_templates[3]->SetLineColor(13);
-  mtop_templates[4]->SetLineColor(kBlue);
-  mtop_templates[5]->SetLineColor(kMagenta);
+  mtop_templates[4]->SetLineColor(kAzure+7);
+  mtop_templates[5]->SetLineColor(kAzure+7);
   mtop_templates[6]->SetLineColor(kAzure+7);
 
   for(unsigned int i = 0; i < mtop_templates.size(); i++){
@@ -209,7 +209,7 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
     if(show[i]) mtop_templates[i]->Draw("HIST SAME");
   }
   output->Draw("E1 SAME"); // draw again to set markers in front
-  TLegend *l=new TLegend(0.5,0.65,0.85,0.85);
+  TLegend *l=new TLegend(0.56,0.65,0.78,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"data unfolded","pl");
@@ -313,7 +313,7 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
   sig->Add(bgr, 1.);
-  sig->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  sig->GetXaxis()->SetTitle("detector binning");
   sig->GetYaxis()->SetTitle("events");
   sig->GetYaxis()->SetTitleOffset(1.5);
   sig->GetYaxis()->SetNdivisions(505);
@@ -354,7 +354,7 @@ void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
   TH1D* hist = (TH1D*) hist_->Clone("hist");
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15);
-  hist->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  hist->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   hist->GetYaxis()->SetTitle("events");
   hist->GetYaxis()->SetTitleOffset(1.5);
   hist->GetYaxis()->SetNdivisions(505);
@@ -378,7 +378,7 @@ void plotter::draw_delta(TH1* hist_, TString file_name){
   TH1* hist = (TH1*) hist_->Clone("hist");
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15);
-  hist->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  hist->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   hist->GetYaxis()->SetTitle("#Delta events");
   hist->GetYaxis()->SetTitleOffset(1.5);
   hist->GetYaxis()->SetNdivisions(505);
@@ -390,7 +390,7 @@ void plotter::draw_delta(TH1* hist_, TString file_name){
   delete c;
 }
 
-void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString file_name){
+void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString category, TString file_name){
   TH1* total = (TH1*) total_->Clone();
   std::vector<TH1*> delta;
   for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
@@ -400,7 +400,7 @@ void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA,
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
   total->SetTitle("");
-  total->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  total->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   total->GetYaxis()->SetTitle("relative uncertainty [%]");
   total->GetYaxis()->SetTitleOffset(1.5);
   total->GetYaxis()->SetNdivisions(505);
@@ -424,7 +424,8 @@ void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA,
 
   // LEGEND
   TLegend *leg = new TLegend(0.63,0.6,0.88,0.88);
-  leg->AddEntry(total, "exp. sys combined", "f");
+  if(category == "exp")        leg->AddEntry(total, "exp. uncertainties combined", "f");
+  else if(category == "model") leg->AddEntry(total, "model uncertainties combined", "f");
   for(unsigned int i=0; i<delta.size(); i++) leg->AddEntry(delta[i],UncertNames[i],"l");
   leg->Draw();
 
@@ -460,7 +461,7 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
 
   pseudotruth->SetTitle(" ");
   pseudotruth->GetYaxis()->SetRangeUser(0., ymax);
-  pseudotruth->GetXaxis()->SetTitle("Leading Jet Mass [GeV]");
+  pseudotruth->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
   if(norm) pseudotruth->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else     pseudotruth->GetYaxis()->SetTitle("events");
   pseudotruth->GetYaxis()->SetTitleOffset(1.1);
@@ -548,7 +549,7 @@ void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_nam
  ██████ ██   ██ ██     ███████
 */
 
-void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, TString file_name){
+void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, double mass, double uncert, TString file_name){
   TF1 * fit = (TF1*)fit_->Clone("fit");
   TVectorD masses(masses_.size());
   TVectorD chi2(chi2_.size());
@@ -570,8 +571,82 @@ void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<dou
   chi_hist->SetLineColor(1);
   chi_hist->Draw("AP");
   fit->Draw("SAME");
+
+  // write extracted mass value into plot
+  TLatex text;
+  text.SetNDC(kTRUE);
+  text.SetTextFont(43);
+  text.SetTextSize(18);
+  char mass_text[32];
+  sprintf(mass_text, "%.5g", mass);
+  char uncert_text[32];
+  if(uncert < 1) sprintf(uncert_text, "%.2g", uncert);
+  else           sprintf(uncert_text, "%.3g", uncert);
+  TString masstext = "m_{top}^{MC} = ";
+  masstext += mass_text;
+  masstext += " #pm ";
+  masstext += uncert_text;
+  text.DrawLatex(.4,.6, masstext);
+
   c->SaveAs(directory + file_name + ".pdf");
   return;
+}
+
+/*
+██████  ██  █████  ███████
+██   ██ ██ ██   ██ ██
+██████  ██ ███████ ███████
+██   ██ ██ ██   ██      ██
+██████  ██ ██   ██ ███████
+*/
+
+void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_name){
+  TH1D* bias = (TH1D*) bias_->Clone("bias");
+  TH1D* truth = (TH1D*) truth_->Clone("truth");
+  TH1D* output = (TH1D*) output_->Clone("output");
+
+  double ymax_temp = 0;
+  if(truth->GetMaximum() > ymax_temp) ymax_temp = truth->GetMaximum();
+  if(bias->GetMaximum() > ymax_temp) ymax_temp = bias->GetMaximum();
+  if(output->GetMaximum() > ymax_temp) ymax_temp = output->GetMaximum();
+  double ymax = 1.1 * ymax_temp;
+
+  TCanvas *c= new TCanvas("Bias Distribution","",600,600);
+  TGaxis::SetMaxDigits(3);
+  gPad->SetLeftMargin(0.15);
+  truth->SetTitle(" ");
+  truth->GetYaxis()->SetRangeUser(0., ymax);
+  truth->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  truth->GetYaxis()->SetTitle("events");
+  truth->GetYaxis()->SetTitleOffset(1.1);
+  truth->GetXaxis()->SetTitleOffset(0.9);
+  truth->GetYaxis()->SetTitleSize(0.05);
+  truth->GetXaxis()->SetTitleSize(0.05);
+  truth->GetYaxis()->SetNdivisions(505);
+
+  truth->SetLineWidth(4);
+  truth->SetLineColor(kRed);
+  bias->SetLineWidth(4);
+  bias->SetLineColor(kAzure+7);
+  output->SetLineColor(kBlack);
+  output->SetMarkerColor(kBlack);
+  output->SetMarkerStyle(8);
+  output->SetMarkerSize(1);
+
+  truth->Draw("HIST SAME");
+  bias->Draw("HIST SAME");
+  output->Draw("E1 SAME");
+  TLegend *l=new TLegend(0.5,0.6,0.85,0.85);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  l->AddEntry(output,"unfolded result","pl");
+  l->AddEntry(truth,"truth","pl");
+  l->AddEntry(bias,"bias distribution","pl");
+  l->SetTextSize(0.04);
+  l->Draw();
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
 }
 
 /*

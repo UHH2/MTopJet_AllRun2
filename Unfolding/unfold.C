@@ -85,6 +85,9 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   CorM = unfold.GetRhoIJtotal("", 0, "measurement_gen","pt[C]",kTRUE);
   ProbM = unfold.GetProbabilityMatrix("", 0, kTRUE);
 
+  // Get Bias Distribution
+  bias = unfold.GetBias( "",0,"measurement_gen","pt[C]",kTRUE);
+
   // Statistical uncertainties of input distribution
   CovInputStat = unfold.GetEmatrixInput("", 0, "measurement_gen","pt[C]", kTRUE);
   // Statistical ucertainties of matrix
@@ -151,6 +154,9 @@ vector<TH2*> unfolding::GetBgrScaleCov(){
   return CovBgrScale;
 }
 
+TH1* unfolding::GetBiasDistribution(){
+  return bias;
+}
 // TH2* unfolding::GetTotalCov(){
 //   return CovTotal;
 // }

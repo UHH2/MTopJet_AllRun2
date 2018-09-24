@@ -138,8 +138,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
      ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  ||
      ctx.get("dataset_version") == "TTbar_Mtt1000toInft"  ||
      ctx.get("dataset_version") == "TTbar_mtop1665"       ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext1"  ||
-     ctx.get("dataset_version") == "TTbar_mtop1695_ext2"  ||
+     ctx.get("dataset_version") == "TTbar_mtop1695"       ||
      ctx.get("dataset_version") == "TTbar_mtop1715"       ||
      ctx.get("dataset_version") == "TTbar_mtop1735"       ||
      ctx.get("dataset_version") == "TTbar_mtop1755"       ||

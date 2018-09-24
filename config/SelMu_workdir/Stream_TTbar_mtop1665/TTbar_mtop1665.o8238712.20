@@ -1,0 +1,80 @@
+ ( INFO  )  SCycleController   : Initializing
+ ( INFO  )  SCycleController   : Deleting all analysis cycle algorithms from memory
+ ( INFO  )  SCycleController   : Reading xml file: 'TTbar_mtop1665_21.xml'
+ ( INFO  )  SCycleController   : Created cycle 'uhh2::AnalysisModuleRunner'
+ ( INFO  )  SCycleBaseExec     : Initializing from configuration
+ ( INFO  )  SCycleBaseExec     : Reading SInputData: MC - TTbar_mtop1665
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleConfig       :                     Cycle configuration
+ ( INFO  )  SCycleConfig       :   - Running mode: LOCAL
+ ( INFO  )  SCycleConfig       :   - Target luminosity: 35867
+ ( INFO  )  SCycleConfig       :   - Output directory: /nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon//SelMu_workdir/
+ ( INFO  )  SCycleConfig       :   - Post-fix: _20
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SInputData         :  Type               : MC
+ ( INFO  )  SInputData         :  Version            : TTbar_mtop1665
+ ( INFO  )  SInputData         :  Total luminosity   : 23275.2pb-1
+ ( INFO  )  SInputData         :  NEventsMax         : 43294
+ ( INFO  )  SInputData         :  NEventsSkip        : 5000000
+ ( INFO  )  SInputData         :  Cacheable          : No
+ ( INFO  )  SInputData         :  Skip validation    : No
+ ( INFO  )  SInputData         :  Skip file lookup   : No
+ ( INFO  )  SInputData         :  Input File         : '/nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat input tree' (type)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat output tree' (type)
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleController   : Job 'MTopJetSelectionJob' configured
+ ( INFO  )  SCycleController   : Time needed for initialisation:   0.16 s
+ ( INFO  )  SCycleController   : Entering ExecuteAllCycles()
+ ( INFO  )  SInputData         : Input type "MC" version "TTbar_mtop1665" : 5043294 events
+ ( INFO  )  SCycleController   : Executing Cycle #0 ('uhh2::AnalysisModuleRunner') locally
+ ( INFO  )  SCycleController   : Processing input data type: MC version: TTbar_mtop1665
+ ( INFO  )  SCycleBaseExec     : Initialised InputData "MC" (Version:TTbar_mtop1665) on worker node
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5000999 (999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5001999 (1999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5002999 (2999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5003999 (3999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5004999 (4999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5005999 (5999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5006999 (6999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5007999 (7999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5008999 (8999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5009999 (9999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5010999 (10999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5011999 (11999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5012999 (12999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5013999 (13999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5014999 (14999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5015999 (15999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5016999 (16999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5017999 (17999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5018999 (18999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5019999 (19999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5020999 (20999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5021999 (21999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5022999 (22999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5023999 (23999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5024999 (24999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5025999 (25999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5026999 (26999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5027999 (27999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5028999 (28999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5029999 (29999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5030999 (30999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5031999 (31999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5032999 (32999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5033999 (33999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5034999 (34999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5035999 (35999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5036999 (36999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5037999 (37999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5038999 (38999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5039999 (39999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5040999 (40999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5041999 (41999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5042999 (42999 / 43294 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Terminated InputData "MC" (Version:TTbar_mtop1665) on worker node
+ ( INFO  )  SCycleController   : Writing output of "uhh2::AnalysisModuleRunner" to: /nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon//SelMu_workdir/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_20.root
+ ( INFO  )  SCycleController   : Overall cycle statistics:
+ ( INFO  )  SCycleController   :      43294 Events - Real time 364.74 s  -   119 Hz | CPU time 363.29 s  -   119 Hz

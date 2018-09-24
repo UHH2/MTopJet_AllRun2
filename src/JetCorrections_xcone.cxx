@@ -1,4 +1,15 @@
 #include "UHH2/MTopJet/include/JetCorrections_xcone.h"
+#include "UHH2/common/include/Utils.h"
+#include "UHH2/core/include/Utils.h"
+
+#include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "UHH2/JetMETObjects/interface/JetCorrectorParameters.h"
+
+#include <string>
+
+using namespace std;
+using namespace uhh2;
+
 
 // JEC_factor_raw has to be set to a non 0 value for JEC
 std::vector<TopJet> set_JEC_factor(std::vector<TopJet> jets){
@@ -28,6 +39,10 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
   // setup JEC for XCone
   isMC = (ctx.get("dataset_type") == "MC");
   jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, jet_collection_rec));
+
+  // jet_corrector_MC_b.reset(new GenericSubJetCorrector_flavor(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC_flavorB, jet_collection_rec, "b"));
+  // jet_corrector_MC_ud.reset(new GenericSubJetCorrector_flavor(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC_flavorUD, jet_collection_rec, "ud"));
+
   jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection_rec));
   jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection_rec));
   jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection_rec));
@@ -36,8 +51,12 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
 
 bool JetCorrections_xcone::process(uhh2::Event & event){
   std::vector<TopJet> jets = event.get(h_topjets);
-  event.set(h_topjets, set_JEC_factor(jets)); // first set JEC_factor_raw to a non-0 value
-  if(isMC)jet_corrector_MC->process(event);
+  // event.set(h_topjets, set_JEC_factor(jets)); // first set JEC_factor_raw to a non-0 value
+  if(isMC){
+    //jet_corrector_MC_b->process(event);
+    //jet_corrector_MC_ud->process(event);
+    jet_corrector_MC->process(event);
+  }
   else{
     if(event.run <= runnr_BCD)         jet_corrector_BCD->process(event);
     else if(event.run < runnr_EFearly) jet_corrector_EFearly->process(event);
@@ -45,6 +64,7 @@ bool JetCorrections_xcone::process(uhh2::Event & event){
     else if(event.run > runnr_FlateG)  jet_corrector_H->process(event);
     else throw runtime_error("Jet Correction: run number not covered by if-statements in process-routine.");
   }
+
   return true;
 }
 

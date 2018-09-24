@@ -1,0 +1,36 @@
+hadd Target file: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400.root
+hadd compression setting for all ouput: 1
+hadd Source file 1: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_0.root
+hadd Source file 2: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_1.root
+hadd Source file 3: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_2.root
+hadd Source file 4: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_3.root
+hadd Source file 5: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_4.root
+hadd Source file 6: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_5.root
+hadd Source file 7: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_6.root
+hadd Source file 8: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_7.root
+hadd Source file 9: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_8.root
+hadd Source file 10: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_9.root
+hadd Source file 11: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_10.root
+hadd Source file 12: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_11.root
+hadd Source file 13: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_12.root
+hadd Source file 14: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_13.root
+hadd Source file 15: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_14.root
+hadd Source file 16: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_15.root
+hadd Source file 17: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_16.root
+hadd Source file 18: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_17.root
+hadd Source file 19: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_18.root
+hadd Source file 20: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_19.root
+hadd Source file 21: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_20.root
+hadd Source file 22: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_21.root
+hadd Source file 23: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_22.root
+hadd Source file 24: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_23.root
+hadd Source file 25: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_24.root
+hadd Source file 26: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_25.root
+hadd Source file 27: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_26.root
+hadd Source file 28: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_27.root
+hadd Source file 29: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_28.root
+hadd Source file 30: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_29.root
+hadd Source file 31: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_30.root
+hadd Source file 32: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400_31.root
+hadd Target path: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400.root:/
+hadd Target path: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0200to0400.root:/SFrame

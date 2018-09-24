@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
+  <!ENTITY NEVT "-1">
+
+
+ <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon">
+
+ <!ENTITY Sample    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665.root">
+
+]>
+
+<!--
+   <ConfigParse NEventsBreak="150000" LastBreak="0" FileSplit="0"/>
+   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="PostSelMu_workdir"/>
+-->
+
+<JobConfiguration JobName="SplitSampleJob" OutputLevel="INFO">
+  <Library Name="libSUHH2MTopJet"/>
+  <Package Name="SUHH2MTopJet.par"/>
+
+
+  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&INdir;/" PostFix="_split" TargetLumi="1">
+  <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
+
+
+    <InputData Version="Sample" Lumi="1" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&Sample;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<!-- ================================================================================================================================== -->
+<!-- ====================================================== User Config =============================================================== -->
+<!-- ================================================================================================================================== -->
+
+    <UserConfig>
+        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+        <Item Name="GenParticleCollection"   Value="GenParticles"/>
+        <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+        <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+        <Item Name="TauCollection"           Value="slimmedTaus"/>
+
+        <Item Name="JetCollection"           Value="slimmedJets"/>
+        <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
+        <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
+	      <Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
+
+      	<Item Name="additionalBranches" Value="weight xconePuppi xconeCHS xconeCHS_noJEC xconeCHS_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined passed_gensel_2 passed_recsel_2"/>
+
+      	<Item Name="METName" Value="slimmedMETs"/>
+
+        <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->
+        <!-- since the weight has already been scaled in the Selection, do not do it here -->
+      	<Item Name="use_sframe_weight" Value="true"/>
+
+
+      	<Item Name="AnalysisModule" Value="SplitSampleModule"/>
+  </UserConfig>
+
+  </Cycle>
+</JobConfiguration>

@@ -1,0 +1,103 @@
+ ( INFO  )  SCycleController   : Initializing
+ ( INFO  )  SCycleController   : Deleting all analysis cycle algorithms from memory
+ ( INFO  )  SCycleController   : Reading xml file: 'DYJetsToLL_LO_M50_HT0400to0600_14.xml'
+ ( INFO  )  SCycleController   : Created cycle 'uhh2::AnalysisModuleRunner'
+ ( INFO  )  SCycleBaseExec     : Initializing from configuration
+ ( INFO  )  SCycleBaseExec     : Reading SInputData: MC - DYJetsToLL_LO_M50_HT0400to0600
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleConfig       :                     Cycle configuration
+ ( INFO  )  SCycleConfig       :   - Running mode: LOCAL
+ ( INFO  )  SCycleConfig       :   - Target luminosity: 1
+ ( INFO  )  SCycleConfig       :   - Output directory: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel//PreSel_workdir/
+ ( INFO  )  SCycleConfig       :   - Post-fix: _13
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SInputData         :  Type               : MC
+ ( INFO  )  SInputData         :  Version            : DYJetsToLL_LO_M50_HT0400to0600
+ ( INFO  )  SInputData         :  Total luminosity   : 564192pb-1
+ ( INFO  )  SInputData         :  NEventsMax         : -1
+ ( INFO  )  SInputData         :  NEventsSkip        : 0
+ ( INFO  )  SInputData         :  Cacheable          : No
+ ( INFO  )  SInputData         :  Skip validation    : No
+ ( INFO  )  SInputData         :  Skip file lookup   : No
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1188.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1189.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1190.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1191.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1192.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1194.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1195.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Input File         : '/pnfs/desy.de/cms/tier2/store/user/raggleto/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_DYJetsToLL_M-50_HT-400to600_ext1_80Xv5_21_Jun_18/180621_050500/0001/Ntuple_1196.root' (file) | '0' (lumi)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat input tree' (type)
+ ( INFO  )  SInputData         :  Tree               : 'AnalysisTree' (name) | 'Flat output tree' (type)
+ ( INFO  )  SInputData         :  ---------------------------------------------------------
+ ( INFO  )  SCycleConfig       : ===========================================================
+ ( INFO  )  SCycleController   : Job 'MTopJetPreSelectionJob' configured
+ ( INFO  )  SCycleController   : Time needed for initialisation:   0.95 s
+ ( INFO  )  SCycleController   : Entering ExecuteAllCycles()
+ ( INFO  )  SInputData         : Input type "MC" version "DYJetsToLL_LO_M50_HT0400to0600" : 59589 events
+ ( INFO  )  SCycleController   : Executing Cycle #0 ('uhh2::AnalysisModuleRunner') locally
+ ( INFO  )  SCycleController   : Processing input data type: MC version: DYJetsToLL_LO_M50_HT0400to0600
+ ( INFO  )  SCycleBaseExec     : Initialised InputData "MC" (Version:DYJetsToLL_LO_M50_HT0400to0600) on worker node
+ ( INFO  )  SCycleBaseExec     : Processing entry: 999 (999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1999 (1999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2999 (2999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3999 (3999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4999 (4999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5999 (5999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6999 (6999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 588 (7999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1588 (8999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2588 (9999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3588 (10999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4588 (11999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5588 (12999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6588 (13999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 116 (14999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1116 (15999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2116 (16999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3116 (17999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4116 (18999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5116 (19999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6116 (20999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 7116 (21999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 614 (22999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1614 (23999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2614 (24999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3614 (25999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4614 (26999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5614 (27999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6614 (28999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 160 (29999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1160 (30999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2160 (31999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3160 (32999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4160 (33999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5160 (34999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6160 (35999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 7160 (36999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 679 (37999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1679 (38999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2679 (39999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3679 (40999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4679 (41999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5679 (42999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6679 (43999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 7679 (44999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 997 (45999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1997 (46999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2997 (47999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3997 (48999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4997 (49999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5997 (50999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6997 (51999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 555 (52999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 1555 (53999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 2555 (54999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 3555 (55999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 4555 (56999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 5555 (57999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Processing entry: 6555 (58999 / 59589 events processed so far)
+ ( INFO  )  SCycleBaseExec     : Terminated InputData "MC" (Version:DYJetsToLL_LO_M50_HT0400to0600) on worker node
+ ( INFO  )  SCycleController   : Writing output of "uhh2::AnalysisModuleRunner" to: /nfs/dust/cms/user/schwarzd/MTopJet/PreSel//PreSel_workdir/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0400to0600_13.root
+ ( INFO  )  SCycleController   : Overall cycle statistics:
+ ( INFO  )  SCycleController   :      59589 Events - Real time  65.29 s  -   913 Hz | CPU time  42.26 s  -  1410 Hz

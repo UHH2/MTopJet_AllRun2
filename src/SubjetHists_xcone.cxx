@@ -32,6 +32,14 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   JEC_L1_had_subjets = book<TH1F>("JEC_L1_had_subjets", "JEC factor L1", 100, 0, 2);
   JEC_L2L3_had_subjets = book<TH1F>("JEC_L2L3_had_subjets", "JEC factor L2L3", 100, 0, 2);
 
+  JEC_had_bjet = book<TH1F>("JEC_had_bjet", "JEC factor", 100, 0, 2);
+  JEC_L1_had_bjet = book<TH1F>("JEC_L1_had_bjet", "JEC factor L1", 100, 0, 2);
+  JEC_L2L3_had_bjet = book<TH1F>("JEC_L2L3_had_bjet", "JEC factor L2L3", 100, 0, 2);
+
+  JEC_had_lightjets = book<TH1F>("JEC_had_lightjets", "JEC factor", 100, 0, 2);
+  JEC_L1_had_lightjets = book<TH1F>("JEC_L1_had_lightjets", "JEC factor L1", 100, 0, 2);
+  JEC_L2L3_had_lightjets = book<TH1F>("JEC_L2L3_had_lightjets", "JEC factor L2L3", 100, 0, 2);
+
   JEC_lep_subjets = book<TH1F>("JEC_lep_subjets", "JEC factor", 100, 0, 2);
   JEC_L1_lep_subjets = book<TH1F>("JEC_L1_lep_subjets", "JEC factor L1", 100, 0, 2);
   JEC_L2L3_lep_subjets = book<TH1F>("JEC_L2L3_lep_subjets", "JEC factor L2L3", 100, 0, 2);
@@ -239,6 +247,17 @@ void SubjetHists_xcone::fill(const Event & event){
     JEC_L2L3_ak4->Fill(JEC_factor/JEC_L1factor, weight);
   }
 
+  // identify leading subjet (and call it bjet)
+  double ptmax = 0;
+  int index_bjet = -1;
+  for(unsigned int i=0; i<had_subjets.size(); i++){
+    if(had_subjets[i].pt() > ptmax){
+      ptmax = had_subjets[i].pt();
+      index_bjet = i;
+    }
+  }
+  ////
+
   double tot_area=0;
   for(unsigned int i=0; i<had_subjets.size(); i++){
     pt_had_subjets->Fill(had_subjets.at(i).pt(), weight);
@@ -258,6 +277,17 @@ void SubjetHists_xcone::fill(const Event & event){
     JEC_had_subjets->Fill(JEC_factor, weight);
     JEC_L1_had_subjets->Fill(JEC_L1factor, weight);
     JEC_L2L3_had_subjets->Fill(JEC_factor/JEC_L1factor, weight);
+
+    if(i == index_bjet){
+      JEC_had_bjet->Fill(JEC_factor, weight);
+      JEC_L1_had_bjet->Fill(JEC_L1factor, weight);
+      JEC_L2L3_had_bjet->Fill(JEC_factor/JEC_L1factor, weight);
+    }
+    else if(i != index_bjet && i != -1){
+      JEC_had_lightjets->Fill(JEC_factor, weight);
+      JEC_L1_had_lightjets->Fill(JEC_L1factor, weight);
+      JEC_L2L3_had_lightjets->Fill(JEC_factor/JEC_L1factor, weight);
+    }
 
     double eta = sqrt(had_subjets.at(i).eta() * had_subjets.at(i).eta());
     eta_abs_had_subjets->Fill(eta, weight);
