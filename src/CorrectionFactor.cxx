@@ -10,14 +10,16 @@ double CorrectionFactor::get_factor(double pt, double eta){
   }
 
   // get factor from function
-  if(pt > 400) pt = 400;
+  if(pt > 450) pt = 450;
   if(pt < 0)   pt = 0;
 
 
   double factor;
-  if(CorUp || CorDown) factor = CorrectionGraphs[etabin]->Eval(pt);
-  else factor = CorrectionFunctions[etabin]->Eval(pt);
-
+  if(etabin == 11) factor = 1; // because the high eta region does not work
+  else {
+    if(CorUp || CorDown) factor = CorrectionGraphs[etabin]->Eval(pt);
+    else factor = CorrectionFunctions[etabin]->Eval(pt);
+  }
   return factor;
 }
 
@@ -25,7 +27,7 @@ void CorrectionFactor::get_function(){
 
   TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
-  filename = dir + "Correction.root";
+  filename = dir + "Correction_allHad.root";
   TFile *file = new TFile(filename);
 
   TString histname;
@@ -69,9 +71,10 @@ Particle GetLepton(uhh2::Event & event){
 }
 
 
-CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar):
-  h_oldjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS")),
-  h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name))
+CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar, bool allHad_):
+h_oldjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS")),
+h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name)),
+allHad(allHad_)
 {
   CorUp = false;
   CorDown=false;
@@ -87,17 +90,19 @@ bool CorrectionFactor::process(uhh2::Event & event){
   std::vector<TopJet> newjets;
   for(unsigned int i=0; i < oldjets.size(); i++) newjets.push_back(oldjets.at(i));
 
-  // get had jet, to only correct had subjets
-  Particle lepton = GetLepton(event);
+  // get had jet, to only correct had subjets (in l+jets case)
   int had_nr = 0;
   int lep_nr = 1;
-  if(deltaR(lepton, oldjets.at(0)) < deltaR(lepton, oldjets.at(1))){
-    had_nr = 1;
-    lep_nr = 0;
+  if(!allHad){
+    Particle lepton = GetLepton(event);
+    if(deltaR(lepton, oldjets.at(0)) < deltaR(lepton, oldjets.at(1))){
+      had_nr = 1;
+      lep_nr = 0;
+    }
   }
 
   // leave lep subjets unchanged
-  newjets.at(lep_nr).set_subjets(oldjets.at(lep_nr).subjets());
+  if(!allHad) newjets.at(lep_nr).set_subjets(oldjets.at(lep_nr).subjets());
 
   // now correct had subjets
   std::vector<Jet> oldsubjets = oldjets.at(had_nr).subjets();
@@ -112,8 +117,25 @@ bool CorrectionFactor::process(uhh2::Event & event){
     newjet.set_v4(newjet_v4);  // Because of this, all JEC factors are set to the defaul value of 1
     newsubjets.push_back(newjet);
   }
-
   newjets.at(had_nr).set_subjets(newsubjets);
+
+  // if all Had, also correct second jet
+  if(allHad){
+    std::vector<Jet> oldsubjets2 = oldjets.at(lep_nr).subjets();
+    std::vector<Jet> newsubjets2;
+    LorentzVector newjet2_v4;
+    Jet newjet2;
+    float factor2;
+    for(unsigned int i=0; i < oldsubjets2.size(); i++){
+      factor2 = get_factor(oldsubjets2.at(i).pt(), oldsubjets2.at(i).eta());
+      newjet2_v4 = oldsubjets2.at(i).v4() * factor2;
+      newjet2 = oldsubjets2.at(i); // this acutally is not required
+      newjet2.set_v4(newjet2_v4);  // Because of this, all JEC factors are set to the defaul value of 1
+      newsubjets2.push_back(newjet2);
+    }
+    newjets.at(lep_nr).set_subjets(newsubjets2);
+  }
+
   event.set(h_newjets, newjets);
 
   return true;

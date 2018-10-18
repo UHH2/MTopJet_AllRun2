@@ -53,6 +53,8 @@ protected:
     TH1F *area_final;
     TH2F *area_pt_final;
 
+    TH2F *AreaVsPT, *AreaVsPT_ak4;
+
     uhh2::Event::Handle<std::vector<TopJet>>h_recfatjets;
 
 };

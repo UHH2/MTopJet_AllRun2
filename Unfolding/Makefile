@@ -55,8 +55,9 @@ SRC=$(shell ls TUnfold*$(TUNFOLDCODEVER).cxx)
 
 MY_MACRO=$(shell ls unfold_code*.C) # include my macros
 OBJ_binning = binning.o
-OBJ_unfold = do_unfolding.o unfold.o plotter.o sys_handler.o chi2fit.o normalise.o modelsys.o
+OBJ_unfold = do_unfolding.o unfold.o plotter.o sys_handler.o chi2fit.o normalise.o modelsys.o smearing.o
 OBJ_hist = hist_filler.o
+OBJ_smear = SmearInput.o
 
 ## this is for changing the code version
 TUNFOLDNEWVERSION:=V17.6
@@ -148,7 +149,7 @@ tar: $(VERSIONTAR)
 roottar: $(ROOTTAR)
 
 
-mtopjet: binning do_unfolding hist_filler
+mtopjet: binning do_unfolding hist_filler SmearInput
 
 binning: $(OBJ_binning)
 	$(CXX) $(CXXFLAGS) -o binning $(OBJ_binning) $(DICT) $(LDFLAGS) -l$(LIB) $(ROOTLIBS)
@@ -158,6 +159,9 @@ do_unfolding: $(OBJ_unfold)
 
 hist_filler: $(OBJ_hist)
 	$(CXX) $(CXXFLAGS) -o hist_filler $(OBJ_hist) $(DICT) $(LDFLAGS) -l$(LIB) $(ROOTLIBS)
+
+SmearInput: $(OBJ_smear)
+	$(CXX) $(CXXFLAGS) -o SmearInput $(OBJ_smear) $(DICT) $(LDFLAGS) -l$(LIB) $(ROOTLIBS)
 
 
 # extract doxygen documentation

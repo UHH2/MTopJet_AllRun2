@@ -28,3 +28,11 @@ to compile scripts do:
 'make lib'
 
 'make mtopjet'
+
+To Run Unfolding:
+
+1) ./hist_filler fine true/false
+
+2) ./SmearInput
+
+3) ./do_unfolding data/pseudo1/pseudo2 fine

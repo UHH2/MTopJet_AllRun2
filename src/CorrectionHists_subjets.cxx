@@ -20,15 +20,6 @@ CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std:
   pt_eta.resize(no_ptbins, std::vector<TH2F*>(no_etabins, initial_value_2d));
   event_count.resize(no_ptbins, std::vector<TH1F*>(no_etabins, initial_value));
 
-  /*
-  TO DO
-
-  -add pt_rec[pt_bin][eta_bin]
-  -get pt_bins to pt_gen bins
-  -define arrays with binning -> set [pt_bin][eta_bin] in a loop
-
-  */
-
   for(unsigned int pt_bin = 0; pt_bin < no_ptbins; pt_bin++){
     for(unsigned int eta_bin = 0; eta_bin < no_etabins; eta_bin++){
       std::string pt_string = std::to_string(pt_bin);
@@ -134,7 +125,6 @@ void CorrectionHists_subjets::fill(const Event & event){
 
   /* ******************************************************************************
   matching between gen and reco jets:
-  - a rec jet is called isolated if the next jet is not within 2R. An isolated jet should be spherical and more simelar to an ak4 jet
   - for each reco jet, calc distance to all other gen jets
   - gen jet with lowest distance is a match if distance is < 0.2
   - then calculate resolution with reco jet and matched gen jet
@@ -164,7 +154,6 @@ void CorrectionHists_subjets::fill(const Event & event){
       }
     }
     gen_pt=gen_sub.at(nearest_j).v4().Pt();
-    //gen_eta=gen_sub.at(nearest_j).v4().Eta();
     rec_pt=rec_sub.at(i).v4().Pt();
     rec_eta=rec_sub.at(i).v4().Eta();
     R = rec_pt/gen_pt;

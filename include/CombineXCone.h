@@ -74,6 +74,33 @@ private:
 
 };
 
+class CombineXConeAllHad: public uhh2::AnalysisModule{
+public:
+
+  explicit CombineXConeAllHad(uhh2::Context &,  const std::string &, const std::string & , const std::string &);
+  virtual bool process(uhh2::Event & ) override;
+
+private:
+
+  uhh2::Event::Handle<std::vector<TopJet>>h_xcone33hadjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_xcone33lepjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_fatjets;
+
+};
+
+class CombineXConeAllHad_gen: public uhh2::AnalysisModule{
+public:
+
+  explicit CombineXConeAllHad_gen(uhh2::Context &);
+  virtual bool process(uhh2::Event & ) override;
+
+private:
+
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone33hadjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone33lepjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
+
+};
 
 class CopyJets: public uhh2::AnalysisModule{
 public:

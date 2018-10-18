@@ -21,6 +21,7 @@ void fill_template(TTree *, TString);
 void fill_background(TTree *, TString);
 void fill_matrix(TTree *, TString);
 void fill_modelsys(TTree *, TString);
+void fill_pdf(TTree *);
 
 
 
@@ -46,7 +47,6 @@ Double_t massRec, ptRec, massGen, ptGen; // variables
 Bool_t passed_measurement_rec, passed_measurement_gen, is_TTbar, passed_ptmigration_rec, passed_massmigration_rec, passed_btagmigration_rec, passed_ptmigration_gen, passed_massmigration_gen; // bools
 Double_t gen_weight, rec_weight, gen_ttfactor; //weights
 Double_t gen_2width_factor, gen_4width_factor, gen_8width_factor; //factor to change width
-
 
 
 //weights

@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+
   bool data = false;
   bool same = false;
   bool pseudo = false;
@@ -72,11 +73,11 @@ int main(int argc, char* argv[])
   TH1::SetDefaultSumw2();
 
   /*
-   ██████ ██████  ███████  █████  ████████ ███████     ███████ ██ ██      ███████ ███████
+  ██████ ██████  ███████  █████  ████████ ███████     ███████ ██ ██      ███████ ███████
   ██      ██   ██ ██      ██   ██    ██    ██          ██      ██ ██      ██      ██
   ██      ██████  █████   ███████    ██    █████       █████   ██ ██      █████   ███████
   ██      ██   ██ ██      ██   ██    ██    ██          ██      ██ ██      ██           ██
-   ██████ ██   ██ ███████ ██   ██    ██    ███████     ██      ██ ███████ ███████ ███████
+  ██████ ██   ██ ███████ ██   ██    ██    ███████     ██      ██ ███████ ███████ ███████
   */
 
   cout << "Open Files" << endl;
@@ -132,8 +133,8 @@ int main(int argc, char* argv[])
   ██   ██ ███████ ██   ██ ██████      ██   ██ ██ ███████    ██     ██████   ██████  ██   ██ ██   ██ ██      ██ ███████
   */
 
-  TH1D *hist_data,*hist_mc_gen,*hist_mc_bgr,*hist_mc_sig,*hist_mc_rec, *hist_mc_truth;
-  TH2 *histMCGenRec;
+  TH1D *hist_data,*hist_mc_gen,*hist_pseudo_gen,*hist_mc_bgr,*hist_mc_sig,*hist_mc_rec, *hist_mc_truth;
+  TH2 *histMCGenRec, *histMCGenRec_shower, *histMCGenRec_generator;
 
   TH1D* h_pseudodata_truth;
 
@@ -186,11 +187,17 @@ int main(int argc, char* argv[])
     else hist_mc_bgr->Add(backgrounds[i]);
   }
 
+  if(!data) hist_mc_bgr->Reset();
   hist_mc_rec = (TH1D*)hist_mc_sig->Clone();
   if(data) hist_mc_rec->Add(hist_mc_bgr);
 
   inputFile->GetObject("mc_matrix",histMCGenRec);
-
+  inputFile->GetObject("pseudo1_matrix",histMCGenRec_generator);
+  inputFile->GetObject("pseudo2_matrix",histMCGenRec_shower);
+  TH2* MatrixDelta_generator = (TH2*) histMCGenRec->Clone();
+  MatrixDelta_generator->Add(histMCGenRec_generator, -1);
+  TH2* MatrixDelta_shower = (TH2*) histMCGenRec->Clone();
+  MatrixDelta_shower->Add(histMCGenRec_shower, -1);
   // purity
   if(pseudo1){
     inputFile->GetObject("pseudo1_purity_all",h_pur_all);
@@ -211,10 +218,12 @@ int main(int argc, char* argv[])
   // if no data is used, background has to be added to input histogram
   if(pseudo1){
     inputFile->GetObject("pseudo1_sig",hist_data);
+    inputFile->GetObject("pseudo1_gen",hist_pseudo_gen);
     hist_data->Add(hist_mc_bgr);
   }
   if(pseudo2){
-    inputFile->GetObject("pseudo1_sig",hist_data);
+    inputFile->GetObject("pseudo2_sig",hist_data);
+    inputFile->GetObject("pseudo2_gen",hist_pseudo_gen);
     hist_data->Add(hist_mc_bgr);
   }
   if(same){
@@ -259,6 +268,14 @@ int main(int argc, char* argv[])
     }
   }
 
+  vector<TH1D*> GeneratorVariations;
+  TH1D* GeneratorTruth = (TH1D*)inputFile->Get("Generator_truth");
+  for(int i=0; i<200; i++){
+    TString name = "Generator_sig_";
+    name += i;
+    GeneratorVariations.push_back((TH1D*)inputFile->Get(name));
+  }
+
 
   hist_data->Write();
   hist_mc_gen->Write();
@@ -276,10 +293,21 @@ int main(int argc, char* argv[])
   ██    ██ ████   ██ ██      ██    ██ ██      ██   ██ ██ ████   ██ ██
   ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██ ██ ██ ██  ██ ██   ███
   ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██ ██ ██  ██ ██ ██    ██
-   ██████  ██   ████ ██       ██████  ███████ ██████  ██ ██   ████  ██████
+  ██████  ██   ████ ██       ██████  ███████ ██████  ██ ██   ████  ██████
   */
+  cout << "**************************************************************" << endl;
+  cout << "************     STARTING UNFOLDING PROCEDURE     ************" << endl;
+  cout << "**************************************************************" << endl;
 
   int nscan = 100;
+  cout << "    -- YOU SELECTED " << nscan << " STEPS TO DETERMINE TAU" << endl << endl;
+
+  bool do_model = true;
+  bool do_genvar = false;
+
+  if(!do_model) cout << "    -- MODEL VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
+  if(!do_genvar) cout << "    -- GENERATOR SMEARINGS ARE NOT UNFOLDED!" << endl  << endl;
+
 
   TH2 *CovStat, *CovInputStat, *CovMatrixStat;
   vector<TH2*> CovBgrStat;
@@ -299,6 +327,10 @@ int main(int argc, char* argv[])
   vector< vector<TH1*> > MODEL_OUTPUT;
   vector< TH1* > MODEL_rel;
   TH1 *MODEL_rel_total;
+  vector<TH1*> Genvar_OUTPUT;
+  TH1* Genvar_combination;
+  vector<TF1*> Genvar_fits;
+  vector<TH1D*> Genvar_variations;
 
   TH1* DeltaLumi;
   TH2* CovLumi;
@@ -313,7 +345,7 @@ int main(int argc, char* argv[])
   TH1 * pseudodata_bias;
 
   if(same){
-    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, 1);
+    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, 1, 0);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
   }
@@ -322,7 +354,8 @@ int main(int argc, char* argv[])
   if(data || pseudo){
     cout << "***********************" << endl;
     cout << " UNFOLDING OF DATA" << endl;
-    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan);
+    if(pseudo) for(auto i: backgrounds) i->Reset();
+    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan, 0);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
     CorMatrix = unfold.get_cor_matrix();
@@ -338,31 +371,59 @@ int main(int argc, char* argv[])
     // CovTotal_TUnfold = unfold.GetTotalCov();
 
     // now unfold every model variation, get difference to truth and fill cov matrices
-    for(unsigned int i=0; i<model_name.size(); i++){
-      vector<TH1*> dummy;
-      MODEL_OUTPUT.push_back(dummy);
-      MODEL_DELTA.push_back(dummy);
-      MODEL_BIAS.push_back(dummy);
-      vector<TH2*> dummy2;
-      CovModel.push_back(dummy2);
-      for(unsigned int j=0; j<model_name[i].size(); j++){
-        cout << "***********************" << endl;
-        cout << " UNFOLDING OF " << model_name[i][j] << endl;
+    // since tau depends only on the Migration Matrix, one has to find taus only in the first unfolding
+    // for every following unfolding the same tau is used
+    if(do_model){
+      for(unsigned int i=0; i<model_name.size(); i++){
+        vector<TH1*> dummy;
+        MODEL_OUTPUT.push_back(dummy);
+        MODEL_DELTA.push_back(dummy);
+        MODEL_BIAS.push_back(dummy);
+        vector<TH2*> dummy2;
+        CovModel.push_back(dummy2);
+        for(unsigned int j=0; j<model_name[i].size(); j++){
+          cout << "***********************" << endl;
+          cout << " UNFOLDING OF " << model_name[i][j] << endl;
+          vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
+          for(auto i: background_dummy) i->Reset();
+          unfolding* unfold_model = new unfolding(model_input[i][j], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan, 0);
+          TH1* output = unfold_model->get_output(true);
+          MODEL_OUTPUT[i].push_back(output);
+          TH1* delta = GetModelDelta(output, model_truth[i][j]);
+          MODEL_DELTA[i].push_back(delta);
+          TH1* bias = unfold_model->GetBiasDistribution();
+          MODEL_BIAS[i].push_back(bias);
+          TH2* cov = CreateCovFromDelta(delta, CovInputStat);
+          CovModel[i].push_back(cov);
+          //delete output;
+          delete unfold_model;
+          cout << "unfolding finished" << endl;
+        }
+      }
+    }
+
+    // Unfold 100 smeared Generator Distribution
+    // take mean in every bin as central value and rms as error
+    // for every following unfolding the same tau is used
+    if(do_genvar){
+      double tau = 0;
+      for(int i=0; i<GeneratorVariations.size(); i++){
+        cout << "********************************************" << endl;
+        cout << " UNFOLDING OF SMEARED DISTRIBUTION NUMBER " << i << endl;
         vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
         for(auto i: background_dummy) i->Reset();
-        unfolding* unfold_model = new unfolding(model_input[i][j], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan);
-        TH1* output = unfold_model->get_output(true);
-        MODEL_OUTPUT[i].push_back(output);
-        TH1* delta = GetModelDelta(output, model_truth[i][j]);
-        MODEL_DELTA[i].push_back(delta);
-        TH1* bias = unfold_model->GetBiasDistribution();
-        MODEL_BIAS[i].push_back(bias);
-        TH2* cov = CreateCovFromDelta(delta, CovInputStat);
-        CovModel[i].push_back(cov);
-        //delete output;
-        delete unfold_model;
-        cout << "unfolding finished" << endl;
+        unfolding* unfold_genvar;
+        if(i==0) unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan, 0);
+        else     unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, 0, tau);
+        TH1* output = unfold_genvar->get_output(true);
+        Genvar_OUTPUT.push_back(output);
+        tau = unfold_genvar->get_tau();
+        cout << "Log(tau) = " << TMath::Log10(tau) << endl;
       }
+      Smearing * smear = new Smearing(Genvar_OUTPUT);
+      Genvar_combination = smear->GetResult();
+      Genvar_fits = smear->GetFits();
+      Genvar_variations = smear->GetVariations();
     }
 
     // create a delta hist and cov for lumi uncertainty
@@ -395,7 +456,6 @@ int main(int argc, char* argv[])
     CovTotal->Add(CovLumi);
 
     // then add model cov
-    bool do_model = true;
     if(!do_model) cout << "!!!! ATTENTION: MODEL UNCERTAINTIES SWITCHED OFF!!!!! " <<endl;
     cout << "sum up model sys cov matrices" << endl;
     for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
@@ -405,7 +465,7 @@ int main(int argc, char* argv[])
       cout << "using " << model_name[i][j] << endl;
     }
 
-    MODEL_rel_total = AddSys(MODEL_rel);
+    if(do_model) MODEL_rel_total = AddSys(MODEL_rel);
 
 
     cout << "******************************************************" << endl;
@@ -461,11 +521,11 @@ int main(int argc, char* argv[])
   ProbMatrix->Write();
 
   /*
-   ██████ ██   ██ ██     ██████
+  ██████ ██   ██ ██     ██████
   ██      ██   ██ ██          ██
   ██      ███████ ██      █████
   ██      ██   ██ ██     ██
-   ██████ ██   ██ ██     ███████
+  ██████ ██   ██ ██     ███████
   */
 
   // parameters for chi2 fit
@@ -534,6 +594,10 @@ int main(int argc, char* argv[])
   plot->draw_matrix(CovTotal, "COV_TOTAL", false);
   // plot->draw_matrix(CovTotal_TUnfold, "COV_TOTAL_check", false);
   plot->draw_matrix(histMCGenRec, "Migration_Matrix", true);
+  plot->draw_matrix(histMCGenRec_generator, "Migration_Matrix_Generator", true);
+  plot->draw_matrix(histMCGenRec_shower, "Migration_Matrix_Shower", true);
+  plot->draw_matrix(MatrixDelta_generator, "Migration_Delta_Generator", false);
+  plot->draw_matrix(MatrixDelta_shower, "Migration_Delta_Shower", false);
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     for(unsigned int j=0; j<sys_name[i].size(); j++){
@@ -546,14 +610,16 @@ int main(int argc, char* argv[])
   plot->draw_matrix(CovLumi, "COV_Lumi", false);
   plot->draw_delta(DeltaLumi, "DELTA_Lumi");
 
-  for(unsigned int i=0; i<model_name.size(); i++){
-    for(unsigned int j=0; j<model_name[i].size(); j++){
-      plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false);
-      plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);
-      plot->draw_bias(MODEL_OUTPUT[i][j], model_truth[i][j], MODEL_BIAS[i][j], "BIAS_"+model_name[i][j]);
+  if(do_model){
+    for(unsigned int i=0; i<model_name.size(); i++){
+      for(unsigned int j=0; j<model_name[i].size(); j++){
+        plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false);
+        plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);
+        plot->draw_bias(MODEL_OUTPUT[i][j], model_truth[i][j], MODEL_BIAS[i][j], "BIAS_"+model_name[i][j]);
+      }
     }
+    plot->draw_delta_comparison(MODEL_rel_total, MODEL_rel, model_rel_name, "model", "SYS_MODEL_COMPARISION");
   }
-  plot->draw_delta_comparison(MODEL_rel_total, MODEL_rel, model_rel_name, "model", "SYS_MODEL_COMPARISION");
 
   for(unsigned int i=0; i<bgr_name.size(); i++){
     plot->draw_matrix(CovBgrStat[i], "COV_"+bgr_name[i]+"_stat", false);
@@ -561,13 +627,24 @@ int main(int argc, char* argv[])
     plot->draw_delta(BGR_DELTA[i], "DELTA_"+bgr_name[i]);
   }
 
+  if(do_genvar){
+    plot->draw_output(Genvar_combination, GeneratorTruth, false, "GENERATOR_SMEARING_COMBINATION");
+    if(data || pseudo) plot->draw_output_smear(Genvar_OUTPUT, GeneratorTruth, "GeneratorSmearing");
+    for(unsigned int i=0; i<Genvar_fits.size(); i++){
+      TString name = "SmearFit_Bin";
+      int bin = i+1;
+      name += bin;
+      plot->draw_smearFit(Genvar_variations[i], Genvar_fits[i], name);
+    }
+  }
   if(pseudo) plot->draw_output_pseudo(data_unfolded, h_pseudodata_truth, hist_mc_truth, false, "Unfold_pseudo");
   if(pseudo) plot->draw_output_pseudo(data_unfolded_norm, h_pseudodata_truth_norm, hist_mc_truth_norm, true, "Unfold_pseudo_norm");
   if(pseudo) plot->draw_bias(data_unfolded, h_pseudodata_truth, pseudodata_bias, "Unfold_pseudo_bias");
+  if(pseudo) plot->draw_output_pseudo(data_unfolded_all, hist_pseudo_gen, hist_mc_gen, false, "Unfold_pseudo_all");
+  plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
   plot->draw_output_stat(data_unfolded_sys, data_unfolded_stat, hist_mc_truth, false, "Unfold");
   plot->draw_output(data_unfolded_sys, hist_mc_truth, false, "Unfold_SYS");
   plot->draw_output_stat(data_unfolded_norm, data_unfolded_stat_norm, hist_mc_truth_norm, true, "Unfold_norm");
-  plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
   plot->draw_output_mass(data_unfolded_norm, mc_mtop_templates_norm, show, true, "Unfold_masspoints_norm");
   plot->draw_output_mass(data_unfolded, mc_mtop_templates, show, false, "Unfold_masspoints");
   plot->draw_projection(gen_proj, hist_mc_gen, "Projection_gen");

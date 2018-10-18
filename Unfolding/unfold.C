@@ -3,7 +3,7 @@
 using namespace std;
 
 
-unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr_name, TH1D* signal, TH2* migration_matrix, vector< vector<TH2*> > sys_matrix, vector< vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan){
+unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr_name, TH1D* signal, TH2* migration_matrix, vector< vector<TH2*> > sys_matrix, vector< vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan, double tau_){
   cout << "Do unfolding" << endl;
   cout << "   -->  You selected: ";
   if(do_lcurve) cout << "L-Curve Scan" << endl;
@@ -72,12 +72,19 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   if(do_lcurve) unfold.ScanLcurve(nscan,0.,0.,&lcurve,&logTauX,&logTauY);
 
   // rho scan
-  if(!do_lcurve) unfold.ScanTau(nscan,0.0001,100.,&rhoLogTau, TUnfoldDensity::kEScanTauRhoAvgSys, SCAN_DISTRIBUTION,SCAN_AXISSTEERING, &lcurve,&logTauX,&logTauY);
+  if(!do_lcurve && nscan != 0){
+    unfold.ScanTau(nscan,0.0001,100.,&rhoLogTau, TUnfoldDensity::kEScanTauRhoAvgSys, SCAN_DISTRIBUTION,SCAN_AXISSTEERING, &lcurve,&logTauX,&logTauY);
+    tau=unfold.GetTau();
+    double logTau=TMath::Log10(tau);
+    lcurveX=logTauX->Eval(logTau);
+    lcurveY=logTauY->Eval(logTau);
+  }
 
-  tau=unfold.GetTau();
-  double logTau=TMath::Log10(tau);
-  lcurveX=logTauX->Eval(logTau);
-  lcurveY=logTauY->Eval(logTau);
+  if(nscan == 0){
+    tau = tau_;
+    unfold.DoUnfold(tau);
+  }
+
 
   // write hists before including sys uncertainties
   output = unfold.GetOutput("",0,"measurement_gen","pt[C]",kTRUE);

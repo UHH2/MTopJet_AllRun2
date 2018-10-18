@@ -21,7 +21,7 @@
 class unfolding{
 
  public:
-  unfolding(TH1D* input, std::vector<TH1D*> backgrounds,  std::vector<TString> bgr_name, TH1D* signal, TH2* migration_matrix, std::vector< std::vector<TH2*> > sys_matrix, std::vector< std::vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan);
+  unfolding(TH1D* input, std::vector<TH1D*> backgrounds,  std::vector<TString> bgr_name, TH1D* signal, TH2* migration_matrix, std::vector< std::vector<TH2*> > sys_matrix, std::vector< std::vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan, double tau_);
   TH1* get_output(bool);
   TH2* get_prob_matrix();
   TH2* get_cor_matrix();

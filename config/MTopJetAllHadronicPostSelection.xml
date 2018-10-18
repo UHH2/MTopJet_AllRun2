@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
+  <!ENTITY NEVT "-1">
+
+ <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon">
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon">
+
+<!-- =============================================== ttbar =========================================================================== -->
+  <!ENTITY TTbar_Mtt0000to0700_allHad    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_allHad.root">
+  <!ENTITY TTbar_Mtt0700to1000_allHad    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0700to1000_allHad.root">
+  <!ENTITY TTbar_Mtt1000toInft_allHad    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt1000toInft_allHad.root">
+
+]>
+
+<!--
+   <ConfigParse NEventsBreak="150000" LastBreak="0" FileSplit="0"/>
+   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="PostSelMu_workdir"/>
+-->
+
+<JobConfiguration JobName="MTopJetAllHadronicPostSelectionJob" OutputLevel="INFO">
+  <Library Name="libSUHH2MTopJet"/>
+  <Package Name="SUHH2MTopJet.par"/>
+
+
+  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="35867">
+  <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
+
+    <InputData Version="TTbar_Mtt0000to0700_allHad" Lumi="92478.840" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_Mtt0000to0700_allHad;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_Mtt0700to1000_allHad" Lumi="503319.757" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_Mtt0700to1000_allHad;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_Mtt1000toInft_allHad" Lumi="1192545.000" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_Mtt1000toInft_allHad;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!-- ================================================================================================================================== -->
+<!-- ====================================================== User Config =============================================================== -->
+<!-- ================================================================================================================================== -->
+
+    <UserConfig>
+        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+        <Item Name="GenParticleCollection"   Value="GenParticles"/>
+        <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+        <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+        <Item Name="TauCollection"           Value="slimmedTaus"/>
+
+        <Item Name="JetCollection"           Value="slimmedJets"/>
+        <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
+        <Item Name="TopJetCollection"        Value="slimmedJetsAK8_SoftDrop"/>
+	      <Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
+
+      	<Item Name="additionalBranches" Value="xconePuppi xconeCHS xconeCHS_noJEC xconeCHS_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined"/>
+
+      	<Item Name="METName" Value="slimmedMETs"/>
+
+        <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->
+        <!-- since the weight has already been scaled in the Selection, do not do it here -->
+      	<Item Name="use_sframe_weight" Value="true"/>
+
+      	<Item Name="dometfilters" Value="true" />
+      	<Item Name="dopvfilter" Value="true" />
+
+      	<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
+      	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" />
+
+      	<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram.root" />
+      	<Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyMCPileupHistogram.root" />
+      	<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_72383.root" />
+      	<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MyDataPileupHistogram_66017.root" />
+
+      	<Item Name="ScaleVariationMuR" Value="none"/>
+      	<Item Name="ScaleVariationMuF" Value="none"/>
+      	<Item Name="PU_variation" Value="central" />
+      	<Item Name="BTag_variation" Value="central" />
+      	<Item Name="MuScale_variation" Value="nominal" />
+      	<Item Name="MuTrigger_variation" Value="nominal" />
+
+      	<Item Name="AnalysisModule" Value="MTopJetAllHadronicPostSelectionModule"/>
+  </UserConfig>
+
+  </Cycle>
+</JobConfiguration>

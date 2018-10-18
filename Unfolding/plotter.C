@@ -37,11 +37,11 @@ void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog){
 }
 
 /*
- ██████  ██    ██ ████████ ██████  ██    ██ ████████
+██████  ██    ██ ████████ ██████  ██    ██ ████████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██
 ██    ██ ██    ██    ██    ██████  ██    ██    ██
 ██    ██ ██    ██    ██    ██      ██    ██    ██
- ██████   ██████     ██    ██       ██████     ██
+██████   ██████     ██    ██       ██████     ██
 */
 
 void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_name){
@@ -78,7 +78,9 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   truth->SetLineColor(kRed);
   truth->SetLineStyle(2);
   truth->Draw("HIST SAME");
-  TLegend *l=new TLegend(0.5,0.65,0.85,0.85);
+  TLegend *l;
+  if(truth->GetSize() > 20) l=new TLegend(0.2,0.6,0.4,0.85);
+  else                       l=new TLegend(0.5,0.6,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"data unfolded","pl");
@@ -88,12 +90,72 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+
 /*
- ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ████████  █████  ████████
+██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ███    ███ ███████  █████  ██████
+██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██      ████  ████ ██      ██   ██ ██   ██
+██    ██ ██    ██    ██    ██████  ██    ██    ██        ███████ ██ ████ ██ █████   ███████ ██████
+██    ██ ██    ██    ██    ██      ██    ██    ██             ██ ██  ██  ██ ██      ██   ██ ██   ██
+██████   ██████     ██    ██       ██████     ██        ███████ ██      ██ ███████ ██   ██ ██   ██
+*/
+
+void plotter::draw_output_smear(std::vector<TH1*> output_, TH1D* truth_, TString file_name){
+  // std::vector<double> sys = get_sys_errors();
+  // TH1* output_sys = add_error_bar(output, sys);
+
+  std::vector<TH1*> outputs;
+  for(int i=0; i<output_.size(); i++){
+    TH1* hist = (TH1*) output_[i]->Clone();
+    outputs.push_back(hist);
+  }
+  TH1D* truth = (TH1D*) truth_->Clone("truth");
+
+  TCanvas *c = new TCanvas("c","",600,600);
+  double ymax;
+  gPad->SetLeftMargin(0.15);
+
+  if(truth->GetMaximum() > outputs[0]->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
+  else ymax = 1.1 * outputs[0]->GetMaximum();
+  TGaxis::SetMaxDigits(3);
+  for(auto output: outputs){
+    output->SetTitle(" ");
+    output->GetYaxis()->SetRangeUser(0., ymax);
+    output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+    output->GetYaxis()->SetTitle("events");
+    output->GetYaxis()->SetTitleOffset(1.1);
+    output->GetXaxis()->SetTitleOffset(0.9);
+    output->GetYaxis()->SetTitleSize(0.05);
+    output->GetXaxis()->SetTitleSize(0.05);
+    output->GetYaxis()->SetNdivisions(505);
+    output->SetLineColor(kBlack);
+    output->SetMarkerColor(kBlack);
+    output->SetMarkerStyle(8);
+    output->SetMarkerSize(1);
+    output->Draw("E1 SAME");
+  }
+  gStyle->SetEndErrorSize(5);
+  truth->SetLineWidth(3);
+  truth->SetLineColor(kRed);
+  truth->SetLineStyle(2);
+  truth->Draw("HIST SAME");
+  TLegend *l;
+  if(truth->GetSize() > 20) l=new TLegend(0.2,0.6,0.4,0.85);
+  else                       l=new TLegend(0.5,0.6,0.85,0.85);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  l->AddEntry(outputs[0],"data unfolded","pl");
+  l->AddEntry(truth,"MC particle level","pl");
+  l->SetTextSize(0.04);
+  l->Draw();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+/*
+██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ████████  █████  ████████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██         ██    ██   ██    ██
 ██    ██ ██    ██    ██    ██████  ██    ██    ██        ███████    ██    ███████    ██
 ██    ██ ██    ██    ██    ██      ██    ██    ██             ██    ██    ██   ██    ██
- ██████   ██████     ██    ██       ██████     ██        ███████    ██    ██   ██    ██
+██████   ██████     ██    ██       ██████     ██        ███████    ██    ██   ██    ██
 */
 
 
@@ -151,11 +213,11 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
 }
 
 /*
- ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███    ███  █████  ███████ ███████
+██████  ██    ██ ████████ ██████  ██    ██ ████████     ███    ███  █████  ███████ ███████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ████  ████ ██   ██ ██      ██
 ██    ██ ██    ██    ██    ██████  ██    ██    ██        ██ ████ ██ ███████ ███████ ███████
 ██    ██ ██    ██    ██    ██      ██    ██    ██        ██  ██  ██ ██   ██      ██      ██
- ██████   ██████     ██    ██       ██████     ██        ██      ██ ██   ██ ███████ ███████
+██████   ██████     ██    ██       ██████     ██        ██      ██ ██   ██ ███████ ███████
 */
 
 void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_, std::vector<bool> show, bool norm, TString file_name){
@@ -310,16 +372,18 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   TH1D* sig = (TH1D*) sig_->Clone("sig");
   TH1D* bgr = (TH1D*) bgr_->Clone("bgr");
 
-  TCanvas *c= new TCanvas("c","",600,600);
+  TCanvas *c= new TCanvas("c","",1200,600);
   gPad->SetLeftMargin(0.15);
   sig->Add(bgr, 1.);
+  sig->SetTitle(" ");
+  sig->GetYaxis()->SetRangeUser(0., 250);
   sig->GetXaxis()->SetTitle("detector binning");
   sig->GetYaxis()->SetTitle("events");
   sig->GetYaxis()->SetTitleOffset(1.5);
   sig->GetYaxis()->SetNdivisions(505);
   sig->SetFillColor(810);
   sig->SetLineColor(810);
-  sig->Draw("HIST SAME");
+  sig->Draw("HIST");
   bgr->SetFillColor(kGray);
   bgr->SetLineColor(kBlack);
   bgr->SetFillStyle(1001);
@@ -330,7 +394,7 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   data->SetMarkerColor(kBlack);
   data->SetMarkerStyle(20);
   data->Draw("E SAME");
-  TLegend *l=new TLegend(0.55,0.65,0.85,0.8);
+  TLegend *l=new TLegend(0.2,0.7,0.4,0.88);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(data,"Data","pl");
@@ -342,11 +406,11 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   delete c;
 }
 /*
- ██ ██████      ██   ██ ██ ███████ ████████
+██ ██████      ██   ██ ██ ███████ ████████
 ███ ██   ██     ██   ██ ██ ██         ██
- ██ ██   ██     ███████ ██ ███████    ██
- ██ ██   ██     ██   ██ ██      ██    ██
- ██ ██████      ██   ██ ██ ███████    ██
+██ ██   ██     ███████ ██ ███████    ██
+██ ██   ██     ██   ██ ██      ██    ██
+██ ██████      ██   ██ ██ ███████    ██
 */
 
 
@@ -437,11 +501,11 @@ void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA,
 
 
 /*
- ██████  ██    ██ ████████ ██████  ██    ██ ████████     ██████  ███████ ███████ ██    ██ ██████   ██████
+██████  ██    ██ ████████ ██████  ██    ██ ████████     ██████  ███████ ███████ ██    ██ ██████   ██████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██   ██ ██      ██      ██    ██ ██   ██ ██    ██
 ██    ██ ██    ██    ██    ██████  ██    ██    ██        ██████  ███████ █████   ██    ██ ██   ██ ██    ██
 ██    ██ ██    ██    ██    ██      ██    ██    ██        ██           ██ ██      ██    ██ ██   ██ ██    ██
- ██████   ██████     ██    ██       ██████     ██        ██      ███████ ███████  ██████  ██████   ██████
+██████   ██████     ██    ██       ██████     ██        ██      ███████ ███████  ██████  ██████   ██████
 */
 
 
@@ -487,7 +551,9 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
   pseudotruth->Draw("HIST SAME");
   mctruth->Draw("HIST SAME");
   output->Draw("E1 SAME");
-  TLegend *l=new TLegend(0.5,0.6,0.85,0.85);
+  TLegend *l;
+  if(mctruth->GetSize() > 20) l=new TLegend(0.2,0.6,0.4,0.85);
+  else                       l=new TLegend(0.5,0.6,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"pseudo data","pl");
@@ -542,11 +608,11 @@ void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_nam
 }
 
 /*
- ██████ ██   ██ ██     ██████
+██████ ██   ██ ██     ██████
 ██      ██   ██ ██          ██
 ██      ███████ ██      █████
 ██      ██   ██ ██     ██
- ██████ ██   ██ ██     ███████
+██████ ██   ██ ██     ███████
 */
 
 void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, double mass, double uncert, TString file_name){
@@ -580,9 +646,9 @@ void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<dou
   char mass_text[32];
   sprintf(mass_text, "%.5g", mass);
   char uncert_text[32];
-  if(uncert < 1) sprintf(uncert_text, "%.2g", uncert);
-  else           sprintf(uncert_text, "%.3g", uncert);
-  TString masstext = "m_{top}^{MC} = ";
+  if(uncert < 1) sprintf(uncert_text, "%.3g", uncert);
+  else           sprintf(uncert_text, "%.4g", uncert);
+  TString masstext = "m_{top} = ";
   masstext += mass_text;
   masstext += " #pm ";
   masstext += uncert_text;
@@ -644,6 +710,38 @@ void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_nam
   l->AddEntry(bias,"bias distribution","pl");
   l->SetTextSize(0.04);
   l->Draw();
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+/*
+███████ ███    ███ ███████  █████  ██████
+██      ████  ████ ██      ██   ██ ██   ██
+███████ ██ ████ ██ █████   ███████ ██████
+     ██ ██  ██  ██ ██      ██   ██ ██   ██
+███████ ██      ██ ███████ ██   ██ ██   ██
+*/
+
+
+
+void plotter::draw_smearFit(TH1D* variation, TF1* fit_, TString file_name){
+  TH1D* var = (TH1D*) variation->Clone();
+  TF1* fit = (TF1*) fit_->Clone();
+  TCanvas *c= new TCanvas("","",600,600);
+  gPad->SetLeftMargin(0.15);
+  double ymax = var->GetMaximum() * 1.2;
+  var->GetYaxis()->SetRangeUser(0., ymax);
+  var->GetXaxis()->SetTitle("bin content");
+  var->GetYaxis()->SetTitle("events");
+  var->GetYaxis()->SetTitleOffset(1.5);
+  var->GetYaxis()->SetNdivisions(505);
+  var->SetFillColor(kGray);
+  var->SetLineColor(kBlack);
+  var->Draw("HIST");
+  fit->SetLineColor(kRed);
+  fit->SetLineWidth(4);
+  fit->Draw("SAME");
   gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;

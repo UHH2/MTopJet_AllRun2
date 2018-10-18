@@ -4,6 +4,7 @@
 #include "chi2fit.h"
 #include "normalise.h"
 #include "modelsys.h"
+#include "smearing.h"
 
 TString directory;
 TString input_file;

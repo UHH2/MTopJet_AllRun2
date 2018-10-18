@@ -170,7 +170,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // combine XCone
   jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
-  //jetprod_reco_pupppi.reset(new CombineXCone33(ctx, "XCone33_had_Combined_puppi", "XCone33_lep_Combined_puppi", "xconePuppi"));
   jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "xconeCHS" ));
   jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
   copy_jet.reset(new CopyJets(ctx, "xconeCHS", "xconeCHS_noJEC"));
@@ -199,7 +198,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // smear jets after Correction
   JERSmearing.reset(new JER_Smearer_xcone());
   JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
-  Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar));
+  Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, false));
 
   //// EVENT SELECTION
 
