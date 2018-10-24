@@ -51,6 +51,18 @@ namespace uhh2 {
     float ptcut_;
   };
 
+  class LeadingRecoJetETA : public Selection {
+
+   public:
+     explicit LeadingRecoJetETA(Context&, const std::string &, float);
+     virtual bool passes(const Event&) override;
+
+   private:
+     uhh2::Event::Handle<std::vector<TopJet>> h_jets;
+     float etacut_;
+   };
+
+
  class MassCutReco : public Selection {
 
   public:

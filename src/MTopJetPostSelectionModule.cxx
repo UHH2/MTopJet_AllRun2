@@ -67,6 +67,7 @@ protected:
   std::unique_ptr<uhh2::Selection> njet_had;
   std::unique_ptr<uhh2::Selection> njet_lep;
   std::unique_ptr<uhh2::Selection> pt_sel;
+  std::unique_ptr<uhh2::Selection> eta_sel;
   std::unique_ptr<uhh2::Selection> pt350_gensel;
   std::unique_ptr<uhh2::Selection> pt350_sel;
   std::unique_ptr<uhh2::Selection> pt750_sel;
@@ -278,6 +279,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   njet_lep.reset(new NJetXCone(ctx, jet_label_lep, 1));
 
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
+  eta_sel.reset(new LeadingRecoJetETA(ctx, jet_label_had, 2.5));
   pt350_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 350));
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
@@ -531,7 +533,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
-  double SF_tt = 0.75;
+  double SF_tt = 0.8;
 
   // get lumi weight = genweight (inkl scale variation)
   scale_variation->process(event); // here, it is only executed to be filled into the gen weight is has to be done again to appear in the event.weight
@@ -616,22 +618,22 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool pass_btagmigration_rec;
   bool pass_WJets_sel;
 
-  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && passed_btag) pass_measurement_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag) pass_measurement_rec = true;
   else pass_measurement_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_pt350migration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_pt350migration_rec = true;
   else pass_pt350migration_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_ptmigration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_ptmigration_rec = true;
   else pass_ptmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && !mass_sel->passes(event) && passed_btag) pass_massmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && !mass_sel->passes(event) && passed_btag) pass_massmigration_rec = true;
   else pass_massmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium) pass_btagmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium) pass_btagmigration_rec = true;
   else pass_btagmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && !passed_btag_loose) pass_WJets_sel = true;
+  if(passed_recsel && pt_sel->passes(event)  && eta_sel->passes(event) && !passed_btag_loose) pass_WJets_sel = true;
   else pass_WJets_sel = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/
@@ -646,7 +648,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(passed_gensel33 && !pt_gensel->passes(event) && pt350_gensel->passes(event) && mass_gensel->passes(event)) pass_pt350migration_gen = true;
     else pass_pt350migration_gen = false;
 
-    if(passed_gensel33 && pt_gensel->passes(event) && !mass_gensel->passes(event)) pass_massmigration_gen = true;
+    if(passed_gensel33 && pt_gensel->passes(event)&& !mass_gensel->passes(event)) pass_massmigration_gen = true;
     else pass_massmigration_gen = false;
   }
   if(!isMC){

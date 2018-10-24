@@ -29,6 +29,17 @@ RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string 
   PtReso_rec9 = book<TH1F>("PtResolution_rec9", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec10 = book<TH1F>("PtResolution_rec10", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
 
+  PtRec_1 = book<TH1F>("PtRec_1", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_2 = book<TH1F>("PtRec_2", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_3 = book<TH1F>("PtRec_3", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_4 = book<TH1F>("PtRec_4", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_5 = book<TH1F>("PtRec_5", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_6 = book<TH1F>("PtRec_6", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_7 = book<TH1F>("PtRec_7", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_8 = book<TH1F>("PtRec_8", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_9 = book<TH1F>("PtRec_9", "p^{rec}_{T, jet}", 200, 0, 1000);
+  PtRec_10 = book<TH1F>("PtRec_10", "p^{rec}_{T, jet}", 200, 0, 1000);
+
   min_mass_Wjet_rec = book<TH1F>("min_mass_Wjet_rec", "min M_{ij}", 60, 60, 120);
   min_mass_Wjet_gen = book<TH1F>("min_mass_Wjet_gen", "min M_{ij}", 60, 60, 120);
   WMassReso = book<TH1F>("WMassResolution", "(M^{rec}_{W} - M^{gen}_{W}) / M^{gen}_{W}) ", 90, -1.5, 1.5);
@@ -151,6 +162,17 @@ void RecoGenHists_allHad::fill(const Event & event){
         if(gen_pt > 370 && gen_pt <= 420) PtReso_9->Fill( R, weight );
         if(gen_pt > 420) PtReso_10->Fill( R, weight );
 
+        if(gen_pt <= 50) PtRec_1->Fill( rec_pt, weight );
+        if(gen_pt > 50 && gen_pt <= 80) PtRec_2->Fill( rec_pt, weight );
+        if(gen_pt > 80 && gen_pt <= 120) PtRec_3->Fill( rec_pt, weight );
+        if(gen_pt > 120 && gen_pt <= 170) PtRec_4->Fill( rec_pt, weight );
+        if(gen_pt > 170 && gen_pt <= 220) PtRec_5->Fill( rec_pt, weight );
+        if(gen_pt > 220 && gen_pt <= 270) PtRec_6->Fill( rec_pt, weight );
+        if(gen_pt > 270 && gen_pt <= 320) PtRec_7->Fill( rec_pt, weight );
+        if(gen_pt > 320 && gen_pt <= 370) PtRec_8->Fill( rec_pt, weight );
+        if(gen_pt > 370 && gen_pt <= 420) PtRec_9->Fill( rec_pt, weight );
+        if(gen_pt > 420) PtRec_10->Fill( rec_pt, weight );
+
         if(rec_pt <= 50) PtReso_rec1->Fill( R, weight );
         if(rec_pt > 50 && rec_pt <= 80) PtReso_rec2->Fill( R, weight );
         if(rec_pt > 80 && rec_pt <= 120) PtReso_rec3->Fill( R, weight );
@@ -191,6 +213,17 @@ void RecoGenHists_allHad::fill(const Event & event){
         if(gen_pt > 320 && gen_pt <= 370) PtReso_8->Fill( R, weight );
         if(gen_pt > 370 && gen_pt <= 420) PtReso_9->Fill( R, weight );
         if(gen_pt > 420) PtReso_10->Fill( R, weight );
+
+        if(gen_pt <= 50) PtRec_1->Fill( rec_pt, weight );
+        if(gen_pt > 50 && gen_pt <= 80) PtRec_2->Fill( rec_pt, weight );
+        if(gen_pt > 80 && gen_pt <= 120) PtRec_3->Fill( rec_pt, weight );
+        if(gen_pt > 120 && gen_pt <= 170) PtRec_4->Fill( rec_pt, weight );
+        if(gen_pt > 170 && gen_pt <= 220) PtRec_5->Fill( rec_pt, weight );
+        if(gen_pt > 220 && gen_pt <= 270) PtRec_6->Fill( rec_pt, weight );
+        if(gen_pt > 270 && gen_pt <= 320) PtRec_7->Fill( rec_pt, weight );
+        if(gen_pt > 320 && gen_pt <= 370) PtRec_8->Fill( rec_pt, weight );
+        if(gen_pt > 370 && gen_pt <= 420) PtRec_9->Fill( rec_pt, weight );
+        if(gen_pt > 420) PtRec_10->Fill( rec_pt, weight );
 
         if(rec_pt <= 50) PtReso_rec1->Fill( R, weight );
         if(rec_pt > 50 && rec_pt <= 80) PtReso_rec2->Fill( R, weight );

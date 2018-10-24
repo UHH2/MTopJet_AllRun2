@@ -13,6 +13,23 @@ bool uhh2::NJetXCone::passes(const uhh2::Event& event){
 }
 ////////////////////////////////////////////////////////
 
+uhh2::LeadingRecoJetETA::LeadingRecoJetETA(uhh2::Context& ctx, const std::string & name, float etacut):
+  h_jets(ctx.get_handle<std::vector<TopJet>>(name)),
+  etacut_(etacut) {}
+
+bool uhh2::LeadingRecoJetETA::passes(const uhh2::Event& event){
+  bool pass_jeteta = false;
+  std::vector<TopJet> jets = event.get(h_jets);
+  TopJet jet1;
+  if(jets.size()>0){
+    jet1 = jets.at(0);
+    float eta = sqrt(jet1.eta()*jet1.eta());
+    if(eta < etacut_) pass_jeteta = true;
+  }
+  return pass_jeteta;
+}
+////////////////////////////////////////////////////////
+
 uhh2::LeadingRecoJetPT::LeadingRecoJetPT(uhh2::Context& ctx, const std::string & name, float ptcut):
   h_jets(ctx.get_handle<std::vector<TopJet>>(name)),
   ptcut_(ptcut) {}

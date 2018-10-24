@@ -10,18 +10,34 @@ double CorrectionFactor::get_factor(double pt, double eta){
   }
 
   // get factor from function
-  if(pt > 450) pt = 450;
+  if(pt > 430) pt = 430;
   if(pt < 0)   pt = 0;
 
 
-  double factor;
-  if(etabin == 11) factor = 1; // because the high eta region does not work
+  double factor = 1;
+  if(etabin == 11) factor = 1; // but there should be no jet left in this area in the final phase space
   else {
-    if(CorUp || CorDown) factor = CorrectionGraphs[etabin]->Eval(pt);
-    else factor = CorrectionFunctions[etabin]->Eval(pt);
+    if(CorUp || CorDown){
+      // first get central factor
+      double f_c = CentralCorrectionFunctions[etabin]->Eval(pt);
+      // get up/down factor
+      double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);
+      // get difference
+      double df = f_c - f_ud;
+      // get additional sys (this already is a difference)
+      double dg = AdditionalSys->Eval(pt);
+      // to get the total factor one has to:
+      // 1. add df and dg in quadrature (this gives the total diff to central factor)
+      // 2. add this to central factor
+      if(CorUp)        factor = f_c + sqrt(df*df + dg*dg);
+      else if(CorDown) factor = f_c - sqrt(df*df + dg*dg);
+
+    }
+    else factor = CentralCorrectionFunctions[etabin]->Eval(pt);
   }
   return factor;
 }
+
 
 void CorrectionFactor::get_function(){
 
@@ -30,25 +46,43 @@ void CorrectionFactor::get_function(){
   filename = dir + "Correction_allHad.root";
   TFile *file = new TFile(filename);
 
-  TString histname;
+  TString histname_updown;
+  TString histname_central;
   int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
   for(int i = 0; i < N_eta_bins; i++){
     stringstream BinString;
     BinString << i;
-    histname = BinString.str();
+    histname_updown = BinString.str();
+    histname_central = BinString.str();
     if(CorUp){
-      histname += "/Up";
-      CorrectionGraphs.push_back((TGraph*)file->Get(histname));
+      histname_updown += "/Up";
+      UpDownCorrectionGraphs.push_back((TGraph*)file->Get(histname_updown));
     }
     else if(CorDown){
-      histname += "/Down";
-      CorrectionGraphs.push_back((TGraph*)file->Get(histname));
+      histname_updown += "/Down";
+      UpDownCorrectionGraphs.push_back((TGraph*)file->Get(histname_updown));
     }
-    else{
-      histname += "/Central";
-      CorrectionFunctions.push_back((TF1*)file->Get(histname));
-    }
+    histname_central += "/Central";
+    CentralCorrectionFunctions.push_back((TF1*)file->Get(histname_central));
   }
+}
+
+void CorrectionFactor::get_additionalSYS(){
+
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
+  TString filename;
+  filename = dir + "Correction_SysFromResolution.root";
+  TFile *file = new TFile(filename);
+
+  if(CorUp){
+    TString histname = "Up";
+    AdditionalSys = (TGraph*)file->Get(histname);
+  }
+  else if(CorDown){
+    TString histname = "Down";
+    AdditionalSys = (TGraph*)file->Get(histname);
+  }
+  return;
 }
 
 Particle GetLepton(uhh2::Event & event){
@@ -83,6 +117,7 @@ allHad(allHad_)
   else if(corvar == "down") CorDown = true;
 
   get_function(); // read file here, not in every event
+  get_additionalSYS();
 }
 
 bool CorrectionFactor::process(uhh2::Event & event){
