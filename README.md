@@ -31,8 +31,10 @@ to compile scripts do:
 
 To Run Unfolding:
 
-1) ./hist_filler fine true/false
+1) ./binning fine
 
-2) ./SmearInput
+2) ./hist_filler fine true/false
 
-3) ./do_unfolding data/pseudo1/pseudo2 fine
+3) ./SmearInput
+
+4) ./do_unfolding data/pseudo1/pseudo2 fine

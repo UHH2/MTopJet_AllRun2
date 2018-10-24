@@ -149,6 +149,15 @@ int main(int argc, char* argv[])
   TH1D* mc_mtop1785_truth;
   std::vector<TH1D*> mc_mtop_templates;
 
+  TH1D* mc_mtop1665_input;
+  TH1D* mc_mtop1695_input;
+  TH1D* mc_mtop1715_input;
+  TH1D* mc_mtop1725_input;
+  TH1D* mc_mtop1735_input;
+  TH1D* mc_mtop1755_input;
+  TH1D* mc_mtop1785_input;
+  std::vector<TH1D*> mc_mtop_inputs;
+
   std::vector<TH1D*> hist_PseudoData , hist_PseudoData_gen, hist_PseudoMC_sig, hist_PseudoData_truth, hist_PseudoMC_truth;
 
 
@@ -174,6 +183,22 @@ int main(int argc, char* argv[])
   mc_mtop_templates.push_back(mc_mtop1735_truth);
   mc_mtop_templates.push_back(mc_mtop1755_truth);
   mc_mtop_templates.push_back(mc_mtop1785_truth);
+
+  inputFile->GetObject("mc_mtop1665_sig",mc_mtop1665_input);
+  inputFile->GetObject("mc_mtop1695_sig",mc_mtop1695_input);
+  inputFile->GetObject("mc_mtop1715_sig",mc_mtop1715_input);
+  inputFile->GetObject("mc_mtop1735_sig",mc_mtop1735_input);
+  inputFile->GetObject("mc_mtop1755_sig",mc_mtop1755_input);
+  inputFile->GetObject("mc_mtop1785_sig",mc_mtop1785_input);
+
+  mc_mtop_inputs.push_back(mc_mtop1665_input);
+  mc_mtop_inputs.push_back(mc_mtop1695_input);
+  mc_mtop_inputs.push_back(mc_mtop1715_input);
+  mc_mtop_inputs.push_back(mc_mtop1725_input);
+  mc_mtop_inputs.push_back(mc_mtop1735_input);
+  mc_mtop_inputs.push_back(mc_mtop1755_input);
+  mc_mtop_inputs.push_back(mc_mtop1785_input);
+
   std::vector<double> masses = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
   std::vector<bool>     show = {false,  true, false,  true, false,  true, false}; // decides which masspoint is shown
   // std::vector<bool> show = {true, true, true, true, true, true, true};
@@ -248,13 +273,19 @@ int main(int argc, char* argv[])
       sys_matrix[i].push_back((TH2*)inputFile->Get(sys_name[i][j] + "_matrix"));
     }
   }
-
   // now read model variations
-  vector<TString> shower = {"Shower"};
+  //vector<TString> shower = {"Shower"};
   vector<TString> generator = {"Generator"};
   vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
-  vector< vector<TString> > model_name = {shower, generator, scale};
-  vector<TString> model_rel_name = {"shower", "generator", "scale"};
+  vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
+  // vector<TString> pdf;
+  // for(unsigned int i=0; i<100; i++){
+  //   TString name = "PDF_";
+  //   name += i;
+  //   pdf.push_back(name);
+  // }
+  vector< vector<TString> > model_name = {generator, scale, mass}; // PDF, MASS AND SHOWER NOT INCLUDED!!!
+  vector<TString> model_rel_name = {"generator", "scale", "mass"}; // PDF, MASS AND SHOWER NOT INCLUDED!!!
   vector< vector<TH1D*> > model_input;
   vector< vector<TH1D*> > model_truth;
   for(unsigned int i=0; i<model_name.size(); i++){
@@ -332,6 +363,8 @@ int main(int argc, char* argv[])
   vector<TF1*> Genvar_fits;
   vector<TH1D*> Genvar_variations;
 
+  vector<TH1*> MTOP_OUTPUT;
+
   TH1* DeltaLumi;
   TH2* CovLumi;
 
@@ -349,6 +382,14 @@ int main(int argc, char* argv[])
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
   }
+
+  /*
+  ██    ██ ███    ██ ███████  ██████  ██      ██████      ██████   █████  ████████  █████
+  ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ██   ██ ██   ██    ██    ██   ██
+  ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ██   ██ ███████    ██    ███████
+  ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██     ██   ██ ██   ██    ██    ██   ██
+  ██████  ██   ████ ██       ██████  ███████ ██████      ██████  ██   ██    ██    ██   ██
+  */
 
 
   if(data || pseudo){
@@ -369,6 +410,16 @@ int main(int argc, char* argv[])
     SYS_DELTA = unfold.get_sys_delta();
     BGR_DELTA = unfold.get_bgr_delta();
     // CovTotal_TUnfold = unfold.GetTotalCov();
+
+    /*
+    ██    ██ ███    ██ ███████  ██████  ██      ██████      ███    ███  ██████  ██████  ███████ ██
+    ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ████  ████ ██    ██ ██   ██ ██      ██
+    ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ██ ████ ██ ██    ██ ██   ██ █████   ██
+    ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██     ██  ██  ██ ██    ██ ██   ██ ██      ██
+    ██████  ██   ████ ██       ██████  ███████ ██████      ██      ██  ██████  ██████  ███████ ███████
+    */
+
+
 
     // now unfold every model variation, get difference to truth and fill cov matrices
     // since tau depends only on the Migration Matrix, one has to find taus only in the first unfolding
@@ -401,6 +452,16 @@ int main(int argc, char* argv[])
         }
       }
     }
+
+    /*
+    ██    ██ ███    ██ ███████  ██████  ██      ██████      ███████ ███    ███ ███████  █████  ██████
+    ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ██      ████  ████ ██      ██   ██ ██   ██
+    ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ███████ ██ ████ ██ █████   ███████ ██████
+    ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██          ██ ██  ██  ██ ██      ██   ██ ██   ██
+    ██████  ██   ████ ██       ██████  ███████ ██████      ███████ ██      ██ ███████ ██   ██ ██   ██
+    */
+
+
 
     // Unfold 100 smeared Generator Distribution
     // take mean in every bin as central value and rms as error
@@ -473,7 +534,29 @@ int main(int argc, char* argv[])
     data_unfolded_stat = SetSysError(data_unfolded, CovStat);
   }
 
+  /*
+  ██    ██ ███    ██ ███████  ██████  ██      ██████      ███    ███  █████  ███████ ███████ ███████ ███████
+  ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ████  ████ ██   ██ ██      ██      ██      ██
+  ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ██ ████ ██ ███████ ███████ ███████ █████   ███████
+  ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██     ██  ██  ██ ██   ██      ██      ██ ██           ██
+  ██████  ██   ████ ██       ██████  ███████ ██████      ██      ██ ██   ██ ███████ ███████ ███████ ███████
+  */
 
+
+
+  // unfold mass samples
+  // for(unsigned int i=0; i<mc_mtop_inputs.size(); i++){
+  //   if(masses[i] != 172.5){ // cannot unfold same sample as Matrix
+  //     cout << "***********************" << endl;
+  //     cout << " UNFOLDING OF MTOP = " << masses[i] << endl;
+  //     vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
+  //     for(auto i: background_dummy) i->Reset();
+  //     unfolding *unfold_mtop = new unfolding(mc_mtop_inputs[i], backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, false, nscan, 0);
+  //     TH1* output = unfold_mtop->get_output(true);
+  //     MTOP_OUTPUT.push_back(output);
+  //   }
+  //   else MTOP_OUTPUT.push_back(mc_mtop1725_truth);
+  // }
 
   // get projections
   int ngen = binning_gen->GetEndBin();
@@ -620,6 +703,12 @@ int main(int argc, char* argv[])
     }
     plot->draw_delta_comparison(MODEL_rel_total, MODEL_rel, model_rel_name, "model", "SYS_MODEL_COMPARISION");
   }
+
+  // for(unsigned int i=0; i<mc_mtop_inputs.size(); i++){
+  //   TString name = "Unfold_MTOP_";
+  //   name += masses[i];
+  //   plot->draw_output_pseudo(MTOP_OUTPUT[i], mc_mtop_templates[i], hist_mc_truth, false, name);
+  // }
 
   for(unsigned int i=0; i<bgr_name.size(); i++){
     plot->draw_matrix(CovBgrStat[i], "COV_"+bgr_name[i]+"_stat", false);

@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
   // 1. set-up binning in vectors
   std::vector<Double_t> MASS;
-  if(fine) MASS = {120, 142, 157, 172, 187, 220, 250};
+  if(fine) MASS = {110, 137, 157, 172, 187, 220, 250};
   // if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270};
   else     MASS = {120, 150, 180, 210, 240, 270, 300};
 

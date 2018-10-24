@@ -135,6 +135,8 @@ int main(int argc, char* argv[]){
   fill_template((TTree *) mc_truth_File[4]->Get("AnalysisTree"), "1755");
   fill_template((TTree *) mc_truth_File[5]->Get("AnalysisTree"), "1785");
 
+
+
   // fill background
   vector<TString> bkg_name = {"WJets", "SingleTop", "other"};
   for(unsigned int i=0; i<bkg_name.size(); i++){
@@ -208,21 +210,25 @@ void fill_template(TTree* tree, TString mtop){
   else      cout << "Filling Template Histograms...\n";
 
   TH1* h_mass_truth = measurement_gen->CreateHistogram("mc_mtop"+mtop+"_truth",kTRUE,0,0,"pt[C]");
-  TH1* h_mass_rec = measurement_rec->CreateHistogram("mc_mtop"+mtop+"_rec",kTRUE,0,0,"pt[C]");
+  TH1* h_mass_sig = binning_rec->CreateHistogram("mc_mtop"+mtop+"_sig");
 
   outputFile->cd();
-
   tree->ResetBranchAddresses();
-  tree->SetBranchAddress("Mass_Gen33",&massGen);
   tree->SetBranchAddress("Mass_Rec",&massRec);
+  tree->SetBranchAddress("Mass_Gen33",&massGen);
+  tree->SetBranchAddress("Pt_Rec",&ptRec);
+  tree->SetBranchAddress("Pt_Gen33",&ptGen);
   tree->SetBranchAddress("passed_measurement_rec",&passed_measurement_rec);
-  tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
-  tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
-  tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchAddress("passed_measurement_gen",&passed_measurement_gen);
   tree->SetBranchAddress("is_TTbar",&is_TTbar);
+  tree->SetBranchAddress("rec_weight",&rec_weight);
   tree->SetBranchAddress("gen_weight",&gen_weight);
   tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
+  tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
+  tree->SetBranchAddress("passed_ptmigration_gen",&passed_ptmigration_gen);
+  tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
+  tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
+  tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
 
 
@@ -234,19 +240,40 @@ void fill_template(TTree* tree, TString mtop){
     }
 
     if(ttweight) gen_weight *= gen_ttfactor;
-    w_rec = rec_weight * gen_weight;
 
-    if(passed_measurement_gen){
-      h_mass_truth->Fill(massGen, gen_weight);
-    }
-    if(passed_measurement_rec || passed_ptmigration_rec || passed_massmigration_rec || passed_btagmigration_rec){
-      h_mass_rec->Fill(massRec, w_rec);
-    }
+    // get weight for gen and rec hists
+    w_sig_rec = rec_weight * gen_weight;
+    w_gen = gen_weight;
+
+
+    // get global bins
+    Int_t genBin;
+    if     (passed_measurement_gen)   genBin = measurement_gen->GetGlobalBinNumber(massGen,ptGen);
+    else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
+    else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
+    else                              genBin = 0;
+
+    Int_t recBin;
+    if     (passed_measurement_rec)    recBin = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
+    else                               recBin = 0;
+
+    bool rec_info = false;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_btagmigration_rec) rec_info = true;
+    bool gen_info = false;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen) gen_info = true;
+
+    // Fill 1D Hists (for truth distribution only use gen selection)
+    if(passed_measurement_gen) h_mass_truth->Fill(massGen, w_gen);
+    if(rec_info) h_mass_sig->Fill(recBin, w_sig_rec);
+
   }
+  h_mass_sig->Write();
   h_mass_truth->Write();
-  h_mass_rec->Write();
+  delete h_mass_sig;
   delete h_mass_truth;
-  delete h_mass_rec;
   return;
 }
 
@@ -539,16 +566,33 @@ void fill_pdf(TTree* tree){
   if(!tree) cout<<"could not read 'mc signal' tree\n";
   else      cout << "Filling Model SYS Histograms (PDF) ...\n";
 
+
+  // setup hist names
+  vector<TString> name_sig;
+  vector<TString> name_gen;
+  vector<TString> name_truth;
+  for(unsigned int i=0; i<100; i++){
+    TString prefix = "PDF_";
+    prefix += i;
+    TString ns = prefix + "_sig";
+    TString ng = prefix + "_gen";
+    TString nt = prefix + "_truth";
+    name_sig.push_back(ns);
+    name_gen.push_back(ng);
+    name_truth.push_back(nt);
+  }
+
   // setup hists
-  TString prefix = "pdf";
   vector<TH1*> h_mc_sig;
   vector<TH1*> h_mc_gen;
   vector<TH1*> h_mc_truth;
+  TH1* h_sig = binning_rec->CreateHistogram("PDF_sig");
+  TH1* h_gen = binning_gen->CreateHistogram("PDF_gen");
+  TH1* h_truth = measurement_gen->CreateHistogram("PDF_truth",kTRUE,0,0,"pt[C]");
   for(unsigned int i=0; i<100; i++){
-    TString number = i;
-    h_mc_sig.push_back(binning_rec->CreateHistogram("PDF_sig_" + number));
-    h_mc_gen.push_back(binning_gen->CreateHistogram("PDF_gen_" + number));
-    h_mc_truth.push_back(measurement_gen->CreateHistogram("PDF_truth_" + number,kTRUE,0,0,"pt[C]"));
+    h_mc_sig.push_back((TH1*)h_sig->Clone());
+    h_mc_gen.push_back((TH1*)h_gen->Clone());
+    h_mc_truth.push_back((TH1*)h_truth->Clone());
   }
 
 
@@ -618,9 +662,9 @@ void fill_pdf(TTree* tree){
 
   }
   for(unsigned int i=0; i<100; i++){
-    h_mc_sig[i]->Write();
-    h_mc_truth[i]->Write();
-    h_mc_gen[i]->Write();
+    h_mc_sig[i]->Write(name_sig[i]);
+    h_mc_truth[i]->Write(name_truth[i]);
+    h_mc_gen[i]->Write(name_gen[i]);
   }
 
   return;

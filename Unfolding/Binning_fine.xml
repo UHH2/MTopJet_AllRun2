@@ -102,10 +102,11 @@
 </BinningNode>
 <BinningNode name="binning_gen" firstbin="1" factor="1">
  <BinningNode name="measurement_gen" firstbin="1" factor="1">
-  <Axis name="mass" lowEdge="120">
-   <Bin location="underflow" width="22" center="109" />
-   <Bin width="22" center="131" />
-   <Bin repeat="3" width="15" center="149.5" />
+  <Axis name="mass" lowEdge="110">
+   <Bin location="underflow" width="27" center="96.5" />
+   <Bin width="27" center="123.5" />
+   <Bin width="20" center="147" />
+   <Bin repeat="2" width="15" center="164.5" />
    <Bin width="33" center="203.5" />
    <Bin width="30" center="235" />
    <Bin location="overflow" width="30" center="265"/>
@@ -116,10 +117,11 @@
   </Axis>
  </BinningNode>
  <BinningNode name="ptmigration_gen" firstbin="17" factor="1">
-  <Axis name="mass" lowEdge="120">
-   <Bin location="underflow" width="22" center="109" />
-   <Bin width="22" center="131" />
-   <Bin repeat="3" width="15" center="149.5" />
+  <Axis name="mass" lowEdge="110">
+   <Bin location="underflow" width="27" center="96.5" />
+   <Bin width="27" center="123.5" />
+   <Bin width="20" center="147" />
+   <Bin repeat="2" width="15" center="164.5" />
    <Bin width="33" center="203.5" />
    <Bin width="30" center="235" />
    <Bin location="overflow" width="30" center="265"/>
