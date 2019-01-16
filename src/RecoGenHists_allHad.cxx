@@ -1,7 +1,7 @@
 #include "UHH2/MTopJet/include/RecoGenHists_allHad.h"
 
 
-RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string & dirname,  const std::string & type): Hists(ctx, dirname){
+RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string & dirname,  const std::string & type, double ptreccut_, double ptgencut_): Hists(ctx, dirname){
   // book all histograms here
   MassReso = book<TH1F>("MassResolution", "(M^{rec}_{jet} - M^{gen}_{jet}) / M^{gen}_{jet}) ", 90, -1.5, 1.5);
   PtReso = book<TH1F>("PtResolution", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
@@ -17,6 +17,16 @@ RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string 
   PtReso_8 = book<TH1F>("PtResolution_8", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_9 = book<TH1F>("PtResolution_9", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_10 = book<TH1F>("PtResolution_10", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+
+  PtReso_area1 = book<TH1F>("PtResolution_area1", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area2 = book<TH1F>("PtResolution_area2", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area3 = book<TH1F>("PtResolution_area3", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area4 = book<TH1F>("PtResolution_area4", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area5 = book<TH1F>("PtResolution_area5", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area6 = book<TH1F>("PtResolution_area6", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area7 = book<TH1F>("PtResolution_area7", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+  PtReso_area8 = book<TH1F>("PtResolution_area8", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
+
 
   PtReso_rec1 = book<TH1F>("PtResolution_rec1", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
   PtReso_rec2 = book<TH1F>("PtResolution_rec2", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
@@ -55,6 +65,14 @@ RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string 
     h_recjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   }
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
+
+  // handle for ttbargen
+  h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
+
+  // set min ptgen and min ptrec
+  ptreccut = ptreccut_;
+  ptgencut = ptgencut_;
+
 
 }
 
@@ -107,15 +125,18 @@ void RecoGenHists_allHad::fill(const Event & event){
   std::vector<Particle> gen_sub1 = genjets.at(i1).subjets();
   std::vector<Particle> gen_sub2 = genjets.at(i2).subjets();
 
+  sort_by_pt<Jet> (rec_sub1);
+  sort_by_pt<Jet> (rec_sub2);
 
+  double ptsubmax = 0;
   for(auto subjet: rec_sub1){
-    if(subjet.v4().Pt() < 30) use_jet1 = false;
+    if(subjet.v4().Pt() < ptsubmax) use_jet1 = false;
   }
   for(auto subjet: rec_sub2){
-    if(subjet.v4().Pt() < 30) use_jet2 = false;
+    if(subjet.v4().Pt() < ptsubmax) use_jet2 = false;
   }
-  if(recjets.at(0).v4().Pt() < 400) use_jet1 = false;
-  if(recjets.at(1).v4().Pt() < 400) use_jet2 = false;
+  if(recjets.at(0).v4().Pt() < ptreccut || genjets.at(i1).v4().Pt() < ptgencut) use_jet1 = false;
+  if(recjets.at(1).v4().Pt() < ptreccut || genjets.at(i2).v4().Pt() < ptgencut) use_jet2 = false;
 
 
   if(!use_jet1 && !use_jet2) return;
@@ -133,6 +154,7 @@ void RecoGenHists_allHad::fill(const Event & event){
   double gen_pt;
   double rec_pt;
   double R;
+  double area;
   // do matching
   if(use_jet1){
     for(unsigned int i=0; i<rec_sub1.size(); i++){
@@ -147,10 +169,12 @@ void RecoGenHists_allHad::fill(const Event & event){
       }
       gen_pt=gen_sub1.at(nearest_j).v4().Pt();
       rec_pt=rec_sub1.at(i).v4().Pt();
+      area = rec_sub1.at(i).jetArea();
       R = (rec_pt - gen_pt) / gen_pt;
       if(nearest_j != 100 && dR <= 0.2){
         PtReso->Fill( R, weight );
         MassReso->Fill( (rec_sub1.at(i).v4().M() - gen_sub1.at(nearest_j).v4().M())/gen_sub1.at(nearest_j).v4().M() , weight );
+        // resolution vs genpt
         if(gen_pt <= 50) PtReso_1->Fill( R, weight );
         if(gen_pt > 50 && gen_pt <= 80) PtReso_2->Fill( R, weight );
         if(gen_pt > 80 && gen_pt <= 120) PtReso_3->Fill( R, weight );
@@ -161,6 +185,15 @@ void RecoGenHists_allHad::fill(const Event & event){
         if(gen_pt > 320 && gen_pt <= 370) PtReso_8->Fill( R, weight );
         if(gen_pt > 370 && gen_pt <= 420) PtReso_9->Fill( R, weight );
         if(gen_pt > 420) PtReso_10->Fill( R, weight );
+        // resolution vs area
+        if(area <= 0.30) PtReso_area1->Fill( R, weight );
+        if(area > 0.30 && area <= 0.35) PtReso_area2->Fill( R, weight );
+        if(area > 0.35 && area <= 0.38) PtReso_area3->Fill( R, weight );
+        if(area > 0.38 && area <= 0.41) PtReso_area4->Fill( R, weight );
+        if(area > 0.41 && area <= 0.44) PtReso_area5->Fill( R, weight );
+        if(area > 0.44 && area <= 0.47) PtReso_area6->Fill( R, weight );
+        if(area > 0.47 && area <= 0.5) PtReso_area7->Fill( R, weight );
+        if(area > 0.5) PtReso_area8->Fill( R, weight );
 
         if(gen_pt <= 50) PtRec_1->Fill( rec_pt, weight );
         if(gen_pt > 50 && gen_pt <= 80) PtRec_2->Fill( rec_pt, weight );
@@ -199,6 +232,7 @@ void RecoGenHists_allHad::fill(const Event & event){
       }
       gen_pt=gen_sub2.at(nearest_j).v4().Pt();
       rec_pt=rec_sub2.at(i).v4().Pt();
+      area = rec_sub2.at(i).jetArea();
       R = (rec_pt - gen_pt) / gen_pt;
       if(nearest_j != 100 && dR <= 0.2){
         PtReso->Fill( R, weight );
@@ -213,6 +247,15 @@ void RecoGenHists_allHad::fill(const Event & event){
         if(gen_pt > 320 && gen_pt <= 370) PtReso_8->Fill( R, weight );
         if(gen_pt > 370 && gen_pt <= 420) PtReso_9->Fill( R, weight );
         if(gen_pt > 420) PtReso_10->Fill( R, weight );
+        // resolution vs area
+        if(area <= 0.30) PtReso_area1->Fill( R, weight );
+        if(area > 0.30 && area <= 0.35) PtReso_area2->Fill( R, weight );
+        if(area > 0.35 && area <= 0.38) PtReso_area3->Fill( R, weight );
+        if(area > 0.38 && area <= 0.41) PtReso_area4->Fill( R, weight );
+        if(area > 0.41 && area <= 0.44) PtReso_area5->Fill( R, weight );
+        if(area > 0.44 && area <= 0.47) PtReso_area6->Fill( R, weight );
+        if(area > 0.47 && area <= 0.5) PtReso_area7->Fill( R, weight );
+        if(area > 0.5) PtReso_area8->Fill( R, weight );
 
         if(gen_pt <= 50) PtRec_1->Fill( rec_pt, weight );
         if(gen_pt > 50 && gen_pt <= 80) PtRec_2->Fill( rec_pt, weight );

@@ -1,5 +1,7 @@
 #include "UHH2/MTopJet/include/CombineXCone.h"
 
+// TODO: remove ptcut from combine
+
 bool CombineXCone::FindLepton(uhh2::Event & event){
   bool lepton_in_event = false;
   if(event.muons->size() > 0 || event.electrons->size() > 0) lepton_in_event = true;
@@ -54,7 +56,7 @@ GenParticle CombineXCone::GetLepton_gen(uhh2::Event & event){
 
 
 // Combine Subjets to jet (do not use subjet if pt < ptmin)
-TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin){
+TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax){
   double px=0, py=0, pz=0, E=0;
   TLorentzVector jet_v4;
   TopJet jet;
@@ -64,6 +66,8 @@ TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin){
   bool good_jet = true;
   for(unsigned int i=0; i < subjets.size(); ++i){
     if(subjets.at(i).pt() < ptmin) good_jet = false;
+    if(subjets.at(i).eta() > etamax) good_jet = false;
+    if(subjets.at(i).eta() < -etamax) good_jet = false;
   }
   if(good_jet && subjets.size() >= 3){
     for(unsigned int i=0; i < subjets.size(); ++i){
@@ -80,10 +84,11 @@ TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin){
   jet.set_phi(jet_v4.Phi());
   jet.set_energy(jet_v4.E());
 
+
   return jet;
 }
 
-GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<Particle> subjets, double ptmin){
+GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<Particle> subjets, double ptmin, double etamax){
   double px=0, py=0, pz=0, E=0;
   TLorentzVector jet_v4;
   GenTopJet jet;
@@ -91,6 +96,8 @@ GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<Particle> subjets, do
   bool good_jet = true;
   for(unsigned int i=0; i < subjets.size(); ++i){
     if(subjets.at(i).pt() < ptmin) good_jet = false;
+    if(subjets.at(i).eta() > etamax) good_jet = false;
+    if(subjets.at(i).eta() < -etamax) good_jet = false;
   }
   if(good_jet){
     for(unsigned int i=0; i < subjets.size(); ++i){
@@ -155,8 +162,8 @@ bool CombineXCone33::process(uhh2::Event & event){
   TopJet lepjet, hadjet;
   std::vector<Jet> subjets_lep = fatlepjet.subjets();
   std::vector<Jet> subjets_had = fathadjet.subjets();
-  lepjet = combine->CreateTopJetFromSubjets(subjets_lep, 0);
-  hadjet = combine->CreateTopJetFromSubjets(subjets_had, 30);
+  lepjet = combine->CreateTopJetFromSubjets(subjets_lep, 0, 2.5);
+  hadjet = combine->CreateTopJetFromSubjets(subjets_had, 0, 2.5);
 
   vector<TopJet> hadjets;
   vector<TopJet> lepjets;
@@ -212,8 +219,8 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
-  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0);
-  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0);
+  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0, 2.5);
+  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0, 2.5);
   vector<GenTopJet> hadjets;
   vector<GenTopJet> lepjets;
   hadjets.push_back(hadjet);
@@ -272,8 +279,8 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
-  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0);
-  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0);
+  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0, 2.5);
+  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0, 2.5);
   vector<GenTopJet> hadjets;
   vector<GenTopJet> lepjets;
   hadjets.push_back(hadjet);
@@ -322,8 +329,8 @@ bool CombineXConeAllHad::process(uhh2::Event & event){
   TopJet lepjet, hadjet;
   std::vector<Jet> subjets_lep = fatlepjet.subjets();
   std::vector<Jet> subjets_had = fathadjet.subjets();
-  lepjet = combine->CreateTopJetFromSubjets(subjets_lep, 0);
-  hadjet = combine->CreateTopJetFromSubjets(subjets_had, 0);
+  lepjet = combine->CreateTopJetFromSubjets(subjets_lep, 0, 2.5);
+  hadjet = combine->CreateTopJetFromSubjets(subjets_had, 0, 2.5);
 
   vector<TopJet> hadjets;
   vector<TopJet> lepjets;
@@ -364,8 +371,8 @@ bool CombineXConeAllHad_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   std::vector<Particle> subjets_lep = fatlepjet.subjets();
   std::vector<Particle> subjets_had = fathadjet.subjets();
-  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0);
-  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0);
+  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0, 2.5);
+  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0, 2.5);
   vector<GenTopJet> hadjets;
   vector<GenTopJet> lepjets;
   hadjets.push_back(hadjet);

@@ -2,6 +2,13 @@
 
 double CorrectionFactor::get_factor(double pt, double eta){
 
+  // first transform eta to absolute value
+  if(eta < 0) eta *= -1;
+
+  // make sure that there is not jet with eta > 2.5
+  // (this should not happen because in CombineXCone this should be sorted out)
+  if(eta > 2.5) eta = 2.5;
+
   // get eta bin
   int etabin = 0;
   int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
@@ -15,26 +22,30 @@ double CorrectionFactor::get_factor(double pt, double eta){
 
 
   double factor = 1;
-  if(etabin == 11) factor = 1; // but there should be no jet left in this area in the final phase space
-  else {
-    if(CorUp || CorDown){
-      // first get central factor
-      double f_c = CentralCorrectionFunctions[etabin]->Eval(pt);
-      // get up/down factor
-      double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);
-      // get difference
-      double df = f_c - f_ud;
-      // get additional sys (this already is a difference)
-      double dg = AdditionalSys->Eval(pt);
-      // to get the total factor one has to:
-      // 1. add df and dg in quadrature (this gives the total diff to central factor)
-      // 2. add this to central factor
-      if(CorUp)        factor = f_c + sqrt(df*df + dg*dg);
-      else if(CorDown) factor = f_c - sqrt(df*df + dg*dg);
+  if(CorUp || CorDown){
+    // first get central factor
+    double f_c = CentralCorrectionFunctions[etabin]->Eval(pt);
+    // get up/down factor
+    double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);
+    // get difference
+    double df = f_ud - f_c;
+    // get additional sys (this already is a difference)
+    double dg = AdditionalSys->Eval(pt);
+    // to get the total factor one has to:
+    // 1. add df and dg in quadrature (this gives the total diff to central factor)
+    // 2. add this to central factor
+    if(CorUp)        factor = f_c + sqrt(df*df + dg*dg);
+    else if(CorDown) factor = f_c - sqrt(df*df + dg*dg);
+    // cout << "------------------------------------------" << endl;
+    // cout << "central factor         = " << f_c << endl;
+    // cout << "diff from function     = " << df << endl;
+    // cout << "diff from additional   = " << dg << endl;
+    // cout << "diff to central factor = " << sqrt(df*df + dg*dg) << endl;
+    // cout << "new factor             = " << factor << endl;
 
-    }
-    else factor = CentralCorrectionFunctions[etabin]->Eval(pt);
   }
+  else factor = CentralCorrectionFunctions[etabin]->Eval(pt);
+
   return factor;
 }
 

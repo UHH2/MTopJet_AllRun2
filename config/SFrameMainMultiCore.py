@@ -67,7 +67,8 @@ def main():
     while not result.ready():
         with Ndone.get_lock():
             percent = Ndone.value*100/nxmls
-        sys.stdout.write("\r" + loading_bar(percent))
+            missing = nxmls - Ndone.value
+        sys.stdout.write("\r" + str(missing) + " jobs left - " +loading_bar(percent))
         sys.stdout.flush()
         time.sleep(1)
 
@@ -96,6 +97,7 @@ def submit_job(job_list):
         global Ndone
         with Ndone.get_lock():
             Ndone.value += 1
+
     return 1
 
 # ------------------------------------------------------------------------------
@@ -139,7 +141,8 @@ def delete_temp_dirs():
 # ------------------------------------------------------------------------------
 # this converts percent into a loading bar and returns a string containing the bar
 def loading_bar(percent):
-    bar = 'Progress: '+str(round(percent))+'% ['
+    p = float("{0:.2f}".format(percent)) # round to two digits
+    bar = 'Progress: '+str(p)+'% ['
     levels = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95]
     for level in levels:
         if percent > level:

@@ -5,6 +5,9 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   // book all histograms here
   pt_had_subjets = book<TH1F>("pt_had_subjets", "p_{T}^{had subjets}", 50, 0, 500);
   pt_had_subjets_fine = book<TH1F>("pt_had_subjets_fine", "p_{T}^{had subjets}", 100, 0, 500);
+  pt_had_subjet1_fine = book<TH1F>("pt_had_subjet1_fine", "p_{T}^{1st had subjet}", 100, 0, 500);
+  pt_had_subjet2_fine = book<TH1F>("pt_had_subjet2_fine", "p_{T}^{2nd had subjet}", 100, 0, 500);
+  pt_had_subjet3_fine = book<TH1F>("pt_had_subjet3_fine", "p_{T}^{3rd had subjet}", 100, 0, 500);
   eta_had_subjets = book<TH1F>("eta_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   eta_abs_had_subjets = book<TH1F>("eta_abs_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 2);
@@ -20,7 +23,9 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   area_all_subjets = book<TH1F>("area_all_subjets", "jet area (all subjets)", 100, 0, 2);
   pt_all_subjets = book<TH1F>("pt_all_subjets", "p_{T}^{all subjets}", 100, 0, 500);
   eta_all_subjets = book<TH1F>("eta_all_subjets", "#eta^{all subjets}", 100, -5, 5);
-  AreaVsPT = book<TH2F>("AreaVsPT", "x=Area y=p_{T}^{all subjets}", 100, 0, 2, 100, 0, 500);
+  AreaVsPT = book<TH2F>("AreaVsPT", "x=p_{T}^{had subjets} y=Area", 100, 0, 500, 30, 0, 0.6);
+
+  match_to_subjet = book<TH1F>("match_to_subjet", "ak4 b-tag matched to XCone subjet", 4, -1.5, 2.5);
 
   // Because the v4 is set again in 'cor' jets, the JEC factor ist set to the default value 1
   // So, in lep jets the JEC factor should not change from 'jec' to 'cor'
@@ -82,7 +87,7 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   JEC_ak4 = book<TH1F>("JEC_ak4", "JEC factor", 100, 0, 2);
   JEC_L1_ak4 = book<TH1F>("JEC_L1_ak4", "JEC factor L1", 100, 0, 2);
   JEC_L2L3_ak4 = book<TH1F>("JEC_L2L3_ak4", "JEC factor L2L3", 100, 0, 2);
-  AreaVsPT_ak4 = book<TH2F>("AreaVsPT_ak4", "x=Area y=p_{T}^{all ak4 jets}", 100, 0, 2, 100, 0, 500);
+  AreaVsPT_ak4 = book<TH2F>("AreaVsPT_ak4", "x=p_{T}^{all ak4} y=Area", 100, 0, 500, 100, 0, 0.7);
 
   // handle for jets
   if(type == "raw") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
@@ -241,7 +246,7 @@ void SubjetHists_xcone::fill(const Event & event){
     pt_ak4->Fill(event.jets->at(i).pt(), weight);
     eta_ak4->Fill(event.jets->at(i).eta(), weight);
     area_ak4->Fill(event.jets->at(i).jetArea(), weight);
-    AreaVsPT_ak4->Fill(event.jets->at(i).jetArea(), event.jets->at(i).pt(), weight);
+    AreaVsPT_ak4->Fill(event.jets->at(i).pt(), event.jets->at(i).jetArea(), weight);
 
     JEC_factor = 1./(event.jets->at(i).JEC_factor_raw());
     JEC_L1factor = event.jets->at(i).JEC_L1factor_raw();
@@ -262,6 +267,9 @@ void SubjetHists_xcone::fill(const Event & event){
   ////
 
   double tot_area=0;
+  pt_had_subjet1_fine->Fill(had_subjets.at(0).pt(), weight);
+  pt_had_subjet2_fine->Fill(had_subjets.at(1).pt(), weight);
+  pt_had_subjet3_fine->Fill(had_subjets.at(2).pt(), weight);
   for(unsigned int i=0; i<had_subjets.size(); i++){
     pt_had_subjets->Fill(had_subjets.at(i).pt(), weight);
     pt_had_subjets_fine->Fill(had_subjets.at(i).pt(), weight);
@@ -273,7 +281,7 @@ void SubjetHists_xcone::fill(const Event & event){
     tot_area += had_subjets.at(i).jetArea();
     JEC_factor = 1./(had_subjets.at(i).JEC_factor_raw());
     JEC_L1factor = had_subjets.at(i).JEC_L1factor_raw();
-    AreaVsPT->Fill(had_subjets.at(i).jetArea(), had_subjets.at(i).pt(), weight);
+    AreaVsPT->Fill(had_subjets.at(i).pt(), had_subjets.at(i).jetArea(), weight);
 
     JEC_all_subjets->Fill(JEC_factor, weight);
     JEC_L1_all_subjets->Fill(JEC_L1factor, weight);
@@ -339,6 +347,22 @@ void SubjetHists_xcone::fill(const Event & event){
   mass_had_combine->Fill(had_jet_v4.M(), weight);
   mass_had_combine_cut->Fill(had_jet_v4_cut.M(), weight);
   mass_lep_combine->Fill(lep_jet_v4.M(), weight);
+
+  for(const auto& ak4 : *event.jets){
+    if(CSVBTag(CSVBTag::WP_TIGHT)(ak4, event)){
+      double dR_min = 100;
+      double dR;
+      int index_match = -1;
+      for(unsigned int i=0; i< had_subjets.size(); i++){
+        dR = deltaR(ak4, had_subjets[i]);
+        if(dR < dR_min && dR < 0.2){
+          dR_min = dR;
+          index_match = i;
+        }
+      }
+      match_to_subjet->Fill(index_match, weight);
+    }
+  }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 

@@ -25,9 +25,9 @@ class CombineXCone{
   bool FindLepton(uhh2::Event &);
   bool FindLepton_gen(uhh2::Event &);
   Particle GetLepton(uhh2::Event &);
-  TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin);
+  TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax);
   GenParticle GetLepton_gen(uhh2::Event &);
-  GenTopJet CreateTopJetFromSubjets_gen(vector<Particle> subjets, double ptmin);
+  GenTopJet CreateTopJetFromSubjets_gen(vector<Particle> subjets, double ptmin, double etamax);
 };
 
 

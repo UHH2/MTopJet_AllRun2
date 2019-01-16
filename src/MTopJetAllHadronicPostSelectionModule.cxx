@@ -27,12 +27,13 @@
 #include <UHH2/MTopJet/include/PDFHists.h>
 
 #include <UHH2/MTopJet/include/GenHists_xcone.h>
-#include <UHH2/MTopJet/include/GenHists_particles.h>
+#include <UHH2/MTopJet/include/GenHists_allHad.h>
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/SubjetHists_xcone.h>
 #include "UHH2/MTopJet/include/RecoGenHists_allHad.h"
+#include "UHH2/MTopJet/include/RecoGenHists_allHad_flavor.h"
 #include "UHH2/MTopJet/include/RecoGenHists_ak4.h"
 #include "UHH2/MTopJet/include/CorrectionHists_allHad.h"
 #include "UHH2/MTopJet/include/CorrectionFactor.h"
@@ -70,9 +71,20 @@ protected:
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
   std::unique_ptr<Hists> h_XCone_cor_subjets_SF, h_XCone_jec_subjets_SF, h_XCone_raw_subjets_SF;
 
+  std::unique_ptr<Hists> h_RecGenHists_rec0_gen400;
+  std::unique_ptr<Hists> h_RecGenHists_rec200_gen0;
+  std::unique_ptr<Hists> h_RecGenHists_rec300_gen0;
+  std::unique_ptr<Hists> h_RecGenHists_rec400_gen0;
+  std::unique_ptr<Hists> h_RecGenHists_bmatching, h_RecGenHists_noJEC_bmatching;
+  std::unique_ptr<Hists> h_RecGenHists_bmatching_light, h_RecGenHists_noJEC_bmatching_light;
+  std::unique_ptr<Hists> h_RecGenHists_bmatching_b, h_RecGenHists_noJEC_bmatching_b;
+
+
   std::unique_ptr<Hists> h_RecGenHists_allHad, h_RecGenHists_allHad_noJEC, h_RecGenHists_allHad_corrected;
   std::unique_ptr<Hists> h_RecGenHists_allHad_lowPU, h_RecGenHists_allHad_medPU, h_RecGenHists_allHad_highPU;
   std::unique_ptr<Hists> h_RecGenHists_allHad_noJEC_lowPU, h_RecGenHists_allHad_noJEC_medPU, h_RecGenHists_allHad_noJEC_highPU;
+
+  std::unique_ptr<Hists> h_GenParticles;
 
   bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
@@ -94,10 +106,17 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
 
   /*************************** CONFIGURATION **********************************************************************************/
   isMC = (ctx.get("dataset_type") == "MC");
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_allHad"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_allHad"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_allHad" ) isTTbar = true;
+  else isTTbar = false;
 
   // PU reweighting
   PUreweight.reset(new MCPileupReweight(ctx, "central"));
 
+  // ttbar gen
+  const std::string ttbar_gen_label("ttbargen");
+  if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   h_recjets_had = ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
   if(isMC) h_genjets23_had = ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone23_had_Combined");
@@ -141,15 +160,32 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
   if(isMC){
     h_CorrectionHists.reset(new CorrectionHists_allHad(ctx, "CorrectionHists"));
 
-    h_RecGenHists_allHad.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad", "jec"));
-    h_RecGenHists_allHad_corrected.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_corrected", "cor"));
-    h_RecGenHists_allHad_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_lowPU", "jec"));
-    h_RecGenHists_allHad_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_medPU", "jec"));
-    h_RecGenHists_allHad_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_highPU", "jec"));
-    h_RecGenHists_allHad_noJEC.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC", "raw"));
-    h_RecGenHists_allHad_noJEC_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_lowPU", "raw"));
-    h_RecGenHists_allHad_noJEC_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_medPU", "raw"));
-    h_RecGenHists_allHad_noJEC_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_highPU", "raw"));
+    h_RecGenHists_allHad.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad", "jec", 0, 400));
+    h_RecGenHists_allHad_corrected.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_corrected", "cor", 0, 400));
+    h_RecGenHists_allHad_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_lowPU", "jec", 0, 400));
+    h_RecGenHists_allHad_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_medPU", "jec", 0, 400));
+    h_RecGenHists_allHad_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_highPU", "jec", 0, 400));
+    h_RecGenHists_allHad_noJEC.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC", "raw", 0, 400));
+    h_RecGenHists_allHad_noJEC_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_lowPU", "raw", 0, 400));
+    h_RecGenHists_allHad_noJEC_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_medPU", "raw", 0, 400));
+    h_RecGenHists_allHad_noJEC_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_highPU", "raw", 0, 400));
+
+    h_RecGenHists_bmatching.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_bmatching", "jec", 0, 400, "both"));
+    h_RecGenHists_noJEC_bmatching.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_noJEC_bmatching", "raw", 0, 400, "both"));
+
+    h_RecGenHists_bmatching_light.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_bmatching_light", "jec", 0, 400, "light"));
+    h_RecGenHists_noJEC_bmatching_light.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_noJEC_bmatching_light", "raw", 0, 400, "light"));
+
+    h_RecGenHists_bmatching_b.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_bmatching_b", "jec", 0, 400, "b"));
+    h_RecGenHists_noJEC_bmatching_b.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_noJEC_bmatching_b", "raw", 0, 400, "b"));
+
+    h_RecGenHists_rec0_gen400.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec0_gen400", "jec", 0, 400));
+    h_RecGenHists_rec200_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec200_gen0", "jec", 200, 0));
+    h_RecGenHists_rec300_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec300_gen0", "jec", 300, 0));
+    h_RecGenHists_rec400_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec400_gen0", "jec", 400, 0));
+
+    h_GenParticles.reset(new GenHists_allHad(ctx, "GenParticles"));
+
   }
 
   // undeclare event output (jet collections etc) to get small root files
@@ -166,6 +202,9 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
   ██      ██   ██  ██████   ██████ ███████ ███████ ███████
   */
 
+  // fill ttbargen class
+  if(isTTbar) ttgenprod->process(event);
+  ////
 
   // check if event has one had and one lep jet
   if( !(njet_had->passes(event)) ) return false;
@@ -189,7 +228,7 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
   BTagScaleFactors->process(event);
 
   /** pT Selection *********************/
-  if(!pt_sel1->passes(event) && !pt_sel2->passes(event)) return false;
+  // if(!pt_sel1->passes(event) && !pt_sel2->passes(event)) return false;
 
   /*************************** Pile Up bools  ***************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
@@ -216,6 +255,7 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
     h_XCone_raw_subjets_SF->fill(event);
     h_XCone_jec_subjets_SF->fill(event);
     h_XCone_cor_subjets_SF->fill(event);
+
   }
 
   if(lowPU){
@@ -236,7 +276,18 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_allHad_noJEC->fill(event);
     h_RecGenHists_allHad_corrected->fill(event);
     h_CorrectionHists->fill(event);
+    h_RecGenHists_bmatching->fill(event);
+    h_RecGenHists_noJEC_bmatching->fill(event);
+    h_RecGenHists_bmatching_light->fill(event);
+    h_RecGenHists_noJEC_bmatching_light->fill(event);
+    h_RecGenHists_bmatching_b->fill(event);
+    h_RecGenHists_noJEC_bmatching_b->fill(event);
+    h_RecGenHists_rec0_gen400->fill(event);
+    h_RecGenHists_rec200_gen0->fill(event);
+    h_RecGenHists_rec300_gen0->fill(event);
+    h_RecGenHists_rec400_gen0->fill(event);
     //h_CorrectionHists_after->fill(event);
+    h_GenParticles->fill(event);
   }
 
   return true;

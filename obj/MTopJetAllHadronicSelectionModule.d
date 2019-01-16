@@ -341,6 +341,7 @@ obj/MTopJetAllHadronicSelectionModule.o: \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/TriggerSelection.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/MuonIds.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/ElectronIds.h \
+ /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/TTbarGen.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/TopJetIds.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/AdditionalSelections.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/MCWeight.h \
@@ -358,7 +359,6 @@ obj/MTopJetAllHadronicSelectionModule.o: \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_8_0_24_patch1/external/slc6_amd64_gcc530/bin/../../../../../../../slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed5/include/TFitResultPtr.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/TopPtReweight.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/core/include/Hists.h \
- /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/TTbarGen.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc530/cms/cmssw-patch/CMSSW_8_0_24_patch1/external/slc6_amd64_gcc530/bin/../../../../../../../slc6_amd64_gcc530/lcg/root/6.06.00-ikhhed5/include/TH1F.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/ElectronHists.h \
  /nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/include/MuonHists.h \

@@ -40,6 +40,50 @@ RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::strin
   PtRec_9 = book<TH1F>("PtRec_9", "p^{rec}_{T, jet}", 200, 0, 1000);
   PtRec_10 = book<TH1F>("PtRec_10", "p^{rec}_{T, jet}", 200, 0, 1000);
 
+  MatchedGen_1 = book<TH1F>("MatchedGen_1", "count", 1, 0, 2);
+  MatchedGen_2 = book<TH1F>("MatchedGen_2", "count", 1, 0, 2);
+  MatchedGen_3 = book<TH1F>("MatchedGen_3", "count", 1, 0, 2);
+  MatchedGen_4 = book<TH1F>("MatchedGen_4", "count", 1, 0, 2);
+  MatchedGen_5 = book<TH1F>("MatchedGen_5", "count", 1, 0, 2);
+  MatchedGen_6 = book<TH1F>("MatchedGen_6", "count", 1, 0, 2);
+  MatchedGen_7 = book<TH1F>("MatchedGen_7", "count", 1, 0, 2);
+  MatchedGen_8 = book<TH1F>("MatchedGen_8", "count", 1, 0, 2);
+  MatchedGen_9 = book<TH1F>("MatchedGen_9", "count", 1, 0, 2);
+  MatchedGen_10 = book<TH1F>("MatchedGen_10", "count", 1, 0, 2);
+
+  MatchedRec_1 = book<TH1F>("MatchedRec_1", "count", 1, 0, 2);
+  MatchedRec_2 = book<TH1F>("MatchedRec_2", "count", 1, 0, 2);
+  MatchedRec_3 = book<TH1F>("MatchedRec_3", "count", 1, 0, 2);
+  MatchedRec_4 = book<TH1F>("MatchedRec_4", "count", 1, 0, 2);
+  MatchedRec_5 = book<TH1F>("MatchedRec_5", "count", 1, 0, 2);
+  MatchedRec_6 = book<TH1F>("MatchedRec_6", "count", 1, 0, 2);
+  MatchedRec_7 = book<TH1F>("MatchedRec_7", "count", 1, 0, 2);
+  MatchedRec_8 = book<TH1F>("MatchedRec_8", "count", 1, 0, 2);
+  MatchedRec_9 = book<TH1F>("MatchedRec_9", "count", 1, 0, 2);
+  MatchedRec_10 = book<TH1F>("MatchedRec_10", "count", 1, 0, 2);
+
+  TotalGen_1 = book<TH1F>("TotalGen_1", "count", 1, 0, 2);
+  TotalGen_2 = book<TH1F>("TotalGen_2", "count", 1, 0, 2);
+  TotalGen_3 = book<TH1F>("TotalGen_3", "count", 1, 0, 2);
+  TotalGen_4 = book<TH1F>("TotalGen_4", "count", 1, 0, 2);
+  TotalGen_5 = book<TH1F>("TotalGen_5", "count", 1, 0, 2);
+  TotalGen_6 = book<TH1F>("TotalGen_6", "count", 1, 0, 2);
+  TotalGen_7 = book<TH1F>("TotalGen_7", "count", 1, 0, 2);
+  TotalGen_8 = book<TH1F>("TotalGen_8", "count", 1, 0, 2);
+  TotalGen_9 = book<TH1F>("TotalGen_9", "count", 1, 0, 2);
+  TotalGen_10 = book<TH1F>("TotalGen_10", "count", 1, 0, 2);
+
+  TotalRec_1 = book<TH1F>("TotalRec_1", "count", 1, 0, 2);
+  TotalRec_2 = book<TH1F>("TotalRec_2", "count", 1, 0, 2);
+  TotalRec_3 = book<TH1F>("TotalRec_3", "count", 1, 0, 2);
+  TotalRec_4 = book<TH1F>("TotalRec_4", "count", 1, 0, 2);
+  TotalRec_5 = book<TH1F>("TotalRec_5", "count", 1, 0, 2);
+  TotalRec_6 = book<TH1F>("TotalRec_6", "count", 1, 0, 2);
+  TotalRec_7 = book<TH1F>("TotalRec_7", "count", 1, 0, 2);
+  TotalRec_8 = book<TH1F>("TotalRec_8", "count", 1, 0, 2);
+  TotalRec_9 = book<TH1F>("TotalRec_9", "count", 1, 0, 2);
+  TotalRec_10 = book<TH1F>("TotalRec_10", "count", 1, 0, 2);
+
   min_mass_Wjet_rec = book<TH1F>("min_mass_Wjet_rec", "min M_{ij}", 60, 60, 120);
   min_mass_Wjet_gen = book<TH1F>("min_mass_Wjet_gen", "min M_{ij}", 60, 60, 120);
   WMassReso = book<TH1F>("WMassResolution", "(M^{rec}_{W} - M^{gen}_{W}) / M^{gen}_{W}) ", 90, -1.5, 1.5);
@@ -84,12 +128,18 @@ void RecoGenHists_subjets::fill(const Event & event){
   for(unsigned int j=0; j<rec.at(had_nr).subjets().size(); j++){
     rec_sub.push_back(rec.at(had_nr).subjets().at(j));
   }
-  // get all subjets on gen level
-  for(unsigned int i=0; i<gen.size(); i++){
-    for(unsigned int j=0; j<gen.at(i).subjets().size(); j++){
-      gen_sub.push_back(gen.at(i).subjets().at(j));
-    }
+
+  // select which gen fatjet is closer to had jet and get those gen subjets
+  int gen_index = 0;
+  if(deltaR(had[0], gen[0]) > deltaR(had[0], gen[1]) ){
+    gen_index = 1;
   }
+
+  // get all subjets on gen level
+  for(unsigned int j=0; j<gen.at(gen_index).subjets().size(); j++){
+    gen_sub.push_back(gen.at(gen_index).subjets().at(j));
+  }
+
 
   if(rec_sub.size() < 1) return;
   if(gen_sub.size() < 1) return;
@@ -108,7 +158,7 @@ void RecoGenHists_subjets::fill(const Event & event){
   int nearest_j;
   double gen_pt, rec_pt, R;
 
-  // do matching
+  // do matching from rec to gen
   for(unsigned int i=0; i<rec_sub.size(); i++){
     dR = 1000;
     nearest_j = 100;
@@ -120,15 +170,45 @@ void RecoGenHists_subjets::fill(const Event & event){
         nearest_j = j;
       }
     }
+    if(nearest_j == 100) return;
+    rec_pt = rec_sub.at(i).v4().Pt();
+    if(nearest_j != 100 && dR <= 0.2){
+      // count all matched subjets
+      if(rec_pt <= 50) MatchedRec_1->Fill(1, weight );
+      if(rec_pt > 50 && rec_pt <= 80) MatchedRec_2->Fill(1, weight );
+      if(rec_pt > 80 && rec_pt <= 120) MatchedRec_3->Fill(1, weight );
+      if(rec_pt > 120 && rec_pt <= 170) MatchedRec_4->Fill(1, weight );
+      if(rec_pt > 170 && rec_pt <= 220) MatchedRec_5->Fill(1, weight );
+      if(rec_pt > 220 && rec_pt <= 270) MatchedRec_6->Fill(1, weight );
+      if(rec_pt > 270 && rec_pt <= 320) MatchedRec_7->Fill(1, weight );
+      if(rec_pt > 320 && rec_pt <= 370) MatchedRec_8->Fill(1, weight );
+      if(rec_pt > 370 && rec_pt <= 420) MatchedRec_9->Fill(1, weight );
+      if(rec_pt > 420) MatchedRec_10->Fill(1, weight );
+      ////
+    }
+
+  }
+
+  // do matching from gen to rec
+  for(unsigned int i=0; i<gen_sub.size(); i++){
+    dR = 1000;
+    nearest_j = 100;
+    for(unsigned int j=0; j<rec_sub.size(); j++){
+      dR_temp = uhh2::deltaR(rec_sub.at(j), gen_sub.at(i));
+      if(dR_temp < dR){
+        dR = dR_temp;
+        nearest_j = j;
+      }
+    }
 
     if(nearest_j == 100) return;
-    gen_pt = gen_sub.at(nearest_j).v4().Pt();
-    rec_pt = rec_sub.at(i).v4().Pt();
+    gen_pt = gen_sub.at(i).v4().Pt();
+    rec_pt = rec_sub.at(nearest_j).v4().Pt();
     R = (rec_pt - gen_pt) / gen_pt;
 
     if(nearest_j != 100 && dR <= 0.2){
       PtReso->Fill( R, weight );
-      MassReso->Fill( (rec_sub.at(i).v4().M() - gen_sub.at(nearest_j).v4().M())/gen_sub.at(nearest_j).v4().M() , weight );
+      MassReso->Fill( (rec_sub.at(nearest_j).v4().M() - gen_sub.at(i).v4().M())/gen_sub.at(i).v4().M() , weight );
       if(gen_pt <= 50) PtReso_1->Fill( R, weight );
       if(gen_pt > 50 && gen_pt <= 80) PtReso_2->Fill( R, weight );
       if(gen_pt > 80 && gen_pt <= 120) PtReso_3->Fill( R, weight );
@@ -161,8 +241,50 @@ void RecoGenHists_subjets::fill(const Event & event){
       if(rec_pt > 320 && rec_pt <= 370) PtReso_rec8->Fill( R, weight );
       if(rec_pt > 370 && rec_pt <= 420) PtReso_rec9->Fill( R, weight );
       if(rec_pt > 420) PtReso_rec10->Fill( R, weight );
+
+      // count all matched subjets
+      if(gen_pt <= 50) MatchedGen_1->Fill(1, weight );
+      if(gen_pt > 50 && gen_pt <= 80) MatchedGen_2->Fill(1, weight );
+      if(gen_pt > 80 && gen_pt <= 120) MatchedGen_3->Fill(1, weight );
+      if(gen_pt > 120 && gen_pt <= 170) MatchedGen_4->Fill(1, weight );
+      if(gen_pt > 170 && gen_pt <= 220) MatchedGen_5->Fill(1, weight );
+      if(gen_pt > 220 && gen_pt <= 270) MatchedGen_6->Fill(1, weight );
+      if(gen_pt > 270 && gen_pt <= 320) MatchedGen_7->Fill(1, weight );
+      if(gen_pt > 320 && gen_pt <= 370) MatchedGen_8->Fill(1, weight );
+      if(gen_pt > 370 && gen_pt <= 420) MatchedGen_9->Fill(1, weight );
+      if(gen_pt > 420) MatchedGen_10->Fill(1, weight );
+      ////
     }
 
+  }
+
+  //// Here: Count total subjets in bins
+  for(unsigned int j=0; j<gen_sub.size(); j++){
+    double gen_pt = gen_sub[j].pt();
+    if(gen_pt <= 50) TotalGen_1->Fill(1, weight );
+    if(gen_pt > 50 && gen_pt <= 80) TotalGen_2->Fill(1, weight );
+    if(gen_pt > 80 && gen_pt <= 120) TotalGen_3->Fill(1, weight );
+    if(gen_pt > 120 && gen_pt <= 170) TotalGen_4->Fill(1, weight );
+    if(gen_pt > 170 && gen_pt <= 220) TotalGen_5->Fill(1, weight );
+    if(gen_pt > 220 && gen_pt <= 270) TotalGen_6->Fill(1, weight );
+    if(gen_pt > 270 && gen_pt <= 320) TotalGen_7->Fill(1, weight );
+    if(gen_pt > 320 && gen_pt <= 370) TotalGen_8->Fill(1, weight );
+    if(gen_pt > 370 && gen_pt <= 420) TotalGen_9->Fill(1, weight );
+    if(gen_pt > 420) TotalGen_10->Fill(1, weight );
+  }
+
+  for(unsigned int i=0; i<rec_sub.size(); i++){
+    double rec_pt = rec_sub[i].pt();
+    if(rec_pt <= 50) TotalRec_1->Fill(1, weight );
+    if(rec_pt > 50 && rec_pt <= 80) TotalRec_2->Fill(1, weight );
+    if(rec_pt > 80 && rec_pt <= 120) TotalRec_3->Fill(1, weight );
+    if(rec_pt > 120 && rec_pt <= 170) TotalRec_4->Fill(1, weight );
+    if(rec_pt > 170 && rec_pt <= 220) TotalRec_5->Fill(1, weight );
+    if(rec_pt > 220 && rec_pt <= 270) TotalRec_6->Fill(1, weight );
+    if(rec_pt > 270 && rec_pt <= 320) TotalRec_7->Fill(1, weight );
+    if(rec_pt > 320 && rec_pt <= 370) TotalRec_8->Fill(1, weight );
+    if(rec_pt > 370 && rec_pt <= 420) TotalRec_9->Fill(1, weight );
+    if(rec_pt > 420) TotalRec_10->Fill(1, weight );
   }
   //---------------------------------------------------------------------------------------
   //--------------------------------- add subjets to reconstruct W ------------------------

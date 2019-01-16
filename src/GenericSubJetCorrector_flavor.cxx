@@ -10,6 +10,8 @@
 using namespace std;
 using namespace uhh2;
 
+// TODO: replace data JER files with v15
+
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //            replace L2Relative with flavor
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -42,12 +44,6 @@ const std::vector<std::string> JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_D
   "JECDatabase/textFiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2L3Residual_AK4PFchs.txt",
 };
 
-const std::vector<std::string> JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC_flavorUD = {
-  "JECDatabase/textFiles/Summer16_07Aug2017_V10_Flavor_Pythia8_MC/Summer16_07Aug2017_V10_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
-  "JECDatabase/textFiles/Summer16_07Aug2017_V10_Flavor_Pythia8_MC/Summer16_07Aug2017_V10_Flavor_Pythia8_MC_ud_L5Flavor_AK4PFchs.txt",
-  "JECDatabase/textFiles/Summer16_07Aug2017_V10_Flavor_Pythia8_MC/Summer16_07Aug2017_V10_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
-};
-
 const std::vector<std::string> JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorB = {
   "JECDatabase/textFiles/Summer16_23Sep2016BCDV4_DATA/Summer16_23Sep2016BCDV4_DATA_L1FastJet_AK4PFchs.txt",
   "JECDatabase/textFiles/Summer16_23Sep2016BCDV4_DATA/Summer16_23Sep2016BCDV4_DATA_L2Relative_AK4PFchs.txt",
@@ -76,10 +72,39 @@ const std::vector<std::string> JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_D
   "JECDatabase/textFiles/Summer16_23Sep2016HV4_DATA/Summer16_23Sep2016HV4_DATA_L2L3Residual_AK4PFchs.txt",
 };
 
-const std::vector<std::string> JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC_flavorB = {
-  "JECDatabase/textFiles/Summer16_07Aug2017_V10_Flavor_Pythia8_MC/Summer16_07Aug2017_V10_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
-  "JECDatabase/textFiles/Summer16_07Aug2017_V10_Flavor_Pythia8_MC/Summer16_07Aug2017_V10_Flavor_Pythia8_MC_b_L5Flavor_AK4PFchs.txt",
-  "JECDatabase/textFiles/Summer16_07Aug2017_V10_Flavor_Pythia8_MC/Summer16_07Aug2017_V10_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
+// MC - light flavor
+const std::vector<std::string> JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorUD = {
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_ud_L5Flavor_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
+};
+
+// MC - s flavor
+const std::vector<std::string> JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorS = {
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_s_L5Flavor_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
+};
+
+// MC - c flavor
+const std::vector<std::string> JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorC = {
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_c_L5Flavor_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
+};
+
+// MC - b flavor
+const std::vector<std::string> JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorB = {
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_b_L5Flavor_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
+};
+
+// MC - g flavor
+const std::vector<std::string> JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorG = {
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L1FastJet_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_g_L5Flavor_AK4PFchs.txt",
+  "JECDatabase/textFiles/Summer16_07Aug2017_V15_Flavor_Pythia8_MC/Summer16_07Aug2017_V15_Flavor_Pythia8_MC_L3Absolute_AK4PFchs.txt",
 };
 
 void correct_jet_flavor(FactorizedJetCorrector & corrector, Jet & jet, const Event & event, JetCorrectionUncertainty* jec_unc, int jec_unc_direction){
@@ -176,13 +201,26 @@ namespace {
 
 }
 
+/*
+███████ ██       █████  ██    ██  ██████  ██████       ██████  ██████  ██████  ██████  ███████  ██████ ████████  ██████  ██████
+██      ██      ██   ██ ██    ██ ██    ██ ██   ██     ██      ██    ██ ██   ██ ██   ██ ██      ██         ██    ██    ██ ██   ██
+█████   ██      ███████ ██    ██ ██    ██ ██████      ██      ██    ██ ██████  ██████  █████   ██         ██    ██    ██ ██████
+██      ██      ██   ██  ██  ██  ██    ██ ██   ██     ██      ██    ██ ██   ██ ██   ██ ██      ██         ██    ██    ██ ██   ██
+██      ███████ ██   ██   ████    ██████  ██   ██      ██████  ██████  ██   ██ ██   ██ ███████  ██████    ██     ██████  ██   ██
+*/
 
-GenericSubJetCorrector_flavor::GenericSubJetCorrector_flavor(uhh2::Context & ctx, const std::vector<std::string> & filenames, const std::string & collectionname, std::string flavor_){
-  corrector = build_corrector_flavor(filenames);
-  direction = 0;
-  flavor = flavor_;
-  jec_uncertainty = corrector_uncertainty_flavor(ctx, filenames, direction) ;
+
+
+
+GenericSubJetCorrector_flavor::GenericSubJetCorrector_flavor(uhh2::Context & ctx, const std::vector<std::vector<std::string>>&  filenames, const std::string & collectionname){
+  for(unsigned int i=0; i<filenames.size(); i++){
+    correctors.push_back(build_corrector_flavor(filenames[i]));
+    direction = 0;
+    jec_uncertainty.push_back(corrector_uncertainty_flavor(ctx, filenames[i], direction));
+  }
   h_jets = ctx.get_handle<std::vector<TopJet> >(collectionname);
+  h_ttbargen = ctx.get_handle<TTbarGen>("ttbargen");
+  ReadFlavorFractionsFile();
 }
 
 bool GenericSubJetCorrector_flavor::process(uhh2::Event & event){
@@ -191,22 +229,47 @@ bool GenericSubJetCorrector_flavor::process(uhh2::Event & event){
   assert(topjets);
   for(auto & topjet : *topjets){
     auto subjets = topjet.subjets();
-    int index_bjet = 0;
-    double ptmax = 0;
-    for(unsigned int i=0; i<subjets.size(); i++){
-      if(subjets[i].pt() > ptmax) ptmax = subjets[i].pt();
-      index_bjet = i;
-    }
+
     for (unsigned int i=0; i<subjets.size(); i++) {
-      if(flavor == "ud"){
-        if(i != index_bjet) correct_jet_flavor(*corrector, subjets[i], event, jec_uncertainty, direction);
+      // first do a copy of every subjet for every flavor corrector
+      // also do one copy that becomes the final Jet in the end
+      vector<Jet> raw_jets;
+      for(unsigned int j=0; j<correctors.size(); j++){
+        raw_jets.push_back(subjets[i]);
       }
-      else if(flavor == "b"){
-        if(i == index_bjet) correct_jet_flavor(*corrector, subjets[i], event, jec_uncertainty, direction);
+      // also store raw pt to get correct flavor fraction
+      // set a maximum value for pT here because flavor fraction lacks of statistics at very high pT
+      double pt_raw = subjets[i].pt();
+      double pt_max = 500.;
+      if(pt_raw > pt_max) pt_raw = pt_max;
+      // now put raw jet in every corrector and extract L2L3 factor
+      // also store L1_factors (all of them should be the same)
+      vector<double> L1_factors;
+      vector<double> L2L3_factors;
+      for(unsigned int j=0; j<correctors.size(); j++){
+        correct_jet_flavor(*correctors[j], raw_jets[j], event, jec_uncertainty[j], direction);
+        // attention: factor_raw brings corrected jet back to raw
+        // but L1factor_raw brings raw back to L1
+        // since I only need to extract L2L3, it has to be like this:
+        double L2L3_f = 1./(raw_jets[j].JEC_L1factor_raw() * raw_jets[j].JEC_factor_raw() );
+        L2L3_factors.push_back(L2L3_f);
+        L1_factors.push_back(raw_jets[j].JEC_L1factor_raw());
       }
-      else{
-        correct_jet_flavor(*corrector, subjets[i], event, jec_uncertainty, direction);
+      // now calculate final L2L3 factor from flavor_fractions
+      double final_L2L3 = 0;
+      for(unsigned int k=0; k<L2L3_factors.size(); k++){
+        double flavor_fraction = FlavorFractions[k]->Eval(pt_raw);
+        final_L2L3 += L2L3_factors[k] * flavor_fraction;
       }
+      // multiply with L1 for total correction factor
+      double final_L1 = L1_factors[0];
+      double final_factor = final_L1 * final_L2L3;
+      // apply total correction to jet, also set correct factor_raw
+      LorentzVector jet_v4_corrected = subjets[i].v4() * final_factor;
+      subjets[i].set_v4(jet_v4_corrected);
+      subjets[i].set_JEC_factor_raw(1. / final_L2L3);
+      subjets[i].set_JEC_L1factor_raw(final_L1);
+
     }
     topjet.set_subjets(move(subjets));
   }
@@ -215,3 +278,67 @@ bool GenericSubJetCorrector_flavor::process(uhh2::Event & event){
 
 // note: implement here because only here (and not in the header file), the destructor of FactorizedJetCorrector is known
 GenericSubJetCorrector_flavor::~GenericSubJetCorrector_flavor(){}
+
+void GenericSubJetCorrector_flavor::ReadFlavorFractionsFile(){
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/FlavorFractions/";
+  TString filename;
+  filename = dir + "FlavorFractions.root";
+  TFile *file = new TFile(filename);
+  FlavorFractions.push_back((TGraph*)file->Get("ud_fraction"));
+  FlavorFractions.push_back((TGraph*)file->Get("s_fraction"));
+  FlavorFractions.push_back((TGraph*)file->Get("c_fraction"));
+  FlavorFractions.push_back((TGraph*)file->Get("b_fraction"));
+  FlavorFractions.push_back((TGraph*)file->Get("g_fraction"));
+}
+
+//
+// // function to find b-quark in jet
+// int GenericSubJetCorrector_flavor::IndexBJet(const uhh2::Event & event, TopJet jet){
+//   int index = -1;
+//   vector<Jet> subjets = jet.subjets();
+//   const auto & ttbargen = event.get(h_ttbargen);
+//   GenParticle b1 = ttbargen.bTop();
+//   GenParticle b2 = ttbargen.bAntitop();
+//   GenParticle bot;
+//   // first match b to TopJet
+//   if(deltaR(b1, jet) < deltaR(b2, jet)) bot = b1;
+//   else bot = b2;
+//
+//   // now find subjet closest to bottom quark
+//   double dR = 100;
+//   for(unsigned int i=0; i<subjets.size(); i++){
+//     if(deltaR(bot, subjets[i]) < dR){
+//       dR = deltaR(bot, subjets[i]);
+//       if(dR < 0.4) index = i;
+//     }
+//   }
+//   return index;
+// }
+//
+// // function to find b-quark in jet
+// int GenericSubJetCorrector_flavor::IndexBJet_match_btag(const uhh2::Event & event, TopJet jet){
+//   int index = -1;
+//   vector<Jet> subjets = jet.subjets();
+//   vector<Jet> btags;
+//   // first, create a vector of btag that are inside fatjet
+//   for(const auto& ak4 : *event.jets){
+//     if(CSVBTag(CSVBTag::WP_TIGHT)(ak4, event)){
+//       if( deltaR(ak4, jet) < 1.2){
+//         btags.push_back(ak4);
+//       }
+//     }
+//   }
+//   if(btags.size() == 0 ) return -1;
+//   // if there are still multiple jets, take leading in pT
+//   sort_by_pt<Jet>(btags);
+//   // now find subjet closest to btag ak4
+//   double dR_min = 100;
+//   for(unsigned int i=0; i<subjets.size(); i++){
+//     if(deltaR(btags[0], subjets[i]) < dR_min){
+//       dR_min = deltaR(btags[0], subjets[i]);
+//       if(dR_min < 0.4) index = i;
+//     }
+//   }
+//
+//   return index;
+// }

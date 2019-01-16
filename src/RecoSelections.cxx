@@ -47,6 +47,24 @@ bool uhh2::LeadingRecoJetPT::passes(const uhh2::Event& event){
 }
 ////////////////////////////////////////////////////////
 
+uhh2::SubjetQuality::SubjetQuality(uhh2::Context& ctx, const std::string & name, float ptmin_, float etamax_):
+  h_jets(ctx.get_handle<std::vector<TopJet>>(name)),
+  ptmin(ptmin_),
+  etamax(etamax_){}
+
+bool uhh2::SubjetQuality::passes(const uhh2::Event& event){
+  bool pass = true;
+  std::vector<TopJet> jets = event.get(h_jets);
+  std::vector<Jet> subjets = jets[0].subjets();
+  if(subjets.size() != 3) pass = false;
+  for(auto subjet: subjets){
+    if(subjet.pt() < ptmin) pass = false;
+    if(fabs(subjet.eta()) > etamax) pass = false;
+  }
+  return pass;
+}
+////////////////////////////////////////////////////////
+
 uhh2::MassCutReco::MassCutReco(uhh2::Context& ctx, const std::string & name):
   h_jets(ctx.get_handle<std::vector<Jet>>(name)) {}
 

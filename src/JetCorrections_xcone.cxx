@@ -40,30 +40,34 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
   isMC = (ctx.get("dataset_type") == "MC");
   jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, jet_collection_rec));
 
-  // jet_corrector_MC_b.reset(new GenericSubJetCorrector_flavor(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC_flavorB, jet_collection_rec, "b"));
-  // jet_corrector_MC_ud.reset(new GenericSubJetCorrector_flavor(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC_flavorUD, jet_collection_rec, "ud"));
+  vector<vector<string>> JERfiles_flavor = {JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorUD,
+                                            JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorS,
+                                            JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorC,
+                                            JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorB,
+                                            JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorG};
 
-  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection_rec));
-  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection_rec));
-  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection_rec));
-  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA, jet_collection_rec));
+  jet_corrector_MC_flavor.reset(new GenericSubJetCorrector_flavor(ctx, JERfiles_flavor, jet_collection_rec));
+
+  // jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection_rec));
+  // jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection_rec));
+  // jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection_rec));
+  // jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA, jet_collection_rec));
 }
 
 bool JetCorrections_xcone::process(uhh2::Event & event){
   std::vector<TopJet> jets = event.get(h_topjets);
-  // event.set(h_topjets, set_JEC_factor(jets)); // first set JEC_factor_raw to a non-0 value
+  event.set(h_topjets, set_JEC_factor(jets)); // first set JEC_factor_raw to a non-0 value
   if(isMC){
-    //jet_corrector_MC_b->process(event);
-    //jet_corrector_MC_ud->process(event);
-    jet_corrector_MC->process(event);
+    // jet_corrector_MC->process(event);
+    jet_corrector_MC_flavor->process(event);
   }
-  else{
-    if(event.run <= runnr_BCD)         jet_corrector_BCD->process(event);
-    else if(event.run < runnr_EFearly) jet_corrector_EFearly->process(event);
-    else if(event.run <= runnr_FlateG) jet_corrector_FlateG->process(event);
-    else if(event.run > runnr_FlateG)  jet_corrector_H->process(event);
-    else throw runtime_error("Jet Correction: run number not covered by if-statements in process-routine.");
-  }
+  // else{
+  //   if(event.run <= runnr_BCD)         jet_corrector_BCD->process(event);
+  //   else if(event.run < runnr_EFearly) jet_corrector_EFearly->process(event);
+  //   else if(event.run <= runnr_FlateG) jet_corrector_FlateG->process(event);
+  //   else if(event.run > runnr_FlateG)  jet_corrector_H->process(event);
+  //   else throw runtime_error("Jet Correction: run number not covered by if-statements in process-routine.");
+  // }
 
   return true;
 }

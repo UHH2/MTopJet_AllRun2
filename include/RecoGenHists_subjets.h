@@ -26,6 +26,10 @@ protected:
     TH1F *PtRec_1, *PtRec_2, *PtRec_3, *PtRec_4, *PtRec_5, *PtRec_6, *PtRec_7, *PtRec_8, *PtRec_9, *PtRec_10;
     TH1F *area_all, *area_iso;
     TH1F *min_mass_Wjet_rec, *min_mass_Wjet_gen;
+    TH1F *MatchedGen_1, *MatchedGen_2, *MatchedGen_3, *MatchedGen_4, *MatchedGen_5, *MatchedGen_6, *MatchedGen_7, *MatchedGen_8, *MatchedGen_9, *MatchedGen_10;
+    TH1F *MatchedRec_1, *MatchedRec_2, *MatchedRec_3, *MatchedRec_4, *MatchedRec_5, *MatchedRec_6, *MatchedRec_7, *MatchedRec_8, *MatchedRec_9, *MatchedRec_10;
+    TH1F *TotalGen_1, *TotalGen_2, *TotalGen_3, *TotalGen_4, *TotalGen_5, *TotalGen_6, *TotalGen_7, *TotalGen_8, *TotalGen_9, *TotalGen_10;
+    TH1F *TotalRec_1, *TotalRec_2, *TotalRec_3, *TotalRec_4, *TotalRec_5, *TotalRec_6, *TotalRec_7, *TotalRec_8, *TotalRec_9, *TotalRec_10;
 
     uhh2::Event::Handle<std::vector<TopJet>>h_recjets;
     uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;

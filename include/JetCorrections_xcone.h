@@ -24,7 +24,7 @@ public:
   virtual bool process(uhh2::Event & event) override;
 
 private:
-  std::unique_ptr<GenericSubJetCorrector_flavor> jet_corrector_MC_ud, jet_corrector_MC_b;
+  std::unique_ptr<GenericSubJetCorrector_flavor> jet_corrector_MC_flavor;
   std::unique_ptr<GenericSubJetCorrector> jet_corrector_MC, jet_corrector_BCD, jet_corrector_EFearly, jet_corrector_FlateG, jet_corrector_H;
   std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
   const int runnr_BCD = 276811;

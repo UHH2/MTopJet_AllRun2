@@ -14,6 +14,7 @@
 #include <UHH2/common/include/MuonIds.h>
 #include <UHH2/common/include/ElectronIds.h>
 #include <UHH2/common/include/JetIds.h>
+#include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/TopJetIds.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
@@ -29,6 +30,7 @@
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
+#include <UHH2/MTopJet/include/NonClosureUncertainty.h>
 
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
@@ -66,6 +68,8 @@ class MTopJetSelectionModule : public ModuleBASE {
   std::unique_ptr<JetCorrections_xcone> JetCorrections;
   std::unique_ptr<JER_Smearer_xcone> JERSmearing;
   std::unique_ptr<uhh2::AnalysisModule> Correction;
+  std::unique_ptr<uhh2::AnalysisModule> NonClosureSYS;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
   // Btag efficiency hists
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
@@ -127,6 +131,8 @@ class MTopJetSelectionModule : public ModuleBASE {
   bool recsel_only;
 
   string corvar ="nominal";
+  string nonclosureSYS = "false";
+  bool do_nonClosure = false;
 
 };
 
@@ -146,6 +152,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
      ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
      ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
+
+  // ttbar gen
+  const std::string ttbar_gen_label("ttbargen");
+  if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   if(isTTbar) h_gensel = ctx.get_handle<bool>("passed_gensel");
   h_recsel = ctx.get_handle<bool>("passed_recsel");
@@ -191,6 +201,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // double jecsysfactor = 1.0;
 
   corvar = ctx.get("JetCorrection_direction","nominal");
+  nonclosureSYS = ctx.get("NonClosureUncertainty","false");
+  if(nonclosureSYS == "true") do_nonClosure = true;
 
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
@@ -199,7 +211,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   JERSmearing.reset(new JER_Smearer_xcone());
   JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
   Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, false));
-
+  NonClosureSYS.reset(new NonClosureUncertainty(ctx));
   //// EVENT SELECTION
 
 
@@ -342,6 +354,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   bool passed_recsel;
   if(isTTbar) passed_recsel = event.get(h_recsel);
   passed_recsel = true;
+
+  // fill ttbargen class
+  if(isTTbar) ttgenprod->process(event);
+  ////
 
   // cout << "*******************************" << endl;
   // cout << "processing event nr. " << event.event<< endl;
@@ -553,6 +569,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
   copy_jet->process(event);                // copy 'raw' Fatets (with subjets) and name one copy 'noJEC'
   JetCorrections->process(event);          // apply AK4 JEC/JER to subjets of the original Fatjet Collection
+  if(do_nonClosure) NonClosureSYS->process(event);           // do nonClosure variation here
   jetprod_reco->process(event);            // now store sum of 'jec' subjets
   Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets

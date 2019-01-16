@@ -14,6 +14,7 @@
 #include <UHH2/common/include/MuonIds.h>
 #include <UHH2/common/include/ElectronIds.h>
 #include <UHH2/common/include/JetIds.h>
+#include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/TopJetIds.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
@@ -47,11 +48,11 @@
 
 class MTopJetAllHadronicSelectionModule : public ModuleBASE {
 
- public:
+public:
   explicit MTopJetAllHadronicSelectionModule(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
 
- protected:
+protected:
   enum lepton { muon, elec };
   lepton channel_;
 
@@ -62,6 +63,7 @@ class MTopJetAllHadronicSelectionModule : public ModuleBASE {
   std::unique_ptr<JetCorrections_xcone> JetCorrections;
   std::unique_ptr<JER_Smearer_xcone> JERSmearing;
   std::unique_ptr<uhh2::AnalysisModule> Correction;
+  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
   // Btag efficiency hists
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
@@ -99,6 +101,16 @@ class MTopJetAllHadronicSelectionModule : public ModuleBASE {
 MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Context& ctx){
 
   isMC = (ctx.get("dataset_type") == "MC");
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_allHad"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_allHad"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_allHad" ) isTTbar = true;
+  else isTTbar = false;
+
+
+  // ttbar gen
+  const std::string ttbar_gen_label("ttbargen");
+  if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
+
   h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   h_gen23fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone23TopJets");
   h_gen33fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
@@ -136,7 +148,7 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
 
 
-   //// Obj Cleaning
+  //// Obj Cleaning
 
   common.reset(new CommonModules());
   common->set_HTjetid(jetid_cleaner);
@@ -158,7 +170,7 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
 
 bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
 
-   /* *********** at least 1 good primary vertex *********** */
+  /* *********** at least 1 good primary vertex *********** */
   if(!pv_sel->passes(event)) return false;
 
   /* *********** BTag Effi Hist *********** */
@@ -169,6 +181,11 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
   if(jetbtagN == 0) return false;
+
+
+  // fill ttbargen class
+  if(isTTbar) ttgenprod->process(event);
+  ////
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   // store reco jets with and without JEC applied, and also copy uncorrected subjets
@@ -194,7 +211,7 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
   JERSmearing->process(event);             // apply JER smearing on final jets
   ////
-return true;
+  return true;
 }
 
 UHH2_REGISTER_ANALYSIS_MODULE(MTopJetAllHadronicSelectionModule)

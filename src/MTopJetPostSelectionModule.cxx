@@ -78,6 +78,7 @@ protected:
   std::unique_ptr<uhh2::Selection> mass_gensel23;
   std::unique_ptr<uhh2::Selection> matched_sub;
   std::unique_ptr<uhh2::Selection> matched_fat;
+  std::unique_ptr<uhh2::Selection> subjet_quality;
 
 
   std::unique_ptr<uhh2::Selection> njet_ak8;
@@ -161,7 +162,7 @@ protected:
   std::unique_ptr<Hists> h_RecGenHists_RecOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly_noJEC;
   std::unique_ptr<Hists> h_RecGenHists_Both, h_RecGenHists_Both_corr;
-  std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC, h_RecGenHists_subjets_corrected;
+  std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC, h_RecGenHists_subjets_corrected, h_RecGenHists_subjets_matched;
   std::unique_ptr<Hists> h_RecGenHists_subjets_lowPU, h_RecGenHists_subjets_medPU, h_RecGenHists_subjets_highPU;
   std::unique_ptr<Hists> h_RecGenHists_subjets_noJEC_lowPU, h_RecGenHists_subjets_noJEC_medPU, h_RecGenHists_subjets_noJEC_highPU;
   std::unique_ptr<Hists> h_RecGenHists_subjets_WJets, h_RecGenHists_subjets_noJEC_WJets;
@@ -222,6 +223,24 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_Mtt0000to0700_cordown"  ||
   ctx.get("dataset_version") == "TTbar_Mtt0700to1000_cordown"  ||
   ctx.get("dataset_version") == "TTbar_Mtt1000toInft_cordown"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_flavor_match"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_flavor_match"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_flavor_match"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_flavor_lightonly"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_flavor_lightonly"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_flavor_lightonly"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_flavor_leadingpt"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_flavor_leadingpt"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_flavor_leadingpt"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_flavor_btag"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_flavor_btag"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_flavor_btag"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_flavor_fractions"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_flavor_fractions"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_flavor_fractions"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_std_jec"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_std_jec"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_std_jec"  ||
   ctx.get("dataset_version") == "TTbar_mtop1665"       ||
   ctx.get("dataset_version") == "TTbar_mtop1695"       ||
   ctx.get("dataset_version") == "TTbar_mtop1715"       ||
@@ -278,6 +297,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   njet_had.reset(new NJetXCone(ctx, jet_label_had, 1));
   njet_lep.reset(new NJetXCone(ctx, jet_label_lep, 1));
 
+  subjet_quality.reset(new SubjetQuality(ctx, jet_label_had, 30, 2.5));
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
   eta_sel.reset(new LeadingRecoJetETA(ctx, jet_label_had, 2.5));
   pt350_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 350));
@@ -395,6 +415,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_GenParticles_newWidth.reset(new GenHists_particles(ctx, "GenParticles_newWidth"));
 
     h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", "jec"));
+    h_RecGenHists_subjets_matched.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_matched", "jec"));
     h_RecGenHists_subjets_lowPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_lowPU", "jec"));
     h_RecGenHists_subjets_medPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_medPU", "jec"));
     h_RecGenHists_subjets_highPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_highPU", "jec"));
@@ -618,22 +639,22 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool pass_btagmigration_rec;
   bool pass_WJets_sel;
 
-  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag) pass_measurement_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event)) pass_measurement_rec = true;
   else pass_measurement_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_pt350migration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && pt350_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) ) pass_pt350migration_rec = true;
   else pass_pt350migration_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag ) pass_ptmigration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event)) pass_ptmigration_rec = true;
   else pass_ptmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && !mass_sel->passes(event) && passed_btag) pass_massmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && !mass_sel->passes(event) && passed_btag && subjet_quality->passes(event)) pass_massmigration_rec = true;
   else pass_massmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium) pass_btagmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium && subjet_quality->passes(event)) pass_btagmigration_rec = true;
   else pass_btagmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event)  && eta_sel->passes(event) && !passed_btag_loose) pass_WJets_sel = true;
+  if(passed_recsel && pt_sel->passes(event)  && eta_sel->passes(event) && !passed_btag_loose && subjet_quality->passes(event)) pass_WJets_sel = true;
   else pass_WJets_sel = false;
 
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/
@@ -714,6 +735,38 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_subjets_noJEC_WJets->fill(event);
   }
 
+  if(pass_measurement_gen){
+    if(lowPU){
+      if(isMC)h_RecGenHists_lowPU->fill(event);
+      if(isMC)h_RecGenHists_lowPU_noJEC->fill(event);
+      if(isMC)h_RecGenHists_subjets_lowPU->fill(event);
+      if(isMC)h_RecGenHists_subjets_noJEC_lowPU->fill(event);
+    }
+    if(midPU){
+      if(isMC)h_RecGenHists_medPU->fill(event);
+      if(isMC)h_RecGenHists_medPU_noJEC->fill(event);
+      if(isMC)h_RecGenHists_subjets_medPU->fill(event);
+      if(isMC)h_RecGenHists_subjets_noJEC_medPU->fill(event);
+    }
+    if(highPU){
+      if(isMC)h_RecGenHists_highPU->fill(event);
+      if(isMC)h_RecGenHists_highPU_noJEC->fill(event);
+      if(isMC)h_RecGenHists_subjets_highPU->fill(event);
+      if(isMC)h_RecGenHists_subjets_noJEC_highPU->fill(event);
+    }
+    h_RecGenHists_RecOnly->fill(event);
+    h_RecGenHists_RecOnly_noJEC->fill(event);
+    h_RecGenHists_RecOnly_corr->fill(event);
+    if(matched_fat->passes(event)) h_RecGenHists_subjets_matched->fill(event);
+    h_RecGenHists_subjets->fill(event);
+    h_RecGenHists_subjets_noJEC->fill(event);
+    h_RecGenHists_subjets_corrected->fill(event);
+    if(isTTbar) h_CorrectionHists->fill(event);
+    if(isTTbar) h_CorrectionHists_after->fill(event);
+    h_RecGenHists_ak4->fill(event);
+    h_RecGenHists_ak4_noJEC->fill(event);
+  }
+
   if(pass_measurement_rec){
     if(isTTbar) h_PDFHists->fill(event);
 
@@ -743,26 +796,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(lowPU){
       h_XCone_cor_PUlow_subjets->fill(event);
       h_XCone_cor_PUlow->fill(event);
-      if(isMC)h_RecGenHists_lowPU->fill(event);
-      if(isMC)h_RecGenHists_lowPU_noJEC->fill(event);
-      if(isMC)h_RecGenHists_subjets_lowPU->fill(event);
-      if(isMC)h_RecGenHists_subjets_noJEC_lowPU->fill(event);
     }
     if(midPU){
       h_XCone_cor_PUmid_subjets->fill(event);
       h_XCone_cor_PUmid->fill(event);
-      if(isMC)h_RecGenHists_medPU->fill(event);
-      if(isMC)h_RecGenHists_medPU_noJEC->fill(event);
-      if(isMC)h_RecGenHists_subjets_medPU->fill(event);
-      if(isMC)h_RecGenHists_subjets_noJEC_medPU->fill(event);
     }
     if(highPU){
       h_XCone_cor_PUhigh_subjets->fill(event);
       h_XCone_cor_PUhigh->fill(event);
-      if(isMC)h_RecGenHists_highPU->fill(event);
-      if(isMC)h_RecGenHists_highPU_noJEC->fill(event);
-      if(isMC)h_RecGenHists_subjets_highPU->fill(event);
-      if(isMC)h_RecGenHists_subjets_noJEC_highPU->fill(event);
     }
 
     if(isTTbar){
@@ -777,18 +818,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(isMC){
       h_XCone_GEN_RecOnly->fill(event);
       if(isTTbar) h_GenParticles_RecOnly->fill(event);
-      h_RecGenHists_RecOnly->fill(event);
-      h_RecGenHists_RecOnly_noJEC->fill(event);
-      h_RecGenHists_RecOnly_corr->fill(event);
-      h_RecGenHists_subjets->fill(event);
-      h_RecGenHists_subjets_noJEC->fill(event);
-      h_RecGenHists_subjets_corrected->fill(event);
-      if(isTTbar) h_CorrectionHists->fill(event);
-      if(isTTbar) h_CorrectionHists_after->fill(event);
-      h_RecGenHists_ak4->fill(event);
-      h_RecGenHists_ak4_noJEC->fill(event);
+
     }
   }
+
 
   /*************************** fill hists with gen sel applied *************************************************************************************/
   if(pass_measurement_gen){

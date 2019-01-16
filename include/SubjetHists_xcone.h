@@ -2,6 +2,7 @@
 #include "UHH2/core/include/Hists.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
+#include <UHH2/common/include/JetIds.h>
 #include <math.h>
 #include <vector>
 
@@ -21,12 +22,13 @@ public:
 protected:
 
 
-    TH1F *pt_had_subjets, *pt_had_subjets_fine, *pt_lep_subjets;
+    TH1F *pt_had_subjets, *pt_had_subjets_fine, *pt_lep_subjets, *pt_had_subjet1_fine, *pt_had_subjet2_fine, *pt_had_subjet3_fine;
     TH1F *eta_had_subjets, *eta_lep_subjets, *eta_abs_had_subjets;
     TH1F *area_had_subjets, *area_had1_subjet, *area_had2_subjet, *area_had3_subjet;
     TH1F *area_lep_subjets, *area_lep1_subjet, *area_lep2_subjet, *area_lep3_subjet;
     TH1F *area_all_subjets, *pt_all_subjets, *eta_all_subjets;
     TH1F *area_ak4, *pt_ak4, *eta_ak4;
+    TH1F *match_to_subjet;
 
     TH1F *pt_had_combine, *pt_lep_combine;
     TH1F *mass_had_combine, *mass_had_combine_cut, *mass_lep_combine;

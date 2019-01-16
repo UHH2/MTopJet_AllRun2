@@ -97,8 +97,11 @@ void CorrectionHists_allHad::fill(const Event & event){
   // for(unsigned int i=0; i<rec_sub2.size(); i++){
   //   if(rec_sub2.at(i).v4().Pt() < 30) use_jet2 = false;
   // }
-  if(recjets.at(0).v4().Pt() < 350) use_jet1 = false;
-  if(recjets.at(1).v4().Pt() < 350) use_jet2 = false;
+
+  double ptrecmin = 0;
+  double ptgenmin = 400;
+  if(recjets.at(0).v4().Pt() < ptrecmin || genjets.at(i1).v4().Pt() < ptgenmin) use_jet1 = false;
+  if(recjets.at(1).v4().Pt() < ptrecmin || genjets.at(i2).v4().Pt() < ptgenmin) use_jet2 = false;
 
 
   if(!use_jet1 && !use_jet2) return;
