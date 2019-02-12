@@ -151,7 +151,7 @@ protected:
   std::unique_ptr<Hists> h_XCone_cor_pt350, h_XCone_cor_noptcut;
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
   std::unique_ptr<Hists> h_XCone_cor_subjets_SF, h_XCone_jec_subjets_SF, h_XCone_raw_subjets_SF;
-  std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_nobtag, h_XCone_cor_Sel_pt350;
+  std::unique_ptr<Hists> h_XCone_cor_Sel_noSel, h_XCone_cor_Sel_noMass, h_XCone_cor_Sel_nobtag, h_XCone_cor_Sel_pt350, h_XCone_cor_Sel_ptsub;
 
   std::unique_ptr<Hists> h_XCone_cor_m, h_XCone_cor_u, h_XCone_cor_m_fat, h_XCone_cor_u_fat;
 
@@ -175,7 +175,7 @@ protected:
   std::unique_ptr<Hists> h_XCone_cor_migration_pt, h_XCone_cor_migration_pt350, h_XCone_cor_migration_mass, h_XCone_cor_migration_btag;
   std::unique_ptr<Hists> h_750_ak8, h_750_xcone;
 
-  std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350;
+  std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350, h_XCone_GEN_Sel_ptsub;
   std::unique_ptr<Hists> h_PDFHists;
 
   bool isMC;    //define here to use it in "process" part
@@ -372,6 +372,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_XCone_cor_Sel_noMass.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass", "cor"));
   h_XCone_cor_Sel_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt350", "cor"));
   h_XCone_cor_Sel_nobtag.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_nobtag", "cor"));
+  h_XCone_cor_Sel_ptsub.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_ptsub", "cor"));
 
   // PU dependence
   h_XCone_cor_PUlow.reset(new RecoHists_xcone(ctx, "XCone_cor_PUlow", "cor"));
@@ -406,6 +407,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_XCone_GEN_Sel_measurement.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_measurement"));
     h_XCone_GEN_Sel_noMass.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_noMass"));
     h_XCone_GEN_Sel_pt350.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_pt350"));
+    h_XCone_GEN_Sel_ptsub.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_ptsub"));
 
     h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
     h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
@@ -739,10 +741,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(pass_btagmigration_rec)  h_XCone_cor_Sel_nobtag->fill(event);
   if(pass_pt350migration_rec) h_XCone_cor_Sel_pt350->fill(event);
   if(pass_massmigration_rec)  h_XCone_cor_Sel_noMass->fill(event);
+  if(pass_subptmigration_rec) h_XCone_cor_Sel_ptsub->fill(event);
 
   if(pass_measurement_gen)    h_XCone_GEN_Sel_measurement->fill(event);
   if(pass_pt350migration_gen) h_XCone_GEN_Sel_pt350->fill(event);
   if(pass_massmigration_gen)  h_XCone_GEN_Sel_noMass->fill(event);
+  if(pass_subptmigration_gen) h_XCone_GEN_Sel_ptsub->fill(event);
 
   if(pass_WJets_sel && isMC){
     h_CorrectionHists_WJets->fill(event);
@@ -750,7 +754,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_subjets_noJEC_WJets->fill(event);
   }
 
-  if(pass_measurement_gen){
+  // fill resolution hists here without the subjet pt cut
+  if(pass_measurement_gen || pass_subptmigration_gen){
     if(lowPU){
       if(isMC)h_RecGenHists_lowPU->fill(event);
       if(isMC)h_RecGenHists_lowPU_noJEC->fill(event);
@@ -881,7 +886,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_nomass_gen, pass_massmigration_gen);
   event.set(h_nobtag_rec, pass_btagmigration_rec);
   event.set(h_ptsub_rec, pass_subptmigration_rec);
-  event.set(h_ptsub_rec, pass_subptmigration_rec);
+  event.set(h_ptsub_gen, pass_subptmigration_gen);
 
   event.set(h_factor_2width, factor_2w);
   event.set(h_factor_4width, factor_4w);
