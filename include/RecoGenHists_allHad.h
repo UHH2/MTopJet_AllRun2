@@ -17,7 +17,7 @@ using namespace std;
 class RecoGenHists_allHad: public uhh2::Hists {
 public:
   // use the same constructor arguments as Hists for forwarding:
-  RecoGenHists_allHad(uhh2::Context & ctx, const std::string & dirname,  const std::string & type, double ptreccut_, double ptgencut_);
+  RecoGenHists_allHad(uhh2::Context & ctx, const std::string & dirname,  const std::string & type, const std::string & subjet_selection, double ptreccut_, double ptgencut_);
   virtual void fill(const uhh2::Event & ev) override;
 
 protected:
@@ -35,4 +35,6 @@ protected:
   uhh2::Event::Handle<TTbarGen>h_ttbargen;
 
   double ptgencut, ptreccut;
+  bool only_one_jet;
+  int index_onlyjet;
 };

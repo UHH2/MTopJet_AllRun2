@@ -260,11 +260,13 @@ int main(int argc, char* argv[])
   vector<TString> btag_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown"};
   vector<TString> jec_name = {"jecup", "jecdown"};
   vector<TString> jer_name = {"jerup", "jerdown"};
+  vector<TString> cor_name = {"corup", "cordown"};
   vector<TString> muid_name = {"muidup", "muiddown"};
   vector<TString> mutr_name = {"mutrup", "mutrdown"};
   vector<TString> pu_name = {"puup", "pudown"};
-  vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, muid_name, mutr_name, pu_name};
-  vector<TString> sys_rel_name = {"b-tagging", "jec", "jer", "MuID", "MuTrigger", "pile-up"}; // used for comparison plot
+  // vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, muid_name, mutr_name, pu_name};
+  vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, cor_name, muid_name, mutr_name, pu_name};
+  vector<TString> sys_rel_name = {"b-tagging", "jec", "jer", "cor","MuID", "MuTrigger", "pile-up"}; // used for comparison plot
   vector< vector<TH2*> > sys_matrix;
   for(unsigned int i=0; i<sys_name.size(); i++){
     vector<TH2*> dummy;
@@ -277,15 +279,16 @@ int main(int argc, char* argv[])
   //vector<TString> shower = {"Shower"};
   vector<TString> generator = {"Generator"};
   vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
-  vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
-  // vector<TString> pdf;
-  // for(unsigned int i=0; i<100; i++){
-  //   TString name = "PDF_";
-  //   name += i;
-  //   pdf.push_back(name);
-  // }
-  vector< vector<TString> > model_name = {generator, scale, mass}; // PDF, MASS AND SHOWER NOT INCLUDED!!!
-  vector<TString> model_rel_name = {"generator", "scale", "mass"}; // PDF, MASS AND SHOWER NOT INCLUDED!!!
+  // vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
+  vector<TString> mass = {"mc_mtop1715","mc_mtop1735"};
+  vector<TString> pdf;
+  for(unsigned int i=0; i<100; i++){
+    TString name = "PDF_";
+    name += i;
+    pdf.push_back(name);
+  }
+  vector< vector<TString> > model_name = {generator, scale, mass, pdf}; // PDF, MASS AND SHOWER NOT INCLUDED!!!
+  vector<TString> model_rel_name = {"generator", "scale", "mass", "pdf"}; // PDF, MASS AND SHOWER NOT INCLUDED!!!
   vector< vector<TH1D*> > model_input;
   vector< vector<TH1D*> > model_truth;
   for(unsigned int i=0; i<model_name.size(); i++){
@@ -334,9 +337,11 @@ int main(int argc, char* argv[])
   cout << "    -- YOU SELECTED " << nscan << " STEPS TO DETERMINE TAU" << endl << endl;
 
   bool do_model = true;
+  bool do_pdf = false;
   bool do_genvar = false;
 
   if(!do_model) cout << "    -- MODEL VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
+  if(!do_pdf) cout << "    -- PDF VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
   if(!do_genvar) cout << "    -- GENERATOR SMEARINGS ARE NOT UNFOLDED!" << endl  << endl;
 
 
@@ -426,6 +431,7 @@ int main(int argc, char* argv[])
     // for every following unfolding the same tau is used
     if(do_model){
       for(unsigned int i=0; i<model_name.size(); i++){
+        if(!do_pdf && (model_rel_name[i] == "pdf") ) continue;
         vector<TH1*> dummy;
         MODEL_OUTPUT.push_back(dummy);
         MODEL_DELTA.push_back(dummy);
@@ -643,13 +649,17 @@ int main(int argc, char* argv[])
   }
 
   // write a new vector for masses used in the chi2 fit
+  bool use_all_masses = false;
   vector<TH1D*> chi2_MassSamples;
   std::vector<double> chi2_masses;
   for(unsigned int i=0; i<mc_mtop_templates_norm.size(); i++){
-    if(i != 0 && i != mc_mtop_templates_norm.size()-1){
-      chi2_MassSamples.push_back(mc_mtop_templates_norm[i]);
-      chi2_masses.push_back(masses[i]);
+    if(!use_all_masses){
+      // define here which masses not to use
+      if( i == 0) continue;
+      if( i == mc_mtop_templates_norm.size()-1 ) continue;
     }
+    chi2_MassSamples.push_back(mc_mtop_templates_norm[i]);
+    chi2_masses.push_back(masses[i]);
   }
 
   // perform chi2 fit
@@ -695,6 +705,7 @@ int main(int argc, char* argv[])
 
   if(do_model){
     for(unsigned int i=0; i<model_name.size(); i++){
+      if(!do_pdf && model_rel_name[i] == "pdf") continue;
       for(unsigned int j=0; j<model_name[i].size(); j++){
         plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false);
         plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);

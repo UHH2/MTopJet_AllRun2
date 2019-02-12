@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #=========================================
     #important variables!
     #=========================================
-    xmlfile = "MTopJetPostSelection_muon.xml"
+    xmlfile = "MTopJetPostSelection_SYS.xml"
     outputDir = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/"
     option = "-slac "
     #option = " "

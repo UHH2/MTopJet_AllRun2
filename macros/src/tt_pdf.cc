@@ -1,9 +1,6 @@
 #include "../include/CentralInclude.h"
 
 
-// compile with:
-// g++ -o tt_pdf tt_pdf.cc `root-config --cflags --glibs`
-
 std::vector< double > GetRMS(std::vector< TH1F* > hists);
 std::vector< double > GetRMS(TH1F* central, std::vector< TH1F* > hists);
 TH1F* GetVariationUp(TH1F* central, std::vector< double > rms, TString name);

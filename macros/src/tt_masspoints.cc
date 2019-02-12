@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
     histname = "Mass_HadJet33";
   }
   else{
-    histdir = "XCone_cor/";
+    histdir = "XCone_jec/";
     histname = "M_jet1_B";
   }
 

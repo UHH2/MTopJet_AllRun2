@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 
   std::vector<TFile*> ScaleVariations_f, BTagVariations_f, PUVariations_f;
   std::vector<TFile*> MuIdVariations_f, MuTrVariations_f;
-  std::vector<TFile*> JECVariations_f, JERVariations_f, CORVariations_f;
+  std::vector<TFile*> JECVariations_f, JERVariations_f, NONCLOSUREVariations_f;
   std::vector<TFile*> GeneratorVariations_f, ShowerVariations_f, PDFVariations_f;
 
   ScaleVariations_f.push_back(new TFile(dir+"SCALE_upup/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
@@ -43,8 +43,7 @@ int main(int argc, char* argv[])
   JECVariations_f.push_back(new TFile(dir+"JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   JERVariations_f.push_back(new TFile(dir+"JER_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   JERVariations_f.push_back(new TFile(dir+"JER_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  CORVariations_f.push_back(new TFile(dir+"COR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  CORVariations_f.push_back(new TFile(dir+"COR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  NONCLOSUREVariations_f.push_back(new TFile(dir+"NONCLOSURE/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   GeneratorVariations_f.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root"));
   ShowerVariations_f.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_powheg-herwig.root"));
   PDFVariations_f.push_back(new TFile(dir+"PDF_up/PDF_Variations.root"));
@@ -59,12 +58,12 @@ int main(int argc, char* argv[])
 
 
   TString histdir, histname;
-  histdir = "XCone_cor/";
+  histdir = "XCone_jec/";
   histname = "M_jet1_B";
 
   std::vector<TH1F*> ScaleVariations,BTagVariations,PUVariations;
   std::vector<TH1F*>  MuIdVariations, MuTrVariations;
-  std::vector<TH1F*>  JECVariations, JERVariations, CORVariations;
+  std::vector<TH1F*>  JECVariations, JERVariations, NONCLOSUREVariations;
   std::vector<TH1F*> GeneratorVariations, ShowerVariations, PDFVariations;
 
   for(unsigned int i=0; i<ScaleVariations_f.size(); i++){
@@ -88,8 +87,8 @@ int main(int argc, char* argv[])
   for(unsigned int i=0; i<JERVariations_f.size(); i++){
     JERVariations.push_back((TH1F*)JERVariations_f[i]->Get(histdir + histname));
   }
-  for(unsigned int i=0; i<CORVariations_f.size(); i++){
-    CORVariations.push_back((TH1F*)CORVariations_f[i]->Get(histdir + histname));
+  for(unsigned int i=0; i<NONCLOSUREVariations_f.size(); i++){
+    NONCLOSUREVariations.push_back((TH1F*)NONCLOSUREVariations_f[i]->Get(histdir + histname));
   }
   for(unsigned int i=0; i<GeneratorVariations_f.size(); i++){
     GeneratorVariations.push_back((TH1F*)GeneratorVariations_f[i]->Get(histdir + histname));
@@ -216,17 +215,17 @@ int main(int argc, char* argv[])
   ErrorSym.push_back(JERErrorSym);
   CovMatrix.push_back(GetCovMatrix(JERErrorSym));
 
-  TH1F* COREnvelopeUp = GetEnvelopeUp(CORVariations);
-  TH1F* CORErrorUp = GetError(Central, COREnvelopeUp);
-  TH1F* COREnvelopeDown = GetEnvelopeDown(CORVariations);
-  TH1F* CORErrorDown = GetError(Central, COREnvelopeDown);
-  TH1F* CORErrorSym = GetSymmetricError(CORErrorUp, CORErrorDown);
-  EnvelopeUp.push_back(COREnvelopeUp);
-  EnvelopeDown.push_back(COREnvelopeDown);
-  ErrorUp.push_back(CORErrorUp);
-  ErrorDown.push_back(CORErrorDown);
-  ErrorSym.push_back(CORErrorSym);
-  CovMatrix.push_back(GetCovMatrix(CORErrorSym));
+  TH1F* NONCLOSUREEnvelopeUp = GetEnvelopeUp(NONCLOSUREVariations);
+  TH1F* NONCLOSUREErrorUp = GetError(Central, NONCLOSUREEnvelopeUp);
+  TH1F* NONCLOSUREEnvelopeDown = GetEnvelopeDown(NONCLOSUREVariations);
+  TH1F* NONCLOSUREErrorDown = GetError(Central, NONCLOSUREEnvelopeDown);
+  TH1F* NONCLOSUREErrorSym = GetSymmetricError(NONCLOSUREErrorUp, NONCLOSUREErrorDown);
+  EnvelopeUp.push_back(NONCLOSUREEnvelopeUp);
+  EnvelopeDown.push_back(NONCLOSUREEnvelopeDown);
+  ErrorUp.push_back(NONCLOSUREErrorUp);
+  ErrorDown.push_back(NONCLOSUREErrorDown);
+  ErrorSym.push_back(NONCLOSUREErrorSym);
+  CovMatrix.push_back(GetCovMatrix(NONCLOSUREErrorSym));
 
   TH1F* GeneratorEnvelopeUp = GetEnvelopeUp(GeneratorVariations);
   TH1F* GeneratorErrorUp = GetError(Central, GeneratorEnvelopeUp);
@@ -296,7 +295,7 @@ int main(int argc, char* argv[])
 
   TFile *Stat, *BKG;
 
-  Stat = new TFile("STAT.root","RECREATE");
+  Stat = new TFile(dir+"STAT.root","RECREATE");
   Stat->mkdir("Up");
   Stat->mkdir("Down");
   Stat->cd("Up");
@@ -315,7 +314,7 @@ int main(int argc, char* argv[])
   SysFiles.push_back(new TFile(dir+"SYS_MUTR.root","RECREATE"));
   SysFiles.push_back(new TFile(dir+"SYS_JEC.root","RECREATE"));
   SysFiles.push_back(new TFile(dir+"SYS_JER.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_COR.root","RECREATE"));
+  SysFiles.push_back(new TFile(dir+"SYS_NONCLOSURE.root","RECREATE"));
   SysFiles.push_back(new TFile(dir+"SYS_GENERATOR.root","RECREATE"));
   SysFiles.push_back(new TFile(dir+"SYS_SHOWER.root","RECREATE"));
   SysFiles.push_back(new TFile(dir+"SYS_PDF.root","RECREATE"));

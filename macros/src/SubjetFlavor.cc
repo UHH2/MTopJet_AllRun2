@@ -35,6 +35,10 @@ int main(int argc, char* argv[]){
 
   bool skip_unmatched = true;
 
+  // also get noMatch seperately
+  TH1F *noMatch = (TH1F*)TT_file->Get("GenParticles_GenOnly/fraction_nomatch_A");
+
+
   TH1F *nMatches = (TH1F*)TT_file->Get(dir+"N_matches");
 
   for(auto name: names){
@@ -49,13 +53,15 @@ int main(int argc, char* argv[]){
 
 
   // first calculate sum in every bin
-  vector<double> sum;
+  vector<double> sum, sum_nomatch;
   for(unsigned int i=1; i<=nbins; i++){
     double s = 0;
     for(unsigned int k=0; k<hists.size(); k++){
       s += hists[k]->GetBinContent(i);
     }
+    double s_nomatch = noMatch->GetBinContent(i);
     sum.push_back(s);
+    sum_nomatch.push_back(s + s_nomatch);
   }
 
   // now read x and y values
@@ -70,6 +76,10 @@ int main(int argc, char* argv[]){
     xvals.push_back(x);
     yvals.push_back(y);
   }
+  vector<double> yvals_nomatch;
+  for(unsigned int i=1; i<=nbins; i++){
+    yvals_nomatch.push_back(noMatch->GetBinContent(i)/sum_nomatch[i-1]);
+  }
 
   // Now write into TGraph for each flavor
   vector<TGraph*> fractions;
@@ -77,6 +87,10 @@ int main(int argc, char* argv[]){
     TGraph* g = new TGraph(xvals[i].size(), &xvals[i][0], &yvals[i][0]);
     fractions.push_back(g);
   }
+
+  // Now write into TGraph for not matched
+  TGraph* fraction_nomatch = new TGraph(xvals[0].size(), &xvals[0][0], &yvals_nomatch[0]);
+
 
   // write output to file
   TString rootname = "files/FlavorFractions_"+mode+".root";
@@ -109,6 +123,22 @@ int main(int argc, char* argv[]){
     fractions[i]->SetMarkerStyle(markers[i]);
   }
 
+  fraction_nomatch->SetTitle(" ");
+  fraction_nomatch->GetXaxis()->SetTitle("subjet p_{T}");
+  fraction_nomatch->GetYaxis()->SetTitle("flavor fraction");
+  fraction_nomatch->GetYaxis()->SetTitleSize(0.06);
+  fraction_nomatch->GetXaxis()->SetTitleSize(0.05);
+  fraction_nomatch->GetXaxis()->SetTitleOffset(0.9);
+  fraction_nomatch->GetYaxis()->SetTitleOffset(1.1);
+  fraction_nomatch->GetXaxis()->SetNdivisions(505);
+  fraction_nomatch->GetYaxis()->SetNdivisions(505);
+  fraction_nomatch->SetLineWidth(4);
+  fraction_nomatch->SetLineColor(kBlack);
+  fraction_nomatch->SetMarkerColor(kBlack);
+  fraction_nomatch->SetMarkerStyle(8);
+
+
+
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
@@ -126,10 +156,10 @@ int main(int argc, char* argv[]){
   TCanvas *c = new TCanvas("c", " ", 600, 600);
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.1);
-  // gPad->SetLogx();
-  // gPad->SetLogy();
-  fractions[0]->GetXaxis()->SetRangeUser(0, 600);
-  fractions[0]->GetYaxis()->SetRangeUser(0.0, 0.7);
+  gPad->SetLogx();
+  gPad->SetLogy();
+  fractions[0]->GetXaxis()->SetRangeUser(30, 600);
+  fractions[0]->GetYaxis()->SetRangeUser(0.01, 3);
   fractions[0]->Draw("AP");
   TLegend* leg = new TLegend(0.65,0.65,0.85,0.85);
   leg->SetNColumns(2);
@@ -139,6 +169,16 @@ int main(int argc, char* argv[]){
   }
   leg->Draw();
   c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/FlavorFractions/Flavor_fraction_"+mode+".pdf");
+
+  TCanvas *c2 = new TCanvas("c2", " ", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.1);
+  gPad->SetLogx();
+  gPad->SetLogy();
+  fraction_nomatch->GetXaxis()->SetRangeUser(30, 600);
+  fraction_nomatch->GetYaxis()->SetRangeUser(0.01, 3);
+  fraction_nomatch->Draw("AP");
+  c2->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/FlavorFractions/Flavor_fraction_noMatch.pdf");
 
   TCanvas *d = new TCanvas("d", " ", 600, 600);
   gPad->SetLeftMargin(0.15);

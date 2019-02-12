@@ -23,6 +23,7 @@ protected:
 
 
     TH1F *pt_had_subjets, *pt_had_subjets_fine, *pt_lep_subjets, *pt_had_subjet1_fine, *pt_had_subjet2_fine, *pt_had_subjet3_fine;
+    TH1F *pt_had_subjet1, *pt_had_subjet2, *pt_had_subjet3;
     TH1F *eta_had_subjets, *eta_lep_subjets, *eta_abs_had_subjets;
     TH1F *area_had_subjets, *area_had1_subjet, *area_had2_subjet, *area_had3_subjet;
     TH1F *area_lep_subjets, *area_lep1_subjet, *area_lep2_subjet, *area_lep3_subjet;

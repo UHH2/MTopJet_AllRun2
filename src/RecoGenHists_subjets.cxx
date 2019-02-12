@@ -207,6 +207,7 @@ void RecoGenHists_subjets::fill(const Event & event){
     R = (rec_pt - gen_pt) / gen_pt;
 
     if(nearest_j != 100 && dR <= 0.2){
+      // if( !RecoGenHists_subjets::findMatch(event, rec_sub.at(nearest_j)) ) continue;
       PtReso->Fill( R, weight );
       MassReso->Fill( (rec_sub.at(nearest_j).v4().M() - gen_sub.at(i).v4().M())/gen_sub.at(i).v4().M() , weight );
       if(gen_pt <= 50) PtReso_1->Fill( R, weight );
@@ -328,4 +329,24 @@ void RecoGenHists_subjets::fill(const Event & event){
   //---------------------------------------------------------------------------------------
 
 
+}
+
+// only returns true if there is exactly one gen particle that is matched to subjet
+bool RecoGenHists_subjets::findMatch(const Event & event, Jet jet){
+  bool match = false;
+  int nMatches = 0;
+  std::vector<GenParticle>* genparts = event.genparticles;
+  for (unsigned int i=0; i < genparts->size(); ++i){
+    GenParticle p = genparts->at(i);
+    if(i==0 || i==1) continue;        // skip initial particles
+    int id = abs(p.pdgId());
+    if(id == 1 || id == 2 || id == 3 || id == 4 || id == 5 || id == 9){
+      double dR = deltaR(jet, p);
+      if(dR < 0.2){
+        nMatches++;
+      }
+    }
+  }
+  if(nMatches == 1) match = true;
+  return match;
 }

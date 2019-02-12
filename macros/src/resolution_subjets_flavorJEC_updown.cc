@@ -17,9 +17,9 @@ int main(int argc, char* argv[]){
   if(argc >1 && strcmp(argv[1], "median") == 0) use_median = true;
 
   // declare files
-  TFile *f_central = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_flavor_fractions.root");
-  TFile *f_up = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_jecup.root");
-  TFile *f_down = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_jecdown.root");
+  TFile *f_central = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
+  TFile *f_up = new TFile(dir+"JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar.root");
+  TFile *f_down = new TFile(dir+"JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar.root");
 
   // set binning
   int n_ptbin = 10;
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
   TGraph* nonclosure = GetNonClosure(resolution_central, resolution_up, resolution_down, ptrec);
 
   // non-closure in root file
-  TString rootname = "files/FlavorJEC_nonClosure.root";
+  TString rootname = "files/NonClosure.root";
   TFile * outfile = new TFile(rootname,"RECREATE");
   nonclosure->Write("nonclosure");
   outfile->Close();
@@ -88,9 +88,9 @@ int main(int argc, char* argv[]){
   resolution_central->GetXaxis()->SetTitle("p_{T}^{gen}");
   resolution_central->GetYaxis()->SetTitle(mean_median+" #left[ #frac{p_{T}^{rec} - p_{T}^{gen}}{p_{T}^{gen}} #right]");
   resolution_central->SetLineWidth(4);
-  resolution_central->SetLineColor(kOrange+1);
+  resolution_central->SetLineColor(kAzure+7);
   resolution_up->SetLineWidth(4);
-  resolution_up->SetLineColor(kAzure+7);
+  resolution_up->SetLineColor(kOrange+1);
   resolution_down->SetLineWidth(4);
   resolution_down->SetLineColor(kRed+1);
 

@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
   Double_t BINS_REC_MASS_PTMIGRATION[] = {100, 123, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 400};
   Double_t BINS_REC_PT_PTMIGRATION[] = {350, 380, 400};
   Double_t BINS_REC_MASS_MASSMIGRATION[] = {45, 70, 90, 100, 110, 125, 130, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 400};
+  Double_t BINS_REC_MASS_SUBPTMIGRATION[] = {100, 123, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 400};
   Double_t BINS_REC_MASS_BTAGMIGRATION[] = {100, 123, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 400};
 
   // calculate total number of bins
@@ -48,6 +49,7 @@ int main(int argc, char* argv[])
   int N_BINS_REC_MASS_PTMIGRATION = sizeof(BINS_REC_MASS_PTMIGRATION)/sizeof(BINS_REC_MASS_PTMIGRATION[0]) - 1;
   int N_BINS_REC_PT_PTMIGRATION = sizeof(BINS_REC_PT_PTMIGRATION)/sizeof(BINS_REC_PT_PTMIGRATION[0]) - 1;
   int N_BINS_REC_MASS_MASSMIGRATION = sizeof(BINS_REC_MASS_MASSMIGRATION)/sizeof(BINS_REC_MASS_MASSMIGRATION[0]) - 1;
+  int N_BINS_REC_MASS_SUBPTMIGRATION = sizeof(BINS_REC_MASS_SUBPTMIGRATION)/sizeof(BINS_REC_MASS_SUBPTMIGRATION[0]) - 1;
   int N_BINS_REC_MASS_BTAGMIGRATION = sizeof(BINS_REC_MASS_BTAGMIGRATION)/sizeof(BINS_REC_MASS_BTAGMIGRATION[0]) - 1;
 
   /******************* GEN BINNING ************************************/
@@ -55,8 +57,9 @@ int main(int argc, char* argv[])
 
   // 1. set-up binning in vectors
   std::vector<Double_t> MASS;
-  if(fine) MASS = {110, 137, 157, 172, 187, 220, 250};
-  // if(fine) MASS = {127, 142, 157, 172, 187, 203, 218, 240, 270};
+  if(fine) MASS = {117, 137, 157, 172, 187, 222};
+  // if(fine) MASS = {117, 137, 157, 172, 187, 202, 222};
+  // if(fine) MASS = {110, 137, 157, 172, 187, 220, 250};
   else     MASS = {120, 150, 180, 210, 240, 270, 300};
 
   std::vector<Double_t> MASS_MASSMIGRATION;
@@ -69,12 +72,16 @@ int main(int argc, char* argv[])
   std::vector<Double_t> PT = {400, 500, 10000};
   std::vector<Double_t> PT_PTMIGRATION = {350, 400};
 
+  std::vector<Double_t> MASS_SUBPTMIGRATION;
+  MASS_SUBPTMIGRATION = MASS;
+
   // 2. get number of bins from every vector
   int N_BINS_GEN_MASS = MASS.size() - 1;
   int N_BINS_GEN_PT = PT.size() - 1;
   int N_BINS_GEN_PT_PTMIGRATION = PT_PTMIGRATION.size() - 1;
   int N_BINS_GEN_MASS_MASSMIGRATION = MASS_MASSMIGRATION.size() - 1;
   int N_BINS_GEN_MASS_PTMIGRATION = MASS_PTMIGRATION.size() - 1;
+  int N_BINS_GEN_MASS_SUBPTMIGRATION = MASS_SUBPTMIGRATION.size() - 1;
 
   // 3. create arrays from vectors arrays with correct size
   Double_t *BINS_GEN_MASS = MASS.data();
@@ -82,6 +89,7 @@ int main(int argc, char* argv[])
   Double_t *BINS_GEN_MASS_PTMIGRATION = MASS_PTMIGRATION.data();
   Double_t *BINS_GEN_PT_PTMIGRATION = PT_PTMIGRATION.data();
   Double_t *BINS_GEN_MASS_MASSMIGRATION = MASS_MASSMIGRATION.data();
+  Double_t *BINS_GEN_MASS_SUBPTMIGRATION = MASS_SUBPTMIGRATION.data();
 
 
   // =======================================================================================================
@@ -115,7 +123,14 @@ int main(int argc, char* argv[])
                                 false, // no underflow bin
                                 false // overflow bin
                                 );
-
+  //
+  // define sideband: migration from lower sub-pt region
+  //
+  TUnfoldBinning *subptmigration_rec = binning_rec->AddBinning("subptmigration_rec");
+  subptmigration_rec->AddAxis("mass",N_BINS_REC_MASS_SUBPTMIGRATION,BINS_REC_MASS_SUBPTMIGRATION,
+                                true, // underflow bin
+                                true // overflow bin
+                                );
   //
   // define sideband: migration from mass cut
   //
@@ -167,7 +182,14 @@ int main(int argc, char* argv[])
                                 false, // no underflow bin
                                 false // overflow bin
                                 );
-
+  //
+  // define sideband: migration from lower sub-pt region
+  //
+  TUnfoldBinning *subptmigration_gen = binning_gen->AddBinning("subptmigration_gen");
+  subptmigration_gen->AddAxis("mass",N_BINS_GEN_MASS_SUBPTMIGRATION,BINS_GEN_MASS_SUBPTMIGRATION,
+                                true, // no underflow bin
+                                true // overflow bin
+                                );
   //
   // define sideband: migration from mass cut
   //

@@ -136,7 +136,7 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
   JetCorrections->init(ctx, "xconeCHS");
   Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true));
   JERSmearing.reset(new JER_Smearer_xcone());
-  JERSmearing->init(ctx, "XCone33_had_Combined_Corrected", "GEN_XCone33_had_Combined");
+  JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
   //// EVENT SELECTION
 
 
@@ -206,10 +206,10 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
   copy_jet->process(event);                // copy 'raw' Fatets (with subjets) and name one copy 'noJEC'
   JetCorrections->process(event);          // apply AK4 JEC/JER to subjets of the original Fatjet Collection
+  JERSmearing->process(event);             // apply JER smearing on subjets
   jetprod_reco->process(event);            // now store sum of 'jec' subjets
   Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
-  JERSmearing->process(event);             // apply JER smearing on final jets
   ////
   return true;
 }

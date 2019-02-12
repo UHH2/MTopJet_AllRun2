@@ -18,7 +18,7 @@ double CorrectionFactor::get_factor(double pt, double eta){
 
   // get factor from function
   if(pt > 430) pt = 430;
-  if(pt < 0)   pt = 0;
+  if(pt < 30)  pt = 30;
 
 
   double factor = 1;
@@ -137,21 +137,21 @@ bool CorrectionFactor::process(uhh2::Event & event){
   for(unsigned int i=0; i < oldjets.size(); i++) newjets.push_back(oldjets.at(i));
 
   // get had jet, to only correct had subjets (in l+jets case)
-  int had_nr = 0;
-  int lep_nr = 1;
-  if(!allHad){
-    Particle lepton = GetLepton(event);
-    if(deltaR(lepton, oldjets.at(0)) < deltaR(lepton, oldjets.at(1))){
-      had_nr = 1;
-      lep_nr = 0;
-    }
-  }
+  // int had_nr = 0;
+  // int lep_nr = 1;
+  // if(!allHad){
+  //   Particle lepton = GetLepton(event);
+  //   if(deltaR(lepton, oldjets.at(0)) < deltaR(lepton, oldjets.at(1))){
+  //     had_nr = 1;
+  //     lep_nr = 0;
+  //   }
+  // }
 
-  // leave lep subjets unchanged
-  if(!allHad) newjets.at(lep_nr).set_subjets(oldjets.at(lep_nr).subjets());
+  // leave lep subjets unchanged (dont do this anymore!!)
+  // if(!allHad) newjets.at(lep_nr).set_subjets(oldjets.at(lep_nr).subjets());
 
   // now correct had subjets
-  std::vector<Jet> oldsubjets = oldjets.at(had_nr).subjets();
+  std::vector<Jet> oldsubjets = oldjets.at(0).subjets();
   std::vector<Jet> newsubjets;
   LorentzVector newjet_v4;
   Jet newjet;
@@ -163,24 +163,23 @@ bool CorrectionFactor::process(uhh2::Event & event){
     newjet.set_v4(newjet_v4);  // Because of this, all JEC factors are set to the defaul value of 1
     newsubjets.push_back(newjet);
   }
-  newjets.at(had_nr).set_subjets(newsubjets);
+  newjets.at(0).set_subjets(newsubjets);
 
-  // if all Had, also correct second jet
-  if(allHad){
-    std::vector<Jet> oldsubjets2 = oldjets.at(lep_nr).subjets();
-    std::vector<Jet> newsubjets2;
-    LorentzVector newjet2_v4;
-    Jet newjet2;
-    float factor2;
-    for(unsigned int i=0; i < oldsubjets2.size(); i++){
-      factor2 = get_factor(oldsubjets2.at(i).pt(), oldsubjets2.at(i).eta());
-      newjet2_v4 = oldsubjets2.at(i).v4() * factor2;
-      newjet2 = oldsubjets2.at(i); // this acutally is not required
-      newjet2.set_v4(newjet2_v4);  // Because of this, all JEC factors are set to the defaul value of 1
-      newsubjets2.push_back(newjet2);
-    }
-    newjets.at(lep_nr).set_subjets(newsubjets2);
+  // also correct second jet
+  std::vector<Jet> oldsubjets2 = oldjets.at(1).subjets();
+  std::vector<Jet> newsubjets2;
+  LorentzVector newjet2_v4;
+  Jet newjet2;
+  float factor2;
+  for(unsigned int i=0; i < oldsubjets2.size(); i++){
+    factor2 = get_factor(oldsubjets2.at(i).pt(), oldsubjets2.at(i).eta());
+    newjet2_v4 = oldsubjets2.at(i).v4() * factor2;
+    newjet2 = oldsubjets2.at(i); // this acutally is not required
+    newjet2.set_v4(newjet2_v4);  // Because of this, all JEC factors are set to the defaul value of 1
+    newsubjets2.push_back(newjet2);
   }
+  newjets.at(1).set_subjets(newsubjets2);
+
 
   event.set(h_newjets, newjets);
 

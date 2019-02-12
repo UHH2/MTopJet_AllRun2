@@ -20,12 +20,19 @@
 #include <TTree.h>
 #include <TVectorD.h>
 #include <TMatrix.h>
-#include <TDecompLU.h>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <cstdio>
 #include <TColor.h>
+#include <TMatrixDSym.h>
+#include <TMatrixDSymEigen.h>
+#include <TDecompSVD.h>
+#include <TDecompLU.h>
+#include <TVirtualFitter.h>
+#include <TFitResult.h>
+
+
 
 TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/";

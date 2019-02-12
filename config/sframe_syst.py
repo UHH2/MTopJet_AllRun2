@@ -26,7 +26,7 @@ sys_uncerts = {
      'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
      'BTAG_udsg_down'        : {'BTag_variation':'down_udsg'},
 }
-start_all_parallel = False
+start_all_parallel = True
 
 ############################################################### script code ###
 import varial

@@ -20,15 +20,36 @@
 class FactorizedJetCorrector;
 
 namespace JERFiles {
-  // DATA
+  // DATA UD
   extern const std::vector<std::string> Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorUD;
   extern const std::vector<std::string> Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorUD;
   extern const std::vector<std::string> Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorUD;
   extern const std::vector<std::string> Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorUD;
+
+  // DATA C
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorC;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorC;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorC;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorC;
+
+  // DATA S
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorS;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorS;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorS;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorS;
+
+  // DATA B
   extern const std::vector<std::string> Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorB;
   extern const std::vector<std::string> Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorB;
   extern const std::vector<std::string> Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorB;
   extern const std::vector<std::string> Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorB;
+
+  // DATA G
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorG;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorG;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorG;
+  extern const std::vector<std::string> Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorG;
+
   // MC
   extern const std::vector<std::string> Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorUD;
   extern const std::vector<std::string> Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorC;

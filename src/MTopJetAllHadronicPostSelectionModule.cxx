@@ -79,7 +79,7 @@ protected:
   std::unique_ptr<Hists> h_RecGenHists_bmatching_light, h_RecGenHists_noJEC_bmatching_light;
   std::unique_ptr<Hists> h_RecGenHists_bmatching_b, h_RecGenHists_noJEC_bmatching_b;
 
-
+  std::unique_ptr<Hists> h_RecGenHists_allHad_jet1, h_RecGenHists_allHad_jet2, h_RecGenHists_allHad_jet3;
   std::unique_ptr<Hists> h_RecGenHists_allHad, h_RecGenHists_allHad_noJEC, h_RecGenHists_allHad_corrected;
   std::unique_ptr<Hists> h_RecGenHists_allHad_lowPU, h_RecGenHists_allHad_medPU, h_RecGenHists_allHad_highPU;
   std::unique_ptr<Hists> h_RecGenHists_allHad_noJEC_lowPU, h_RecGenHists_allHad_noJEC_medPU, h_RecGenHists_allHad_noJEC_highPU;
@@ -107,8 +107,8 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
   /*************************** CONFIGURATION **********************************************************************************/
   isMC = (ctx.get("dataset_type") == "MC");
   if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_allHad"  ||
-     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_allHad"  ||
-     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_allHad" ) isTTbar = true;
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_allHad"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_allHad" ) isTTbar = true;
   else isTTbar = false;
 
   // PU reweighting
@@ -159,16 +159,19 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
 
   if(isMC){
     h_CorrectionHists.reset(new CorrectionHists_allHad(ctx, "CorrectionHists"));
+    h_RecGenHists_allHad_jet1.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_jet1", "jec", "first", 0, 400));
+    h_RecGenHists_allHad_jet2.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_jet2", "jec", "second", 0, 400));
+    h_RecGenHists_allHad_jet3.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_jet3", "jec", "third", 0, 400));
 
-    h_RecGenHists_allHad.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad", "jec", 0, 400));
-    h_RecGenHists_allHad_corrected.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_corrected", "cor", 0, 400));
-    h_RecGenHists_allHad_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_lowPU", "jec", 0, 400));
-    h_RecGenHists_allHad_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_medPU", "jec", 0, 400));
-    h_RecGenHists_allHad_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_highPU", "jec", 0, 400));
-    h_RecGenHists_allHad_noJEC.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC", "raw", 0, 400));
-    h_RecGenHists_allHad_noJEC_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_lowPU", "raw", 0, 400));
-    h_RecGenHists_allHad_noJEC_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_medPU", "raw", 0, 400));
-    h_RecGenHists_allHad_noJEC_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_highPU", "raw", 0, 400));
+    h_RecGenHists_allHad.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad", "jec", "all", 0, 400));
+    h_RecGenHists_allHad_corrected.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_corrected", "cor", "all", 0, 400));
+    h_RecGenHists_allHad_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_lowPU", "jec", "all", 0, 400));
+    h_RecGenHists_allHad_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_medPU", "jec", "all", 0, 400));
+    h_RecGenHists_allHad_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_highPU", "jec", "all", 0, 400));
+    h_RecGenHists_allHad_noJEC.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC", "raw", "all", 0, 400));
+    h_RecGenHists_allHad_noJEC_lowPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_lowPU", "raw", "all", 0, 400));
+    h_RecGenHists_allHad_noJEC_medPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_medPU", "raw", "all", 0, 400));
+    h_RecGenHists_allHad_noJEC_highPU.reset(new RecoGenHists_allHad(ctx, "RecGenHists_allHad_noJEC_highPU", "raw", "all", 0, 400));
 
     h_RecGenHists_bmatching.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_bmatching", "jec", 0, 400, "both"));
     h_RecGenHists_noJEC_bmatching.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_noJEC_bmatching", "raw", 0, 400, "both"));
@@ -179,10 +182,10 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
     h_RecGenHists_bmatching_b.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_bmatching_b", "jec", 0, 400, "b"));
     h_RecGenHists_noJEC_bmatching_b.reset(new RecoGenHists_allHad_flavor(ctx, "RecGenHists_noJEC_bmatching_b", "raw", 0, 400, "b"));
 
-    h_RecGenHists_rec0_gen400.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec0_gen400", "jec", 0, 400));
-    h_RecGenHists_rec200_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec200_gen0", "jec", 200, 0));
-    h_RecGenHists_rec300_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec300_gen0", "jec", 300, 0));
-    h_RecGenHists_rec400_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec400_gen0", "jec", 400, 0));
+    h_RecGenHists_rec0_gen400.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec0_gen400", "jec", "all", 0, 400));
+    h_RecGenHists_rec200_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec200_gen0", "jec", "all", 200, 0));
+    h_RecGenHists_rec300_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec300_gen0", "jec", "all", 300, 0));
+    h_RecGenHists_rec400_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec400_gen0", "jec", "all", 400, 0));
 
     h_GenParticles.reset(new GenHists_allHad(ctx, "GenParticles"));
 
@@ -272,6 +275,10 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
   }
 
   if(isMC){
+    h_RecGenHists_allHad_jet1->fill(event);
+    h_RecGenHists_allHad_jet2->fill(event);
+    h_RecGenHists_allHad_jet3->fill(event);
+
     h_RecGenHists_allHad->fill(event);
     h_RecGenHists_allHad_noJEC->fill(event);
     h_RecGenHists_allHad_corrected->fill(event);

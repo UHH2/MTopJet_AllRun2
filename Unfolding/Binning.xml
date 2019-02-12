@@ -18,8 +18,9 @@
    <Bin width="16" center="232" />
    <Bin width="23" center="251.5" />
    <Bin width="30" center="278" />
-   <Bin width="107" center="346.5" />
-   <Bin location="overflow" width="107" center="453.5"/>
+   <Bin width="50" center="318" />
+   <Bin width="57" center="371.5" />
+   <Bin location="overflow" width="57" center="428.5"/>
    <Axis name="pt" lowEdge="400">
     <Bin width="50" center="425" />
     <Bin width="80" center="490" />
@@ -27,7 +28,7 @@
    </Axis>
   </Axis>
  </BinningNode>
- <BinningNode name="ptmigration_rec" firstbin="76" factor="1">
+ <BinningNode name="ptmigration_rec" firstbin="79" factor="1">
   <Axis name="mass" lowEdge="100">
    <Bin location="underflow" width="23" center="88.5" />
    <Bin width="23" center="111.5" />
@@ -52,11 +53,15 @@
    </Axis>
   </Axis>
  </BinningNode>
- <BinningNode name="massmigration_rec" firstbin="128" factor="1">
-  <Axis name="mass" lowEdge="100">
-   <Bin location="underflow" width="23" center="88.5" />
-   <Bin width="23" center="111.5" />
-   <Bin width="15" center="130.5" />
+ <BinningNode name="massmigration_rec" firstbin="131" factor="1">
+  <Axis name="mass" lowEdge="45">
+   <Bin location="underflow" width="25" center="32.5" />
+   <Bin width="25" center="57.5" />
+   <Bin width="20" center="80" />
+   <Bin repeat="2" width="10" center="95" />
+   <Bin width="15" center="117.5" />
+   <Bin width="5" center="127.5" />
+   <Bin width="8" center="134" />
    <Bin width="9" center="142.5" />
    <Bin width="6" center="150" />
    <Bin repeat="2" width="4" center="155" />
@@ -73,7 +78,7 @@
    <Bin location="overflow" width="107" center="453.5"/>
   </Axis>
  </BinningNode>
- <BinningNode name="btagmigration_rec" firstbin="154" factor="1">
+ <BinningNode name="btagmigration_rec" firstbin="162" factor="1">
   <Axis name="mass" lowEdge="100">
    <Bin location="underflow" width="23" center="88.5" />
    <Bin width="23" center="111.5" />

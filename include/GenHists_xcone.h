@@ -36,10 +36,17 @@ protected:
 
     TH1F *SoftDropMass;
 
+    TH1F *min_mass_Wjet, *min_mass_Wjet_zoom, *min_mass_Wjet_ptlow, *min_mass_Wjet_pthigh, *min_mass_Wjet_ptmix, *all_mass_Wjet;
+    TH1F *pt_Wjet, *pt_Wjet_i, *pt_Wjet_j, *pt_Wjet_diff;
+    TH2F *pt_Wjets;
+    TH1F* Wjet_combination;
+
+    TH1F* pt_subjets_had, *pt_subjets_had1, *pt_subjets_had2, *pt_subjets_had3;
 
     uhh2::Event::Handle<std::vector<GenTopJet>>h_hadjets23;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_lepjets23;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_hadjets33;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_lepjets33;
+    uhh2::Event::Handle<std::vector<GenTopJet>>h_fatjets33;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_softdrop;
 };

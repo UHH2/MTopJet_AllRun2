@@ -4,11 +4,11 @@
 RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
 
-  HadJetMass = book<TH1F>("M_jet1", "Leading Jet Mass [GeV]", 50, 0, 500);
-  HadJetMass_B = book<TH1F>("M_jet1_B", "Leading Jet Mass [GeV]", 100, 0, 500);
-  HadJetMass_rebin = book<TH1F>("M_jet1_", "Leading Jet Mass [GeV]", 25, 0, 500);
+  HadJetMass = book<TH1F>("M_jet1", "Leading-Jet Mass [GeV]", 50, 0, 500);
+  HadJetMass_B = book<TH1F>("M_jet1_B", "Leading-Jet Mass [GeV]", 100, 0, 500);
+  HadJetMass_rebin = book<TH1F>("M_jet1_", "Leading-Jet Mass [GeV]", 25, 0, 500);
 
-  LepJetMass = book<TH1F>("M_jet2", "m_{jet}", 50, 0, 500);
+  LepJetMass = book<TH1F>("M_jet2", "m_{jet + lepton}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);
 
   HadJetEta = book<TH1F>("eta_jet1", "#eta", 50, -5, 5);
@@ -76,20 +76,17 @@ void RecoHists_xcone::fill(const Event & event){
   std::vector<TopJet> lepjets = event.get(h_lepjets);
   std::vector<TopJet> fatjets = event.get(h_fatjets);
   double rho = event.rho;
-  // Particle lepton;
-  // if(event.muons->size() > 0 && event.electrons->size() > 0){
-  //   return;
-  // }
-  // if(event.muons->size() > 0){
-  //   lepton = event.muons->at(0);
-  // }
-  // else if(event.electrons->size() > 0){
-  //   lepton = event.electrons->at(0);
-  // }
-  // if(hadjets.size() == 0 || lepjets.size() == 0) return;
 
-  // float dR_had = deltaR(lepton, hadjets.at(0));
-  // float dR_lep = deltaR(lepton, lepjets.at(0));
+  Particle lepton;
+  bool found_lep = false;
+  if(event.muons->size() > 0){
+    lepton = event.muons->at(0);
+    found_lep = true;
+  }
+  else if(event.electrons->size() > 0){
+    lepton = event.electrons->at(0);
+    found_lep = true;
+  }
 
   // get had jet from fat jets for softdrop mass
   int nr_hadjet = 0;
@@ -108,6 +105,8 @@ void RecoHists_xcone::fill(const Event & event){
   pzlep = lepjets.at(0).v4().Pz();
   Elep = lepjets.at(0).v4().E();
   lepjet_v4.SetPxPyPzE(pxlep, pylep, pzlep, Elep);
+  LorentzVector lepjet_lepton_v4 = lepjets.at(0).v4();
+  if(found_lep) lepjet_lepton_v4 += lepton.v4();
 
   double pxhad, pyhad, pzhad, Ehad;
   pxhad = hadjets.at(0).v4().Px();
@@ -132,8 +131,8 @@ void RecoHists_xcone::fill(const Event & event){
   HadJetMass->Fill(hadjet_v4.M(), weight);
   HadJetMass_B->Fill(hadjet_v4.M(), weight);
   HadJetMass_rebin->Fill(hadjet_v4.M(), weight);
-  LepJetMass->Fill(lepjet_v4.M(), weight);
-  HadMassLepMass->Fill(hadjet_v4.M() - lepjet_v4.M(), weight);
+  LepJetMass->Fill(lepjet_lepton_v4.M(), weight);
+  HadMassLepMass->Fill(hadjet_v4.M() - lepjet_lepton_v4.M(), weight);
 
   HadJetEta->Fill(hadjet_v4.Eta(), weight);
   HadJetPhi->Fill(hadjet_v4.Phi(), weight);
@@ -154,7 +153,7 @@ void RecoHists_xcone::fill(const Event & event){
 
   FatJetPT_lep->Fill(fatjets.at(nr_lepjet).pt(), weight);
   FatJetPTDiff_lep->Fill((fatjets.at(nr_lepjet).pt() - lepjet_v4.Pt()), weight);
-  FatJetMassDiff_lep->Fill((fatjets.at(nr_lepjet).softdropmass() - lepjet_v4.M()), weight);
+  FatJetMassDiff_lep->Fill((fatjets.at(nr_lepjet).softdropmass() - lepjet_lepton_v4.M()), weight);
   if(fatjets.at(nr_hadjet).pt() > 400 && fatjets.at(nr_lepjet).softdropmass() < fatjets.at(nr_hadjet).softdropmass())SoftdropMass_Sel->Fill(fatjets.at(nr_hadjet).softdropmass(), weight);
 
   double rhoa_fat = rho * M_PI * 1.2 * 1.2;

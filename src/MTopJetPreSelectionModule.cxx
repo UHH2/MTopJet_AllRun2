@@ -33,11 +33,11 @@ using namespace std;
 
 class MTopJetPreSelectionModule : public ModuleBASE {
 
- public:
+public:
   explicit MTopJetPreSelectionModule(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
 
- protected:
+protected:
 
 
   // selections
@@ -51,6 +51,7 @@ class MTopJetPreSelectionModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> jet2_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
+  std::unique_ptr<uhh2::Selection> GenMuonPT;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -111,6 +112,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   //// EVENTS SELECTION GEN
   if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
   else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
+  if(isMC) GenMuonPT.reset(new GenMuonSel(ctx, 55.));
   ////
 
 }
@@ -140,17 +142,21 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   if(isMC)pass_semilep = SemiLepDecay->passes(event);
   else pass_semilep=false;
 
+  bool pass_genmuon = false;
+  if(isMC){
+    pass_genmuon = GenMuonPT->passes(event);
+  }
   // cut on GEN Jet PT
   bool passed_genpt=false;
-  if(isMC && pass_semilep){
+  if(isMC && pass_semilep && pass_genmuon){
     std::vector<GenTopJet> jets = event.get(h_GENfatjets);
     if(jets.size() > 1){
       GenParticle lepton;
       std::vector<GenParticle>* genparts = event.genparticles;
       for (unsigned int i=0; i<(genparts->size()); ++i){
-	GenParticle p = genparts->at(i);
-	if(abs(p.pdgId()) == 13) lepton = p;
-	else if(abs(p.pdgId()) == 11) lepton = p;
+        GenParticle p = genparts->at(i);
+        if(abs(p.pdgId()) == 13) lepton = p;
+        else if(abs(p.pdgId()) == 11) lepton = p;
       }
       float dR1 = deltaR(lepton, jets.at(0));
       float dR2 = deltaR(lepton, jets.at(1));
@@ -162,10 +168,10 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
       double px=0, py=0, pz=0, E=0;
       TLorentzVector jet_v4;
       for(unsigned int i=0; i < had_subjets.size(); ++i){
-	px += had_subjets.at(i).v4().Px();
-	py += had_subjets.at(i).v4().Py();
-	pz += had_subjets.at(i).v4().Pz();
-	E += had_subjets.at(i).v4().E();
+        px += had_subjets.at(i).v4().Px();
+        py += had_subjets.at(i).v4().Py();
+        pz += had_subjets.at(i).v4().Pz();
+        E += had_subjets.at(i).v4().E();
       }
       jet_v4.SetPxPyPzE(px, py, pz, E);
       double pt = jet_v4.Pt();
@@ -177,7 +183,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   if(pass_lep1 && pass_jet2 && pass_jet1 && pass_met && pass_lepsel) passed_recsel = true;
   else passed_recsel = false;
 
-  if(pass_semilep && passed_genpt) passed_gensel = true;
+  if(pass_semilep && passed_genpt && pass_genmuon) passed_gensel = true;
   else passed_gensel = false;
 
   if(!passed_recsel && !passed_gensel) return false;

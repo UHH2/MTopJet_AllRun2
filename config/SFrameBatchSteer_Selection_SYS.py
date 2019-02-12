@@ -25,10 +25,12 @@ if __name__ == "__main__":
 
     # the first value in systematics is the name of the variable in the xml file
     # the second value is the name of the directory
-    # systematics = [ ['jecsmear_direction', 'JEC'], ['jersmear_direction', 'JER'] ]
+    # systematics = [ ['jecsmear_direction', 'JEC'], ['jersmear_direction', 'JER'], ['JetCorrection_direction', 'COR'] ]
     # variations = ['up','down']
-    systematics = [ ['NonClosureUncertainty', 'NonClosure'] ]
-    variations = ['true']
+    systematics = [ ['jersmear_direction', 'JER'], ['JetCorrection_direction', 'COR'] ]
+    variations = ['up','down']
+    #systematics = [ ['NonClosureUncertainty', 'NonClosure'] ]
+    #variations = ['true']
     for sys in systematics:
         for value in variations:
 

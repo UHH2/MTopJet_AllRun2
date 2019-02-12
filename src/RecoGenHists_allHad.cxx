@@ -1,7 +1,7 @@
 #include "UHH2/MTopJet/include/RecoGenHists_allHad.h"
 
 
-RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string & dirname,  const std::string & type, double ptreccut_, double ptgencut_): Hists(ctx, dirname){
+RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string & dirname,  const std::string & type, const std::string & subjet_selection, double ptreccut_, double ptgencut_): Hists(ctx, dirname){
   // book all histograms here
   MassReso = book<TH1F>("MassResolution", "(M^{rec}_{jet} - M^{gen}_{jet}) / M^{gen}_{jet}) ", 90, -1.5, 1.5);
   PtReso = book<TH1F>("PtResolution", "(p^{rec}_{T, jet} - p^{gen}_{T, jet}) / p^{gen}_{T, jet}) ", 90, -1.5, 1.5);
@@ -73,7 +73,22 @@ RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string 
   ptreccut = ptreccut_;
   ptgencut = ptgencut_;
 
-
+  if(subjet_selection == "first"){
+    only_one_jet = true;
+    index_onlyjet = 0;
+  }
+  else if(subjet_selection == "second"){
+    only_one_jet = true;
+    index_onlyjet = 1;
+  }
+  else if(subjet_selection == "third"){
+    only_one_jet = true;
+    index_onlyjet = 2;
+  }
+  else{
+    only_one_jet = false;
+    index_onlyjet = -1;
+  }
 }
 
 
@@ -158,6 +173,7 @@ void RecoGenHists_allHad::fill(const Event & event){
   // do matching
   if(use_jet1){
     for(unsigned int i=0; i<rec_sub1.size(); i++){
+      if(only_one_jet && (i != index_onlyjet) ) continue;
       dR = 1000;
       nearest_j = 100;
       for(unsigned int j=0; j<gen_sub1.size(); j++){
@@ -221,6 +237,7 @@ void RecoGenHists_allHad::fill(const Event & event){
   }
   if(use_jet2){
     for(unsigned int i=0; i<rec_sub2.size(); i++){
+      if(only_one_jet && (i != index_onlyjet) ) continue;      
       dR = 1000;
       nearest_j = 100;
       for(unsigned int j=0; j<gen_sub2.size(); j++){

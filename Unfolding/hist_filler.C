@@ -20,11 +20,11 @@ int main(int argc, char* argv[]){
   TH1::SetDefaultSumw2();
 
   /*
-  ██████ ██████  ███████  █████  ████████ ███████      ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ██ ██      ███████
+   ██████ ██████  ███████  █████  ████████ ███████      ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ██ ██      ███████
   ██      ██   ██ ██      ██   ██    ██    ██          ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██      ██ ██      ██
   ██      ██████  █████   ███████    ██    █████       ██    ██ ██    ██    ██    ██████  ██    ██    ██        █████   ██ ██      █████
   ██      ██   ██ ██      ██   ██    ██    ██          ██    ██ ██    ██    ██    ██      ██    ██    ██        ██      ██ ██      ██
-  ██████ ██   ██ ███████ ██   ██    ██    ███████      ██████   ██████     ██    ██       ██████     ██        ██      ██ ███████ ███████
+   ██████ ██   ██ ███████ ██   ██    ██    ███████      ██████   ██████     ██    ██       ██████     ██        ██      ██ ███████ ███████
   */
 
   std::string filename;
@@ -96,8 +96,8 @@ int main(int argc, char* argv[]){
   fill_matrix((TTree *) pseudodata2_File->Get("AnalysisTree"), "pseudo2");
 
   // fill SYS
-  vector<TString> sys_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown", "jecup", "jecdown", "jerup", "jerdown", "muidup", "muiddown", "mutrup", "mutrdown", "puup", "pudown"};
-  vector<TString> subdir = {"BTAG_bc_up", "BTAG_bc_down", "BTAG_udsg_up", "BTAG_udsg_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "PU_up", "PU_down"};
+  vector<TString> sys_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown", "jecup", "jecdown", "jerup", "jerdown", "corup", "cordown", "muidup", "muiddown", "mutrup", "mutrdown", "puup", "pudown"};
+  vector<TString> subdir = {"BTAG_bc_up", "BTAG_bc_down", "BTAG_udsg_up", "BTAG_udsg_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "COR_up", "COR_down", "MUID_up", "MUID_down", "MUTR_up", "MUTR_down", "PU_up", "PU_down"};
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     TFile *file = new TFile(dir+subdir[i]+prefix+"MC.TTbar.root");
@@ -226,6 +226,8 @@ void fill_template(TTree* tree, TString mtop){
   tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
   tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
   tree->SetBranchAddress("passed_ptmigration_gen",&passed_ptmigration_gen);
+  tree->SetBranchAddress("passed_subptmigration_rec",&passed_subptmigration_rec);
+  tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
@@ -250,20 +252,23 @@ void fill_template(TTree* tree, TString mtop){
     Int_t genBin;
     if     (passed_measurement_gen)   genBin = measurement_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
+    else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
     if     (passed_measurement_rec)    recBin = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
-    bool rec_info = false;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_btagmigration_rec) rec_info = true;
     bool gen_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen) gen_info = true;
+    bool rec_info = false;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_btagmigration_rec) rec_info = true;
+
 
     // Fill 1D Hists (for truth distribution only use gen selection)
     if(passed_measurement_gen) h_mass_truth->Fill(massGen, w_gen);
@@ -372,6 +377,8 @@ void fill_matrix(TTree* tree, TString prefix){
   tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
   tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
   tree->SetBranchAddress("passed_ptmigration_gen",&passed_ptmigration_gen);
+  tree->SetBranchAddress("passed_subptmigration_rec",&passed_subptmigration_rec);
+  tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
@@ -402,20 +409,22 @@ void fill_matrix(TTree* tree, TString prefix){
     Int_t genBin;
     if     (passed_measurement_gen)   genBin = measurement_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
+    else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
     if     (passed_measurement_rec)    recBin = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
     bool gen_info = false;
     bool rec_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)
@@ -494,6 +503,8 @@ void fill_modelsys(TTree* tree, TString prefix){
   tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
   tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
   tree->SetBranchAddress("passed_ptmigration_gen",&passed_ptmigration_gen);
+  tree->SetBranchAddress("passed_subptmigration_rec",&passed_subptmigration_rec);
+  tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
@@ -518,20 +529,23 @@ void fill_modelsys(TTree* tree, TString prefix){
     Int_t genBin;
     if     (passed_measurement_gen)   genBin = measurement_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
+    else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
     if     (passed_measurement_rec)    recBin = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
-    bool rec_info = false;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_btagmigration_rec) rec_info = true;
     bool gen_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen) gen_info = true;
+    bool rec_info = false;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_btagmigration_rec) rec_info = true;
+
 
     // Fill 1D Hists (for truth distribution only use gen selection)
     if(passed_measurement_gen) h_mc_truth->Fill(massGen, w_gen);
@@ -614,6 +628,8 @@ void fill_pdf(TTree* tree){
   tree->SetBranchAddress("gen_weight_ttfactor",&gen_ttfactor);
   tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
   tree->SetBranchAddress("passed_ptmigration_gen",&passed_ptmigration_gen);
+  tree->SetBranchAddress("passed_subptmigration_rec",&passed_subptmigration_rec);
+  tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
@@ -638,20 +654,23 @@ void fill_pdf(TTree* tree){
     Int_t genBin;
     if     (passed_measurement_gen)   genBin = measurement_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
+    else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
     if     (passed_measurement_rec)    recBin = measurement_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
+    else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
-    bool rec_info = false;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_btagmigration_rec) rec_info = true;
     bool gen_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen) gen_info = true;
+    bool rec_info = false;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_btagmigration_rec) rec_info = true;
+
 
     // Fill 1D Hists (for truth distribution only use gen selection)
     for(unsigned int i=0; i<100; i++){

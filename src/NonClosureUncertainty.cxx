@@ -15,7 +15,7 @@ double NonClosureUncertainty::get_factor(double pt){
 
 
 void NonClosureUncertainty::get_function(){
-  TString filename = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/NonClosure/FlavorJEC_nonClosure.root";
+  TString filename = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/NonClosure/NonClosure.root";
   TFile *file = new TFile(filename);
   TString histname = "nonclosure";
   NonClosureFunction = (TGraph*)file->Get(histname);

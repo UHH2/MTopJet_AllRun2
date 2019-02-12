@@ -8,9 +8,10 @@ SRCDIR   = src
 SOURCES  := $(wildcard $(SRCDIR)/*.cc)
 INCLUDES := $(wildcard $(INCDIR)/*.h)
 
-MACROS := AcceptancePuritySubjets SubjetFlavor resolution_subjets_flavorJEC resolution_subjets_flavorJEC_updown tt_envelope tt_masspoints tt_pdf tt_sys
+MACROS_temp := $(basename $(SOURCES))
+MACROS := $(notdir $(MACROS_temp) )
 
-all: $(MACROS) # clean first and build always everything
+all: $(MACROS)
 
 
 $(MACROS): % : $(SRCDIR)/%.cc $(INCLUDES)

@@ -17,8 +17,35 @@
 #include <unordered_map>
 #include <iostream>
 
+using namespace std;
+
 
 namespace uhh2 {
+
+  class SubjetQuality_gen : public Selection {
+
+  public:
+    explicit SubjetQuality_gen(Context&, const std::string &, float, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_jets;
+    float ptmin, etamax;
+  };
+
+
+
+  class GenMuonSel : public Selection {
+
+  public:
+    explicit GenMuonSel(Context&, double);
+    virtual bool passes(const Event&) override;
+
+  protected:
+    double ptmin;
+  };
+
+
 
   class TTbarSemilep : public Selection {
 
@@ -62,7 +89,7 @@ namespace uhh2 {
     float jetradius_;
   };
 
-   class Matching_HOTVR : public Selection {
+  class Matching_HOTVR : public Selection {
 
   public:
     explicit Matching_HOTVR(Context&, const std::string &, double);
@@ -96,7 +123,7 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
- class Matching_XCone33 : public Selection {
+  class Matching_XCone33 : public Selection {
 
   public:
     explicit Matching_XCone33(Context&, bool);
@@ -119,7 +146,7 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
-   class Matching_top : public Selection {
+  class Matching_top : public Selection {
 
   public:
     explicit Matching_top(Context&, float);
@@ -132,7 +159,7 @@ namespace uhh2 {
   };
 
 
- class LeadingJetPT : public Selection {
+  class LeadingJetPT : public Selection {
 
   public:
     explicit LeadingJetPT(Context&, const std::string &, float);
@@ -143,7 +170,7 @@ namespace uhh2 {
     float ptcut_;
   };
 
- class LeadingJetPT_gen : public Selection {
+  class LeadingJetPT_gen : public Selection {
 
   public:
     explicit LeadingJetPT_gen(Context&, const std::string &, float);
@@ -155,7 +182,7 @@ namespace uhh2 {
   };
 
 
- class LeadingTopJetPT : public Selection {
+  class LeadingTopJetPT : public Selection {
 
   public:
     explicit LeadingTopJetPT(Context&, float);
@@ -166,7 +193,7 @@ namespace uhh2 {
     float ptcut_;
   };
 
- class MassCut : public Selection {
+  class MassCut : public Selection {
 
   public:
     explicit MassCut(Context&, const std::string &);
@@ -177,7 +204,7 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
- class MassCut_gen : public Selection {
+  class MassCut_gen : public Selection {
 
   public:
     explicit MassCut_gen(Context&, const std::string &, const std::string &);
@@ -199,19 +226,19 @@ namespace uhh2 {
     uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
- class DeltaPhiCut : public Selection {
+  class DeltaPhiCut : public Selection {
 
   public:
-   explicit DeltaPhiCut(Context&, const std::string &, float);
-   virtual bool passes(const Event&) override;
+    explicit DeltaPhiCut(Context&, const std::string &, float);
+    virtual bool passes(const Event&) override;
 
   private:
-   uhh2::Event::Handle<std::vector<Jet>> h_jets;
-   uhh2::Event::Handle<TTbarGen> h_ttbargen;
-   float jetradius_;
+    uhh2::Event::Handle<std::vector<Jet>> h_jets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float jetradius_;
   };
 
- class DeltaRCut : public Selection {
+  class DeltaRCut : public Selection {
 
   public:
     explicit DeltaRCut(Context&, const std::string &, float);
@@ -223,7 +250,7 @@ namespace uhh2 {
     float jetradius_;
   };
 
- class DeltaRCut_HOTVR : public Selection {
+  class DeltaRCut_HOTVR : public Selection {
 
   public:
     explicit DeltaRCut_HOTVR(Context&, const std::string &, double);
@@ -236,7 +263,7 @@ namespace uhh2 {
   };
 
 
- class DeltaRCut_top : public Selection {
+  class DeltaRCut_top : public Selection {
 
   public:
     explicit DeltaRCut_top(Context&, float);
@@ -248,7 +275,7 @@ namespace uhh2 {
     float jetradius_;
   };
 
- class NGenJets : public Selection {
+  class NGenJets : public Selection {
 
   public:
     explicit NGenJets(Context&, const std::string &, float min_pt = 0, float min = 0, float max = 9999);
@@ -274,7 +301,7 @@ namespace uhh2 {
     float max_;
   };
 
- class GenJetLeptonCleaner : public uhh2::AnalysisModule {
+  class GenJetLeptonCleaner : public uhh2::AnalysisModule {
 
   public:
     explicit GenJetLeptonCleaner(Context&, const std::string &, float);
@@ -286,23 +313,23 @@ namespace uhh2 {
     float jetradius_;
   };
 
- class GenTopJetLeptonCleaner : public uhh2::AnalysisModule {
+  class GenTopJetLeptonCleaner : public uhh2::AnalysisModule {
 
   public:
     explicit GenTopJetLeptonCleaner(Context&, float);
     virtual bool process(Event& ) override;
 
   private:
-     uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
-     uhh2::Event::Handle<TTbarGen> h_ttbargen;
-     float jetradius_;
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_gentopjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    float jetradius_;
   };
 
 
- class MassCutGen1 : public Selection{
+  class MassCutGen1 : public Selection{
 
   public:
-   explicit MassCutGen1(Context&, const std::string &, float, float);
+    explicit MassCutGen1(Context&, const std::string &, float, float);
     virtual bool passes(const Event& ) override;
 
   private:
@@ -311,10 +338,10 @@ namespace uhh2 {
     float M_max_;
   };
 
- class MassCutGen_XCone : public Selection{
+  class MassCutGen_XCone : public Selection{
 
   public:
-   explicit MassCutGen_XCone(Context&, float, float);
+    explicit MassCutGen_XCone(Context&, float, float);
     virtual bool passes(const Event& ) override;
 
   private:

@@ -93,7 +93,8 @@ def init(args):
 def submit_job(job_list):
     #print len(job_list)
     for xml in job_list:
-        subprocess.call(['sframe_main',xml],stdout=subprocess.PIPE)
+        # subprocess.call(['sframe_main',xml],stdout=subprocess.PIPE)
+        subprocess.call(['sframe_main',xml], stdout=open("/dev/null","w"), stderr=subprocess.STDOUT)
         global Ndone
         with Ndone.get_lock():
             Ndone.value += 1

@@ -8,6 +8,9 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   pt_had_subjet1_fine = book<TH1F>("pt_had_subjet1_fine", "p_{T}^{1st had subjet}", 100, 0, 500);
   pt_had_subjet2_fine = book<TH1F>("pt_had_subjet2_fine", "p_{T}^{2nd had subjet}", 100, 0, 500);
   pt_had_subjet3_fine = book<TH1F>("pt_had_subjet3_fine", "p_{T}^{3rd had subjet}", 100, 0, 500);
+  pt_had_subjet1 = book<TH1F>("pt_had_subjet1", "p_{T}^{1st had subjet}", 50, 0, 500);
+  pt_had_subjet2 = book<TH1F>("pt_had_subjet2", "p_{T}^{2nd had subjet}", 50, 0, 500);
+  pt_had_subjet3 = book<TH1F>("pt_had_subjet3", "p_{T}^{3rd had subjet}", 50, 0, 500);
   eta_had_subjets = book<TH1F>("eta_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   eta_abs_had_subjets = book<TH1F>("eta_abs_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 2);
@@ -270,6 +273,9 @@ void SubjetHists_xcone::fill(const Event & event){
   pt_had_subjet1_fine->Fill(had_subjets.at(0).pt(), weight);
   pt_had_subjet2_fine->Fill(had_subjets.at(1).pt(), weight);
   pt_had_subjet3_fine->Fill(had_subjets.at(2).pt(), weight);
+  pt_had_subjet1->Fill(had_subjets.at(0).pt(), weight);
+  pt_had_subjet2->Fill(had_subjets.at(1).pt(), weight);
+  pt_had_subjet3->Fill(had_subjets.at(2).pt(), weight);
   for(unsigned int i=0; i<had_subjets.size(); i++){
     pt_had_subjets->Fill(had_subjets.at(i).pt(), weight);
     pt_had_subjets_fine->Fill(had_subjets.at(i).pt(), weight);

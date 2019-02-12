@@ -156,6 +156,7 @@ void CorrectionHists_subjets::fill(const Event & event){
     gen_pt=gen_sub.at(nearest_j).v4().Pt();
     rec_pt=rec_sub.at(i).v4().Pt();
     rec_eta=rec_sub.at(i).v4().Eta();
+    if(gen_pt == 0) continue;
     R = rec_pt/gen_pt;
     if(nearest_j != 100 && dR <= 0.2){
       // bins in pt_rec
