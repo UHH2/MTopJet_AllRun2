@@ -595,6 +595,7 @@ int main(int argc, char* argv[]){
     F2->SaveAs((name+ending).c_str());
   }
 
+  ////----
   for(int eta_bin = 0; eta_bin < no_etabins; eta_bin++){
     TCanvas *G = new TCanvas("G", "G", 600, 600);
     gPad->SetLeftMargin(0.15);
@@ -624,12 +625,14 @@ int main(int argc, char* argv[]){
     text.DrawLatex(.2,.2, chi2term);
 
     gPad->RedrawAxis();
+
     TString filename = "/afs/desy.de/user/s/schwarzd/Plots/Correction_allHad/Fits_";
     filename += eta_bin;
     filename += ".pdf";
     G->SaveAs(filename);
     delete G;
   }
+  ////----
 
   TCanvas *G2 = new TCanvas("G2", "G2", 600, 600);
   gPad->SetLeftMargin(0.15);

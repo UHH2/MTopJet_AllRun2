@@ -29,6 +29,9 @@ GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & 
   bjet_index = book<TH1F>("bjet_index", "jet index including b-quark", 4, -1.5, 2.5);
   bjet_index_nomatch = book<TH1F>("bjet_index_nomatch", "no match found", 1, -0.5, 0.5);
 
+  pthadtop_ptleptop = book<TH2F>("pthadtop_ptleptop", "x=had. top p_{T} y=lep top p_{T}", 100, 0, 1000, 100, 0, 1000);
+
+
   dR_pt_b_subjet = book<TH2F>("dR_pt_b_subjet", "x=#Delta R(b, subjet) y=p_{T} subjet", 60, 0, 6, 60, 0, 600);
   dR_pt_ud_subjet = book<TH2F>("dR_pt_ud_subjet", "x=#Delta R(ud, subjet) y=p_{T} subjet", 60, 0, 6, 60, 0, 600);
   dR_pt_g_subjet = book<TH2F>("dR_pt_g_subjet", "x=#Delta R(g, subjet) y=p_{T} subjet", 60, 0, 6, 60, 0, 600);
@@ -134,6 +137,7 @@ void GenHists_particles::fill(const Event & event){
 
   hadtop_pt->Fill(tophad.pt(), weight);
   leptop_pt->Fill(toplep.pt(), weight);
+  pthadtop_ptleptop->Fill(tophad.pt(), toplep.pt(), weight);
   hadtop_mass->Fill(tophad.v4().M(), weight);
   leptop_mass->Fill(toplep.v4().M(), weight);
   lepton_pt->Fill(lepton.pt(), weight);
@@ -322,7 +326,7 @@ void GenHists_particles::fill(const Event & event){
   double had_phi, lep_phi, delta_phi;
   had_phi = tophad.phi() + M_PI;
   lep_phi = toplep.phi() + M_PI;
-  delta_phi = abs(had_phi - lep_phi);
+  delta_phi = fabs(had_phi - lep_phi);
   deltaPhi_hadtop_leptop->Fill(delta_phi, weight);
 
   return;

@@ -13,8 +13,8 @@ TH1F* ConvertToRelative(TH1F* central, TH1F* sys);
 
 int main(int argc, char* argv[]){
 
-  double xmin = 100;
-  double xmax = 250;
+  double xmin = 150;
+  double xmax = 200;
 
   TFile* STAT_F = new TFile(dir+"STAT.root");
 
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]){
   TH1F* PDF_UP = (TH1F*)PDF_F->Get("ErrorUp/hist");
   TH1F* PDF_DOWN = (TH1F*)PDF_F->Get("ErrorDown/hist");
 
-  TH1F* CENTRAL = (TH1F*)CENTRAL_F->Get("XCone_cor/M_jet1_B");
+  TH1F* CENTRAL = (TH1F*)CENTRAL_F->Get("XCone_cor/M_jet1");
 
   // only look at largest error
   TH1F* STAT = (TH1F*)STAT_F->Get("Down/hist");

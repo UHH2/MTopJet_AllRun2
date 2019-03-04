@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
   vector<TH1F*> rec, gen;
 
   for(auto name: histnames){
-    rec.push_back( (TH1F*)TT_file->Get( "XCone_jec_subjets/"+name) );
+    rec.push_back( (TH1F*)TT_file->Get( "XCone_"+pdfname+"_subjets/"+name) );
     gen.push_back( (TH1F*)TT_file->Get( "XCone_GEN_Sel_measurement/"+name) );
 
   }
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]){
     rec[i]->SetFillColor(kRed);
     rec[i]->SetLineColor(1);
     rec[i]->Draw("HIST");
-    a->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Wmass/REC_"+histnames[i]+".pdf");
+    a->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Wmass/REC_"+histnames[i]+"_"+pdfname+".pdf");
     delete a;
   }
 
@@ -90,14 +90,14 @@ int main(int argc, char* argv[]){
 
   TCanvas *a = new TCanvas("a", " ", 600, 600);
   gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.15);
+  gPad->SetBottomMargin(0.2);
   reso->SetTitle(" ");
   reso->GetXaxis()->SetTitle("#frac{m^{rec}_{W} - m^{gen}_{W}}{m^{gen}_{W}}");
   reso->GetYaxis()->SetTitle("events");
   reso->GetYaxis()->SetTitleSize(0.06);
   reso->GetXaxis()->SetTitleSize(0.05);
   reso->GetZaxis()->SetTitleSize(0.05);
-  reso->GetXaxis()->SetTitleOffset(0.9);
+  reso->GetXaxis()->SetTitleOffset(1.3);
   reso->GetYaxis()->SetTitleOffset(1.1);
   reso->GetZaxis()->SetTitleOffset(0.9);
   reso->GetXaxis()->SetNdivisions(505);
@@ -111,14 +111,14 @@ int main(int argc, char* argv[]){
 
   TCanvas *b = new TCanvas("b", " ", 600, 600);
   gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.15);
+  gPad->SetBottomMargin(0.2);
   reso->SetTitle(" ");
   reso->GetXaxis()->SetTitle("#frac{m^{rec}_{W} - m^{gen}_{W}}{m^{gen}_{W}}");
   reso->GetYaxis()->SetTitle("events");
   reso->GetYaxis()->SetTitleSize(0.06);
   reso->GetXaxis()->SetTitleSize(0.05);
   reso->GetZaxis()->SetTitleSize(0.05);
-  reso->GetXaxis()->SetTitleOffset(0.9);
+  reso->GetXaxis()->SetTitleOffset(1.3);
   reso->GetYaxis()->SetTitleOffset(1.1);
   reso->GetZaxis()->SetTitleOffset(0.9);
   reso->GetXaxis()->SetNdivisions(505);

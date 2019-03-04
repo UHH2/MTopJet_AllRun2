@@ -29,6 +29,8 @@ protected:
     TH1F *deltaR_hadtop_genjet1, *deltaPT_hadtop_genjet1;
     TH1F *bjet_index, *bjet_index_nomatch, *MinDeltaR_bot_subjet, *InsideFat_MinDeltaR_bot_subjet, *b_inside_fatjet;
 
+    TH2F *pthadtop_ptleptop;
+
     TH1F *closest_particle_0,*closest_particle_50, *closest_particle_100, *closest_particle_200, *closest_particle_300, *closest_particle_400, *closest_particle_500;
     TH2F *dR_pt_b_subjet, *dR_pt_ud_subjet, *dR_pt_g_subjet;
 

@@ -123,6 +123,8 @@ void SubjetHists_xcone::fill(const Event & event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
+
+  if(rec_fatjets.size() != 2) return;
   double dR1 = uhh2::deltaR(lepton, rec_fatjets.at(0));
   double dR2 = uhh2::deltaR(lepton, rec_fatjets.at(1));
   if(dR1 > dR2){
@@ -133,6 +135,8 @@ void SubjetHists_xcone::fill(const Event & event){
     lep_subjets = rec_fatjets.at(0).subjets();
     had_subjets = rec_fatjets.at(1).subjets();
   }
+  if(had_subjets.size() != 3) return;
+  if(lep_subjets.size() != 3) return;
 
   //---------------------------------------------------------------------------------------
   //------------------------ add subjets without and with  pt cut--------------------------

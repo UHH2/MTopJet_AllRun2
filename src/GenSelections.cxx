@@ -9,6 +9,7 @@ etamax(etamax_){}
 bool uhh2::SubjetQuality_gen::passes(const uhh2::Event& event){
   bool pass = true;
   std::vector<GenTopJet> jets = event.get(h_jets);
+  if(jets.size() == 0) return false;
   std::vector<Particle> subjets = jets[0].subjets();
   if(subjets.size() != 3) pass = false;
   for(auto subjet: subjets){
@@ -333,19 +334,31 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
     if(deltaR(q2, fathadjet) < 1.2) matched_q2 = true;
     if(deltaR(bot, fathadjet) < 1.2) matched_bot = true;
   }
-  // continue here if matching should be performed
+  if(matched_q1 && matched_q2 && matched_bot) matched = true;
+
+  // continue here if matching should be performed to subjets
+  // to pass, every subjet has to contain exactly one genparticle
   else if (subjet_matching){
     std::vector<Jet> jets = fathadjet.subjets();
-    Jet jet1, jet2, jet3;
-    jet1 = jets.at(0);
-    jet2 = jets.at(1);
-    jet3 = jets.at(2);
-    if(deltaR(q1, jet1) < 0.4 || deltaR(q1, jet2) < 0.4 || deltaR(q1, jet3) < 0.4) matched_q1 = true;
-    if(deltaR(q2, jet1) < 0.4 || deltaR(q2, jet2) < 0.4 || deltaR(q2, jet3) < 0.4) matched_q2 = true;
-    if(deltaR(bot, jet1) < 0.4 || deltaR(bot, jet2) < 0.4 || deltaR(bot, jet3) < 0.4) matched_bot = true;
+    std::vector<GenParticle> partons = {q1, q2, bot};
+    for(int i=0; i<jets.size(); i++){
+      double minR = 100;
+      int j_remove = -1;
+      for(int j=0; j<partons.size(); j++){
+        if(deltaR(jets[i], partons[j]) < minR){
+          minR = deltaR(jets[i], partons[j]);
+          j_remove = j;
+        }
+      }
+      // if no parton found, return false
+      if(minR > 0.2 || minR == 100 || j_remove==-1) return false;
+      // remove the matched parton
+      partons.erase(partons.begin()+j_remove);
+    }
+    // if the event still arrives here, it is matched!
+    matched = true;
   }
 
-  if(matched_q1 && matched_q2 && matched_bot) matched = true;
   return matched;
 }
 

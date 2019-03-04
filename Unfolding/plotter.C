@@ -6,6 +6,7 @@ plotter::plotter(TString dir){
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
+  gStyle->SetLegendBorderSize(0);
 }
 
 /*
@@ -220,9 +221,11 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
 ██████   ██████     ██    ██       ██████     ██        ██      ██ ██   ██ ███████ ███████
 */
 
-void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_, std::vector<bool> show, bool norm, TString file_name){
+void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mtop_templates_, std::vector<bool> show, bool norm, TString file_name){
 
   TH1* output = (TH1*) output_->Clone("output");
+  TH1* stat = (TH1*) stat_->Clone("stat");
+
   std::vector<TH1D*> mtop_templates;
   for(unsigned int i = 0; i < mtop_templates_.size(); i++){
     mtop_templates.push_back((TH1D*) mtop_templates_[i]->Clone(""));
@@ -256,6 +259,10 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
   output->SetMarkerStyle(8);
   output->SetMarkerSize(1);
   output->Draw("E1 SAME");
+  stat->SetLineColor(kBlack);
+  stat->SetMarkerColor(kBlack);
+  stat->SetMarkerStyle(8);
+  stat->SetMarkerSize(1);
   gStyle->SetEndErrorSize(5);
 
   mtop_templates[0]->SetLineColor(kRed);
@@ -270,6 +277,7 @@ void plotter::draw_output_mass(TH1* output_, std::vector<TH1D*> mtop_templates_,
     mtop_templates[i]->SetLineWidth(3);
     if(show[i]) mtop_templates[i]->Draw("HIST SAME");
   }
+  stat->Draw("E1 SAME");
   output->Draw("E1 SAME"); // draw again to set markers in front
   TLegend *l=new TLegend(0.56,0.65,0.78,0.85);
   l->SetBorderSize(0);
@@ -302,7 +310,8 @@ void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_nam
   lcurve->SetLineWidth(2);
   lcurve->SetTitle("L curve;L_{X};L_{Y}");
   lcurve->Draw("AL");
-  lcurve->GetXaxis()->SetRangeUser(1.9,2.2);
+  lcurve->GetXaxis()->SetRangeUser(1.0,  3.0);
+  lcurve->GetYaxis()->SetRangeUser(0.0, 10.0);
   lcurve->Draw("AL");
   c->Update();
   TMarker *p1=new TMarker(x1,y1,20);
@@ -454,8 +463,9 @@ void plotter::draw_delta(TH1* hist_, TString file_name){
   delete c;
 }
 
-void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString category, TString file_name){
+void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString category, TString file_name){
   TH1* total = (TH1*) total_->Clone();
+  TH1* stat = (TH1*) stat_->Clone();
   std::vector<TH1*> delta;
   for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
     delta.push_back( (TH1*) MODEL_DELTA[i]->Clone() );
@@ -474,22 +484,29 @@ void plotter::draw_delta_comparison( TH1* total_, std::vector<TH1*> MODEL_DELTA,
   total->SetLineColor(13);
   total->SetMarkerStyle(-1);
   total->Draw("HIST");
+  stat->SetLineColor(kBlack);
+  stat->SetLineWidth(4);
+  stat->SetMarkerStyle(0);
+  stat->Draw("B SAME");
 
-  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, 12};
+  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta};
   int i=0;
   for(auto hist: delta){
     gPad->SetLeftMargin(0.15);
     hist->SetLineColor(col[i]);
     hist->SetLineWidth(4);
     hist->SetMarkerStyle(0);
-    hist->Draw("PX SAME");
+    hist->Draw("B SAME");
     i++;
   }
 
   // LEGEND
-  TLegend *leg = new TLegend(0.63,0.6,0.88,0.88);
-  if(category == "exp")        leg->AddEntry(total, "exp. uncertainties combined", "f");
-  else if(category == "model") leg->AddEntry(total, "model uncertainties combined", "f");
+  TLegend *leg = new TLegend(0.4,0.6,0.88,0.88);
+  leg->SetFillStyle(0);
+  leg->SetNColumns(2);
+  if(category == "exp")        leg->AddEntry(total, "stat #oplus exp. sys", "f");
+  else if(category == "model") leg->AddEntry(total, "stat #oplus model sys", "f");
+  leg->AddEntry(stat, "stat", "l");
   for(unsigned int i=0; i<delta.size(); i++) leg->AddEntry(delta[i],UncertNames[i],"l");
   leg->Draw();
 
@@ -653,8 +670,8 @@ void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<dou
   masstext += " #pm ";
   masstext += uncert_text;
   text.DrawLatex(.4,.6, masstext);
-
   c->SaveAs(directory + file_name + ".pdf");
+  delete c;
   return;
 }
 

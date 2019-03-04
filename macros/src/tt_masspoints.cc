@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
   istringstream ss(argv[2]);
   if (!(ss >> mass)) cerr << "Invalid number " << argv[2] << '\n';
   if(strcmp(argv[1], "mass") == 0){
-    if(mass != 166 && mass != 169 && mass != 171 && mass != 172 && mass != 173 && mass != 175 && mass != 178){
+    if(mass != 169 && mass != 171 && mass != 172 && mass != 173 && mass != 175){
       cout << "Select a valid Mass" << endl;
       return 0;
     }
@@ -93,13 +93,11 @@ int main(int argc, char* argv[])
   TString data_file_string;
   if(use_data)      data_file_string = dir+"uhh2.AnalysisModuleRunner.DATA.DATA.root";
   else if(use_mass){
-    if(mass == 166) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665.root";
     if(mass == 169) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695.root";
     if(mass == 171) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715.root";
     if(mass == 172) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root";
     if(mass == 173) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735.root";
     if(mass == 175) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755.root";
-    if(mass == 178) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785.root";
   }
   else if(use_pseudo1) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root";
   //else if(use_pseudo1) data_file_string = dir+"uhh2.AnalysisModuleRunner.MC.TTbar_MuRdown_MuFdown.root";
@@ -109,12 +107,10 @@ int main(int argc, char* argv[])
   TFile *BGR = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.Background_only.root");
 
   TFile *TT = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
-  TFile *TT_1665 = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665.root");
   TFile *TT_1695 = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695.root");
   TFile *TT_1715 = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715.root");
   TFile *TT_1735 = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735.root");
   TFile *TT_1755 = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755.root");
-  TFile *TT_1785 = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785.root");
 
   vector<TFile*> SYS_FILES;
   if(!StatOnly){
@@ -161,8 +157,8 @@ int main(int argc, char* argv[])
     histname = "Mass_HadJet33";
   }
   else{
-    histdir = "XCone_jec/";
-    histname = "M_jet1_B";
+    histdir = "XCone_cor/";
+    histname = "M_jet1";
   }
 
   TH1F * JetMass_data = (TH1F*)DATA->Get(histdir + histname);
@@ -184,41 +180,35 @@ int main(int argc, char* argv[])
     JetMass_data->Add(JetMass_bgr, -1); // subtract background
   }
 
-  TH1F * JetMass_1665 = (TH1F*)TT_1665->Get(histdir + histname);
   TH1F * JetMass_1695 = (TH1F*)TT_1695->Get(histdir + histname);
   TH1F * JetMass_1715 = (TH1F*)TT_1715->Get(histdir + histname);
   TH1F * JetMass_1725 = (TH1F*)TT->Get(histdir + histname);
   TH1F * JetMass_1735 = (TH1F*)TT_1735->Get(histdir + histname);
   TH1F * JetMass_1755 = (TH1F*)TT_1755->Get(histdir + histname);
-  TH1F * JetMass_1785 = (TH1F*)TT_1785->Get(histdir + histname);
 
   // cout << "rel. uncertainty in peak bin (data) = " << 100*JetMass_data->GetBinError(18)/JetMass_data->GetBinContent(18) << " %" << endl;
   // cout << "rel. uncertainty in peak bin   (mc) = " << 100*JetMass_1725->GetBinError(18)/JetMass_1725->GetBinContent(18) << " %" << endl;
 
 
-  std::vector<TH1F*> mass_samples = {JetMass_1665, JetMass_1695, JetMass_1715, JetMass_1725, JetMass_1735, JetMass_1755, JetMass_1785};
+  std::vector<TH1F*> mass_samples = {JetMass_1695, JetMass_1715, JetMass_1725, JetMass_1735, JetMass_1755};
   if(use_mass){
-    if(mass == 166) mass_samples.erase(mass_samples.begin());
-    if(mass == 169) mass_samples.erase(mass_samples.begin()+1);
-    if(mass == 171) mass_samples.erase(mass_samples.begin()+2);
-    if(mass == 172) mass_samples.erase(mass_samples.begin()+3);
-    if(mass == 173) mass_samples.erase(mass_samples.begin()+4);
-    if(mass == 175) mass_samples.erase(mass_samples.begin()+5);
-    if(mass == 178) mass_samples.erase(mass_samples.begin()+6);
+    if(mass == 169) mass_samples.erase(mass_samples.begin());
+    if(mass == 171) mass_samples.erase(mass_samples.begin()+1);
+    if(mass == 172) mass_samples.erase(mass_samples.begin()+2);
+    if(mass == 173) mass_samples.erase(mass_samples.begin()+3);
+    if(mass == 175) mass_samples.erase(mass_samples.begin()+4);
   }
 
-  Double_t all_masses[] = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
+  Double_t all_masses[] = {169.5, 171.5, 172.5, 173.5, 175.5};
   const int N_samples = mass_samples.size();
   Double_t masses[N_samples];
   int k = 0;
   for(int i =0; i<N_samples; i++){
-    if(mass == 166 && k == 0) k++;
-    if(mass == 169 && k == 1) k++;
-    if(mass == 171 && k == 2) k++;
-    if(mass == 172 && k == 3) k++;
-    if(mass == 173 && k == 4) k++;
-    if(mass == 175 && k == 5) k++;
-    if(mass == 178 && k == 6) continue;
+    if(mass == 169 && k == 0) k++;
+    if(mass == 171 && k == 1) k++;
+    if(mass == 172 && k == 2) k++;
+    if(mass == 173 && k == 3) k++;
+    if(mass == 175 && k == 4) continue;
     masses[i] = all_masses[k];
     k++;
   }
@@ -401,18 +391,8 @@ int main(int argc, char* argv[])
   // xhigh = 1000;
   ylow = 0;
   yhigh = data->GetMaximum() * 1.1;
-  if(mass != 166 ){
-    if(JetMass_1665->GetMaximum() * 1.1 > yhigh)  yhigh = JetMass_1665->GetMaximum() * 1.1;
-  }
-  else{
-    if(JetMass_1695->GetMaximum() * 1.1 > yhigh)  yhigh = JetMass_1695->GetMaximum() * 1.1;
-  }
-  if(mass != 178 ){
-    if(JetMass_1785->GetMaximum() * 1.1 > yhigh)  yhigh = JetMass_1785->GetMaximum() * 1.1;
-  }
-  else{
-    if(JetMass_1755->GetMaximum() * 1.1 > yhigh)  yhigh = JetMass_1755->GetMaximum() * 1.1;
-  }
+  if(JetMass_1695->GetMaximum() * 1.1 > yhigh)  yhigh = JetMass_1695->GetMaximum() * 1.1;
+  if(JetMass_1755->GetMaximum() * 1.1 > yhigh)  yhigh = JetMass_1755->GetMaximum() * 1.1;
 
   for(auto &i: mass_samples){
     i->SetLineWidth(3);
@@ -428,7 +408,6 @@ int main(int argc, char* argv[])
     i->SetLineWidth(4);
   }
 
-  JetMass_1665->SetLineColor(kRed-4);
   JetMass_1695->SetLineColor(kRed-4);
   JetMass_1715->SetLineColor(kRed-4);
 
@@ -436,7 +415,6 @@ int main(int argc, char* argv[])
 
   JetMass_1735->SetLineColor(kAzure+7);
   JetMass_1755->SetLineColor(kAzure+7);
-  JetMass_1785->SetLineColor(kAzure+7);
 
   data->SetLineColor(kBlack);
   data->SetMarkerColor(kBlack);
@@ -458,24 +436,21 @@ int main(int argc, char* argv[])
   gPad->SetLeftMargin(0.1);
   TGaxis::SetMaxDigits(3);
 
-  if(mass != 166) JetMass_1665->Draw("HIST SAME");
-  else            JetMass_1695->Draw("HIST SAME");
-  if(mass != 172) JetMass_1725->Draw("HIST SAME");
-  if(mass != 178) JetMass_1785->Draw("HIST SAME");
-  else            JetMass_1755->Draw("HIST SAME");
+  JetMass_1695->Draw("HIST SAME");
+  JetMass_1725->Draw("HIST SAME");
+  JetMass_1755->Draw("HIST SAME");
 
   data->Draw("E1 SAME");
   dataSTAT->Draw("E1 SAME");
 
   TLegend *leg = new TLegend(0.3,0.15,0.7,0.35);
   leg->SetBorderSize(0);
+  leg->SetFillStyle(0);
   if(use_data) leg->AddEntry(data,"data","pl");
   else         leg->AddEntry(data,"pseudo data","pl");
-  if(mass != 166) leg->AddEntry(JetMass_1665,"t#bar{t} (m_{top} = 166.5 GeV)","l");
-  else            leg->AddEntry(JetMass_1695,"t#bar{t} (m_{top} = 169.5 GeV)","l");
-  if(mass != 172) leg->AddEntry(JetMass_1725,"t#bar{t} (m_{top} = 172.5 GeV)","l");
-  if(mass != 178) leg->AddEntry(JetMass_1785,"t#bar{t} (m_{top} = 178.5 GeV)","l");
-  else            leg->AddEntry(JetMass_1755,"t#bar{t} (m_{top} = 175.5 GeV)","l");
+  leg->AddEntry(JetMass_1695,"t#bar{t} (m_{top} = 169.5 GeV)","l");
+  leg->AddEntry(JetMass_1725,"t#bar{t} (m_{top} = 172.5 GeV)","l");
+  leg->AddEntry(JetMass_1755,"t#bar{t} (m_{top} = 175.5 GeV)","l");
   leg->Draw("");
   if(use_data)       A->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Masspoints/JetMass_data.pdf");
   else if(use_pseudo1){
@@ -820,13 +795,11 @@ void WriteValuesToFile(int mass, bool gen, double measured, double error){
   ofstream ofile;
   ofile.open("temp.txt");
   string mass_string;
-  if(mass == 166) mass_string = "166.5";
   if(mass == 169) mass_string = "169.5";
   if(mass == 171) mass_string = "171.5";
   if(mass == 172) mass_string = "172.5";
   if(mass == 173) mass_string = "173.5";
   if(mass == 175) mass_string = "175.5";
-  if(mass == 178) mass_string = "178.5";
   while (!file.eof()){
     getline(file,x);
     if(x.find(mass_string) != std::string::npos){

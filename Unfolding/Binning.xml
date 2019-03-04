@@ -30,55 +30,69 @@
  </BinningNode>
  <BinningNode name="ptmigration_rec" firstbin="79" factor="1">
   <Axis name="mass" lowEdge="100">
-   <Bin location="underflow" width="23" center="88.5" />
-   <Bin width="23" center="111.5" />
-   <Bin width="15" center="130.5" />
-   <Bin width="9" center="142.5" />
-   <Bin width="6" center="150" />
-   <Bin repeat="2" width="4" center="155" />
-   <Bin repeat="9" width="3" center="162.5" />
-   <Bin width="4" center="190" />
-   <Bin width="5" center="194.5" />
-   <Bin width="6" center="200" />
-   <Bin width="10" center="208" />
-   <Bin width="11" center="218.5" />
-   <Bin width="16" center="232" />
-   <Bin width="23" center="251.5" />
-   <Bin width="30" center="278" />
-   <Bin width="107" center="346.5" />
-   <Bin location="overflow" width="107" center="453.5"/>
+   <Bin location="underflow" width="38" center="81" />
+   <Bin width="38" center="119" />
+   <Bin width="15" center="145.5" />
+   <Bin width="8" center="157" />
+   <Bin repeat="4" width="6" center="164" />
+   <Bin width="7" center="188.5" />
+   <Bin width="11" center="197.5" />
+   <Bin width="21" center="213.5" />
+   <Bin width="39" center="243.5" />
+   <Bin width="137" center="331.5" />
+   <Bin location="overflow" width="137" center="468.5"/>
    <Axis name="pt" lowEdge="350">
-    <Bin width="30" center="365" />
+    <Bin repeat="2" width="15" center="357.5" />
     <Bin width="20" center="390" />
    </Axis>
   </Axis>
  </BinningNode>
- <BinningNode name="massmigration_rec" firstbin="131" factor="1">
+ <BinningNode name="subptmigration_rec" firstbin="121" factor="1">
   <Axis name="mass" lowEdge="45">
-   <Bin location="underflow" width="25" center="32.5" />
-   <Bin width="25" center="57.5" />
-   <Bin width="20" center="80" />
+   <Bin location="underflow" width="45" center="22.5" />
+   <Bin width="45" center="67.5" />
    <Bin repeat="2" width="10" center="95" />
-   <Bin width="15" center="117.5" />
+   <Bin width="8" center="114" />
+   <Bin width="7" center="121.5" />
    <Bin width="5" center="127.5" />
-   <Bin width="8" center="134" />
-   <Bin width="9" center="142.5" />
-   <Bin width="6" center="150" />
+   <Bin width="6" center="133" />
+   <Bin width="5" center="138.5" />
+   <Bin repeat="2" width="6" center="144" />
    <Bin repeat="2" width="4" center="155" />
-   <Bin repeat="9" width="3" center="162.5" />
-   <Bin width="4" center="190" />
-   <Bin width="5" center="194.5" />
-   <Bin width="6" center="200" />
-   <Bin width="10" center="208" />
-   <Bin width="11" center="218.5" />
-   <Bin width="16" center="232" />
-   <Bin width="23" center="251.5" />
-   <Bin width="30" center="278" />
+   <Bin width="3" center="162.5" />
+   <Bin repeat="4" width="6" center="167" />
+   <Bin width="9" center="192.5" />
+   <Bin width="16" center="205" />
+   <Bin width="27" center="226.5" />
+   <Bin width="53" center="266.5" />
    <Bin width="107" center="346.5" />
    <Bin location="overflow" width="107" center="453.5"/>
   </Axis>
  </BinningNode>
- <BinningNode name="btagmigration_rec" firstbin="162" factor="1">
+ <BinningNode name="massmigration_rec" firstbin="145" factor="1">
+  <Axis name="mass" lowEdge="40">
+   <Bin location="underflow" width="15" center="32.5" />
+   <Bin repeat="3" width="15" center="47.5" />
+   <Bin repeat="7" width="10" center="90" />
+   <Bin repeat="6" width="5" center="157.5" />
+   <Bin repeat="3" width="10" center="190" />
+   <Bin width="20" center="225" />
+   <Bin width="28" center="249" />
+   <Bin width="137" center="331.5" />
+   <Bin location="overflow" width="137" center="468.5"/>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="muonptmigration_rec" firstbin="169" factor="1">
+  <Axis name="mass" lowEdge="45">
+   <Bin location="underflow" width="112" center="-11" />
+   <Bin width="112" center="101" />
+   <Bin width="23" center="168.5" />
+   <Bin width="50" center="205" />
+   <Bin width="170" center="315" />
+   <Bin location="overflow" width="170" center="485"/>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="btagmigration_rec" firstbin="175" factor="1">
   <Axis name="mass" lowEdge="100">
    <Bin location="underflow" width="23" center="88.5" />
    <Bin width="23" center="111.5" />
@@ -102,32 +116,52 @@
 </BinningNode>
 <BinningNode name="binning_gen" firstbin="1" factor="1">
  <BinningNode name="measurement_gen" firstbin="1" factor="1">
-  <Axis name="mass" lowEdge="120">
-   <Bin location="underflow" width="30" center="105" />
-   <Bin repeat="6" width="30" center="135" />
-   <Bin location="overflow" width="30" center="315"/>
+  <Axis name="mass" lowEdge="112">
+   <Bin location="underflow" width="20" center="102" />
+   <Bin repeat="4" width="20" center="122" />
+   <Bin width="40" center="212" />
+   <Bin location="overflow" width="40" center="252"/>
    <Axis name="pt" lowEdge="400">
     <Bin width="100" center="450" />
     <Bin width="9500" center="5250" />
    </Axis>
   </Axis>
  </BinningNode>
- <BinningNode name="ptmigration_gen" firstbin="17" factor="1">
-  <Axis name="mass" lowEdge="120">
-   <Bin location="underflow" width="30" center="105" />
-   <Bin repeat="6" width="30" center="135" />
-   <Bin location="overflow" width="30" center="315"/>
+ <BinningNode name="ptmigration_gen" firstbin="15" factor="1">
+  <Axis name="mass" lowEdge="112">
+   <Bin location="underflow" width="20" center="102" />
+   <Bin repeat="4" width="20" center="122" />
+   <Bin width="40" center="212" />
+   <Bin location="overflow" width="40" center="252"/>
    <Axis name="pt" lowEdge="350">
-    <Bin width="50" center="375" />
+    <Bin width="30" center="365" />
+    <Bin width="20" center="390" />
    </Axis>
   </Axis>
  </BinningNode>
- <BinningNode name="massmigration_gen" firstbin="25" factor="1">
+ <BinningNode name="subptmigration_gen" firstbin="29" factor="1">
+  <Axis name="mass" lowEdge="112">
+   <Bin location="underflow" width="20" center="102" />
+   <Bin repeat="4" width="20" center="122" />
+   <Bin width="40" center="212" />
+   <Bin location="overflow" width="40" center="252"/>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="massmigration_gen" firstbin="36" factor="1">
   <Axis name="mass" lowEdge="50">
-   <Bin location="underflow" width="40" center="30" />
-   <Bin width="40" center="70" />
-   <Bin repeat="7" width="30" center="105" />
+   <Bin location="underflow" width="70" center="15" />
+   <Bin width="70" center="85" />
+   <Bin repeat="8" width="15" center="127.5" />
+   <Bin repeat="2" width="30" center="255" />
    <Bin location="overflow" width="30" center="315"/>
+  </Axis>
+ </BinningNode>
+ <BinningNode name="muonptmigration_gen" firstbin="49" factor="1">
+  <Axis name="mass" lowEdge="112">
+   <Bin location="underflow" width="20" center="102" />
+   <Bin repeat="4" width="20" center="122" />
+   <Bin width="40" center="212" />
+   <Bin location="overflow" width="40" center="252"/>
   </Axis>
  </BinningNode>
 </BinningNode>

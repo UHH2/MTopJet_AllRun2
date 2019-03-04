@@ -1,0 +1,14 @@
+BINNING REC
+  -- measurement_rec (bins 1 - 78)
+  -- ptmigration_rec (bins 79 - 120)
+  -- subptmigration_rec (bins 121 - 144)
+  -- massmigration_rec (bins 145 - 168)
+  -- muonptmigration_rec (bins 169 - 174)
+  -- btagmigration_rec (bins 175 - 200)
+-------------------------------------------
+BINNING GEN
+  -- measurement_gen (bins 1 - 14)
+  -- ptmigration_gen (bins 15 - 28)
+  -- subptmigration_gen (bins 29 - 35)
+  -- massmigration_gen (bins 36 - 48)
+  -- muonptmigration_gen (bins 49 - 55)

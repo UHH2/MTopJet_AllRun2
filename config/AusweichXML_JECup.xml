@@ -7,7 +7,7 @@
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
  <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PreSel">
- <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon/COR_up">
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon/JEC_up">
 
 
 <!-- =============================================== ttbar =========================================================================== -->
@@ -18,7 +18,7 @@
 
 <!--
    <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
-   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="workdirSelectionSYS.COR_up"/>
+   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="workdirSelectionSYS.JEC_up"/>
 -->
 
 <JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
@@ -75,9 +75,9 @@
       <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
       <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" />
 
-      <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+      <Item Name="jecsmear_direction" Value="up" />       <!-- has to be: nominal, up or down! -->
       <Item Name="jersmear_direction" Value="nominal" />            <!-- has to be: nominal, up or down! -->
-      <Item Name="JetCorrection_direction" Value="up" />  <!-- has to be: nominal, up or down! -->
+      <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
       <Item Name="NonClosureUncertainty" Value="false" />  <!-- has to be: true or false! -->
 
 

@@ -10,23 +10,72 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   if(!do_lcurve) cout << "Rho Scan" << endl;
 
 
-  // preserve the area
+  /*
+   █████  ██████  ███████  █████       ██████  ██████  ███    ██ ███████ ████████ ██████   █████  ██ ███    ██ ████████
+  ██   ██ ██   ██ ██      ██   ██     ██      ██    ██ ████   ██ ██         ██    ██   ██ ██   ██ ██ ████   ██    ██
+  ███████ ██████  █████   ███████     ██      ██    ██ ██ ██  ██ ███████    ██    ██████  ███████ ██ ██ ██  ██    ██
+  ██   ██ ██   ██ ██      ██   ██     ██      ██    ██ ██  ██ ██      ██    ██    ██   ██ ██   ██ ██ ██  ██ ██    ██
+  ██   ██ ██   ██ ███████ ██   ██      ██████  ██████  ██   ████ ███████    ██    ██   ██ ██   ██ ██ ██   ████    ██
+  */
+
   TUnfold::EConstraint constraintMode= TUnfold::kEConstraintNone;
+  // TUnfold::EConstraint constraintMode= TUnfold::kEConstraintArea;
 
-  // choice of regularisation scheme:
-  TUnfold::ERegMode regMode = TUnfold::kRegModeSize;
+  /*
+  ██████  ███████  ██████  ██    ██ ██       █████  ██████  ██ ███████  █████  ████████ ██  ██████  ███    ██
+  ██   ██ ██      ██       ██    ██ ██      ██   ██ ██   ██ ██ ██      ██   ██    ██    ██ ██    ██ ████   ██
+  ██████  █████   ██   ███ ██    ██ ██      ███████ ██████  ██ ███████ ███████    ██    ██ ██    ██ ██ ██  ██
+  ██   ██ ██      ██    ██ ██    ██ ██      ██   ██ ██   ██ ██      ██ ██   ██    ██    ██ ██    ██ ██  ██ ██
+  ██   ██ ███████  ██████   ██████  ███████ ██   ██ ██   ██ ██ ███████ ██   ██    ██    ██  ██████  ██   ████
+  */
+
+  // TUnfold::ERegMode regMode = TUnfold::kRegModeSize;
   // TUnfold::ERegMode regMode = TUnfold::kRegModeDerivative;
-  // TUnfold::ERegMode regMode = TUnfold::kRegModeCurvature;
+  TUnfold::ERegMode regMode = TUnfold::kRegModeCurvature;
 
-  // density flags
+  /*
+██████  ███████ ███    ██ ███████ ██ ████████ ██    ██     ███████ ██       █████   ██████  ███████
+██   ██ ██      ████   ██ ██      ██    ██     ██  ██      ██      ██      ██   ██ ██       ██
+██   ██ █████   ██ ██  ██ ███████ ██    ██      ████       █████   ██      ███████ ██   ███ ███████
+██   ██ ██      ██  ██ ██      ██ ██    ██       ██        ██      ██      ██   ██ ██    ██      ██
+██████  ███████ ██   ████ ███████ ██    ██       ██        ██      ███████ ██   ██  ██████  ███████
+*/
   TUnfoldDensity::EDensityMode densityFlags = TUnfoldDensity::kDensityModeNone;
+  // TUnfoldDensity::EDensityMode densityFlags = TUnfoldDensity::kDensityModeBinWidth;
+  // TUnfoldDensity::EDensityMode densityFlags = TUnfoldDensity::kDensityModeBinWidthAndUser;
+  // TUnfoldDensity::EDensityMode densityFlags = TUnfoldDensity::kDensityModeUser;
+
+  /*
+  ███████  ██████  █████  ███    ██     ███    ███  ██████  ██████  ███████
+  ██      ██      ██   ██ ████   ██     ████  ████ ██    ██ ██   ██ ██
+  ███████ ██      ███████ ██ ██  ██     ██ ████ ██ ██    ██ ██   ██ █████
+       ██ ██      ██   ██ ██  ██ ██     ██  ██  ██ ██    ██ ██   ██ ██
+  ███████  ██████ ██   ██ ██   ████     ██      ██  ██████  ██████  ███████
+  */
+
+  // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoAvg;
+  // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoMax;
+  TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoAvgSys;
+  // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoMaxSys;
+  // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoSquareAvg;
+  // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoSquareAvgSys;
+
+
 
   // detailed steering for regularisation
-  const char *REGULARISATION_DISTRIBUTION=0;
-  const char *REGULARISATION_AXISSTEERING="*[B]";
+  // const char *REGULARISATION_DISTRIBUTION=0;
+  // const char *REGULARISATION_AXISSTEERING="*[B]";
+  //
+  // const char *SCAN_DISTRIBUTION="measurement_gen";
+  // const char *SCAN_AXISSTEERING=0;
 
-  const char *SCAN_DISTRIBUTION="measurement_gen";
+  const char *REGULARISATION_DISTRIBUTION=0;
+  const char *REGULARISATION_AXISSTEERING=0;
+
+  // const char *SCAN_DISTRIBUTION="measurement_gen";
+  const char *SCAN_DISTRIBUTION=0;
   const char *SCAN_AXISSTEERING=0;
+
 
   // define scaling to account for different cross section in data and MC
   double bkg_events = 0;
@@ -44,17 +93,31 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   cout << endl;
 
 
-  // set up matrix of migrations
+  // set up TUnfold Class
   TUnfoldDensity unfold(migration_matrix,TUnfold::kHistMapOutputHoriz,
     regMode,constraintMode,densityFlags,
     binning_gen,binning_rec,
     REGULARISATION_DISTRIBUTION,
     REGULARISATION_AXISSTEERING);
 
+    /*
+  ██ ███    ██ ██████  ██    ██ ████████
+  ██ ████   ██ ██   ██ ██    ██    ██
+  ██ ██ ██  ██ ██████  ██    ██    ██
+  ██ ██  ██ ██ ██      ██    ██    ██
+  ██ ██   ████ ██       ██████     ██
+  */
 
   unfold.SetInput(input, scale);
 
-  // handle backgrounds
+  /*
+  ██████   █████   ██████ ██   ██  ██████  ██████   ██████  ██    ██ ███    ██ ██████  ███████
+  ██   ██ ██   ██ ██      ██  ██  ██       ██   ██ ██    ██ ██    ██ ████   ██ ██   ██ ██
+  ██████  ███████ ██      █████   ██   ███ ██████  ██    ██ ██    ██ ██ ██  ██ ██   ██ ███████
+  ██   ██ ██   ██ ██      ██  ██  ██    ██ ██   ██ ██    ██ ██    ██ ██  ██ ██ ██   ██      ██
+  ██████  ██   ██  ██████ ██   ██  ██████  ██   ██  ██████   ██████  ██   ████ ██████  ███████
+  */
+
   for(unsigned int i=0; i<bgr_name.size(); i++){
     double scale_error = 0;
     if(bgr_name[i] == "WJets") scale_error = 0.19;
@@ -65,24 +128,45 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   }
 
 
+  /*
+██    ██ ███    ██ ███████  ██████  ██      ██████
+██    ██ ████   ██ ██      ██    ██ ██      ██   ██
+██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██
+██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██
+ ██████  ██   ████ ██       ██████  ███████ ██████
+*/
+
+
   TSpline *rhoLogTau=0;
   TSpline *logTauX=0,*logTauY=0;
 
-  // L-curve scan
-  if(do_lcurve) unfold.ScanLcurve(nscan,0.,0.,&lcurve,&logTauX,&logTauY);
+  double tau_min = 0.00001;
+  double tau_max = 0.9;
 
-  // rho scan
-  if(!do_lcurve && nscan != 0){
-    unfold.ScanTau(nscan,0.0001,100.,&rhoLogTau, TUnfoldDensity::kEScanTauRhoAvgSys, SCAN_DISTRIBUTION,SCAN_AXISSTEERING, &lcurve,&logTauX,&logTauY);
+  // L-curve scan
+  if(do_lcurve && nscan != 0){
+    unfold.ScanLcurve(nscan,tau_min,tau_max,&lcurve,&logTauX,&logTauY);
+    // get tau value and position on l-curve
     tau=unfold.GetTau();
     double logTau=TMath::Log10(tau);
     lcurveX=logTauX->Eval(logTau);
     lcurveY=logTauY->Eval(logTau);
   }
 
+  // directly put tau value here
   if(nscan == 0){
     tau = tau_;
     unfold.DoUnfold(tau);
+  }
+
+  // rho scan
+  if(!do_lcurve && nscan != 0){
+    unfold.ScanTau(nscan,tau_min,tau_max,&rhoLogTau, scanMode, SCAN_DISTRIBUTION,SCAN_AXISSTEERING, &lcurve,&logTauX,&logTauY);
+    // get tau value and position on l-curve
+    tau=unfold.GetTau();
+    double logTau=TMath::Log10(tau);
+    lcurveX=logTauX->Eval(logTau);
+    lcurveY=logTauY->Eval(logTau);
   }
 
 
@@ -130,9 +214,6 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   }
 
   // CovTotal = unfold.GetEmatrixTotal("", 0, "measurement_gen","pt[C]", kTRUE);
-
-
-
 }
 
 

@@ -92,6 +92,8 @@ GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<Particle> subjets, do
   double px=0, py=0, pz=0, E=0;
   TLorentzVector jet_v4;
   GenTopJet jet;
+  // first store subjets
+  for(auto sj: subjets) jet.add_subjet(sj);
   // only combine if all subjets have pt > ptmin
   bool good_jet = true;
   for(unsigned int i=0; i < subjets.size(); ++i){

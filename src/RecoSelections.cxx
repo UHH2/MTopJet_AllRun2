@@ -55,6 +55,7 @@ etamax(etamax_){}
 bool uhh2::SubjetQuality::passes(const uhh2::Event& event){
   bool pass = true;
   std::vector<TopJet> jets = event.get(h_jets);
+  if(jets.size() == 0) return false;
   std::vector<Jet> subjets = jets[0].subjets();
   if(subjets.size() != 3) pass = false;
   for(auto subjet: subjets){
