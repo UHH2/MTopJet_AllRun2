@@ -426,20 +426,20 @@ int main(int argc, char* argv[])
   cout << endl;
 
   bool do_model = true;
-  bool do_pdf = false;
+  bool do_all_pdf = false;
   bool do_genvar = false;
   bool do_masses_only = false;
 
   if(pseudo1695 || pseudo1715 || pseudo1735 || pseudo1755){
     do_model = true;
     do_masses_only = true;
-    do_pdf = false;
+    do_all_pdf = false;
     do_genvar = false;
   }
 
   if(!do_model) cout << "    -- MODEL VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
   if(do_masses_only) cout << "    -- ONLY MASSES CONSIDERED AS MODEL VARIATIONS!" << endl  << endl;
-  if(!do_pdf) cout << "    -- PDF VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
+  if(!do_all_pdf) cout << "    -- ONLY ONE PDF VARIATION IS UNFOLDED!" << endl  << endl;
   if(!do_genvar) cout << "    -- GENERATOR SMEARINGS ARE NOT UNFOLDED!" << endl  << endl;
 
 
@@ -555,12 +555,28 @@ int main(int argc, char* argv[])
       }
     }
 
+    // if not all pdf should be unfolded, only keep one variation
+    if(!do_all_pdf){
+      // go through all vectors reverse to make deleting possible
+      for(int i=model_name.size()-1; i>-1 ; i--){
+        if(model_rel_name[i] == "pdf"){
+          for(int j=model_name[i].size()-1; j>-1; j--){
+            if(j==0) continue; // only keep first variation
+            model_name[i].erase(model_name[i].begin()+j);
+            model_input[i].erase(model_input[i].begin()+j);
+            model_truth[i].erase(model_truth[i].begin()+j);
+
+          }
+        }
+      }
+    }
+
+
     // now unfold every model variation, get difference to truth and fill cov matrices
     // since tau depends only on the Migration Matrix, one has to find taus only in the first unfolding
     // for every following unfolding the same tau is used
     if(do_model){
       for(unsigned int i=0; i<model_name.size(); i++){
-        if(!do_pdf && (model_rel_name[i] == "pdf") ) continue;
         vector<TH1*> dummy;
         MODEL_OUTPUT.push_back(dummy);
         MODEL_DELTA.push_back(dummy);
@@ -639,6 +655,10 @@ int main(int argc, char* argv[])
     CovTotal = (TH2*) CovStat->Clone();
     for(auto bgrcov: CovBgrScale) CovTotal->Add(bgrcov);
 
+    // write in a file which variations are used
+    std::ofstream out(directory+"/SYS.txt");
+    auto coutbuf = std::cout.rdbuf(out.rdbuf());
+
     // then add sys cov (and convert used uncertainty to relative hist)
     cout << "sum up experimental sys cov matrices" << endl;
     for(unsigned int i=0; i<SYS_DELTA.size(); i++){
@@ -664,6 +684,9 @@ int main(int argc, char* argv[])
       MODEL_rel.push_back(ConvertToRelative(MODEL_DELTA[i][j], data_unfolded));
       cout << "using " << model_name[i][j] << endl;
     }
+
+    // close sys file again
+    std::cout.rdbuf(coutbuf);
 
     if(do_model){
       MODEL_rel.push_back(STAT_REL);        // put in stat to get total
@@ -863,7 +886,6 @@ int main(int argc, char* argv[])
 
   if(do_model){
     for(unsigned int i=0; i<model_name.size(); i++){
-      if(!do_pdf && model_rel_name[i] == "pdf") continue;
       for(unsigned int j=0; j<model_name[i].size(); j++){
         plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false);
         plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);
