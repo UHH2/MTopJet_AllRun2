@@ -27,4 +27,4 @@ Bool_t passed_measurement_rec;
 Double_t rec_weight;
 Double_t gen_weight;
 
-const vector<Double_t> bins = {112, 127, 142, 157, 172, 187, 202, 217};
+const vector<Double_t> bins = {82, 97, 112, 127, 142, 157, 172, 187, 202, 217, 232, 247, 262, 277, 292, 307, 322};

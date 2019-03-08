@@ -37,8 +37,6 @@ using namespace std;
 double xmin = 0;
 double xmax = 0;
 
-vector<double> CalculateParameterUncertainty(TGraphErrors* data_, TString function, TFitResultPtr fitresult, vector<double> parameters, TString updown);
-
 /*
 ███    ███  █████  ██ ███    ██
 ████  ████ ██   ██ ██ ████   ██

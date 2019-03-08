@@ -140,8 +140,8 @@ int main(int argc, char* argv[])
   */
 
 
-  double from = 127;
-  double to = 217;
+  double from = 82;
+  double to = 322;
 
   int firstbin = JetMass_data->GetXaxis()->FindBin(from);
   int lastbin = JetMass_data->GetXaxis()->FindBin(to) - 1;
