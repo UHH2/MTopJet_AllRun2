@@ -19,7 +19,7 @@ plotter::plotter(TString dir){
 
 
 
-void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog){
+void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog, bool is_migration){
   TH1* hist = (TH1*) hist_->Clone("hist");
 
   TCanvas *c= new TCanvas("c","",600,600);
@@ -29,8 +29,15 @@ void plotter::draw_matrix(TH2* hist_, TString file_name, bool zlog){
   hist->SetTitle(" ");
   hist->GetXaxis()->SetTitleOffset(1.1);
   hist->GetYaxis()->SetTitleOffset(1.5);
-  hist->GetXaxis()->SetTitle("generator binning");
-  hist->GetYaxis()->SetTitle("detector binning");
+  if(is_migration){
+    hist->GetXaxis()->SetTitle("generator binning");
+    hist->GetYaxis()->SetTitle("detector binning");
+  }
+  else{
+    hist->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
+    hist->GetYaxis()->SetTitle("Leading-jet mass [GeV]");
+  }
+
   hist->Draw("COLZ");
   hist->Draw("BOX SAME");
   c->SaveAs(directory + file_name + ".pdf");
@@ -61,7 +68,7 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
-  output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  output->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
   output->GetYaxis()->SetTitleOffset(1.1);
@@ -121,7 +128,7 @@ void plotter::draw_output_smear(std::vector<TH1*> output_, TH1D* truth_, TString
   for(auto output: outputs){
     output->SetTitle(" ");
     output->GetYaxis()->SetRangeUser(0., ymax);
-    output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+    output->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
     output->GetYaxis()->SetTitle("events");
     output->GetYaxis()->SetTitleOffset(1.1);
     output->GetXaxis()->SetTitleOffset(0.9);
@@ -177,7 +184,7 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
-  output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  output->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
   output->GetYaxis()->SetTitleOffset(1.1);
@@ -246,7 +253,7 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
-  output->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  output->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
   output->GetYaxis()->SetTitleOffset(1.1);
@@ -326,6 +333,60 @@ void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_nam
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+
+/*
+██████  ██   ██  ██████  ████████  █████  ██    ██
+██   ██ ██   ██ ██    ██    ██    ██   ██ ██    ██
+██████  ███████ ██    ██    ██    ███████ ██    ██
+██   ██ ██   ██ ██    ██    ██    ██   ██ ██    ██
+██   ██ ██   ██  ██████     ██    ██   ██  ██████
+*/
+
+
+
+void plotter::draw_rhotau(TSpline *rhotau, double tau, TString file_name){
+  TCanvas *c = new TCanvas("c","",600,600);
+  gPad->SetLeftMargin(0.15);
+  TGaxis::SetMaxDigits(3);
+  double logtau = TMath::Log10(tau);
+  std::vector<double> Xpoint = {logtau};
+  std::vector<double> Ypoint = {rhotau->Eval(logtau)};
+  TGraph * point = new TGraph(1, &Xpoint[0], &Ypoint[0]);
+  point->SetTitle(" ");
+  point->GetXaxis()->SetTitle("log #tau");
+  point->GetYaxis()->SetTitle("#rho(log #tau)");
+  point->GetYaxis()->SetTitleOffset(1.5);
+  point->GetXaxis()->SetNdivisions(505);
+  point->GetYaxis()->SetNdivisions(505);
+  point->SetMarkerStyle(20);
+  point->SetMarkerSize(1.5);
+  point->SetLineColor(1);
+  point->Draw("AP");
+  point->GetXaxis()->SetLimits(-4.0, -1.5);
+  double ymin = Ypoint[0]*0.95;
+  double ymax = 1.15;
+  point->GetYaxis()->SetRangeUser(ymin, ymax);
+  point->Draw("AP");
+  c->Update();
+
+  // gPad->SetLogx();
+
+  rhotau->SetLineColor(kCyan+2);
+  rhotau->SetLineWidth(2);
+  rhotau->Draw("L SAME");
+  point->Draw("P SAME");
+
+  TLegend *l=new TLegend(0.55,0.65,0.85,0.8);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  l->AddEntry(point,"final #tau value","pl");
+  l->AddEntry(rhotau,"#tau scan","l");
+  l->Draw();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+
 /*
 ██████  ██████   ██████       ██ ███████  ██████ ████████ ██  ██████  ███    ██
 ██   ██ ██   ██ ██    ██      ██ ██      ██         ██    ██ ██    ██ ████   ██
@@ -427,7 +488,8 @@ void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
   TH1D* hist = (TH1D*) hist_->Clone("hist");
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15);
-  hist->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  hist->SetTitle(" ");
+  hist->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   hist->GetYaxis()->SetTitle("events");
   hist->GetYaxis()->SetTitleOffset(1.5);
   hist->GetYaxis()->SetNdivisions(505);
@@ -451,7 +513,8 @@ void plotter::draw_delta(TH1* hist_, TString file_name){
   TH1* hist = (TH1*) hist_->Clone("hist");
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15);
-  hist->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  hist->SetTitle(file_name);
+  hist->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   hist->GetYaxis()->SetTitle("#Delta events");
   hist->GetYaxis()->SetTitleOffset(1.5);
   hist->GetYaxis()->SetNdivisions(505);
@@ -474,7 +537,7 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
   total->SetTitle("");
-  total->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  total->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   total->GetYaxis()->SetTitle("relative uncertainty [%]");
   total->GetYaxis()->SetTitleOffset(1.5);
   total->GetYaxis()->SetNdivisions(505);
@@ -537,12 +600,12 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
   if(pseudotruth->GetMaximum() > ymax_temp) ymax_temp = pseudotruth->GetMaximum();
   if(mctruth->GetMaximum() > ymax_temp) ymax_temp = mctruth->GetMaximum();
   if(output->GetMaximum() > ymax_temp) ymax_temp = output->GetMaximum();
-  double ymax = 1.1 * ymax_temp;
+  double ymax = 1.2 * ymax_temp;
 
 
   pseudotruth->SetTitle(" ");
   pseudotruth->GetYaxis()->SetRangeUser(0., ymax);
-  pseudotruth->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  pseudotruth->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   if(norm) pseudotruth->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else     pseudotruth->GetYaxis()->SetTitle("events");
   pseudotruth->GetYaxis()->SetTitleOffset(1.1);
@@ -570,7 +633,7 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
   output->Draw("E1 SAME");
   TLegend *l;
   if(mctruth->GetSize() > 20) l=new TLegend(0.2,0.6,0.4,0.85);
-  else                       l=new TLegend(0.5,0.6,0.85,0.85);
+  else                       l=new TLegend(0.55,0.6,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"pseudo data","pl");
@@ -692,14 +755,14 @@ void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_nam
   if(truth->GetMaximum() > ymax_temp) ymax_temp = truth->GetMaximum();
   if(bias->GetMaximum() > ymax_temp) ymax_temp = bias->GetMaximum();
   if(output->GetMaximum() > ymax_temp) ymax_temp = output->GetMaximum();
-  double ymax = 1.1 * ymax_temp;
+  double ymax = 1.2 * ymax_temp;
 
   TCanvas *c= new TCanvas("Bias Distribution","",600,600);
   TGaxis::SetMaxDigits(3);
   gPad->SetLeftMargin(0.15);
-  truth->SetTitle(" ");
+  truth->SetTitle(file_name);
   truth->GetYaxis()->SetRangeUser(0., ymax);
-  truth->GetXaxis()->SetTitle("Leading-jet mass[GeV]");
+  truth->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
   truth->GetYaxis()->SetTitle("events");
   truth->GetYaxis()->SetTitleOffset(1.1);
   truth->GetXaxis()->SetTitleOffset(0.9);
@@ -719,7 +782,7 @@ void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_nam
   truth->Draw("HIST SAME");
   bias->Draw("HIST SAME");
   output->Draw("E1 SAME");
-  TLegend *l=new TLegend(0.5,0.6,0.85,0.85);
+  TLegend *l=new TLegend(0.55,0.6,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"unfolded result","pl");

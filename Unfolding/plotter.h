@@ -3,6 +3,7 @@
 #include <TStyle.h>
 #include <TGraph.h>
 #include <TGraphErrors.h>
+#include <TSpline.h>
 #include <TGaxis.h>
 #include <TLegend.h>
 #include <TMarker.h>
@@ -19,13 +20,14 @@ class plotter{
 
  public:
   plotter(TString);
-  void draw_matrix(TH2* hist, TString file_name, bool zlog);
+  void draw_matrix(TH2* hist, TString file_name, bool zlog, bool is_migration);
   void draw_output(TH1* output, TH1D* truth, bool norm, TString file_name);
   void draw_output_smear(std::vector<TH1*> output, TH1D* truth, TString file_name);
   void draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm, TString file_name);
   void draw_output_mass(TH1* output, TH1* stat_, std::vector<TH1D*> mtop_templates, std::vector<bool> show, bool norm, TString file_name);
   void draw_output_pseudo(TH1* output, TH1D* pseudotruth, TH1D* mctruth, bool norm, TString file_name);
   void draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_name);
+  void draw_rhotau(TSpline *rhotau, double tau, TString file_name);
   void draw_projection(TH1D* proj, TH1D* compare, TString file_name );
   void draw_1D_hist(TH1D* hist, TString file_name);
   void draw_delta(TH1* hist, TString file_name);

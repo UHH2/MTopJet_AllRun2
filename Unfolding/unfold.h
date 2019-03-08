@@ -26,6 +26,7 @@ class unfolding{
   TH2* get_prob_matrix();
   TH2* get_cor_matrix();
   TH1* GetBiasDistribution();
+  TSpline* GetRhoTau();
   std::vector< std::vector<TH1*> > get_sys_delta();
   std::vector< std::vector<TH2*> > GetSysCov();
   // TH2* GetTotalCov();
@@ -48,6 +49,7 @@ class unfolding{
   TH2 *CorM;
   TH2 *ProbM;
   TH1 *bias;
+  TSpline *rhoLogTau=0;
   TGraph *lcurve = 0;
   double tau;
   double lcurveX, lcurveY;

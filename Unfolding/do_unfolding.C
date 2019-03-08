@@ -302,36 +302,36 @@ int main(int argc, char* argv[])
   if(pseudo1){
     inputFile->GetObject("pseudo1_sig",hist_data);
     inputFile->GetObject("pseudo1_gen",hist_pseudo_gen);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
   if(pseudo2){
     inputFile->GetObject("pseudo2_sig",hist_data);
     inputFile->GetObject("pseudo2_gen",hist_pseudo_gen);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
   if(pseudo1695){
     inputFile->GetObject("pseudo1695_sig",hist_data);
     inputFile->GetObject("pseudo1695_gen",hist_pseudo_gen);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
   if(pseudo1715){
     inputFile->GetObject("pseudo1715_sig",hist_data);
     inputFile->GetObject("pseudo1715_gen",hist_pseudo_gen);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
   if(pseudo1735){
     inputFile->GetObject("pseudo1735_sig",hist_data);
     inputFile->GetObject("pseudo1735_gen",hist_pseudo_gen);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
   if(pseudo1755){
     inputFile->GetObject("pseudo1755_sig",hist_data);
     inputFile->GetObject("pseudo1755_gen",hist_pseudo_gen);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
   if(same){
     inputFile->GetObject("mc_sig",hist_data);
-    hist_data->Add(hist_mc_bgr);
+    // hist_data->Add(hist_mc_bgr);
   }
 
   // read migrations from variations (vector of every source containing a vector of every variation e.g. up/down)
@@ -357,8 +357,8 @@ int main(int argc, char* argv[])
   //vector<TString> shower = {"Shower"};
   vector<TString> generator = {"Generator"};
   vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
-  // vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
-  vector<TString> mass = {"mc_mtop1715","mc_mtop1735"};
+  vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
+  // vector<TString> mass = {"mc_mtop1715","mc_mtop1735"};
   vector<TString> pdf;
   for(unsigned int i=0; i<100; i++){
     TString name = "PDF_";
@@ -480,6 +480,8 @@ int main(int argc, char* argv[])
 
   TGraph* lcurve;
   double lcurve_x, lcurve_y;
+  TSpline* rhotau;
+  double tau_final;
 
   TH1 *data_unfolded,*data_unfolded_sys,*data_unfolded_stat,*data_unfolded_all;
   TH1 * pseudodata_bias;
@@ -532,7 +534,8 @@ int main(int argc, char* argv[])
     lcurve = unfold.get_lcurve();
     lcurve_x = unfold.get_best_point("x");
     lcurve_y = unfold.get_best_point("y");
-
+    rhotau = unfold.GetRhoTau();
+    tau_final = unfold.get_tau();
 
     /*
     ██    ██ ███    ██ ███████  ██████  ██      ██████      ███    ███  ██████  ██████  ███████ ██
@@ -854,40 +857,40 @@ int main(int argc, char* argv[])
   plotter * plot = new plotter(directory);
   plot->draw_chi2(chi2_fitfunction, chi2_masses, chi2values, chi2->GetMass(), chi2->GetUncertainty(), "chi2fit");
   plot->draw_chi2(chi2_stat_fitfunction, chi2_masses, chi2values_stat, chi2_stat->GetMass(), chi2_stat->GetUncertainty(), "chi2fit_stat");
-  plot->draw_matrix(ProbMatrix, "Prob_Matrix", true);
-  plot->draw_matrix(CorMatrix, "Cor_Matrix", false);
-  plot->draw_matrix(CovStat, "COV_STAT", false);
-  plot->draw_matrix(CovInputStat, "COV_INPUT_STAT", false);
-  plot->draw_matrix(CovMatrixStat, "COV_MATRIX_STAT", false);
-  plot->draw_matrix(CovTotal, "COV_TOTAL", false);
+  plot->draw_matrix(ProbMatrix, "Prob_Matrix", true, true);
+  plot->draw_matrix(CorMatrix, "Cor_Matrix", false, false);
+  plot->draw_matrix(CovStat, "COV_STAT", false, false);
+  plot->draw_matrix(CovInputStat, "COV_INPUT_STAT", false, false);
+  plot->draw_matrix(CovMatrixStat, "COV_MATRIX_STAT", false, false);
+  plot->draw_matrix(CovTotal, "COV_TOTAL", false, false);
   // plot->draw_matrix(CovTotal_TUnfold, "COV_TOTAL_check", false);
-  plot->draw_matrix(histMCGenRec, "Migration_Matrix", true);
-  plot->draw_matrix(histMCGenRec_generator, "Migration_Matrix_Generator", true);
-  plot->draw_matrix(histMCGenRec_shower, "Migration_Matrix_Shower", true);
-  plot->draw_matrix(histMCGenRec_mtop1715, "Migration_Matrix_mtop1715", true);
-  plot->draw_matrix(histMCGenRec_mtop1735, "Migration_Matrix_mtop1735", true);
-  plot->draw_matrix(MatrixDelta_generator, "Migration_Delta_Generator", false);
-  plot->draw_matrix(MatrixDelta_shower, "Migration_Delta_Shower", false);
-  plot->draw_matrix(MatrixDelta_mtop1715, "Migration_Delta_mtop1715", false);
-  plot->draw_matrix(MatrixDelta_mtop1735, "Migration_Delta_mtop1735", false);
+  plot->draw_matrix(histMCGenRec, "Migration_Matrix", true, true);
+  plot->draw_matrix(histMCGenRec_generator, "Migration_Matrix_Generator", true, true);
+  plot->draw_matrix(histMCGenRec_shower, "Migration_Matrix_Shower", true, true);
+  plot->draw_matrix(histMCGenRec_mtop1715, "Migration_Matrix_mtop1715", true, true);
+  plot->draw_matrix(histMCGenRec_mtop1735, "Migration_Matrix_mtop1735", true, true);
+  plot->draw_matrix(MatrixDelta_generator, "Migration_Delta_Generator", false, true);
+  plot->draw_matrix(MatrixDelta_shower, "Migration_Delta_Shower", false, true);
+  plot->draw_matrix(MatrixDelta_mtop1715, "Migration_Delta_mtop1715", false, true);
+  plot->draw_matrix(MatrixDelta_mtop1735, "Migration_Delta_mtop1735", false, true);
 
   plot->draw_delta(STAT_DELTA, "DELTA_STAT");
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     for(unsigned int j=0; j<sys_name[i].size(); j++){
-      plot->draw_matrix(CovSys[i][j], "COV_"+sys_name[i][j], false);
+      plot->draw_matrix(CovSys[i][j], "COV_"+sys_name[i][j], false, false);
       plot->draw_delta(SYS_DELTA[i][j], "DELTA_"+sys_name[i][j]);
     }
   }
   plot->draw_delta_comparison(SYS_rel_total, STAT_REL, SYS_rel, sys_rel_name, "exp", "SYS_EXP_COMPARISION");
 
-  plot->draw_matrix(CovLumi, "COV_Lumi", false);
+  plot->draw_matrix(CovLumi, "COV_Lumi", false, false);
   plot->draw_delta(DeltaLumi, "DELTA_Lumi");
 
   if(do_model){
     for(unsigned int i=0; i<model_name.size(); i++){
       for(unsigned int j=0; j<model_name[i].size(); j++){
-        plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false);
+        plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false, false);
         plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);
         plot->draw_bias(MODEL_OUTPUT[i][j], model_truth[i][j], MODEL_BIAS[i][j], "BIAS_"+model_name[i][j]);
       }
@@ -902,8 +905,8 @@ int main(int argc, char* argv[])
   // }
 
   for(unsigned int i=0; i<bgr_name.size(); i++){
-    plot->draw_matrix(CovBgrStat[i], "COV_"+bgr_name[i]+"_stat", false);
-    plot->draw_matrix(CovBgrScale[i], "COV_"+bgr_name[i]+"_scale", false);
+    plot->draw_matrix(CovBgrStat[i], "COV_"+bgr_name[i]+"_stat", false, false);
+    plot->draw_matrix(CovBgrScale[i], "COV_"+bgr_name[i]+"_scale", false, false);
     plot->draw_delta(BGR_DELTA[i], "DELTA_"+bgr_name[i]);
   }
 
@@ -935,6 +938,7 @@ int main(int argc, char* argv[])
   plot->draw_purity(h_pur_samebin_pt, h_pur_all, "Purity_pt");
 
   if(nscan != 0) plot->draw_lcurve(lcurve, lcurve_x, lcurve_y, "LCurve");
+  plot->draw_rhotau(rhotau, tau_final, "RhoTauScan");
 
 
   cout << "finished" << endl;

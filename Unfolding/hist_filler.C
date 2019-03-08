@@ -444,7 +444,7 @@ void fill_matrix(TTree* tree, TString prefix){
     bool gen_info = false;
     bool rec_info = false;
     if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_muonptmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec ||passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec || passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)
@@ -568,7 +568,7 @@ void fill_modelsys(TTree* tree, TString prefix){
     bool gen_info = false;
     bool rec_info = false;
     if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_muonptmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_subptmigration_rec || passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec || passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)

@@ -137,7 +137,6 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
 */
 
 
-  TSpline *rhoLogTau=0;
   TSpline *logTauX=0,*logTauY=0;
 
   double tau_min = 0.00001;
@@ -277,6 +276,11 @@ double unfolding::get_best_point(TString xy){
 double unfolding::get_tau(){
   return tau;
 }
+
+TSpline* unfolding::GetRhoTau(){
+  return rhoLogTau;
+}
+
 
 TH2* unfolding::CreateCovMatrixFromDelta(TH1* delta){
   TH2* cov = (TH2*) CovInputStat->Clone();
