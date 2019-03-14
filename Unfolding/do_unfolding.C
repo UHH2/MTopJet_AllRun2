@@ -731,19 +731,9 @@ int main(int argc, char* argv[])
   for(int rec=0; rec<= nrec+1; rec++) count_gen += histMCGenRec->GetBinContent(0, rec);
   for(int gen=0; gen<= ngen+1; gen++) count_rec += histMCGenRec->GetBinContent(gen, 0);
 
-  cout<< "Events in gen underflow  = " << count_gen << endl;
-  cout<< "Events in rec underflow  = " << count_rec << endl;
-  cout<< "Events in total Matrix   = " << histMCGenRec->Integral(0,ngen+1,0,nrec+1) << endl;
-  cout<< "Events without underflow = " << histMCGenRec->Integral(1,ngen+1,1,nrec+1) << endl;
-  cout<< "Events in gen measurement= " << hist_mc_gen->Integral(1, ngen+1) << endl;
-  cout<< "percent reconstructed    = " << 100*histMCGenRec->Integral(0,ngen+1,1,nrec+1)/hist_mc_gen->Integral(1, ngen) << "%" << endl;
-
-
-
-
-
-  cout<< "Events in generated in measurement region = " << histMCGenRec->Integral(1, 16,1,nrec+1) << endl;
-  cout<< "Events in generated in measurement region = " << histMCGenRec->Integral(1, 16,0,nrec+1) << endl;
+  cout<< "Events in gen measurement                  = " << histMCGenRec->Integral(1, 14,0,nrec+1) << endl;
+  cout<< "Events reconstrcted in gen measurement     = " << histMCGenRec->Integral(1, 14,1,nrec+1) << endl;
+  cout<< "Events not reconstrcted in gen measurement = " << histMCGenRec->Integral(1, 14,0,0) << endl;
 
 
   data_unfolded->Write();

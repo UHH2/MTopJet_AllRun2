@@ -63,8 +63,8 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   double ymax;
   gPad->SetLeftMargin(0.15);
 
-  if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
-  else ymax = 1.1 * output->GetMaximum();
+  if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.5 * truth->GetMaximum();
+  else ymax = 1.5 * output->GetMaximum();
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
@@ -122,8 +122,8 @@ void plotter::draw_output_smear(std::vector<TH1*> output_, TH1D* truth_, TString
   double ymax;
   gPad->SetLeftMargin(0.15);
 
-  if(truth->GetMaximum() > outputs[0]->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
-  else ymax = 1.1 * outputs[0]->GetMaximum();
+  if(truth->GetMaximum() > outputs[0]->GetMaximum()) ymax = 1.5 * truth->GetMaximum();
+  else ymax = 1.5 * outputs[0]->GetMaximum();
   TGaxis::SetMaxDigits(3);
   for(auto output: outputs){
     output->SetTitle(" ");
@@ -179,8 +179,8 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
   double ymax;
   gPad->SetLeftMargin(0.15);
 
-  if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.1 * truth->GetMaximum();
-  else ymax = 1.1 * output->GetMaximum();
+  if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.5 * truth->GetMaximum();
+  else ymax = 1.5 * output->GetMaximum();
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
@@ -248,7 +248,7 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
       if(max_temp > max) max = max_temp;
     }
   }
-  double ymax = 1.1 * max;
+  double ymax = 1.5 * max;
 
   TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
@@ -600,7 +600,7 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
   if(pseudotruth->GetMaximum() > ymax_temp) ymax_temp = pseudotruth->GetMaximum();
   if(mctruth->GetMaximum() > ymax_temp) ymax_temp = mctruth->GetMaximum();
   if(output->GetMaximum() > ymax_temp) ymax_temp = output->GetMaximum();
-  double ymax = 1.2 * ymax_temp;
+  double ymax = 1.5 * ymax_temp;
 
 
   pseudotruth->SetTitle(" ");
@@ -755,7 +755,7 @@ void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_nam
   if(truth->GetMaximum() > ymax_temp) ymax_temp = truth->GetMaximum();
   if(bias->GetMaximum() > ymax_temp) ymax_temp = bias->GetMaximum();
   if(output->GetMaximum() > ymax_temp) ymax_temp = output->GetMaximum();
-  double ymax = 1.2 * ymax_temp;
+  double ymax = 1.5 * ymax_temp;
 
   TCanvas *c= new TCanvas("Bias Distribution","",600,600);
   TGaxis::SetMaxDigits(3);
@@ -810,7 +810,7 @@ void plotter::draw_smearFit(TH1D* variation, TF1* fit_, TString file_name){
   TF1* fit = (TF1*) fit_->Clone();
   TCanvas *c= new TCanvas("","",600,600);
   gPad->SetLeftMargin(0.15);
-  double ymax = var->GetMaximum() * 1.2;
+  double ymax = var->GetMaximum() * 1.5;
   var->GetYaxis()->SetRangeUser(0., ymax);
   var->GetXaxis()->SetTitle("bin content");
   var->GetYaxis()->SetTitle("events");

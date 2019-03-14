@@ -105,12 +105,12 @@ int main(int argc, char* argv[])
   TH1F * JetMass_1755 = (TH1F*)file->Get("1755");
   TH1F * JetMass_1785 = (TH1F*)file->Get("1785");
 
-  std::vector<TH1F*> mass_samples_temp = {JetMass_1665, JetMass_1695, JetMass_1715, JetMass_1725, JetMass_1735, JetMass_1755, JetMass_1785};
-  std::vector<Double_t> masses_temp = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
-  std::vector<TH1F*> mass_samples;
-  std::vector<Double_t> masses;
-  // if mass is extracted from mass sample, it has to be removed from mass templates
-  for(int i=0; i<masses_temp.size(); i++){
+  std::vector<TH1F*> mass_samples = {JetMass_1665, JetMass_1695, JetMass_1715, JetMass_1725, JetMass_1735, JetMass_1755, JetMass_1785};
+  std::vector<Double_t> masses = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
+  std::vector<TH1F*> mass_samples_chi2;
+  std::vector<Double_t> masses_chi2;
+  // if mass is extracted from mass sample, it has to be removed from chi2
+  for(int i=0; i<masses.size(); i++){
     if(use_data || use_pseudo1){
       if(i == 0 || i==6) continue;
     }
@@ -126,10 +126,9 @@ int main(int argc, char* argv[])
     else if(use_pseudo1755){
       if(i == 5 || i==0) continue;
     }
-    mass_samples.push_back(mass_samples_temp[i]);
-    masses.push_back(masses_temp[i]);
+    mass_samples_chi2.push_back(mass_samples[i]);
+    masses_chi2.push_back(masses[i]);
   }
-  int N_samples = mass_samples.size();
 
   /*
   ██████   █████  ███    ██  ██████  ███████      ██████  ███████     ███████ ██ ████████
@@ -140,8 +139,8 @@ int main(int argc, char* argv[])
   */
 
 
-  double from = 82;
-  double to = 322;
+  double from = 150;
+  double to = 200;
 
   int firstbin = JetMass_data->GetXaxis()->FindBin(from);
   int lastbin = JetMass_data->GetXaxis()->FindBin(to) - 1;
@@ -245,19 +244,20 @@ int main(int argc, char* argv[])
 
   std::vector<double> chi_vec;
   j = 0;
-  for(auto &masspoint: mass_samples){
+  for(auto &masspoint: mass_samples_chi2){
     double chi2 = ComputeChi2(data, masspoint, cov, cov_mc[j], bins[j]);
-    cout << "   chi2 (mtop = " << masses[j] <<") = "<< chi2 << endl;
+    cout << "   chi2 (mtop = " << masses_chi2[j] <<") = "<< chi2 << endl;
     chi_vec.push_back(chi2);
     j++;
   }
 
+  int N_samples = mass_samples_chi2.size();
   Double_t y[N_samples];
   for(int i=0; i<N_samples; i++){
     y[i] = chi_vec[i];
   }
 
-  TGraph* chi_hist = new TGraph(N_samples,&masses[0],y);
+  TGraph* chi_hist = new TGraph(N_samples,&masses_chi2[0],y);
   TF1 * fit;
   TF1*f1 = new TF1("f1","pol2",0,500);
   chi_hist->Fit("f1","R");
@@ -309,11 +309,11 @@ int main(int argc, char* argv[])
   }
 
   JetMass_1695->SetLineColor(kRed-4);
-  JetMass_1715->SetLineColor(kRed-4);
+  JetMass_1715->SetLineColor(798);
 
   JetMass_1725->SetLineColor(13);
 
-  JetMass_1735->SetLineColor(kAzure+7);
+  JetMass_1735->SetLineColor(kGreen);
   JetMass_1755->SetLineColor(kAzure+7);
 
   data->SetLineColor(kBlack);
@@ -337,7 +337,9 @@ int main(int argc, char* argv[])
   TGaxis::SetMaxDigits(3);
 
   JetMass_1695->Draw("HIST SAME");
+  // JetMass_1715->Draw("HIST SAME");
   JetMass_1725->Draw("HIST SAME");
+  // JetMass_1735->Draw("HIST SAME");
   JetMass_1755->Draw("HIST SAME");
 
   data->Draw("E1 SAME");
@@ -368,7 +370,7 @@ int main(int argc, char* argv[])
     }
     if(chi_vec[i] < chimin) chimin = chi_vec[i];
   }
-  double chimax_mass = masses[chimax_i];
+  double chimax_mass = masses_chi2[chimax_i];
   double dist_to_min = abs(chimax_mass - minX);
   xfrom = minX - dist_to_min - 1;
   xto = minX + dist_to_min + 1;

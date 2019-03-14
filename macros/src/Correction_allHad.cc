@@ -170,7 +170,6 @@ int main(int argc, char* argv[]){
       cout << "Get ptrec bin pt" << pt_bin << " eta" << eta_bin << endl;
       double upper_ = ptrec[pt_bin][eta_bin]->GetMean() + 2*ptrec[pt_bin][eta_bin]->GetRMS();
       double lower_ = ptrec[pt_bin][eta_bin]->GetMean() - 2*ptrec[pt_bin][eta_bin]->GetRMS();
-      cout << "-------------------------------" << endl;
       cout << "Mean before = " << ptrec[pt_bin][eta_bin]->GetMean() << endl;
       cout << "lower = " << lower_ << endl;
       cout << "upper = " << upper_ << endl;
@@ -178,6 +177,7 @@ int main(int argc, char* argv[]){
       ptrec_mean[pt_bin][eta_bin] = ptrec[pt_bin][eta_bin]->GetMean();
       ptrec_mean_err[pt_bin][eta_bin] = ptrec[pt_bin][eta_bin]->GetMeanError();
       cout << "Mean after = " << ptrec_mean[pt_bin][eta_bin] << endl;
+      cout << "-------------------------------" << endl;
 
       // get event number in each bin
       n_events[pt_bin][eta_bin] = count[pt_bin][eta_bin]->Integral();
