@@ -264,7 +264,7 @@ void SubjetHists_xcone::fill(const Event & event){
 
   // identify leading subjet (and call it bjet)
   double ptmax = 0;
-  int index_bjet = -1;
+  unsigned int index_bjet = 100;
   for(unsigned int i=0; i<had_subjets.size(); i++){
     if(had_subjets[i].pt() > ptmax){
       ptmax = had_subjets[i].pt();
@@ -305,7 +305,7 @@ void SubjetHists_xcone::fill(const Event & event){
       JEC_L1_had_bjet->Fill(JEC_L1factor, weight);
       JEC_L2L3_had_bjet->Fill(JEC_factor/JEC_L1factor, weight);
     }
-    else if(i != index_bjet && i != -1){
+    else if(i != index_bjet && index_bjet != 100){
       JEC_had_lightjets->Fill(JEC_factor, weight);
       JEC_L1_had_lightjets->Fill(JEC_L1factor, weight);
       JEC_L2L3_had_lightjets->Fill(JEC_factor/JEC_L1factor, weight);

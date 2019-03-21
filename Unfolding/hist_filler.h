@@ -42,8 +42,8 @@ const TUnfoldBinning *subptmigration_rec;
 const TUnfoldBinning *subptmigration_gen;
 const TUnfoldBinning *massmigration_rec;
 const TUnfoldBinning *massmigration_gen;
-const TUnfoldBinning *muonptmigration_rec;
-const TUnfoldBinning *muonptmigration_gen;
+const TUnfoldBinning *leptonptmigration_rec;
+const TUnfoldBinning *leptonptmigration_gen;
 const TUnfoldBinning *btagmigration_rec;
 
 // variables to store gen or rec info
@@ -52,7 +52,7 @@ Bool_t passed_measurement_rec, passed_measurement_gen;
 Bool_t is_TTbar;
 Bool_t passed_ptmigration_rec, passed_ptmigration_gen;
 Bool_t passed_subptmigration_rec, passed_subptmigration_gen;
-Bool_t passed_muonptmigration_rec, passed_muonptmigration_gen;
+Bool_t passed_leptonptmigration_rec, passed_leptonptmigration_gen;
 Bool_t passed_massmigration_rec, passed_massmigration_gen;
 Bool_t passed_btagmigration_rec;
 Double_t gen_weight, rec_weight, gen_ttfactor; //weights

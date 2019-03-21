@@ -173,7 +173,7 @@ void RecoGenHists_allHad::fill(const Event & event){
   // do matching
   if(use_jet1){
     for(unsigned int i=0; i<rec_sub1.size(); i++){
-      if(only_one_jet && (i != index_onlyjet) ) continue;
+      if(only_one_jet && ((int) i != index_onlyjet) ) continue;
       dR = 1000;
       nearest_j = 100;
       for(unsigned int j=0; j<gen_sub1.size(); j++){
@@ -237,7 +237,7 @@ void RecoGenHists_allHad::fill(const Event & event){
   }
   if(use_jet2){
     for(unsigned int i=0; i<rec_sub2.size(); i++){
-      if(only_one_jet && (i != index_onlyjet) ) continue;      
+      if(only_one_jet && ((int) i != index_onlyjet) ) continue;
       dR = 1000;
       nearest_j = 100;
       for(unsigned int j=0; j<gen_sub2.size(); j++){

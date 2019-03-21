@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
   for(unsigned int i=1; i<bins_rec.size(); i++){
     TLatex text;
     text.SetTextFont(43);
-    text.SetTextSize(30);
+    text.SetTextSize(40);
     text.SetTextAngle(90);
     text.SetTextAlign(21);
     double position = bins_rec[i-1] + (bins_rec[i]-bins_rec[i-1]) / 2;
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]){
   for(unsigned int i=1; i<bins_gen.size(); i++){
     TLatex text;
     text.SetTextFont(43);
-    text.SetTextSize(30);
+    text.SetTextSize(40);
     text.SetTextAngle(0);
     text.SetTextAlign(21);
     double position = bins_gen[i-1] + (bins_gen[i]-bins_gen[i-1]) / 2;

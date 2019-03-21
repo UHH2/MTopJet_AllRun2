@@ -1,4 +1,4 @@
-#include "hist_filler.h"
+leptonptmigration#include "hist_filler.h"
 
 int main(int argc, char* argv[]){
 
@@ -60,8 +60,8 @@ int main(int argc, char* argv[]){
   massmigration_rec = binning_rec->FindNode("massmigration_rec");
   massmigration_gen = binning_gen->FindNode("massmigration_gen");
 
-  muonptmigration_rec = binning_rec->FindNode("muonptmigration_rec");
-  muonptmigration_gen = binning_gen->FindNode("muonptmigration_gen");
+  leptonptmigration_rec = binning_rec->FindNode("leptonptmigration_rec");
+  leptonptmigration_gen = binning_gen->FindNode("leptonptmigration_gen");
 
   btagmigration_rec = binning_rec->FindNode("btagmigration_rec");
 
@@ -173,7 +173,7 @@ void fill_data(TTree* tree){
   tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
   tree->SetBranchAddress("passed_subptmigration_rec",&passed_subptmigration_rec);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
-  tree->SetBranchAddress("passed_muonptmigration_rec",&passed_muonptmigration_rec);
+  tree->SetBranchAddress("passed_leptonptmigration_rec",&passed_leptonptmigration_rec);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
 
   tree->SetBranchStatus("*",1);
@@ -186,7 +186,7 @@ void fill_data(TTree* tree){
     else if(passed_ptmigration_rec)    binNumber = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_subptmigration_rec) binNumber = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  binNumber = massmigration_rec->GetGlobalBinNumber(massRec);
-    else if(passed_muonptmigration_rec)binNumber = muonptmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_leptonptmigration_rec)binNumber = leptonptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  binNumber = btagmigration_rec->GetGlobalBinNumber(massRec);
 
 
@@ -194,7 +194,7 @@ void fill_data(TTree* tree){
        passed_ptmigration_rec ||
        passed_subptmigration_rec ||
        passed_massmigration_rec ||
-       passed_muonptmigration_rec ||
+       passed_leptonptmigration_rec ||
        passed_btagmigration_rec){
       h_data->Fill(binNumber);
     }
@@ -238,8 +238,8 @@ void fill_template(TTree* tree, TString mtop){
   tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
-  tree->SetBranchAddress("passed_muonptmigration_rec",&passed_muonptmigration_rec);
-  tree->SetBranchAddress("passed_muonptmigration_gen",&passed_muonptmigration_gen);
+  tree->SetBranchAddress("passed_leptonptmigration_rec",&passed_leptonptmigration_rec);
+  tree->SetBranchAddress("passed_leptonptmigration_gen",&passed_leptonptmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
 
@@ -264,7 +264,7 @@ void fill_template(TTree* tree, TString mtop){
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
-    else if(passed_muonptmigration_gen)genBin = muonptmigration_gen->GetGlobalBinNumber(massGen);
+    else if(passed_leptonptmigration_gen)genBin = leptonptmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
@@ -272,14 +272,14 @@ void fill_template(TTree* tree, TString mtop){
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
-    else if(passed_muonptmigration_rec) recBin = muonptmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_leptonptmigration_rec) recBin = leptonptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
     bool gen_info = false;
     bool rec_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_muonptmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec ||passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_leptonptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_leptonptmigration_rec ||passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)
@@ -322,7 +322,7 @@ void fill_background(TTree *tree, TString prefix){
   tree->SetBranchAddress("is_TTbar",&is_TTbar);
   tree->SetBranchAddress("passed_ptmigration_rec",&passed_ptmigration_rec);
   tree->SetBranchAddress("passed_subptmigration_rec",&passed_subptmigration_rec);
-  tree->SetBranchAddress("passed_muonptmigration_rec",&passed_muonptmigration_rec);
+  tree->SetBranchAddress("passed_leptonptmigration_rec",&passed_leptonptmigration_rec);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
@@ -344,10 +344,10 @@ void fill_background(TTree *tree, TString prefix){
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
-    else if(passed_muonptmigration_rec) recBin = muonptmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_leptonptmigration_rec) recBin = leptonptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
 
-    if(passed_measurement_rec || passed_ptmigration_rec || passed_subptmigration_rec || passed_massmigration_rec || passed_muonptmigration_rec ||passed_btagmigration_rec){
+    if(passed_measurement_rec || passed_ptmigration_rec || passed_subptmigration_rec || passed_massmigration_rec || passed_leptonptmigration_rec ||passed_btagmigration_rec){
       h_mc_bgr->Fill(recBin, w_bgr_rec);
     }
   }
@@ -397,8 +397,8 @@ void fill_matrix(TTree* tree, TString prefix){
   tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
-  tree->SetBranchAddress("passed_muonptmigration_rec",&passed_muonptmigration_rec);
-  tree->SetBranchAddress("passed_muonptmigration_gen",&passed_muonptmigration_gen);
+  tree->SetBranchAddress("passed_leptonptmigration_rec",&passed_leptonptmigration_rec);
+  tree->SetBranchAddress("passed_leptonptmigration_gen",&passed_leptonptmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
 
@@ -429,7 +429,7 @@ void fill_matrix(TTree* tree, TString prefix){
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
-    else if(passed_muonptmigration_gen)genBin = muonptmigration_gen->GetGlobalBinNumber(massGen);
+    else if(passed_leptonptmigration_gen)genBin = leptonptmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
@@ -438,13 +438,13 @@ void fill_matrix(TTree* tree, TString prefix){
     else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
-    else if(passed_muonptmigration_rec) recBin = muonptmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_leptonptmigration_rec) recBin = leptonptmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
     bool gen_info = false;
     bool rec_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_muonptmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec || passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_leptonptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_leptonptmigration_rec || passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)
@@ -527,8 +527,8 @@ void fill_modelsys(TTree* tree, TString prefix){
   tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
-  tree->SetBranchAddress("passed_muonptmigration_rec",&passed_muonptmigration_rec);
-  tree->SetBranchAddress("passed_muonptmigration_gen",&passed_muonptmigration_gen);
+  tree->SetBranchAddress("passed_leptonptmigration_rec",&passed_leptonptmigration_rec);
+  tree->SetBranchAddress("passed_leptonptmigration_gen",&passed_leptonptmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
 
@@ -553,7 +553,7 @@ void fill_modelsys(TTree* tree, TString prefix){
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
-    else if(passed_muonptmigration_gen)genBin = muonptmigration_gen->GetGlobalBinNumber(massGen);
+    else if(passed_leptonptmigration_gen)genBin = leptonptmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
@@ -561,14 +561,14 @@ void fill_modelsys(TTree* tree, TString prefix){
     else if(passed_ptmigration_rec)    recBin = ptmigration_rec->GetGlobalBinNumber(massRec,ptRec);
     else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
-    else if(passed_muonptmigration_rec) recBin = muonptmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_leptonptmigration_rec) recBin = leptonptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
     bool gen_info = false;
     bool rec_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_muonptmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec || passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_leptonptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_leptonptmigration_rec || passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)
@@ -656,8 +656,8 @@ void fill_pdf(TTree* tree){
   tree->SetBranchAddress("passed_subptmigration_gen",&passed_subptmigration_gen);
   tree->SetBranchAddress("passed_massmigration_rec",&passed_massmigration_rec);
   tree->SetBranchAddress("passed_massmigration_gen",&passed_massmigration_gen);
-  tree->SetBranchAddress("passed_muonptmigration_rec",&passed_muonptmigration_rec);
-  tree->SetBranchAddress("passed_muonptmigration_gen",&passed_muonptmigration_gen);
+  tree->SetBranchAddress("passed_leptonptmigration_rec",&passed_leptonptmigration_rec);
+  tree->SetBranchAddress("passed_leptonptmigration_gen",&passed_leptonptmigration_gen);
   tree->SetBranchAddress("passed_btagmigration_rec",&passed_btagmigration_rec);
   tree->SetBranchStatus("*",1);
 
@@ -682,7 +682,7 @@ void fill_pdf(TTree* tree){
     else if(passed_ptmigration_gen)   genBin = ptmigration_gen->GetGlobalBinNumber(massGen,ptGen);
     else if(passed_subptmigration_gen)genBin = subptmigration_gen->GetGlobalBinNumber(massGen);
     else if(passed_massmigration_gen) genBin = massmigration_gen->GetGlobalBinNumber(massGen);
-    else if(passed_muonptmigration_gen)genBin = muonptmigration_gen->GetGlobalBinNumber(massGen);
+    else if(passed_leptonptmigration_gen)genBin = leptonptmigration_gen->GetGlobalBinNumber(massGen);
     else                              genBin = 0;
 
     Int_t recBin;
@@ -691,13 +691,13 @@ void fill_pdf(TTree* tree){
     else if(passed_subptmigration_rec) recBin = subptmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_massmigration_rec)  recBin = massmigration_rec->GetGlobalBinNumber(massRec);
     else if(passed_btagmigration_rec)  recBin = btagmigration_rec->GetGlobalBinNumber(massRec);
-    else if(passed_muonptmigration_rec) recBin = muonptmigration_rec->GetGlobalBinNumber(massRec);
+    else if(passed_leptonptmigration_rec) recBin = leptonptmigration_rec->GetGlobalBinNumber(massRec);
     else                               recBin = 0;
 
     bool gen_info = false;
     bool rec_info = false;
-    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_muonptmigration_gen) gen_info = true;
-    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_muonptmigration_rec || passed_btagmigration_rec) rec_info = true;
+    if(passed_ptmigration_gen || passed_measurement_gen || passed_massmigration_gen || passed_subptmigration_gen || passed_leptonptmigration_gen) gen_info = true;
+    if(passed_ptmigration_rec || passed_measurement_rec || passed_massmigration_rec || passed_subptmigration_rec || passed_leptonptmigration_rec || passed_btagmigration_rec) rec_info = true;
 
 
     // Fill 1D Hists (for truth distribution only use gen selection)

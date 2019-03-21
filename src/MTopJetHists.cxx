@@ -111,18 +111,18 @@ void MTopJetHists::fill(const Event & event){
       if((event.muons->size())!= 0){
         deltaR_lep_Bjet->Fill(deltaR(event.muons->at(0), jet),weight);
       }
-      else deltaR_lep_Bjet->Fill(deltaR(event.electrons->at(0), jet),weight);
+      else if((event.electrons->size())!= 0) deltaR_lep_Bjet->Fill(deltaR(event.electrons->at(0), jet),weight);
     }
   }
   //
 
   // delta R1 Jet
   if((event.jets->size())>0){
-    double dR1;
+    double dR1 = -1;
     if((event.muons->size())!= 0){
       dR1 = deltaR(event.muons->at(0), event.jets->at(0));
     }
-    else dR1 = deltaR(event.electrons->at(0), event.jets->at(0));
+    else if((event.electrons->size())!= 0) dR1 = deltaR(event.electrons->at(0), event.jets->at(0));
 
     deltaR_lep_jet1->Fill(dR1, weight);
   }
@@ -130,11 +130,11 @@ void MTopJetHists::fill(const Event & event){
 
   // delta R2  Jet
   if((event.jets->size())>1){
-    double dR2;
+    double dR2 = -1;
     if((event.muons->size())!= 0){
       dR2 = deltaR(event.muons->at(0), event.jets->at(1));
     }
-    else dR2 = deltaR(event.electrons->at(0), event.jets->at(1));
+    else if((event.electrons->size())!= 0) dR2 = deltaR(event.electrons->at(0), event.jets->at(1));
 
     deltaR_lep_jet2->Fill(dR2, weight);
   }
@@ -142,11 +142,11 @@ void MTopJetHists::fill(const Event & event){
 
   // delta R2 Top Jet
   if((event.topjets->size())>1){
-    double dR2;
+    double dR2 = -1;
     if((event.muons->size())!= 0){
       dR2 = deltaR(event.muons->at(0), event.topjets->at(1));
     }
-    else dR2 = deltaR(event.electrons->at(0), event.topjets->at(1));
+    else if((event.electrons->size())!= 0) dR2 = deltaR(event.electrons->at(0), event.topjets->at(1));
 
     deltaR_lep_topjet2->Fill(dR2, weight);
   }
@@ -154,11 +154,11 @@ void MTopJetHists::fill(const Event & event){
 
   // delta R1 Top Jet
   if((event.topjets->size())>0){
-    double dR1;
+    double dR1 = -1;
     if((event.muons->size())!= 0){
       dR1 = deltaR(event.muons->at(0), event.topjets->at(0));
     }
-    else dR1 = deltaR(event.electrons->at(0), event.topjets->at(0));
+    else if((event.electrons->size())!= 0) dR1 = deltaR(event.electrons->at(0), event.topjets->at(0));
 
     deltaR_lep_topjet1->Fill(dR1, weight);
   }
@@ -166,13 +166,13 @@ void MTopJetHists::fill(const Event & event){
 
   // delta Phi Top Jet
   if((event.topjets->size())>0){
-    double dphi;
+    double dphi = -1;
     const Particle* TopJet = &event.topjets->at(0);
     if((event.muons->size())!= 0){
       const Particle* Lep = &event.muons->at(0);
       dphi = (TopJet->v4().Phi()) - (Lep->v4().Phi());
     }
-    else {
+    else if((event.electrons->size())!= 0) {
       const Particle* Lep = &event.electrons->at(0);
       dphi = (TopJet->v4().Phi()) - (Lep->v4().Phi());
     }
@@ -182,13 +182,13 @@ void MTopJetHists::fill(const Event & event){
 
   // delta Phi Top Jet2
   if((event.topjets->size())>1){
-    double dphi2;
+    double dphi2 = -1;
     const Particle* TopJet = &event.topjets->at(1);
     if((event.muons->size())!= 0){
       const Particle* Lep = &event.muons->at(0);
       dphi2 = (TopJet->v4().Phi()) - (Lep->v4().Phi());
     }
-    else {
+    else if((event.electrons->size())!= 0) {
       const Particle* Lep = &event.electrons->at(0);
       dphi2 = (TopJet->v4().Phi()) - (Lep->v4().Phi());
     }

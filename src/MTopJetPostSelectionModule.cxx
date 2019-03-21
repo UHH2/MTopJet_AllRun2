@@ -14,6 +14,8 @@
 #include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/TopPtReweight.h>
 #include <UHH2/common/include/MCWeight.h>
+#include <UHH2/common/include/MuonIds.h>
+#include <UHH2/common/include/ElectronIds.h>
 
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
@@ -38,6 +40,7 @@
 #include "UHH2/MTopJet/include/CorrectionFactor.h"
 #include "UHH2/MTopJet/include/tt_width_reweight.h"
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
+#include <UHH2/MTopJet/include/ElecTriggerScaleFactor.h>
 
 #include <vector>
 
@@ -82,8 +85,9 @@ protected:
   std::unique_ptr<uhh2::Selection> matched_fat;
   std::unique_ptr<uhh2::Selection> subjet_quality;
   std::unique_ptr<uhh2::Selection> subjet_quality_gen;
-  std::unique_ptr<uhh2::Selection> muon_sel;
-  std::unique_ptr<uhh2::Selection> muon_sel_gen;
+  std::unique_ptr<uhh2::Selection> lepton_sel;
+  std::unique_ptr<uhh2::Selection> lepton_sel_gen;
+  std::unique_ptr<uhh2::Selection> lepton_Nsel_gen;
 
   std::unique_ptr<uhh2::Selection> njet_ak8;
   std::unique_ptr<uhh2::Selection> deltaR_ak8;
@@ -108,8 +112,8 @@ protected:
   Event::Handle<bool>h_nomass_gen;
   Event::Handle<bool>h_ptsub_rec;
   Event::Handle<bool>h_ptsub_gen;
-  Event::Handle<bool>h_ptmuon_rec;
-  Event::Handle<bool>h_ptmuon_gen;
+  Event::Handle<bool>h_ptlepton_rec;
+  Event::Handle<bool>h_ptlepton_gen;
   Event::Handle<bool>h_pt350_gen;
   Event::Handle<bool>h_pt350_rec;
   Event::Handle<bool>h_nobtag_rec;
@@ -144,9 +148,9 @@ protected:
   std::unique_ptr<AnalysisModule> PUreweight;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_Muon_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
+  std::unique_ptr<Hists> h_Muon_PreSel, h_Elec_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
 
-  std::unique_ptr<Hists> h_Muon, h_MTopJet, h_Jets;
+  std::unique_ptr<Hists> h_Muon, h_Elec, h_MTopJet, h_Jets;
   std::unique_ptr<Hists> h_CorrectionHists, h_CorrectionHists_after, h_CorrectionHists_WJets;
   std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
 
@@ -189,11 +193,14 @@ protected:
 
   std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
+  std::unique_ptr<uhh2::AnalysisModule> ele_id_SF, ele_trigger_SF, ele_reco_SF;
 
 
   string BTag_variation ="central";
   string MuScale_variation ="nominal";
   string MuTrigger_variation ="nominal";
+  string ElID_variation ="nominal";
+  string ElReco_variation ="nominal";
   string PU_variation ="nominal";
 
 };
@@ -311,11 +318,22 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   eta_sel.reset(new LeadingRecoJetETA(ctx, jet_label_had, 2.5));
   pt350_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 350));
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
-  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(60, 2.4 ))));
 
+  MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(60., 2.4));
+  ElectronId eleid = AndId<Electron>(PtEtaSCCut(130., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
+
+  if(channel_ == muon) lepton_sel.reset(new NMuonSelection(1, -1, muid));
+  else                 lepton_sel.reset(new NElectronSelection(1, -1, eleid));
 
   // GEN Selection
-  muon_sel_gen.reset(new GenMuonSel(ctx, 60.));
+  if(channel_ == muon){
+    lepton_sel_gen.reset(new GenMuonSel(ctx, 60.));
+    lepton_Nsel_gen.reset(new GenMuonCount(ctx, 1, 1));
+  }
+  else{
+    lepton_sel_gen.reset(new GenElecSel(ctx, 135.));
+    lepton_Nsel_gen.reset(new GenElecCount(ctx, 1, 1));
+  }
   subjet_quality_gen.reset(new SubjetQuality_gen(ctx, "GEN_XCone33_had_Combined", 30, 2.5));
   pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
   pt2_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_lep_Combined", 10));
@@ -339,10 +357,15 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   BTag_variation = ctx.get("BTag_variation","central");
   MuScale_variation = ctx.get("MuScale_variation","nominal");
   MuTrigger_variation = ctx.get("MuTrigger_variation","nominal");
+  ElID_variation = ctx.get("ElID_variation","nominal");
+  ElReco_variation = ctx.get("ElReco_variation","nominal");
 
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
+  ele_trigger_SF.reset(new ElectronTriggerSF(ctx)); // approved at https://indico.cern.ch/event/662745/
+  ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
+  ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_MVA90_ID.root", 1, "", ElID_variation));
 
   /*************************** Set up Hists classes **********************************************************************************/
 
@@ -402,10 +425,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
   h_Muon.reset(new MuonHists(ctx, "MuonHists"));
+  h_Elec.reset(new ElectronHists(ctx, "ElecHists"));
   h_Jets.reset(new JetHists(ctx, "JetHits"));
 
   h_MTopJet_PreSel.reset(new MTopJetHists(ctx, "EventHists_PreSel"));
   h_Muon_PreSel.reset(new MuonHists(ctx, "MuonHits_PreSel"));
+  h_Elec_PreSel.reset(new ElectronHists(ctx, "ElecHits_PreSel"));
   h_Jets_PreSel.reset(new JetHists(ctx, "JetHits_PreSel"));
   h_XCone_cor_PreSel.reset(new RecoHists_xcone(ctx, "XCone_cor_PreSel", "cor"));
 
@@ -488,8 +513,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
   h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
   h_nobtag_rec = ctx.declare_event_output<bool>("passed_btagmigration_rec");
-  h_ptmuon_rec = ctx.declare_event_output<bool>("passed_muonptmigration_rec");
-  h_ptmuon_gen = ctx.declare_event_output<bool>("passed_muonptmigration_gen");
+  h_ptlepton_rec = ctx.declare_event_output<bool>("passed_leptonptmigration_rec");
+  h_ptlepton_gen = ctx.declare_event_output<bool>("passed_leptonptmigration_gen");
   h_gensel23 = ctx.declare_event_output<bool>("passed_gensel23_full");
   h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
   h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
@@ -514,7 +539,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
-
 
   /*
   ██████  ██████   ██████   ██████ ███████ ███████ ███████
@@ -620,8 +644,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   PUreweight->process(event);
 
   /** muon SF *********************/
-  muo_tight_noniso_SF->process(event);
-  muo_trigger_SF->process(event);
+  if(channel_ == muon){
+    muo_tight_noniso_SF->process(event);
+    muo_trigger_SF->process(event);
+  }
+  else{
+    ele_id_SF->process(event);
+    ele_reco_SF->process(event);
+    ele_trigger_SF->process(event);
+  }
 
   /** b-tagging *********************/
   int jetbtagN(0);
@@ -661,61 +692,63 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool pass_btagmigration_rec;
   bool pass_WJets_sel;
   bool pass_subptmigration_rec;
-  bool pass_muonptmigration_rec;
+  bool pass_leptonptmigration_rec;
 
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && muon_sel->passes(event)) pass_measurement_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_measurement_rec = true;
   else pass_measurement_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && pt2_sel->passes(event) && pt350_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && muon_sel->passes(event) ) pass_pt350migration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && pt2_sel->passes(event) && pt350_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event) ) pass_pt350migration_rec = true;
   else pass_pt350migration_rec = false;
 
-  if(passed_recsel && !pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && muon_sel->passes(event)) pass_ptmigration_rec = true;
+  if(passed_recsel && !pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_ptmigration_rec = true;
   else pass_ptmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && !mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && muon_sel->passes(event)) pass_massmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && !mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_massmigration_rec = true;
   else pass_massmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium && subjet_quality->passes(event) && muon_sel->passes(event)) pass_btagmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && !passed_btag && passed_btag_medium && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_btagmigration_rec = true;
   else pass_btagmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event)  && eta_sel->passes(event) && !passed_btag_loose && subjet_quality->passes(event) && muon_sel->passes(event)) pass_WJets_sel = true;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event)  && eta_sel->passes(event) && !passed_btag_loose && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_WJets_sel = true;
   else pass_WJets_sel = false;
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && !subjet_quality->passes(event) && muon_sel->passes(event)) pass_subptmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && !subjet_quality->passes(event) && lepton_sel->passes(event)) pass_subptmigration_rec = true;
   else pass_subptmigration_rec = false;
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && !muon_sel->passes(event)) pass_muonptmigration_rec = true;
-  else pass_muonptmigration_rec = false;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && !lepton_sel->passes(event)) pass_leptonptmigration_rec = true;
+  else pass_leptonptmigration_rec = false;
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/
   bool pass_measurement_gen;
   bool pass_pt350migration_gen;
   bool pass_massmigration_gen;
   bool pass_subptmigration_gen;
-  bool pass_muonptmigration_gen;
+  bool pass_leptonptmigration_gen;
 
   if(isTTbar){
-    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && muon_sel_gen->passes(event)) pass_measurement_gen = true;
+    if(!lepton_Nsel_gen->passes(event)) passed_gensel33 = false;
+
+    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event)) pass_measurement_gen = true;
     else pass_measurement_gen = false;
 
-    if(passed_gensel33 && !pt_gensel->passes(event) && pt2_gensel->passes(event) && pt350_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && muon_sel_gen->passes(event)) pass_pt350migration_gen = true;
+    if(passed_gensel33 && !pt_gensel->passes(event) && pt2_gensel->passes(event) && pt350_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event)) pass_pt350migration_gen = true;
     else pass_pt350migration_gen = false;
 
-    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && !mass_gensel->passes(event) && subjet_quality_gen->passes(event) && muon_sel_gen->passes(event)) pass_massmigration_gen = true;
+    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && !mass_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event)) pass_massmigration_gen = true;
     else pass_massmigration_gen = false;
 
-    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && !subjet_quality_gen->passes(event) && muon_sel_gen->passes(event)) pass_subptmigration_gen = true;
+    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && !subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event)) pass_subptmigration_gen = true;
     else pass_subptmigration_gen = false;
 
-    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && !muon_sel_gen->passes(event)) pass_muonptmigration_gen = true;
-    else pass_muonptmigration_gen = false;
+    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && !lepton_sel_gen->passes(event)) pass_leptonptmigration_gen = true;
+    else pass_leptonptmigration_gen = false;
   }
   else if(!isTTbar){
     pass_measurement_gen = false;
     pass_pt350migration_gen = false;
     pass_massmigration_gen = false;
     pass_subptmigration_gen = false;
-    pass_muonptmigration_gen = false;
+    pass_leptonptmigration_gen = false;
   }
 
   /***************************  750GeV SELECTION ***********************************************************************************/
@@ -744,6 +777,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_presel_rec){
     h_MTopJet_PreSel->fill(event);
     h_Muon_PreSel->fill(event);
+    h_Elec_PreSel->fill(event);
     h_Jets_PreSel->fill(event);
     h_XCone_cor_PreSel->fill(event);
   }
@@ -844,6 +878,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     h_MTopJet->fill(event);
     h_Muon->fill(event);
+    h_Elec->fill(event);
     h_Jets->fill(event);
 
     if(lowPU){
@@ -921,8 +956,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_nobtag_rec, pass_btagmigration_rec);
   event.set(h_ptsub_rec, pass_subptmigration_rec);
   event.set(h_ptsub_gen, pass_subptmigration_gen);
-  event.set(h_ptmuon_rec, pass_muonptmigration_rec);
-  event.set(h_ptmuon_gen, pass_muonptmigration_gen);
+  event.set(h_ptlepton_rec, pass_leptonptmigration_rec);
+  event.set(h_ptlepton_gen, pass_leptonptmigration_gen);
 
   event.set(h_factor_2width, factor_2w);
   event.set(h_factor_4width, factor_4w);
@@ -940,8 +975,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     pass_btagmigration_rec ||
     pass_subptmigration_rec ||
     pass_subptmigration_gen ||
-    pass_muonptmigration_rec ||
-    pass_muonptmigration_gen   );
+    pass_leptonptmigration_rec ||
+    pass_leptonptmigration_gen   );
 
     if(!in_migrationmatrix) return false;
     else return true;

@@ -354,7 +354,7 @@ int main(int argc, char* argv[])
     }
   }
   // now read model variations
-  //vector<TString> shower = {"Shower"};
+  vector<TString> shower = {"Shower"};
   vector<TString> generator = {"Generator"};
   vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
   vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
@@ -365,8 +365,10 @@ int main(int argc, char* argv[])
     name += i;
     pdf.push_back(name);
   }
-  vector< vector<TString> > model_name = {generator, scale, mass, pdf}; // SHOWER NOT INCLUDED!!!
-  vector<TString> model_rel_name = {"generator", "scale", "mass", "pdf"}; // SHOWER NOT INCLUDED!!!
+  // vector< vector<TString> > model_name = {generator, scale, mass, shower, pdf};
+  // vector<TString> model_rel_name = {"generator", "scale", "mass", "shower", "pdf"};
+  vector< vector<TString> > model_name = {generator, scale, mass, pdf};
+  vector<TString> model_rel_name = {"generator", "scale", "mass", "pdf"};
   vector< vector<TH1D*> > model_input;
   vector< vector<TH1D*> > model_truth;
   for(unsigned int i=0; i<model_name.size(); i++){
@@ -865,23 +867,27 @@ int main(int argc, char* argv[])
   plot->draw_matrix(MatrixDelta_mtop1735, "Migration_Delta_mtop1735", false, true);
 
   plot->draw_delta(STAT_DELTA, "DELTA_STAT");
+  plot->draw_delta_rel(STAT_DELTA, data_unfolded_sys, "DELTA_STAT_REL");
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     for(unsigned int j=0; j<sys_name[i].size(); j++){
       plot->draw_matrix(CovSys[i][j], "COV_"+sys_name[i][j], false, false);
       plot->draw_delta(SYS_DELTA[i][j], "DELTA_"+sys_name[i][j]);
+      plot->draw_delta_rel(SYS_DELTA[i][j], data_unfolded_sys, "DELTA_"+sys_name[i][j]+"_REL");
     }
   }
   plot->draw_delta_comparison(SYS_rel_total, STAT_REL, SYS_rel, sys_rel_name, "exp", "SYS_EXP_COMPARISION");
 
   plot->draw_matrix(CovLumi, "COV_Lumi", false, false);
   plot->draw_delta(DeltaLumi, "DELTA_Lumi");
+  plot->draw_delta_rel(DeltaLumi, data_unfolded_sys, "DELTA_LUMI_REL");
 
   if(do_model){
     for(unsigned int i=0; i<model_name.size(); i++){
       for(unsigned int j=0; j<model_name[i].size(); j++){
         plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false, false);
         plot->draw_delta(MODEL_DELTA[i][j], "DELTA_"+model_name[i][j]);
+        plot->draw_delta_rel(MODEL_DELTA[i][j], data_unfolded_sys, "DELTA_"+model_name[i][j]+"_REL");
         plot->draw_bias(MODEL_OUTPUT[i][j], model_truth[i][j], MODEL_BIAS[i][j], "BIAS_"+model_name[i][j]);
       }
     }
@@ -898,6 +904,7 @@ int main(int argc, char* argv[])
     plot->draw_matrix(CovBgrStat[i], "COV_"+bgr_name[i]+"_stat", false, false);
     plot->draw_matrix(CovBgrScale[i], "COV_"+bgr_name[i]+"_scale", false, false);
     plot->draw_delta(BGR_DELTA[i], "DELTA_"+bgr_name[i]);
+    plot->draw_delta_rel(BGR_DELTA[i], data_unfolded_sys, "DELTA_"+bgr_name[i]+"_REL");
   }
 
   if(do_genvar){

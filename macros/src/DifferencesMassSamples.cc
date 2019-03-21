@@ -13,6 +13,8 @@ int main(int argc, char* argv[]){
   files.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715.root"));
   files.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   files.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735.root"));
+  files.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_powheg-herwig.root"));
+
   //// ---------------------------------------------------------------------------------------------------------------------
   //// ---------------------------------------------------------------------------------------------------------------------
   vector<vector<TH1F*>> hist;

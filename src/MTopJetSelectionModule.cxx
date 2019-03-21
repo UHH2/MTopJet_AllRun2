@@ -86,14 +86,15 @@ protected:
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
   std::unique_ptr<uhh2::AnalysisModule> copy_jet;
-  std::unique_ptr<uhh2::Selection> trigger_sel_A;
-  std::unique_ptr<uhh2::Selection> trigger_sel_B;
+  std::unique_ptr<uhh2::Selection> trigger_mu_A;
+  std::unique_ptr<uhh2::Selection> trigger_mu_B;
+  std::unique_ptr<uhh2::Selection> trigger_el_A;
+  std::unique_ptr<uhh2::Selection> trigger_el_B;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
-  std::unique_ptr<uhh2::Selection> triangc_sel;
+  std::unique_ptr<uhh2::Selection> elec_sel125;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> pv_sel;
-  std::unique_ptr<uhh2::Selection> htlep_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
   std::unique_ptr<uhh2::Selection> jet_sel;
 
@@ -228,17 +229,19 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // define IDs
   MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
-  ElectronId eleid = AndId<Electron>(ElectronID_Spring16_medium_noIso, PtEtaCut(55., 2.4));
+  ElectronId eleid    = AndId<Electron>(PtEtaSCCut(55., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
+  ElectronId eleid125 = AndId<Electron>(PtEtaSCCut(125., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
+  ElectronId eleid250 = AndId<Electron>(PtEtaSCCut(250., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
   JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4));
   ////
 
   // define Trigger
-  if(channel_ == muon){
-    trigger_sel_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
-    trigger_sel_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
-  }
-  ////
+  trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
+  trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
+  trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
+  trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+
 
   /*Only select event with exacly 1 muon or electron */
   if(channel_ == elec){
@@ -249,17 +252,16 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
     muon_sel.reset(new NMuonSelection(1, 1, muid));
     elec_sel.reset(new NElectronSelection(0, 0, eleid));
   }
+  elec_sel125.reset(new NElectronSelection(1, 1, eleid125));
+
 
   jet_sel.reset(new NJetSelection(2, -1, jetid_selection));
-  met_sel  .reset(new METCut  (50 , uhh2::infinity));
-  htlep_sel.reset(new HTlepCut(100, uhh2::infinity));
+  double metcut = 0;
+  if(channel_ == muon)      metcut = 50;
+  else if(channel_ == elec) metcut = 90;
+  met_sel  .reset(new METCut  (metcut , uhh2::infinity));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
-
-  // if     (channel_ == elec) triangc_sel.reset(new TriangularCuts(M_PI/2., (M_PI/2.)/75.));
-  // else if(channel_ == muon) triangc_sel.reset(new uhh2::AndSelection(ctx));
-  ////
-
 
   //// Obj Cleaning
 
@@ -356,6 +358,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
 }
 
+
 bool MTopJetSelectionModule::process(uhh2::Event& event){
 
   bool passed_gensel;
@@ -366,29 +369,18 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(isTTbar) passed_recsel = event.get(h_recsel);
   passed_recsel = true;
 
+
   // fill ttbargen class
   if(isTTbar) ttgenprod->process(event);
-  ////
-
-  // cout << "*******************************" << endl;
-  // cout << "processing event nr. " << event.event<< endl;
-
-  // if(passed_recsel){
-  //   h_PreSel_event->fill(event);
-  //   h_PreSel_elec->fill(event);
-  //   h_PreSel_muon->fill(event);
-  //   h_PreSel_jets->fill(event);
-  //   h_PreSel_lumi->fill(event);
-  // }
   ////
 
   /* *********** Lepton Cleaner and Selection *********** */
   if(passed_recsel){
     muoSR_cleaner->process(event);
-    sort_by_pt<Muon>(*event.muons);
+    if(event.muons->size() > 0) sort_by_pt<Muon>(*event.muons);
 
     eleSR_cleaner->process(event);
-    sort_by_pt<Electron>(*event.electrons);
+    if(event.electrons->size() > 0) sort_by_pt<Electron>(*event.electrons);
     const bool pass_lep1 = ((event.muons->size() > 0) || (event.electrons->size() > 0));
     if(!pass_lep1) passed_recsel = false;
   }
@@ -400,6 +392,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     jet_cleaner1->process(event);
     sort_by_pt<Jet>(*event.jets);
   }
+
   /* *********** at least 1 good primary vertex *********** */
   if(passed_recsel){
     if(!pv_sel->passes(event)) passed_recsel = false;
@@ -421,13 +414,18 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(channel_ == muon){
     if(passed_recsel){
       if( !isMC && event.run < 274954) {
-        if(!trigger_sel_A->passes(event)) passed_recsel = false;
+        if(!trigger_mu_A->passes(event)) passed_recsel = false;
       }else{
-        if( !(trigger_sel_A->passes(event) || trigger_sel_B->passes(event)) ) passed_recsel = false;
+        if( !(trigger_mu_A->passes(event) || trigger_mu_B->passes(event)) ) passed_recsel = false;
       }
     }
   }
-  // if(channel_ == muon) muo_trigger_SF->process(event);
+  else if(channel_ == elec){
+    if(!trigger_el_A->passes(event)) passed_recsel = false;
+    // once photon stream is available, also add photon trigger
+    // then, the electron trigger is only used until pt < 250,
+    // above only the photon trigger is used
+  }
 
   if(passed_recsel){
     h_Trigger_event->fill(event);
@@ -438,7 +436,12 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   }
   /* *********** lEPTON Selection *********** */
   if(passed_recsel){
-    const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
+    bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
+    // in elec channel use additional cut at pT > 125
+    if(channel_ == elec){
+      if(!elec_sel125->passes(event)) pass_lepsel = false;
+    }
+    ////
     if(!pass_lepsel) passed_recsel = false;
     else{
       h_Lepton_event->fill(event);

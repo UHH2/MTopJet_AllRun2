@@ -290,13 +290,13 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"data unfolded","pl");
-  if(show[0]) l->AddEntry(mtop_templates[0],"m_{top} = 166.5 GeV","pl");
-  if(show[1]) l->AddEntry(mtop_templates[1],"m_{top} = 169.5 GeV","pl");
-  if(show[2]) l->AddEntry(mtop_templates[2],"m_{top} = 171.5 GeV","pl");
-  if(show[3]) l->AddEntry(mtop_templates[3],"m_{top} = 172.5 GeV","pl");
-  if(show[4]) l->AddEntry(mtop_templates[4],"m_{top} = 173.5 GeV","pl");
-  if(show[5]) l->AddEntry(mtop_templates[5],"m_{top} = 175.5 GeV","pl");
-  if(show[6]) l->AddEntry(mtop_templates[6],"m_{top} = 178.5 GeV","pl");
+  if(show[0]) l->AddEntry(mtop_templates[0],"m_{top}^{MC} = 166.5 GeV","pl");
+  if(show[1]) l->AddEntry(mtop_templates[1],"m_{top}^{MC} = 169.5 GeV","pl");
+  if(show[2]) l->AddEntry(mtop_templates[2],"m_{top}^{MC} = 171.5 GeV","pl");
+  if(show[3]) l->AddEntry(mtop_templates[3],"m_{top}^{MC} = 172.5 GeV","pl");
+  if(show[4]) l->AddEntry(mtop_templates[4],"m_{top}^{MC} = 173.5 GeV","pl");
+  if(show[5]) l->AddEntry(mtop_templates[5],"m_{top}^{MC} = 175.5 GeV","pl");
+  if(show[6]) l->AddEntry(mtop_templates[6],"m_{top}^{MC} = 178.5 GeV","pl");
   l->SetTextSize(0.04);
   l->Draw();
   c->SaveAs(directory + file_name + ".pdf");
@@ -526,6 +526,26 @@ void plotter::draw_delta(TH1* hist_, TString file_name){
   delete c;
 }
 
+void plotter::draw_delta_rel(TH1* hist_, TH1* result_, TString file_name){
+  TH1* hist = (TH1*) hist_->Clone("hist");
+  TH1* result = (TH1*) result_->Clone("result");
+  hist->Divide(result);
+  hist->Scale(100);
+  TCanvas *c= new TCanvas("Particle Level","",600,600);
+  gPad->SetLeftMargin(0.15);
+  hist->SetTitle(file_name);
+  hist->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
+  hist->GetYaxis()->SetTitle("relative uncertainty [%]");
+  hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->SetFillColor(810);
+  hist->SetLineColor(810);
+  hist->Draw("HIST");
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
 void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString category, TString file_name){
   TH1* total = (TH1*) total_->Clone();
   TH1* stat = (TH1*) stat_->Clone();
@@ -707,9 +727,12 @@ void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<dou
   gPad->SetLeftMargin(0.15);
   TGaxis::SetMaxDigits(3);
   chi_hist->SetTitle(" ");
-  chi_hist->GetXaxis()->SetTitle("m_{top} [GeV]");
+  chi_hist->GetXaxis()->SetTitle("m_{top}^{MC} [GeV]");
   chi_hist->GetYaxis()->SetTitle("#chi^{2}");
-  chi_hist->GetYaxis()->SetTitleOffset(1.5);
+  chi_hist->GetYaxis()->SetTitleOffset(1.1);
+  chi_hist->GetXaxis()->SetTitleOffset(0.9);
+  chi_hist->GetYaxis()->SetTitleSize(0.05);
+  chi_hist->GetXaxis()->SetTitleSize(0.05);
   chi_hist->GetXaxis()->SetNdivisions(505);
   chi_hist->GetYaxis()->SetNdivisions(505);
   chi_hist->SetMarkerStyle(20);
@@ -728,7 +751,7 @@ void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<dou
   char uncert_text[32];
   if(uncert < 1) sprintf(uncert_text, "%.3g", uncert);
   else           sprintf(uncert_text, "%.4g", uncert);
-  TString masstext = "m_{top} = ";
+  TString masstext = "m_{top}^{MC} = ";
   masstext += mass_text;
   masstext += " #pm ";
   masstext += uncert_text;

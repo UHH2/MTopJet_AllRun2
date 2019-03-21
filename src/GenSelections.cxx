@@ -19,7 +19,42 @@ bool uhh2::SubjetQuality_gen::passes(const uhh2::Event& event){
   return pass;
 }
 ////////////////////////////////////////////////////////
+uhh2::GenMuonCount::GenMuonCount(uhh2::Context& ctx, int min_, int max_):
+min(min_),
+max(max_) {}
 
+bool uhh2::GenMuonCount::passes(const uhh2::Event& event){
+  bool pass = false;
+  int count = 0;
+  std::vector<GenParticle>* genparts = event.genparticles;
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle p = genparts->at(i);
+    if(abs(p.pdgId()) == 13){
+      count++;
+    }
+  }
+  if(count >= min && count <= max) pass = true;
+  return pass;
+}
+////////////////////////////////////////////////////////
+uhh2::GenElecCount::GenElecCount(uhh2::Context& ctx, int min_, int max_):
+min(min_),
+max(max_) {}
+
+bool uhh2::GenElecCount::passes(const uhh2::Event& event){
+  bool pass = false;
+  int count = 0;
+  std::vector<GenParticle>* genparts = event.genparticles;
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle p = genparts->at(i);
+    if(abs(p.pdgId()) == 11){
+      count++;
+    }
+  }
+  if(count >= min && count <= max) pass = true;
+  return pass;
+}
+////////////////////////////////////////////////////////
 
 uhh2::GenMuonSel::GenMuonSel(uhh2::Context& ctx, double ptmin_):
 ptmin(ptmin_) {}
@@ -30,6 +65,23 @@ bool uhh2::GenMuonSel::passes(const uhh2::Event& event){
   for (unsigned int i=0; i<(genparts->size()); ++i){
     GenParticle p = genparts->at(i);
     if(abs(p.pdgId()) == 13){
+      if(p.pt() > ptmin) pass = true;
+    }
+  }
+  return pass;
+}
+////////////////////////////////////////////////////////
+
+
+uhh2::GenElecSel::GenElecSel(uhh2::Context& ctx, double ptmin_):
+ptmin(ptmin_) {}
+
+bool uhh2::GenElecSel::passes(const uhh2::Event& event){
+  bool pass = false;
+  std::vector<GenParticle>* genparts = event.genparticles;
+  for (unsigned int i=0; i<(genparts->size()); ++i){
+    GenParticle p = genparts->at(i);
+    if(abs(p.pdgId()) == 11){
       if(p.pt() > ptmin) pass = true;
     }
   }
@@ -341,10 +393,10 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
   else if (subjet_matching){
     std::vector<Jet> jets = fathadjet.subjets();
     std::vector<GenParticle> partons = {q1, q2, bot};
-    for(int i=0; i<jets.size(); i++){
+    for(unsigned int i=0; i<jets.size(); i++){
       double minR = 100;
       int j_remove = -1;
-      for(int j=0; j<partons.size(); j++){
+      for(unsigned int j=0; j<partons.size(); j++){
         if(deltaR(jets[i], partons[j]) < minR){
           minR = deltaR(jets[i], partons[j]);
           j_remove = j;

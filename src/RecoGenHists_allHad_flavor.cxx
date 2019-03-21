@@ -171,15 +171,15 @@ void RecoGenHists_allHad_flavor::fill(const Event & event){
   // now delete subjet(s) to only maintain 1 b-jet or 2 light jets
   vector<Jet> sub_new1;
   for(unsigned int i=0; i<rec_sub1.size(); i++){
-    if(fill_b     && i == b_index1) sub_new1.push_back(rec_sub1[i]);
-    if(fill_light && i != b_index1) sub_new1.push_back(rec_sub1[i]);
+    if(fill_b     && (int)i == b_index1) sub_new1.push_back(rec_sub1[i]);
+    if(fill_light && (int)i != b_index1) sub_new1.push_back(rec_sub1[i]);
   }
   rec_sub1 = sub_new1;
 
   vector<Jet> sub_new2;
   for(unsigned int i=0; i<rec_sub2.size(); i++){
-    if(fill_b     && i == b_index2) sub_new2.push_back(rec_sub2[i]);
-    if(fill_light && i != b_index2) sub_new2.push_back(rec_sub2[i]);
+    if(fill_b     && (int)i == b_index2) sub_new2.push_back(rec_sub2[i]);
+    if(fill_light && (int)i != b_index2) sub_new2.push_back(rec_sub2[i]);
   }
   rec_sub2 = sub_new2;
   ////

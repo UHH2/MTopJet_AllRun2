@@ -529,6 +529,9 @@
       	<Item Name="BTag_variation" Value="central" />
       	<Item Name="MuScale_variation" Value="nominal" />
       	<Item Name="MuTrigger_variation" Value="nominal" />
+        <Item Name="ElID_variation" Value="nominal" />
+      	<Item Name="ElReco_variation" Value="nominal" />
+        <Item Name="ElTrigger_variation" Value="nominal" />
 
       	<Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
   </UserConfig>

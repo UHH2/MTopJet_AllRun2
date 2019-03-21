@@ -38,7 +38,8 @@ public:
   virtual bool process(uhh2::Event&) override;
 
 protected:
-
+  // enum lepton { muon, elec };
+  // lepton channel_;
 
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
@@ -52,6 +53,7 @@ protected:
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
   std::unique_ptr<uhh2::Selection> GenMuonPT;
+  std::unique_ptr<uhh2::Selection> GenElecPT;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
@@ -75,6 +77,17 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   else isherwig = false;
 
   isMC = (ctx.get("dataset_type") == "MC");
+
+  // const std::string& channel = ctx.get("channel", ""); //define Channel
+  // if     (channel == "muon") channel_ = muon;
+  // else if(channel == "elec") channel_ = elec;
+  // else {
+  //
+  //   std::string log("TTbarLJAnalysisLiteModule::TTbarLJAnalysisLiteModule -- ");
+  //   log += "invalid argument for 'channel' key in xml file (must be 'muon' or 'elec'): \""+channel+"\"";
+  //
+  //   throw std::runtime_error(log);
+  // }
 
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
@@ -104,15 +117,18 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   //// EVENT SELECTION REC
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(50, 2.4))));
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(50, 2.4))));
-  met_sel.reset(new METCut  (20, uhh2::infinity));
-  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(40, 2.4 ))));
-  elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(40, 2.4))));
+  met_sel.reset(new METCut  (30, uhh2::infinity));
+  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(45, 2.4 ))));
+  elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(80, 2.4))));
   ////
 
   //// EVENTS SELECTION GEN
   if(isMC && !isherwig) SemiLepDecay.reset(new TTbarSemilep(ctx));
   else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
-  if(isMC) GenMuonPT.reset(new GenMuonSel(ctx, 55.));
+  if(isMC){
+    GenMuonPT.reset(new GenMuonSel(ctx, 55.));
+    GenElecPT.reset(new GenElecSel(ctx, 125.));
+  }
   ////
 
 }
@@ -142,13 +158,18 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   if(isMC)pass_semilep = SemiLepDecay->passes(event);
   else pass_semilep=false;
 
+  bool pass_genlepton = false;
   bool pass_genmuon = false;
+  bool pass_genelec = false;
   if(isMC){
     pass_genmuon = GenMuonPT->passes(event);
+    pass_genelec = GenElecPT->passes(event);
   }
+  if(pass_genmuon || pass_genelec) pass_genlepton = true;
+
   // cut on GEN Jet PT
   bool passed_genpt=false;
-  if(isMC && pass_semilep && pass_genmuon){
+  if(isMC && pass_semilep && pass_genlepton){
     std::vector<GenTopJet> jets = event.get(h_GENfatjets);
     if(jets.size() > 1){
       GenParticle lepton;
@@ -175,7 +196,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
       }
       jet_v4.SetPxPyPzE(px, py, pz, E);
       double pt = jet_v4.Pt();
-      if(pt > 150) passed_genpt = true;
+      if(pt > 250) passed_genpt = true;
     }
   }
   ///
@@ -183,7 +204,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   if(pass_lep1 && pass_jet2 && pass_jet1 && pass_met && pass_lepsel) passed_recsel = true;
   else passed_recsel = false;
 
-  if(pass_semilep && passed_genpt && pass_genmuon) passed_gensel = true;
+  if(pass_semilep && passed_genpt && pass_genlepton) passed_gensel = true;
   else passed_gensel = false;
 
   if(!passed_recsel && !passed_gensel) return false;

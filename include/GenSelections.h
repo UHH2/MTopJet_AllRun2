@@ -33,7 +33,25 @@ namespace uhh2 {
     float ptmin, etamax;
   };
 
+  class GenMuonCount : public Selection {
 
+  public:
+    explicit GenMuonCount(Context&, int, int);
+    virtual bool passes(const Event&) override;
+
+  protected:
+    int min, max;
+  };
+
+  class GenElecCount : public Selection {
+
+  public:
+    explicit GenElecCount(Context&, int, int);
+    virtual bool passes(const Event&) override;
+
+  protected:
+    int min, max;
+  };
 
   class GenMuonSel : public Selection {
 
@@ -45,7 +63,15 @@ namespace uhh2 {
     double ptmin;
   };
 
+  class GenElecSel : public Selection {
 
+  public:
+    explicit GenElecSel(Context&, double);
+    virtual bool passes(const Event&) override;
+
+  protected:
+    double ptmin;
+  };
 
   class TTbarSemilep : public Selection {
 
