@@ -37,6 +37,7 @@ namespace uhh2 {
   private:
     double sf;
     TString sysdirection;
+    bool is_mc;
 
   };
 

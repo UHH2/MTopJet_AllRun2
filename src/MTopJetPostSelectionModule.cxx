@@ -86,6 +86,7 @@ protected:
   std::unique_ptr<uhh2::Selection> subjet_quality;
   std::unique_ptr<uhh2::Selection> subjet_quality_gen;
   std::unique_ptr<uhh2::Selection> lepton_sel;
+  std::unique_ptr<uhh2::Selection> muon_highpt_sel;
   std::unique_ptr<uhh2::Selection> lepton_sel_gen;
   std::unique_ptr<uhh2::Selection> lepton_Nsel_gen;
 
@@ -148,9 +149,9 @@ protected:
   std::unique_ptr<AnalysisModule> PUreweight;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_Muon_PreSel, h_Elec_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
+  std::unique_ptr<Hists> h_Muon_PreSel, h_Muon_PreSel_highpt, h_Elec_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
 
-  std::unique_ptr<Hists> h_Muon, h_Elec, h_MTopJet, h_Jets;
+  std::unique_ptr<Hists> h_Muon, h_Muon_highpt, h_Elec, h_MTopJet, h_Jets;
   std::unique_ptr<Hists> h_CorrectionHists, h_CorrectionHists_after, h_CorrectionHists_WJets;
   std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
 
@@ -262,6 +263,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_mtop1735"       ||
   ctx.get("dataset_version") == "TTbar_mtop1755"       ||
   ctx.get("dataset_version") == "TTbar_mtop1785"       ||
+  ctx.get("dataset_version") == "TTbar_fsrup"          ||
+  ctx.get("dataset_version") == "TTbar_fsrdown"        ||
+  ctx.get("dataset_version") == "TTbar_isrup"          ||
+  ctx.get("dataset_version") == "TTbar_isrdown"        ||
+  ctx.get("dataset_version") == "TTbar_hdampup"        ||
+  ctx.get("dataset_version") == "TTbar_hdampdown"      ||
   ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
   ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
@@ -320,7 +327,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
   MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(60., 2.4));
-  ElectronId eleid = AndId<Electron>(PtEtaSCCut(130., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
+  ElectronId eleid = AndId<Electron>(PtEtaSCCut(60., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
 
   if(channel_ == muon) lepton_sel.reset(new NMuonSelection(1, -1, muid));
   else                 lepton_sel.reset(new NElectronSelection(1, -1, eleid));
@@ -331,7 +338,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     lepton_Nsel_gen.reset(new GenMuonCount(ctx, 1, 1));
   }
   else{
-    lepton_sel_gen.reset(new GenElecSel(ctx, 135.));
+    lepton_sel_gen.reset(new GenElecSel(ctx, 60.));
     lepton_Nsel_gen.reset(new GenElecCount(ctx, 1, 1));
   }
   subjet_quality_gen.reset(new SubjetQuality_gen(ctx, "GEN_XCone33_had_Combined", 30, 2.5));
@@ -425,11 +432,13 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
   h_Muon.reset(new MuonHists(ctx, "MuonHists"));
+  // h_Muon_highpt.reset(new MuonHists(ctx, "MuonHists_highpt"));
   h_Elec.reset(new ElectronHists(ctx, "ElecHists"));
   h_Jets.reset(new JetHists(ctx, "JetHits"));
 
   h_MTopJet_PreSel.reset(new MTopJetHists(ctx, "EventHists_PreSel"));
   h_Muon_PreSel.reset(new MuonHists(ctx, "MuonHits_PreSel"));
+  // h_Muon_PreSel_highpt.reset(new MuonHists(ctx, "MuonHits_PreSel_highpt"));
   h_Elec_PreSel.reset(new ElectronHists(ctx, "ElecHits_PreSel"));
   h_Jets_PreSel.reset(new JetHists(ctx, "JetHits_PreSel"));
   h_XCone_cor_PreSel.reset(new RecoHists_xcone(ctx, "XCone_cor_PreSel", "cor"));
@@ -777,6 +786,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_presel_rec){
     h_MTopJet_PreSel->fill(event);
     h_Muon_PreSel->fill(event);
+    // if(muon_highpt_sel->passes(event)) h_Muon_PreSel_highpt->fill(event);
     h_Elec_PreSel->fill(event);
     h_Jets_PreSel->fill(event);
     h_XCone_cor_PreSel->fill(event);
@@ -878,6 +888,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     h_MTopJet->fill(event);
     h_Muon->fill(event);
+    // if(muon_highpt_sel->passes(event)) h_Muon_highpt->fill(event);
     h_Elec->fill(event);
     h_Jets->fill(event);
 

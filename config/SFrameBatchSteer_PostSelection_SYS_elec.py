@@ -17,15 +17,15 @@ if __name__ == "__main__":
     #=========================================
     #important variables!
     #=========================================
-    xmlfile = "MTopJetPostSelection_SYS.xml"
-    outputDir = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/"
+    xmlfile = "MTopJetPostSelection_SYS_elec.xml"
+    outputDir = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/elec/"
     option = "-slac "
     #option = " "
     #=========================================
 
     # the first value in systematics is the name of the variable in the xml file
     # the second value is the name of the directory
-    systematics = [ ['MuonID_variation', 'MUID'], ['MuonTrigger_variation', 'MUTR'], ['PU_variation', 'PU'] ]
+    systematics = [ ['ElID_variation', 'ELID'], ['ElReco_variation', 'ELRECO'], ['ElTrigger_variation', 'ELTR'], ['PU_variation', 'PU'] ]
     variations = ['up','down']
 
     systematics_btag = [ ['BTag_variation','BTAG'] ]

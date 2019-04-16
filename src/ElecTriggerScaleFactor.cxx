@@ -20,9 +20,18 @@ using namespace std;
 
 ElectronTriggerSF::ElectronTriggerSF(Context & ctx){
   sysdirection=ctx.get("ElTrigger_variation");
+  auto dataset_type = ctx.get("dataset_type");
+  is_mc = dataset_type == "MC";
+  if (!is_mc) {
+    cout << "Warning: ElectronTriggerSF will not have an effect on "
+         <<" this non-MC sample (dataset_type = '" + dataset_type + "')" << endl;
+    return;
+  }
 }
 
-bool   ElectronTriggerSF::process(uhh2::Event & event){
+bool ElectronTriggerSF::process(uhh2::Event & event){
+  if(!is_mc) return true;
+
   if(event.electrons->size() == 0) return true;
   Particle elec = event.electrons->at(0);
   double elec_pt=elec.pt();

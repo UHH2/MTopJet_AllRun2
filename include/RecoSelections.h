@@ -30,6 +30,17 @@
 namespace uhh2 {
 
   ////////////////////////////////////////////////////////////////
+  class ElectronEtaVeto : public Selection {
+
+  public:
+    explicit ElectronEtaVeto(double, double);
+    virtual bool passes(const Event&) override;
+
+  private:
+    double lower, upper;
+  };
+
+  ////////////////////////////////////////////////////////////////
   class NJetXCone : public Selection {
 
   public:

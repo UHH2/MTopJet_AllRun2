@@ -3,6 +3,9 @@
 using namespace std;
 
 
+void PlotRatio(TGraphErrors* data_, TF1* fit_, TGraph* uncert_, int etabin);
+
+
 // class to transform fit parameters into uncorrelated ones
 class TransformParameters{
 public:
@@ -365,6 +368,8 @@ int main(int argc, char* argv[]){
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
+  gStyle->SetLegendBorderSize(0);
+
   //// ---------------------------------------------------------------------------------------------------------------------
   //// ---------------------------------------------------------------------------------------------------------------------
 
@@ -597,8 +602,10 @@ int main(int argc, char* argv[]){
 
   ////----
   for(int eta_bin = 0; eta_bin < no_etabins; eta_bin++){
+    PlotRatio(factor_pt[eta_bin], NewFit[eta_bin], AreaFromPol[eta_bin], eta_bin);
     TCanvas *G = new TCanvas("G", "G", 600, 600);
     gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.105);    
     factor_pt[eta_bin]->Draw("AP");
     if(show_fit) AreaFromPol[eta_bin]->Draw("f");
     factor_pt[eta_bin]->Draw("P");
@@ -632,6 +639,7 @@ int main(int argc, char* argv[]){
     G->SaveAs(filename);
     delete G;
   }
+
   ////----
 
   TCanvas *G2 = new TCanvas("G2", "G2", 600, 600);
@@ -920,4 +928,77 @@ vector<double> CalculateParameterUncertainty(TGraphErrors* data_, TString functi
     uncertainties.push_back(delta);
   }
   return uncertainties;
+}
+
+
+void PlotRatio(TGraphErrors* data_, TF1* fit_, TGraph* uncert_, int etabin){
+
+  TGraphErrors* data = (TGraphErrors*) data_->Clone();
+  TF1* fit = (TF1*) fit_->Clone();
+  TGraph* uncert = (TGraphErrors*) uncert_->Clone();
+
+  // now make data ratio to fit
+  int Npoints = data->GetN();
+  Double_t *x = data->GetX();
+  Double_t *y = data->GetY();
+  Double_t *ex = data->GetEX();
+  Double_t *ey = data->GetEY();
+
+  for(int i=0; i<Npoints; i++){
+    double ynew = y[i] / fit->Eval(x[i]);
+    double eynew = ey[i] / fit->Eval(x[i]);
+    data->SetPoint(i, x[i], ynew);
+    data->SetPointError(i, ex[i], eynew);
+  }
+
+  // now make uncert ratio to fit
+  int Npoints_u = uncert->GetN();
+  Double_t *x_u = uncert->GetX();
+  Double_t *y_u = uncert->GetY();
+
+  for(int i=0; i<Npoints_u; i++){
+    double ynew = y_u[i] / fit->Eval(x_u[i]);
+    uncert->SetPoint(i, x_u[i], ynew);
+  }
+
+  TLine *line = new TLine(30,1,430,1);
+  line->SetLineColor(kRed);
+  line->SetLineWidth(3);
+
+  TCanvas *C = new TCanvas("C", "C", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.105);
+
+  uncert->SetFillColor(16);
+
+  data->Draw("AP");
+  uncert->Draw("f");
+  line->Draw("SAME");
+  data->Draw("P SAME");
+
+
+  data->GetXaxis()->SetTitle("p_{T}^{rec}");
+  data->GetYaxis()->SetTitle("#frac{correction factor}{fit}");
+  data->GetXaxis()->SetTitleSize(0.05);
+  data->GetXaxis()->SetTitleOffset(0.9);
+  data->GetXaxis()->SetNdivisions(505);
+  data->GetYaxis()->SetTitleSize(0.06);
+  data->GetYaxis()->SetTitleOffset(1.1);
+  data->GetYaxis()->SetNdivisions(505);
+
+  data->GetXaxis()->SetRangeUser(30, 430);
+  data->GetYaxis()->SetRangeUser(0.95, 1.05);
+  gPad->RedrawAxis();
+
+  TLegend* leg = new TLegend(0.55,0.15,0.87,0.40);
+  leg->AddEntry(line,"fit","l");
+  leg->AddEntry(uncert,"fit uncertainty","f");
+  leg->Draw();
+
+  TString filename = "/afs/desy.de/user/s/schwarzd/Plots/Correction_allHad/FitRatio_";
+  filename += etabin;
+  filename += ".pdf";
+  C->SaveAs(filename);
+  delete C;
+  return;
 }

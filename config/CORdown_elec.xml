@@ -3,11 +3,11 @@
 
   <!ENTITY NEVT "-1">
 
-  <!ENTITY channel "muon">
+  <!ENTITY channel "elec">
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
  <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PreSel">
- <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon/NonClosure_true">
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/elec/COR_down">
 
 
 <!-- =============================================== ttbar =========================================================================== -->
@@ -17,8 +17,8 @@
 ]>
 
 <!--
-   <ConfigParse NEventsBreak="150000" LastBreak="0" FileSplit="0"/>
-   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="NonClosure_workdir"/>
+   <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
+   <ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="workdirSelectionSYS.COR_down"/>
 -->
 
 <JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
@@ -77,8 +77,8 @@
 
       <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
       <Item Name="jersmear_direction" Value="nominal" />            <!-- has to be: nominal, up or down! -->
-      <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
-      <Item Name="NonClosureUncertainty" Value="true" />  <!-- has to be: true or false! -->
+      <Item Name="JetCorrection_direction" Value="down" />  <!-- has to be: nominal, up or down! -->
+      <Item Name="NonClosureUncertainty" Value="false" />  <!-- has to be: true or false! -->
 
 
       <Item Name="AnalysisModule" Value="MTopJetSelectionModule"/>

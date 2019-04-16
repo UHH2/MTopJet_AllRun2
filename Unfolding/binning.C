@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   // Double_t BINS_REC_MASS_SUBPTMIGRATION[] = {45, 100, 118, 130, 141, 153, 161, 170, 182, 197, 240, 400};
   // Double_t BINS_REC_MASS_MASSMIGRATION[] = {40, 70, 95, 115, 135, 155, 165, 175, 185, 205, 235, 400};
   // Double_t BINS_REC_MASS_BTAGMIGRATION[] = {100, 138, 153, 161, 167, 173, 179, 185, 192, 203, 224, 263, 400};
-  // Double_t BINS_REC_MASS_MUONPTMIGRATION[] = {45, 180, 400};
+  // Double_t BINS_REC_MASS_LEPTONPTMIGRATION[] = {45, 180, 400};
 
   Double_t BINS_REC_MASS[] = {123, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 343, 400};
   Double_t BINS_REC_PT[] = {400, 450, 530, 10000};
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   Double_t BINS_REC_MASS_SUBPTMIGRATION[] = {45, 90, 100, 110, 118, 125, 130, 136, 141, 147, 153, 157, 161, 164, 170, 176, 182, 188, 197, 213, 240, 293, 400};
   Double_t BINS_REC_MASS_MASSMIGRATION[] = {40, 55, 70, 85, 95, 105, 115, 125, 135, 145, 155, 160, 165, 170, 175, 180, 185, 195, 205, 215, 235, 263, 400};
   Double_t BINS_REC_MASS_BTAGMIGRATION[] = {100, 123, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 400};
-  Double_t BINS_REC_MASS_MUONPTMIGRATION[] = {45, 157, 180, 230, 400};
+  Double_t BINS_REC_MASS_LEPTONPTMIGRATION[] = {45, 157, 180, 230, 400};
 
   // calculate total number of bins
   int N_BINS_REC_MASS = sizeof(BINS_REC_MASS)/sizeof(BINS_REC_MASS[0]) - 1;
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   int N_BINS_REC_MASS_MASSMIGRATION = sizeof(BINS_REC_MASS_MASSMIGRATION)/sizeof(BINS_REC_MASS_MASSMIGRATION[0]) - 1;
   int N_BINS_REC_MASS_SUBPTMIGRATION = sizeof(BINS_REC_MASS_SUBPTMIGRATION)/sizeof(BINS_REC_MASS_SUBPTMIGRATION[0]) - 1;
   int N_BINS_REC_MASS_BTAGMIGRATION = sizeof(BINS_REC_MASS_BTAGMIGRATION)/sizeof(BINS_REC_MASS_BTAGMIGRATION[0]) - 1;
-  int N_BINS_REC_MASS_MUONPTMIGRATION = sizeof(BINS_REC_MASS_MUONPTMIGRATION)/sizeof(BINS_REC_MASS_MUONPTMIGRATION[0]) - 1;
+  int N_BINS_REC_MASS_LEPTONPTMIGRATION = sizeof(BINS_REC_MASS_LEPTONPTMIGRATION)/sizeof(BINS_REC_MASS_LEPTONPTMIGRATION[0]) - 1;
 
   /******************* GEN BINNING ************************************/
   // here some actions with arrays are needed to have different possible array sizes
@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
   std::vector<Double_t> MASS_SUBPTMIGRATION;
   MASS_SUBPTMIGRATION = MASS;
 
-  std::vector<Double_t> MASS_MUONPTMIGRATION;
-  MASS_MUONPTMIGRATION = MASS;
+  std::vector<Double_t> MASS_LEPTONPTMIGRATION;
+  MASS_LEPTONPTMIGRATION = MASS;
 
   // 2. get number of bins from every vector
   int N_BINS_GEN_MASS = MASS.size() - 1;
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
   int N_BINS_GEN_MASS_MASSMIGRATION = MASS_MASSMIGRATION.size() - 1;
   int N_BINS_GEN_MASS_PTMIGRATION = MASS_PTMIGRATION.size() - 1;
   int N_BINS_GEN_MASS_SUBPTMIGRATION = MASS_SUBPTMIGRATION.size() - 1;
-  int N_BINS_GEN_MASS_MUONPTMIGRATION = MASS_MUONPTMIGRATION.size() - 1;
+  int N_BINS_GEN_MASS_LEPTONPTMIGRATION = MASS_LEPTONPTMIGRATION.size() - 1;
 
   // 3. create arrays from vectors arrays with correct size
   Double_t *BINS_GEN_MASS = MASS.data();
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
   Double_t *BINS_GEN_PT_PTMIGRATION = PT_PTMIGRATION.data();
   Double_t *BINS_GEN_MASS_MASSMIGRATION = MASS_MASSMIGRATION.data();
   Double_t *BINS_GEN_MASS_SUBPTMIGRATION = MASS_SUBPTMIGRATION.data();
-  Double_t *BINS_GEN_MASS_MUONPTMIGRATION = MASS_MUONPTMIGRATION.data();
+  Double_t *BINS_GEN_MASS_LEPTONPTMIGRATION = MASS_LEPTONPTMIGRATION.data();
 
 
   // =======================================================================================================
@@ -146,8 +146,8 @@ int main(int argc, char* argv[])
   //
   // define sideband: migration from lower muon-pt region
   //
-  TUnfoldBinning *muonptmigration_rec = binning_rec->AddBinning("muonptmigration_rec");
-  muonptmigration_rec->AddAxis("mass",N_BINS_REC_MASS_MUONPTMIGRATION,BINS_REC_MASS_MUONPTMIGRATION,
+  TUnfoldBinning *leptonptmigration_rec = binning_rec->AddBinning("leptonptmigration_rec");
+  leptonptmigration_rec->AddAxis("mass",N_BINS_REC_MASS_LEPTONPTMIGRATION,BINS_REC_MASS_LEPTONPTMIGRATION,
                                 true, // underflow bin
                                 true // overflow bin
                                 );
@@ -179,8 +179,6 @@ int main(int argc, char* argv[])
                                 false, // no underflow bin
                                 false // overflow bin
                                 );
-
-
   //
   // define sideband: migration from lower pt region
   //
@@ -213,8 +211,8 @@ int main(int argc, char* argv[])
   //
   // define sideband: migration from lower muon-pt region
   //
-  TUnfoldBinning *muonptmigration_gen = binning_gen->AddBinning("muonptmigration_gen");
-  muonptmigration_gen->AddAxis("mass",N_BINS_GEN_MASS_MUONPTMIGRATION,BINS_GEN_MASS_MUONPTMIGRATION,
+  TUnfoldBinning *leptonptmigration_gen = binning_gen->AddBinning("leptonptmigration_gen");
+  leptonptmigration_gen->AddAxis("mass",N_BINS_GEN_MASS_LEPTONPTMIGRATION,BINS_GEN_MASS_LEPTONPTMIGRATION,
                                 true, // no underflow bin
                                 true // overflow bin
                                 );
@@ -229,8 +227,8 @@ int main(int argc, char* argv[])
   std::ofstream out("Binning.txt");
   auto coutbuf = std::cout.rdbuf(out.rdbuf());
   cout << "BINNING REC" << endl;
-  vector<TUnfoldBinning*> regions_rec = {measurement_rec, ptmigration_rec, subptmigration_rec, massmigration_rec, muonptmigration_rec, btagmigration_rec};
-  vector<TString> names_rec = {"measurement_rec", "ptmigration_rec", "subptmigration_rec", "massmigration_rec", "muonptmigration_rec", "btagmigration_rec"};
+  vector<TUnfoldBinning*> regions_rec = {measurement_rec, ptmigration_rec, subptmigration_rec, massmigration_rec, leptonptmigration_rec, btagmigration_rec};
+  vector<TString> names_rec = {"measurement_rec", "ptmigration_rec", "subptmigration_rec", "massmigration_rec", "leptonptmigration_rec", "btagmigration_rec"};
   for(unsigned int i=0; i<regions_rec.size(); i++){
     int start = regions_rec[i]->GetStartBin();
     int end = regions_rec[i]->GetEndBin() - 1;
@@ -238,8 +236,8 @@ int main(int argc, char* argv[])
   }
   cout << "-------------------------------------------" << endl;
   cout << "BINNING GEN" << endl;
-  vector<TUnfoldBinning*> regions_gen = {measurement_gen, ptmigration_gen, subptmigration_gen, massmigration_gen, muonptmigration_gen};
-  vector<TString> names_gen = {"measurement_gen", "ptmigration_gen", "subptmigration_gen", "massmigration_gen", "muonptmigration_gen"};
+  vector<TUnfoldBinning*> regions_gen = {measurement_gen, ptmigration_gen, subptmigration_gen, massmigration_gen, leptonptmigration_gen};
+  vector<TString> names_gen = {"measurement_gen", "ptmigration_gen", "subptmigration_gen", "massmigration_gen", "leptonptmigration_gen"};
   for(unsigned int i=0; i<regions_gen.size(); i++){
     int start = regions_gen[i]->GetStartBin();
     int end = regions_gen[i]->GetEndBin() - 1;

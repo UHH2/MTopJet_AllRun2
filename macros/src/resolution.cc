@@ -11,11 +11,17 @@ vector<double> GetMeans(vector<TH1F*> hists, bool use_median, bool do_ptrec, TSt
 
 int main(int argc, char* argv[]){
 
+
+  TString channel = "elec";
+
   bool use_median = false;
   if(argc >1 && strcmp(argv[1], "median") == 0) use_median = true;
 
   // declare files
-  TFile *f_tt = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
+  TString filedir;
+  if(channel == "muon") filedir = dir;
+  else filedir = dir_elec;
+  TFile *f_tt = new TFile(filedir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
 
   // set binning
   int n_ptbin = 10;
@@ -157,11 +163,11 @@ int main(int argc, char* argv[]){
   text1.DrawLatex(.2,.2, "lepton+jets");
   gPad->RedrawAxis();
   // first save without additional correction
-  c1->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/pt_"+mean_median+"_noAdditional.pdf");
+  c1->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_noAdditional.pdf");
   // and once again with the additional correction
   resolution_cor->Draw("SAME E1");
   leg1->AddEntry(resolution_cor,"additional correction","l");
-  c1->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/pt_"+mean_median+".pdf");
+  c1->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+".pdf");
 
 
 
@@ -185,7 +191,7 @@ int main(int argc, char* argv[]){
   leg2->AddEntry(area_percent, "non-closure", "f");
   leg2->Draw();
   gPad->RedrawAxis();
-  c2->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/nonClosure_"+mean_median+".pdf");
+  c2->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/"+channel+"/nonClosure_"+mean_median+".pdf");
 
 
   return 0;

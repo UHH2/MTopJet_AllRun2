@@ -36,3 +36,4 @@
 
 
 TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/";
+TString dir_elec = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/elec/";

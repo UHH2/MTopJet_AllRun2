@@ -82,7 +82,7 @@
    <Bin location="overflow" width="137" center="468.5"/>
   </Axis>
  </BinningNode>
- <BinningNode name="muonptmigration_rec" firstbin="169" factor="1">
+ <BinningNode name="leptonptmigration_rec" firstbin="169" factor="1">
   <Axis name="mass" lowEdge="45">
    <Bin location="underflow" width="112" center="-11" />
    <Bin width="112" center="101" />
@@ -156,7 +156,7 @@
    <Bin location="overflow" width="30" center="315"/>
   </Axis>
  </BinningNode>
- <BinningNode name="muonptmigration_gen" firstbin="49" factor="1">
+ <BinningNode name="leptonptmigration_gen" firstbin="49" factor="1">
   <Axis name="mass" lowEdge="112">
    <Bin location="underflow" width="20" center="102" />
    <Bin repeat="4" width="20" center="122" />

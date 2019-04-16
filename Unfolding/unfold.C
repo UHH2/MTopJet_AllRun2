@@ -18,8 +18,8 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   ██   ██ ██   ██ ███████ ██   ██      ██████  ██████  ██   ████ ███████    ██    ██   ██ ██   ██ ██ ██   ████    ██
   */
 
-  TUnfold::EConstraint constraintMode= TUnfold::kEConstraintNone;
-  // TUnfold::EConstraint constraintMode= TUnfold::kEConstraintArea;
+  TUnfold::EConstraint constraintMode = TUnfold::kEConstraintNone;
+  // TUnfold::EConstraint constraintMode = TUnfold::kEConstraintArea;
 
   /*
   ██████  ███████  ██████  ██    ██ ██       █████  ██████  ██ ███████  █████  ████████ ██  ██████  ███    ██
@@ -56,23 +56,31 @@ unfolding::unfolding(TH1D* input, vector<TH1D*> backgrounds,  vector<TString>bgr
   // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoAvg;
   // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoMax;
   TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoAvgSys;
-  // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoMaxSys;
   // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoSquareAvg;
   // TUnfoldDensity::EScanTauMode scanMode = TUnfoldDensity::kEScanTauRhoSquareAvgSys;
 
 
 
-  // detailed steering for regularisation
+  // Torbens Setup
   // const char *REGULARISATION_DISTRIBUTION=0;
   // const char *REGULARISATION_AXISSTEERING="*[B]";
   //
   // const char *SCAN_DISTRIBUTION="measurement_gen";
   // const char *SCAN_AXISSTEERING=0;
 
+  // latest standard
+  // const char *REGULARISATION_DISTRIBUTION=0;
+  // const char *REGULARISATION_AXISSTEERING=0;
+  //
+  // const char *SCAN_DISTRIBUTION=0;
+  // const char *SCAN_AXISSTEERING=0;
+
+
+  // const char *REGULARISATION_DISTRIBUTION="measurement_gen";
+  // const char *REGULARISATION_AXISSTEERING="measurement_gen[B]";
+
   const char *REGULARISATION_DISTRIBUTION=0;
   const char *REGULARISATION_AXISSTEERING=0;
-
-  // const char *SCAN_DISTRIBUTION="measurement_gen";
   const char *SCAN_DISTRIBUTION=0;
   const char *SCAN_AXISSTEERING=0;
 

@@ -100,6 +100,80 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
 }
 
 /*
+ ██████  ██    ██ ████████ ██████  ██    ██ ████████     ██████   █████  ████████  █████
+██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██   ██ ██   ██    ██    ██   ██
+██    ██ ██    ██    ██    ██████  ██    ██    ██        ██   ██ ███████    ██    ███████
+██    ██ ██    ██    ██    ██      ██    ██    ██        ██   ██ ██   ██    ██    ██   ██
+ ██████   ██████     ██    ██       ██████     ██        ██████  ██   ██    ██    ██   ██
+*/
+
+
+
+void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> truth_, std::vector<TString> legnames, bool norm, TString file_name){
+
+  TH1* output = (TH1*) output_->Clone("output");
+  TH1* stat = (TH1*) stat_->Clone("stat");
+
+  std::vector<TH1D*> truth;
+  for(auto t: truth_){
+    truth.push_back( (TH1D*) t->Clone() );
+  }
+
+  double max = output->GetMaximum();
+  for(auto t: truth){
+    if(t->GetMaximum() > max) max = t->GetMaximum();
+  }
+  double ymax = 1.5 * max;
+
+  TCanvas *c = new TCanvas("c","",600,600);
+  gPad->SetLeftMargin(0.15);
+  TGaxis::SetMaxDigits(3);
+  output->SetTitle(" ");
+  output->GetYaxis()->SetRangeUser(0., ymax);
+  output->GetXaxis()->SetTitle("Leading-jet mass [GeV]");
+  if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
+  else output->GetYaxis()->SetTitle("#frac{d#sigma}{dm_{jet}} [#frac{fb}{GeV}]");
+  output->GetYaxis()->SetTitleOffset(1.1);
+  output->GetXaxis()->SetTitleOffset(0.9);
+  output->GetYaxis()->SetTitleSize(0.05);
+  output->GetXaxis()->SetTitleSize(0.05);
+  output->GetYaxis()->SetNdivisions(505);
+  output->SetLineColor(kBlack);
+  output->SetMarkerColor(kBlack);
+  output->SetMarkerStyle(8);
+  output->SetMarkerSize(1);
+  output->Draw("E1");
+  stat->SetLineColor(kBlack);
+  stat->SetMarkerColor(kBlack);
+  stat->SetMarkerStyle(8);
+  stat->SetMarkerSize(1);
+  gStyle->SetEndErrorSize(5);
+  Color_t color[] = {kRed-4, kAzure+7, kGreen, 798};
+  Int_t style[] = {1, 2, 9, 7};
+  for(unsigned int i=0; i<truth.size(); i++){
+    truth[i]->SetLineWidth(3);
+    truth[i]->SetLineColor(color[i]);
+    truth[i]->SetLineStyle(style[i]);
+    truth[i]->Draw("HIST SAME");
+  }
+  stat->Draw("E1 SAME");
+  output->Draw("E1 SAME");
+
+  TLegend *l=new TLegend(0.55,0.67,0.85,0.87);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  l->AddEntry(output,"data unfolded","pl");
+  for(unsigned int i=0; i<truth.size(); i++){
+    l->AddEntry(truth[i],legnames[i],"l");
+  }
+  l->SetTextSize(0.03);
+  l->Draw();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+
+/*
 ██████  ██    ██ ████████ ██████  ██    ██ ████████     ███████ ███    ███ ███████  █████  ██████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██      ████  ████ ██      ██   ██ ██   ██
 ██    ██ ██    ██    ██    ██████  ██    ██    ██        ███████ ██ ████ ██ █████   ███████ ██████
@@ -311,11 +385,11 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
 */
 
 
-void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_name){
+void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1,  double x2, double y2, TString file_name){
   TCanvas *c = new TCanvas("c","",600,600);
   lcurve->SetLineColor(kCyan+2);
   lcurve->SetLineWidth(2);
-  lcurve->SetTitle("L curve;L_{X};L_{Y}");
+  lcurve->SetTitle(" ;L_{X};L_{Y}");
   lcurve->Draw("AL");
   lcurve->GetXaxis()->SetRangeUser(1.0,  3.0);
   lcurve->GetYaxis()->SetRangeUser(0.0, 10.0);
@@ -325,10 +399,15 @@ void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_nam
   p1->SetMarkerSize(1.3);
   p1->SetMarkerColor(kRed);
   p1->Draw();
+  TMarker *p2=new TMarker(x2,y2,20);
+  p2->SetMarkerSize(1.3);
+  p2->SetMarkerColor(1);
+  p2->Draw();
   TLegend *l=new TLegend(0.55,0.65,0.85,0.8);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(p1,"L-Curve scan","pl");
+  l->AddEntry(p2,"rho scan","pl");
   l->Draw();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
@@ -561,7 +640,7 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   total->GetYaxis()->SetTitle("relative uncertainty [%]");
   total->GetYaxis()->SetTitleOffset(1.5);
   total->GetYaxis()->SetNdivisions(505);
-  total->GetYaxis()->SetRangeUser(0, 1.5*total->GetMaximum());
+  total->GetYaxis()->SetRangeUser(0, 100);
   total->SetFillColor(13);
   total->SetFillStyle(3144);
   total->SetLineColor(13);
@@ -572,7 +651,7 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   stat->SetMarkerStyle(0);
   stat->Draw("B SAME");
 
-  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta};
+  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta, kYellow, kAzure, 14, kRed+5, kGreen-8};
   int i=0;
   for(auto hist: delta){
     gPad->SetLeftMargin(0.15);
@@ -590,7 +669,21 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   if(category == "exp")        leg->AddEntry(total, "stat #oplus exp. sys", "f");
   else if(category == "model") leg->AddEntry(total, "stat #oplus model sys", "f");
   leg->AddEntry(stat, "stat", "l");
-  for(unsigned int i=0; i<delta.size(); i++) leg->AddEntry(delta[i],UncertNames[i],"l");
+  for(unsigned int i=0; i<delta.size(); i++){
+    if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"choice of m_{t}","l");
+    else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
+    else if (UncertNames[i] == "b-tagging") leg->AddEntry(delta[i],"b tagging","l");
+    else if (UncertNames[i] == "pile-up")   leg->AddEntry(delta[i],"pileup","l");
+    else if (UncertNames[i] == "jec")       leg->AddEntry(delta[i],"jet energy scale","l");
+    else if (UncertNames[i] == "jer")       leg->AddEntry(delta[i],"jet energy resolution","l");
+    else if (UncertNames[i] == "cor")       leg->AddEntry(delta[i],"XCone jet correction","l");
+    else if (UncertNames[i] == "MuTrigger") leg->AddEntry(delta[i],"muon trigger","l");
+    else if (UncertNames[i] == "MuID")      leg->AddEntry(delta[i],"muon ID","l");
+    else if (UncertNames[i] == "ElTrigger") leg->AddEntry(delta[i],"electron trigger","l");
+    else if (UncertNames[i] == "ElID")      leg->AddEntry(delta[i],"electron ID","l");
+    else if (UncertNames[i] == "ElReco")    leg->AddEntry(delta[i],"electron reconstruction","l");
+    else                                    leg->AddEntry(delta[i],UncertNames[i],"l");
+  }
   leg->Draw();
 
   gPad->RedrawAxis();

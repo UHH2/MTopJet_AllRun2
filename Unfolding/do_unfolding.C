@@ -10,16 +10,19 @@ TH1* CreateDeltaFromCov(TH2* Cov);
 TH1* GetLumiDelta(TH1* unfolded, double lumiError);
 TH1* ConvertToRelative(TH1* sys, TH1* central);
 TH1* AddSys(vector<TH1*> sys);
+TH1* ConvertToCrossSection(TH1* hist);
+TH1D* ConvertToCrossSection(TH1D* hist);
 void ScaleErrorToData(TH1* hist);
 
 int main(int argc, char* argv[])
 {
-  if(argc != 2){
+  if(argc != 3){
     cout << "ERROR: WRONG USAGE!" << endl;
     cout << endl;
-    cout << "CORRECT WAY: ./do_unfolding option" << endl;
+    cout << "CORRECT WAY: ./do_unfolding <option> <channel>" << endl;
     cout << endl;
-    cout << "           option = data/pseudo1/pseudo2/same" << endl;
+    cout << "           option  = data/pseudo1/pseudo2/same" << endl;
+    cout << "           channel = muon/elec/combine" << endl;
 
     return 0;
   }
@@ -35,58 +38,67 @@ int main(int argc, char* argv[])
   bool pseudo1735 = false;
   bool pseudo1755 = false;
 
-
+  TString channel;
+  if(strcmp(argv[2], "muon") == 0)         channel = "muon";
+  else if(strcmp(argv[2], "elec") == 0)    channel = "elec";
+  else if(strcmp(argv[2], "combine") == 0) channel = "combine";
+  else{
+    cout << "[ERROR] Channel not known, select muon, elec or combine!" << endl;
+    return 0;
+  }
 
   if(strcmp(argv[1], "data") == 0){
     data = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Data/";
-    output_file = "Results_data.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Data/"+channel+"/";
+    output_file = "Results_data_"+channel+".root";
   }
   else if(strcmp(argv[1], "same") == 0){
     same = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Same/";
-    output_file = "Results_same.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Same/"+channel+"/";
+    output_file = "Results_same_"+channel+".root";
   }
   else if(strcmp(argv[1], "pseudo1") == 0){
     pseudo = true;
     pseudo1 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1/";
-    output_file = "Results_pseudo.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1/"+channel+"/";
+    output_file = "Results_pseudo_"+channel+".root";
   }
   else if(strcmp(argv[1], "pseudo2") == 0){
     pseudo = true;
     pseudo2 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo2/";
-    output_file = "Results_pseudo.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo2/"+channel+"/";
+    output_file = "Results_pseudo_"+channel+".root";
   }
   else if(strcmp(argv[1], "pseudo1695") == 0){
     pseudo = true;
     pseudo1695 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1695/";
-    output_file = "Results_pseudo.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1695/"+channel+"/";
+    output_file = "Results_pseudo_"+channel+".root";
   }
   else if(strcmp(argv[1], "pseudo1715") == 0){
     pseudo = true;
     pseudo1715 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1715/";
-    output_file = "Results_pseudo.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1715/"+channel+"/";
+    output_file = "Results_pseudo_"+channel+".root";
   }
   else if(strcmp(argv[1], "pseudo1735") == 0){
     pseudo = true;
     pseudo1735 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1735/";
-    output_file = "Results_pseudo.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1735/"+channel+"/";
+    output_file = "Results_pseudo_"+channel+".root";
   }
   else if(strcmp(argv[1], "pseudo1755") == 0){
     pseudo = true;
     pseudo1755 = true;
-    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1755/";
-    output_file = "Results_pseudo.root";
+    directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/Pseudo1755/"+channel+"/";
+    output_file = "Results_pseudo_"+channel+".root";
   }
   else {
     cout << "select 'data', 'same', 'pseudo1', 'pseudo2', ..."<< endl;
     return 0;
   }
+
+
 
   cout << "Selected Mode: ";
   if(data) cout << "DATA" << endl;
@@ -121,7 +133,7 @@ int main(int argc, char* argv[])
   ██   ██ ███████ ██   ██ ██████      ██████  ██ ██   ████ ██   ████ ██ ██   ████  ██████
   */
 
-  input_file = "Histograms.root";
+  input_file = "Histograms_"+channel+".root";
   TFile *inputFile=new TFile(input_file);
 
   outputFile->cd();
@@ -193,12 +205,12 @@ int main(int argc, char* argv[])
   inputFile->GetObject("mc_sig",hist_mc_sig);
 
   inputFile->GetObject("mc_truth",hist_mc_truth);
-  if(pseudo1)   inputFile->GetObject("pseudo1_truth",h_pseudodata_truth);
-  if(pseudo2)   inputFile->GetObject("pseudo2_truth",h_pseudodata_truth);
-  if(pseudo1695)inputFile->GetObject("pseudo1695_truth",h_pseudodata_truth);
-  if(pseudo1715)inputFile->GetObject("pseudo1715_truth",h_pseudodata_truth);
-  if(pseudo1735)inputFile->GetObject("pseudo1735_truth",h_pseudodata_truth);
-  if(pseudo1755)inputFile->GetObject("pseudo1755_truth",h_pseudodata_truth);
+  if(pseudo1 || data) inputFile->GetObject("pseudo1_truth",h_pseudodata_truth);
+  else if(pseudo2)    inputFile->GetObject("pseudo2_truth",h_pseudodata_truth);
+  else if(pseudo1695) inputFile->GetObject("pseudo1695_truth",h_pseudodata_truth);
+  else if(pseudo1715) inputFile->GetObject("pseudo1715_truth",h_pseudodata_truth);
+  else if(pseudo1735) inputFile->GetObject("pseudo1735_truth",h_pseudodata_truth);
+  else if(pseudo1755) inputFile->GetObject("pseudo1755_truth",h_pseudodata_truth);
   inputFile->GetObject("mc_mtop1665_truth",mc_mtop1665_truth);
   inputFile->GetObject("mc_mtop1695_truth",mc_mtop1695_truth);
   inputFile->GetObject("mc_mtop1715_truth",mc_mtop1715_truth);
@@ -341,10 +353,37 @@ int main(int argc, char* argv[])
   vector<TString> cor_name = {"corup", "cordown"};
   vector<TString> muid_name = {"muidup", "muiddown"};
   vector<TString> mutr_name = {"mutrup", "mutrdown"};
+  vector<TString> elid_name = {"elidup", "eliddown"};
+  vector<TString> eltr_name = {"eltrup", "eltrdown"};
+  vector<TString> elreco_name = {"elrecoup", "elrecodown"};
   vector<TString> pu_name = {"puup", "pudown"};
   // vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, muid_name, mutr_name, pu_name};
-  vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, cor_name, muid_name, mutr_name, pu_name};
-  vector<TString> sys_rel_name = {"b-tagging", "jec", "jer", "cor","MuID", "MuTrigger", "pile-up"}; // used for comparison plot
+  vector< vector<TString> > sys_name;
+  vector<TString> sys_rel_name;
+  sys_name.push_back(btag_name);
+  sys_name.push_back(jec_name);
+  sys_name.push_back(jer_name);
+  sys_name.push_back(cor_name);
+  sys_name.push_back(pu_name);
+  sys_rel_name.push_back("b-tagging");
+  sys_rel_name.push_back("jec");
+  sys_rel_name.push_back("jer");
+  sys_rel_name.push_back("cor");
+  sys_rel_name.push_back("pile-up");
+  if(channel == "muon" || channel == "combine"){
+    sys_name.push_back(muid_name);
+    sys_name.push_back(mutr_name);
+    sys_rel_name.push_back("MuID");
+    sys_rel_name.push_back("MuTrigger");
+  }
+  if(channel == "elec" || channel == "combine"){
+    sys_name.push_back(elid_name);
+    sys_name.push_back(eltr_name);
+    sys_name.push_back(elreco_name);
+    sys_rel_name.push_back("ElID");
+    sys_rel_name.push_back("ElTrigger");
+    sys_rel_name.push_back("ElReco");
+  }
   vector< vector<TH2*> > sys_matrix;
   for(unsigned int i=0; i<sys_name.size(); i++){
     vector<TH2*> dummy;
@@ -354,7 +393,7 @@ int main(int argc, char* argv[])
     }
   }
   // now read model variations
-  vector<TString> shower = {"Shower"};
+  vector<TString> shower = {"SHOWER_fsrup", "SHOWER_fsrdown", "SHOWER_isrup", "SHOWER_isrdown", "SHOWER_hdampup", "SHOWER_hdampdown"};
   vector<TString> generator = {"Generator"};
   vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
   vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
@@ -365,10 +404,10 @@ int main(int argc, char* argv[])
     name += i;
     pdf.push_back(name);
   }
-  // vector< vector<TString> > model_name = {generator, scale, mass, shower, pdf};
-  // vector<TString> model_rel_name = {"generator", "scale", "mass", "shower", "pdf"};
-  vector< vector<TString> > model_name = {generator, scale, mass, pdf};
-  vector<TString> model_rel_name = {"generator", "scale", "mass", "pdf"};
+  vector< vector<TString> > model_name = {generator, scale, mass, shower, pdf};
+  vector<TString> model_rel_name = {"generator", "scale", "mass", "shower", "pdf"};
+  // vector< vector<TString> > model_name = {generator, scale, mass, pdf};
+  // vector<TString> model_rel_name = {"generator", "scale", "mass", "pdf"};
   vector< vector<TH1D*> > model_input;
   vector< vector<TH1D*> > model_truth;
   for(unsigned int i=0; i<model_name.size(); i++){
@@ -416,7 +455,6 @@ int main(int argc, char* argv[])
   int nscan = 100;
   bool do_lcurve = false;
   double tau = 0.0;
-  // tau = 0.0017 works quite good
 
 
   if(nscan != 0){
@@ -482,6 +520,7 @@ int main(int argc, char* argv[])
 
   TGraph* lcurve;
   double lcurve_x, lcurve_y;
+  double lcurverho_x, lcurverho_y;
   TSpline* rhotau;
   double tau_final;
 
@@ -499,7 +538,7 @@ int main(int argc, char* argv[])
   ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ██   ██ ██   ██    ██    ██   ██
   ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ██   ██ ███████    ██    ███████
   ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██     ██   ██ ██   ██    ██    ██   ██
-   ██████  ██   ████ ██       ██████  ███████ ██████      ██████  ██   ██    ██    ██   ██
+  ██████  ██   ████ ██       ██████  ███████ ██████      ██████  ██   ██    ██    ██   ██
   */
 
   // with this you can scale stat uncerts to sqrt(N)
@@ -533,18 +572,22 @@ int main(int argc, char* argv[])
     SYS_DELTA = unfold.get_sys_delta();
     BGR_DELTA = unfold.get_bgr_delta();
     // CovTotal_TUnfold = unfold.GetTotalCov();
-    lcurve = unfold.get_lcurve();
-    lcurve_x = unfold.get_best_point("x");
-    lcurve_y = unfold.get_best_point("y");
+    lcurverho_x = unfold.get_best_point("x");
+    lcurverho_y = unfold.get_best_point("y");
     rhotau = unfold.GetRhoTau();
     tau_final = unfold.get_tau();
+    // do unfold again with lcurve scan (only for plot)
+    unfolding unfold_lcurve(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, nscan, tau);
+    lcurve = unfold_lcurve.get_lcurve();
+    lcurve_x = unfold_lcurve.get_best_point("x");
+    lcurve_y = unfold_lcurve.get_best_point("y");
 
     /*
     ██    ██ ███    ██ ███████  ██████  ██      ██████      ███    ███  ██████  ██████  ███████ ██
     ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ████  ████ ██    ██ ██   ██ ██      ██
     ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ██ ████ ██ ██    ██ ██   ██ █████   ██
     ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██     ██  ██  ██ ██    ██ ██   ██ ██      ██
-     ██████  ██   ████ ██       ██████  ███████ ██████      ██      ██  ██████  ██████  ███████ ███████
+    ██████  ██   ████ ██       ██████  ███████ ██████      ██      ██  ██████  ██████  ███████ ███████
     */
 
     // remove eveything but masses if wanted
@@ -592,7 +635,7 @@ int main(int argc, char* argv[])
           cout << "***********************" << endl;
           cout << " UNFOLDING OF " << model_name[i][j] << endl;
           vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
-          for(auto i: background_dummy) i->Reset();
+          for(auto b: background_dummy) b->Reset();
           unfolding* unfold_model = new unfolding(model_input[i][j], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, nscan, tau);
           TH1* output = unfold_model->get_output(true);
           MODEL_OUTPUT[i].push_back(output);
@@ -614,7 +657,7 @@ int main(int argc, char* argv[])
     ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ██      ████  ████ ██      ██   ██ ██   ██
     ██    ██ ██ ██  ██ █████   ██    ██ ██      ██   ██     ███████ ██ ████ ██ █████   ███████ ██████
     ██    ██ ██  ██ ██ ██      ██    ██ ██      ██   ██          ██ ██  ██  ██ ██      ██   ██ ██   ██
-     ██████  ██   ████ ██       ██████  ███████ ██████      ███████ ██      ██ ███████ ██   ██ ██   ██
+    ██████  ██   ████ ██       ██████  ███████ ██████      ███████ ██      ██ ███████ ██   ██ ██   ██
     */
 
 
@@ -624,11 +667,11 @@ int main(int argc, char* argv[])
     // for every following unfolding the same tau is used
     if(do_genvar){
       double t = 0;
-      for(int i=0; i<GeneratorVariations.size(); i++){
+      for(unsigned int i=0; i<GeneratorVariations.size(); i++){
         cout << "********************************************" << endl;
         cout << " UNFOLDING OF SMEARED DISTRIBUTION NUMBER " << i << endl;
         vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
-        for(auto i: background_dummy) i->Reset();
+        for(auto b: background_dummy) b->Reset();
         unfolding* unfold_genvar;
         if(i==0) unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, nscan, tau);
         else     unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, 0, t);
@@ -742,11 +785,11 @@ int main(int argc, char* argv[])
   ProbMatrix->Write();
 
   /*
-   ██████ ██   ██ ██     ██████
+  ██████ ██   ██ ██     ██████
   ██      ██   ██ ██          ██
   ██      ███████ ██      █████
   ██      ██   ██ ██     ██
-   ██████ ██   ██ ██     ███████
+  ██████ ██   ██ ██     ███████
   */
 
   // parameters for chi2 fit
@@ -777,10 +820,9 @@ int main(int argc, char* argv[])
 
   // normalise pseudo data truth
   TH1D* h_pseudodata_truth_norm;
-  if(pseudo){
-    Normalise * normPseudo = new Normalise(h_pseudodata_truth, lower, upper, NormToWidth);
-    h_pseudodata_truth_norm  = normPseudo->GetHist();
-  }
+  Normalise * normPseudo = new Normalise(h_pseudodata_truth, lower, upper, NormToWidth);
+  h_pseudodata_truth_norm  = normPseudo->GetHist();
+
 
   // write a new vector for masses used in the chi2 fit
   bool use_all_masses = false;
@@ -922,9 +964,7 @@ int main(int argc, char* argv[])
   if(pseudo) plot->draw_bias(data_unfolded, h_pseudodata_truth, pseudodata_bias, "Unfold_pseudo_bias");
   if(pseudo) plot->draw_output_pseudo(data_unfolded_all, hist_pseudo_gen, hist_mc_gen, false, "Unfold_pseudo_all");
   plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
-  plot->draw_output_stat(data_unfolded_sys, data_unfolded_stat, hist_mc_truth, false, "Unfold");
   plot->draw_output(data_unfolded_sys, hist_mc_truth, false, "Unfold_SYS");
-  plot->draw_output_stat(data_unfolded_norm, data_unfolded_stat_norm, hist_mc_truth_norm, true, "Unfold_norm");
   plot->draw_output_mass(data_unfolded_norm, data_unfolded_stat_norm, mc_mtop_templates_norm, show, true, "Unfold_masspoints_norm");
   plot->draw_output_mass(data_unfolded, data_unfolded_stat, mc_mtop_templates, show, false, "Unfold_masspoints");
   plot->draw_projection(gen_proj, hist_mc_gen, "Projection_gen");
@@ -934,7 +974,23 @@ int main(int argc, char* argv[])
   plot->draw_purity(h_pur_samebin, h_pur_all, "Purity");
   plot->draw_purity(h_pur_samebin_pt, h_pur_all, "Purity_pt");
 
-  if(nscan != 0) plot->draw_lcurve(lcurve, lcurve_x, lcurve_y, "LCurve");
+
+
+  vector<TH1D*> truth = {hist_mc_truth, h_pseudodata_truth};
+  vector<TH1D*> truth_norm = {hist_mc_truth_norm, h_pseudodata_truth_norm};
+  vector<TString> legnames = {"POWHEG+PYTHIA", "aMC@NLO+PYTHIA"};
+  plot->draw_output_data(data_unfolded_sys, data_unfolded_stat, truth, legnames, false, "Unfold_events");
+  plot->draw_output_data(data_unfolded_norm, data_unfolded_stat_norm, truth_norm, legnames, true, "Unfold_norm");
+
+
+  // Convert to cross section
+  TH1* data_crosssection = ConvertToCrossSection(data_unfolded_sys);
+  TH1* data_crosssection_stat = ConvertToCrossSection(data_unfolded_stat);
+  vector<TH1D*> truth_crosssection = {ConvertToCrossSection(hist_mc_truth), ConvertToCrossSection(h_pseudodata_truth)};
+  plot->draw_output_data(data_crosssection, data_crosssection_stat, truth_crosssection, legnames, false, "Unfold");
+
+
+  if(nscan != 0) plot->draw_lcurve(lcurve, lcurve_x, lcurve_y, lcurverho_x, lcurverho_y, "LCurve");
   plot->draw_rhotau(rhotau, tau_final, "RhoTauScan");
 
 
@@ -1085,4 +1141,34 @@ void ScaleErrorToData(TH1* hist){
     hist->SetBinError(bin, sqrt(N));
   }
   return;
+}
+
+TH1* ConvertToCrossSection(TH1* hist){
+  TH1* newhist = (TH1*) hist->Clone();
+  int nbins = hist->GetXaxis()->GetNbins();
+  for(int bin=1; bin<=nbins; bin++){
+    double events = hist->GetBinContent(bin);
+    double error = hist->GetBinError(bin);
+    double binwidth = hist->GetBinWidth(bin);
+    double cs = events/(binwidth*35.9);
+    double er = error/(binwidth*35.9);
+    newhist->SetBinContent(bin, cs);
+    newhist->SetBinError(bin, er);
+  }
+  return newhist;
+}
+
+TH1D* ConvertToCrossSection(TH1D* hist){
+  TH1D* newhist = (TH1D*) hist->Clone();
+  int nbins = hist->GetXaxis()->GetNbins();
+  for(int bin=1; bin<=nbins; bin++){
+    double events = hist->GetBinContent(bin);
+    double error = hist->GetBinError(bin);
+    double binwidth = hist->GetBinWidth(bin);
+    double cs = events/(binwidth*35.9);
+    double er = error/(binwidth*35.9);
+    newhist->SetBinContent(bin, cs);
+    newhist->SetBinError(bin, er);
+  }
+  return newhist;
 }

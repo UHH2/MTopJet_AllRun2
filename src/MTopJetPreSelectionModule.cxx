@@ -61,6 +61,7 @@ protected:
   Event::Handle<bool>h_recsel;
   Event::Handle<bool>h_gensel;
   Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
+  Event::Handle<std::vector<TopJet>>h_fatjets;
 
   bool isMC;
 
@@ -92,6 +93,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   h_recsel = ctx.declare_event_output<bool>("passed_recsel");
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
   h_GENfatjets = ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
+  h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   ////
 
   //// COMMON MODULES
@@ -117,9 +119,9 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   //// EVENT SELECTION REC
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(50, 2.4))));
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(50, 2.4))));
-  met_sel.reset(new METCut  (30, uhh2::infinity));
-  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(45, 2.4 ))));
-  elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(80, 2.4))));
+  met_sel.reset(new METCut  (40, uhh2::infinity));
+  muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
+  elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
   ////
 
   //// EVENTS SELECTION GEN
@@ -127,7 +129,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   else if(isherwig) SemiLepDecay.reset(new TTbarSemilep_herwig(ctx));
   if(isMC){
     GenMuonPT.reset(new GenMuonSel(ctx, 55.));
-    GenElecPT.reset(new GenElecSel(ctx, 125.));
+    GenElecPT.reset(new GenElecSel(ctx, 55.));
   }
   ////
 
@@ -154,6 +156,18 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   const bool pass_jet1 = jet1_sel->passes(event);
   const bool pass_met = met_sel->passes(event);
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
+
+  // cut on fatjet pt
+  bool passed_fatpt=false;
+  std::vector<TopJet> jets = event.get(h_fatjets);
+  double ptcut = 200;
+  for(auto jet: jets){
+    if(jet.pt() > ptcut) passed_fatpt = true;
+  }
+  ///
+
+
+
   bool pass_semilep;
   if(isMC)pass_semilep = SemiLepDecay->passes(event);
   else pass_semilep=false;
@@ -196,12 +210,12 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
       }
       jet_v4.SetPxPyPzE(px, py, pz, E);
       double pt = jet_v4.Pt();
-      if(pt > 250) passed_genpt = true;
+      if(pt > 330) passed_genpt = true;
     }
   }
   ///
 
-  if(pass_lep1 && pass_jet2 && pass_jet1 && pass_met && pass_lepsel) passed_recsel = true;
+  if(pass_lep1 && passed_fatpt && pass_jet2 && pass_jet1 && pass_met && pass_lepsel) passed_recsel = true;
   else passed_recsel = false;
 
   if(pass_semilep && passed_genpt && pass_genlepton) passed_gensel = true;

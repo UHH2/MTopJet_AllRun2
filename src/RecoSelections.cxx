@@ -1,5 +1,18 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 
+uhh2::ElectronEtaVeto::ElectronEtaVeto(double lower_, double upper_):
+lower(lower_),
+upper(upper_) {}
+
+bool uhh2::ElectronEtaVeto::passes(const uhh2::Event& event){
+  bool pass_veto = false;
+  if(event.electrons->size() != 0){
+    double eta = fabs(event.electrons->at(0).eta());
+    if(eta < lower || eta > upper) pass_veto = true;
+  }
+  return pass_veto;
+}
+////////////////////////////////////////////////////////
 
 uhh2::NJetXCone::NJetXCone(uhh2::Context& ctx, const std::string & name, unsigned int njet):
 h_jets(ctx.get_handle<std::vector<TopJet>>(name)),

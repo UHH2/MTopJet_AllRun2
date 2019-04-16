@@ -22,11 +22,12 @@ class plotter{
   plotter(TString);
   void draw_matrix(TH2* hist, TString file_name, bool zlog, bool is_migration);
   void draw_output(TH1* output, TH1D* truth, bool norm, TString file_name);
+  void draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> truth_, std::vector<TString> legnames, bool norm, TString file_name);
   void draw_output_smear(std::vector<TH1*> output, TH1D* truth, TString file_name);
   void draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm, TString file_name);
   void draw_output_mass(TH1* output, TH1* stat_, std::vector<TH1D*> mtop_templates, std::vector<bool> show, bool norm, TString file_name);
   void draw_output_pseudo(TH1* output, TH1D* pseudotruth, TH1D* mctruth, bool norm, TString file_name);
-  void draw_lcurve(TGraph *lcurve, double x1, double y1, TString file_name);
+  void draw_lcurve(TGraph *lcurve, double x1, double y1,  double x2, double y2, TString file_name);
   void draw_rhotau(TSpline *rhotau, double tau, TString file_name);
   void draw_projection(TH1D* proj, TH1D* compare, TString file_name );
   void draw_1D_hist(TH1D* hist, TString file_name);

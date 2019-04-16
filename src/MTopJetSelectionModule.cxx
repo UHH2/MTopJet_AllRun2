@@ -90,9 +90,11 @@ protected:
   std::unique_ptr<uhh2::Selection> trigger_mu_B;
   std::unique_ptr<uhh2::Selection> trigger_el_A;
   std::unique_ptr<uhh2::Selection> trigger_el_B;
+  std::unique_ptr<uhh2::Selection> trigger_el_C;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
   std::unique_ptr<uhh2::Selection> elec_sel125;
+  std::unique_ptr<uhh2::Selection> elec_etaveto;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
@@ -154,6 +156,12 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_mtop1735"       ||
   ctx.get("dataset_version") == "TTbar_mtop1755"       ||
   ctx.get("dataset_version") == "TTbar_mtop1785"       ||
+  ctx.get("dataset_version") == "TTbar_fsrup"          ||
+  ctx.get("dataset_version") == "TTbar_fsrdown"        ||
+  ctx.get("dataset_version") == "TTbar_isrup"          ||
+  ctx.get("dataset_version") == "TTbar_isrdown"        ||
+  ctx.get("dataset_version") == "TTbar_hdampup"        ||
+  ctx.get("dataset_version") == "TTbar_hdampdown"      ||
   ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
   ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
@@ -239,8 +247,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // define Trigger
   trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
   trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
-  trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
-  trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+  trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
+  trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
+  trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
 
 
   /*Only select event with exacly 1 muon or electron */
@@ -252,13 +261,13 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
     muon_sel.reset(new NMuonSelection(1, 1, muid));
     elec_sel.reset(new NElectronSelection(0, 0, eleid));
   }
-  elec_sel125.reset(new NElectronSelection(1, 1, eleid125));
-
+  elec_etaveto.reset(new ElectronEtaVeto(1.44, 1.57));
+  // elec_sel125.reset(new NElectronSelection(1, 1, eleid125));
 
   jet_sel.reset(new NJetSelection(2, -1, jetid_selection));
   double metcut = 0;
   if(channel_ == muon)      metcut = 50;
-  else if(channel_ == elec) metcut = 90;
+  else if(channel_ == elec) metcut = 50;
   met_sel  .reset(new METCut  (metcut , uhh2::infinity));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
@@ -421,7 +430,8 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     }
   }
   else if(channel_ == elec){
-    if(!trigger_el_A->passes(event)) passed_recsel = false;
+    if( !(trigger_el_A->passes(event) || trigger_el_B->passes(event)) ) passed_recsel = false;
+
     // once photon stream is available, also add photon trigger
     // then, the electron trigger is only used until pt < 250,
     // above only the photon trigger is used
@@ -437,9 +447,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   /* *********** lEPTON Selection *********** */
   if(passed_recsel){
     bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
-    // in elec channel use additional cut at pT > 125
+    // in elec channel use additional eta cut
     if(channel_ == elec){
-      if(!elec_sel125->passes(event)) pass_lepsel = false;
+      if(!elec_etaveto->passes(event)) pass_lepsel = false;
     }
     ////
     if(!pass_lepsel) passed_recsel = false;

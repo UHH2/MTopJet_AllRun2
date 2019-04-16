@@ -31,10 +31,10 @@
 
 <!-- =============================================== Single Top ===================================================================== -->
   <!ENTITY ST_t-channel_antitop SYSTEM  "../../common/datasets/RunII_80X_v5/MC_ST_t-channel_antitop_4f_inclusiveDecays.xml">
-  <!ENTITY ST_t-channel_top SYSTEM  "../../common/datasets/RunII_80X_v5/MC_ST_t-channel_top_4f_inclusiveDecays.xml">
-  <!ENTITY ST_s-channel SYSTEM  "../../common/datasets/RunII_80X_v5/MC_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8.xml">
-  <!ENTITY ST_tW_antitop SYSTEM  "../../common/datasets/RunII_80X_v5/MC_ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg.xml">
-  <!ENTITY ST_tW_top SYSTEM  "../../common/datasets/RunII_80X_v5/MC_ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg.xml">
+  <!ENTITY ST_t-channel_top SYSTEM      "../../common/datasets/RunII_80X_v5/MC_ST_t-channel_top_4f_inclusiveDecays.xml">
+  <!ENTITY ST_s-channel SYSTEM          "../../common/datasets/RunII_80X_v5/MC_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8.xml">
+  <!ENTITY ST_tW_antitop SYSTEM         "../../common/datasets/RunII_80X_v5/MC_ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg.xml">
+  <!ENTITY ST_tW_top SYSTEM             "../../common/datasets/RunII_80X_v5/MC_ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg.xml">
 
 <!-- =============================================== ttbar =========================================================================== -->
   <!ENTITY TTbar_Mtt0000to0700 SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4.xml">
@@ -48,6 +48,14 @@
   <!ENTITY TTbar_mtop1735      SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_mtop1735.xml">
   <!ENTITY TTbar_mtop1755      SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_mtop1755.xml">
   <!ENTITY TTbar_mtop1785      SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_mtop1785.xml">
+
+  <!ENTITY TTbar_fsrup     SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4_fsrup.xml">
+  <!ENTITY TTbar_fsrdown   SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4_fsrdown.xml">
+  <!ENTITY TTbar_isrup     SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4_isrup.xml">
+  <!ENTITY TTbar_isrdown   SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4_isrdown.xml">
+  <!ENTITY TTbar_hdampup   SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4_hdampup.xml">
+  <!ENTITY TTbar_hdampdown SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneCUETP8M2T4_hdampdown.xml">
+
 
   <!ENTITY TTbar_amcatnlo-pythia      SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TTJets_13TeV-amcatnloFXFX-pythia8.xml">
   <!ENTITY TTbar_powheg-herwig        SYSTEM  "../../common/datasets/RunII_80X_v5/MC_TT_TuneEE5C_13TeV-powheg-herwigpp.xml">
@@ -296,6 +304,24 @@
 
     <InputData Version="TTbar_mtop1785" Lumi="19689.187" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_mtop1785; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_fsrup" Lumi="183053.487" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_fsrup; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_fsrdown" Lumi="187204.573" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_fsrdown; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_isrup" Lumi="186898.712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_isrup; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_isrdown" Lumi="179597.295" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_isrdown; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_hdampup" Lumi="70750.041" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_hdampup; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_hdampdown" Lumi="69830.925" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_hdampdown; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="TTbar_amcatnlo-pythia" Lumi="117772160.207" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_amcatnlo-pythia; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
