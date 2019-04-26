@@ -20,6 +20,10 @@ int main(int argc, char* argv[]){
   h_mujet.push_back((TH1F*)file->Get("02b_muon/pt_matchjet") );
   h_mujet.push_back((TH1F*)file->Get("02b_muon_xcone/Mass_HadJet33_rebin"));
 
+  vector<TH1F*> h_ptdiff;
+  h_ptdiff.push_back((TH1F*)file->Get("01a_muon/pt_diff"));
+  h_ptdiff.push_back((TH1F*)file->Get("02a_muon/pt_diff"));
+
   for(auto h: h_mu){
     h->SetLineWidth(4);
     h->SetLineColor(kAzure+7);
@@ -71,6 +75,7 @@ int main(int argc, char* argv[]){
     TCanvas *b = new TCanvas("b", " ", 600, 600);
     gPad->SetLeftMargin(0.15);
     gPad->SetBottomMargin(0.1);
+    ratio_mu[i]->SetTitle(" ");
     ratio_mu[i]->GetYaxis()->SetTitle("#frac{lepton from W}{leton GenJet}");
     ratio_mu[i]->GetXaxis()->SetTitle(xtitles[i]);
     ratio_mu[i]->GetXaxis()->SetNdivisions(505);
@@ -84,6 +89,27 @@ int main(int argc, char* argv[]){
     delete b;
   }
 
+  for(unsigned int i=0; i<h_ptdiff.size(); i++){
+    TCanvas *c = new TCanvas("c", " ", 600, 600);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.18);
+    h_ptdiff[i]->SetTitle(" ");
+    h_ptdiff[i]->GetYaxis()->SetTitle("events");
+    h_ptdiff[i]->GetXaxis()->SetTitle("#frac{p_{T}^{lepton jet} - p_{T}^{lepton}}{p_{T}^{lepton}}");
+    h_ptdiff[i]->GetXaxis()->SetNdivisions(505);
+    h_ptdiff[i]->GetYaxis()->SetNdivisions(505);
+    h_ptdiff[i]->GetYaxis()->SetTitleOffset(1.9);
+    h_ptdiff[i]->GetXaxis()->SetTitleOffset(1.7);
+    h_ptdiff[i]->GetXaxis()->SetRangeUser(-0.002, 0.002);
+    h_ptdiff[i]->SetLineColor(1);
+    h_ptdiff[i]->SetFillColor(13);
+    h_ptdiff[i]->Draw("HIST");
+    TString postfix;
+    if(i==0) postfix = "ptCut";
+    if(i==1) postfix = "ptCut_massCut";
+    c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/LeptonJets/ptDiff_"+postfix+".pdf");
+    delete c;
+  }
   //// ---------------------------------------------------------------------------------------------------------------------
   //// ---------------------------------------------------------------------------------------------------------------------
   return 0;

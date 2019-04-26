@@ -327,7 +327,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
   MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(60., 2.4));
-  ElectronId eleid = AndId<Electron>(PtEtaSCCut(60., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
+  ElectronId eleid = AndId<Electron>(PtEtaSCCut(60., 2.4), ElectronID_Spring16_tight);
 
   if(channel_ == muon) lepton_sel.reset(new NMuonSelection(1, -1, muid));
   else                 lepton_sel.reset(new NElectronSelection(1, -1, eleid));
@@ -372,8 +372,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
   ele_trigger_SF.reset(new ElectronTriggerSF(ctx)); // approved at https://indico.cern.ch/event/662745/
   ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
-  ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_MVA90_ID.root", 1, "", ElID_variation));
-
+  ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
   /*************************** Set up Hists classes **********************************************************************************/
 
   //750GeV hists
@@ -660,7 +659,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else{
     ele_id_SF->process(event);
     ele_reco_SF->process(event);
-    ele_trigger_SF->process(event);
+    // ele_trigger_SF->process(event);
   }
 
   /** b-tagging *********************/

@@ -93,12 +93,13 @@ protected:
   std::unique_ptr<uhh2::Selection> trigger_el_C;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
-  std::unique_ptr<uhh2::Selection> elec_sel125;
+  std::unique_ptr<uhh2::Selection> elec_sel_125;
+  std::unique_ptr<uhh2::Selection> elec_sel_triggerA;
+  std::unique_ptr<uhh2::Selection> elec_sel_triggerB;
   std::unique_ptr<uhh2::Selection> elec_etaveto;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
-  std::unique_ptr<uhh2::Selection> jet_sel;
 
   Event::Handle<bool>h_gensel;
   Event::Handle<bool>h_recsel;
@@ -237,11 +238,14 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   // define IDs
   MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
-  ElectronId eleid    = AndId<Electron>(PtEtaSCCut(55., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
-  ElectronId eleid125 = AndId<Electron>(PtEtaSCCut(125., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
-  ElectronId eleid250 = AndId<Electron>(PtEtaSCCut(250., 2.5), ElectronID_MVAGeneralPurpose_Spring16_loose);
+  // this is only used for cleaner and electron veto
+  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight_noIso);
+  // this is used to decide which ele trigger is used
+  ElectronId eleid_noiso125 = AndId<Electron>(PtEtaSCCut(125., 2.4), ElectronID_Spring16_tight_noIso);
+  // this is used in combination with iso trigger
+  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight);
+  // jet ids
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
-  JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4));
   ////
 
   // define Trigger
@@ -255,16 +259,16 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   /*Only select event with exacly 1 muon or electron */
   if(channel_ == elec){
     muon_sel.reset(new NMuonSelection(0, 0, muid));
-    elec_sel.reset(new NElectronSelection(1, 1, eleid));
+    elec_sel.reset(new NElectronSelection(1, 1, eleid_noiso55));
   }
   else if (channel_ == muon){
     muon_sel.reset(new NMuonSelection(1, 1, muid));
-    elec_sel.reset(new NElectronSelection(0, 0, eleid));
+    elec_sel.reset(new NElectronSelection(0, 0, eleid_noiso55));
   }
   elec_etaveto.reset(new ElectronEtaVeto(1.44, 1.57));
-  // elec_sel125.reset(new NElectronSelection(1, 1, eleid125));
+  elec_sel_triggerA.reset(new NElectronSelection(1, 1, eleid_iso55));
+  elec_sel_125.reset(new NElectronSelection(1, 1, eleid_noiso125));
 
-  jet_sel.reset(new NJetSelection(2, -1, jetid_selection));
   double metcut = 0;
   if(channel_ == muon)      metcut = 50;
   else if(channel_ == elec) metcut = 50;
@@ -283,7 +287,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
 
   muoSR_cleaner.reset(new     MuonCleaner(muid));
-  eleSR_cleaner.reset(new ElectronCleaner(eleid));
+  eleSR_cleaner.reset(new ElectronCleaner(eleid_noiso55));
 
   jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
   jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
@@ -362,7 +366,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_ttbar_reweight_muon.reset(new MuonHists(ctx, "ttbar_reweight_Muon"));
   h_ttbar_reweight_jets.reset(new JetHists(ctx, "ttbar_reweight_Jets"));
   h_ttbar_reweight_lumi.reset(new LuminosityHists(ctx, "ttbar_reweight_lumi"));
-
   //
 
 }
@@ -420,6 +423,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   /* *********** Trigger *********** */
   // for DATA until run 274954 -> use only Trigger A
   // for MC and DATA from 274954 -> use "A || B"
+  bool elec_is_isolated = false;
   if(channel_ == muon){
     if(passed_recsel){
       if( !isMC && event.run < 274954) {
@@ -429,12 +433,19 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       }
     }
   }
+  // only use triggerA and isolation if elec pt < 125
+  // for pt > 125 use triggerB || triggerC
   else if(channel_ == elec){
-    if( !(trigger_el_A->passes(event) || trigger_el_B->passes(event)) ) passed_recsel = false;
-
-    // once photon stream is available, also add photon trigger
-    // then, the electron trigger is only used until pt < 250,
-    // above only the photon trigger is used
+    if(passed_recsel){
+      if(!elec_sel_125->passes(event)){
+        if(!trigger_el_A->passes(event))      passed_recsel = false;
+        if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
+        if(passed_recsel) elec_is_isolated = false;
+      }
+      else{
+        if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
+      }
+    }
   }
 
   if(passed_recsel){
@@ -462,19 +473,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     }
   }
   ////
-
-  /* *********** Jet Selection *********** */
-  bool pass_jetsel = false;
-  if(passed_recsel){
-    pass_jetsel = (jet_sel->passes(event));
-    if(!pass_jetsel) passed_recsel = false;
-    else{
-      h_Jet_elec->fill(event);
-      h_Jet_muon->fill(event);
-      h_Jet_jets->fill(event);
-      h_Jet_lumi->fill(event);
-    }
-  }
 
   bool presel = passed_recsel;
 
@@ -505,6 +503,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     }
   }
 
+  if(elec_is_isolated) pass_twodcut = true; // do not do 2D cut for isolated electrons
   if(!pass_twodcut) passed_recsel = false;
   jet_cleaner2->process(event);
   sort_by_pt<Jet>(*event.jets);

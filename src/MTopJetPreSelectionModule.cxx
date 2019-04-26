@@ -48,8 +48,6 @@ protected:
   std::unique_ptr<uhh2::Selection> genflavor_sel;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
-  std::unique_ptr<uhh2::Selection> jet1_sel;
-  std::unique_ptr<uhh2::Selection> jet2_sel;
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
   std::unique_ptr<uhh2::Selection> GenMuonPT;
@@ -117,8 +115,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
 
   //// EVENT SELECTION REC
-  jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(50, 2.4))));
-  jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(50, 2.4))));
   met_sel.reset(new METCut  (40, uhh2::infinity));
   muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
   elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
@@ -152,8 +148,6 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   }
 
   const bool pass_lep1 = ((event.muons->size() >= 1) || (event.electrons->size() >= 1));
-  const bool pass_jet2 = jet2_sel->passes(event);
-  const bool pass_jet1 = jet1_sel->passes(event);
   const bool pass_met = met_sel->passes(event);
   const bool pass_lepsel = (muon_sel->passes(event) || elec_sel->passes(event));
 
@@ -215,7 +209,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   }
   ///
 
-  if(pass_lep1 && passed_fatpt && pass_jet2 && pass_jet1 && pass_met && pass_lepsel) passed_recsel = true;
+  if(pass_lep1 && passed_fatpt && pass_met && pass_lepsel) passed_recsel = true;
   else passed_recsel = false;
 
   if(pass_semilep && passed_genpt && pass_genlepton) passed_gensel = true;

@@ -2,6 +2,7 @@
 #include "plotter.h"
 #include "sys_handler.h"
 #include "chi2fit.h"
+#include "chi2sys.h"
 #include "normalise.h"
 #include "modelsys.h"
 #include "smearing.h"

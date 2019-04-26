@@ -211,6 +211,7 @@ int main(int argc, char* argv[])
   else if(pseudo1715) inputFile->GetObject("pseudo1715_truth",h_pseudodata_truth);
   else if(pseudo1735) inputFile->GetObject("pseudo1735_truth",h_pseudodata_truth);
   else if(pseudo1755) inputFile->GetObject("pseudo1755_truth",h_pseudodata_truth);
+  else if(same)       inputFile->GetObject("mc_truth",h_pseudodata_truth);
   inputFile->GetObject("mc_mtop1665_truth",mc_mtop1665_truth);
   inputFile->GetObject("mc_mtop1695_truth",mc_mtop1695_truth);
   inputFile->GetObject("mc_mtop1715_truth",mc_mtop1715_truth);
@@ -346,6 +347,16 @@ int main(int argc, char* argv[])
     // hist_data->Add(hist_mc_bgr);
   }
 
+  /*
+  ███████ ██ ██      ██          ███████ ██   ██ ██████      ██    ██  █████  ██████  ██  █████  ████████ ██  ██████  ███    ██ ███████
+  ██      ██ ██      ██          ██       ██ ██  ██   ██     ██    ██ ██   ██ ██   ██ ██ ██   ██    ██    ██ ██    ██ ████   ██ ██
+  █████   ██ ██      ██          █████     ███   ██████      ██    ██ ███████ ██████  ██ ███████    ██    ██ ██    ██ ██ ██  ██ ███████
+  ██      ██ ██      ██          ██       ██ ██  ██           ██  ██  ██   ██ ██   ██ ██ ██   ██    ██    ██ ██    ██ ██  ██ ██      ██
+  ██      ██ ███████ ███████     ███████ ██   ██ ██            ████   ██   ██ ██   ██ ██ ██   ██    ██    ██  ██████  ██   ████ ███████
+  */
+
+
+
   // read migrations from variations (vector of every source containing a vector of every variation e.g. up/down)
   vector<TString> btag_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown"};
   vector<TString> jec_name = {"jecup", "jecdown"};
@@ -392,8 +403,18 @@ int main(int argc, char* argv[])
       sys_matrix[i].push_back((TH2*)inputFile->Get(sys_name[i][j] + "_matrix"));
     }
   }
-  // now read model variations
+
+  /*
+  ███████ ██ ██      ██          ███    ███  ██████  ██████  ███████ ██          ██    ██  █████  ██████  ██  █████  ████████ ██  ██████  ███    ██ ███████
+  ██      ██ ██      ██          ████  ████ ██    ██ ██   ██ ██      ██          ██    ██ ██   ██ ██   ██ ██ ██   ██    ██    ██ ██    ██ ████   ██ ██
+  █████   ██ ██      ██          ██ ████ ██ ██    ██ ██   ██ █████   ██          ██    ██ ███████ ██████  ██ ███████    ██    ██ ██    ██ ██ ██  ██ ███████
+  ██      ██ ██      ██          ██  ██  ██ ██    ██ ██   ██ ██      ██           ██  ██  ██   ██ ██   ██ ██ ██   ██    ██    ██ ██    ██ ██  ██ ██      ██
+  ██      ██ ███████ ███████     ██      ██  ██████  ██████  ███████ ███████       ████   ██   ██ ██   ██ ██ ██   ██    ██    ██  ██████  ██   ████ ███████
+  */
   vector<TString> shower = {"SHOWER_fsrup", "SHOWER_fsrdown", "SHOWER_isrup", "SHOWER_isrdown", "SHOWER_hdampup", "SHOWER_hdampdown"};
+  vector<TString> fsr = {"SHOWER_fsrup", "SHOWER_fsrdown"};
+  vector<TString> isr = {"SHOWER_isrup", "SHOWER_isrdown"};
+  vector<TString> hdamp = {"SHOWER_hdampup", "SHOWER_hdampdown"};
   vector<TString> generator = {"Generator"};
   vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
   vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
@@ -404,10 +425,10 @@ int main(int argc, char* argv[])
     name += i;
     pdf.push_back(name);
   }
-  vector< vector<TString> > model_name = {generator, scale, mass, shower, pdf};
-  vector<TString> model_rel_name = {"generator", "scale", "mass", "shower", "pdf"};
-  // vector< vector<TString> > model_name = {generator, scale, mass, pdf};
-  // vector<TString> model_rel_name = {"generator", "scale", "mass", "pdf"};
+  vector< vector<TString> > model_name = {generator, scale, mass, isr, fsr, hdamp, pdf};
+  vector<TString> model_rel_name = {"generator", "scale", "mass", "ISR", "FSR", "hdamp", "pdf"};
+  // vector< vector<TString> > model_name = {fsr};
+  // vector<TString> model_rel_name = {"FSR"};
   vector< vector<TH1D*> > model_input;
   vector< vector<TH1D*> > model_truth;
   for(unsigned int i=0; i<model_name.size(); i++){
@@ -469,6 +490,7 @@ int main(int argc, char* argv[])
   bool do_all_pdf = false;
   bool do_genvar = false;
   bool do_masses_only = false;
+  bool do_chi2modelsys = true;
 
   if(pseudo1695 || pseudo1715 || pseudo1735 || pseudo1755){
     do_model = true;
@@ -476,11 +498,19 @@ int main(int argc, char* argv[])
     do_all_pdf = false;
     do_genvar = false;
   }
+  else if(same){
+    do_model = false;
+    do_masses_only = true;
+    do_all_pdf = false;
+    do_genvar = false;
+    nscan = 1;
+  }
 
   if(!do_model) cout << "    -- MODEL VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
   if(do_masses_only) cout << "    -- ONLY MASSES CONSIDERED AS MODEL VARIATIONS!" << endl  << endl;
   if(!do_all_pdf) cout << "    -- ONLY ONE PDF VARIATION IS UNFOLDED!" << endl  << endl;
   if(!do_genvar) cout << "    -- GENERATOR SMEARINGS ARE NOT UNFOLDED!" << endl  << endl;
+  if(!do_chi2modelsys) cout << "    -- OLD MODEL SYS UNCERTAINTY METHOD IS USED!" << endl  << endl;
 
 
   TH2 *CovStat, *CovInputStat, *CovMatrixStat;
@@ -497,6 +527,7 @@ int main(int argc, char* argv[])
   TH1 *STAT_DELTA, *STAT_REL;
 
   vector< vector<TH2*> > CovModel;
+  vector< vector<TH2*> > CovModelStat;
   vector< vector<TH1*> > MODEL_DELTA;
   vector< vector<TH1*> > MODEL_BIAS;
   vector< vector<TH1*> > MODEL_OUTPUT;
@@ -527,12 +558,6 @@ int main(int argc, char* argv[])
   TH1 *data_unfolded,*data_unfolded_sys,*data_unfolded_stat,*data_unfolded_all;
   TH1 * pseudodata_bias;
 
-  if(same){
-    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, 1, 0);
-    data_unfolded = unfold.get_output(true);
-    data_unfolded_all = unfold.get_output(false);
-  }
-
   /*
   ██    ██ ███    ██ ███████  ██████  ██      ██████      ██████   █████  ████████  █████
   ██    ██ ████   ██ ██      ██    ██ ██      ██   ██     ██   ██ ██   ██    ██    ██   ██
@@ -554,10 +579,10 @@ int main(int argc, char* argv[])
     sys_name = names_empty;
   }
 
-  if(data || pseudo){
+  if(data || pseudo || same){
     cout << "***********************" << endl;
     cout << " UNFOLDING OF DATA" << endl;
-    if(pseudo) for(auto i: backgrounds) i->Reset();
+    if(pseudo || same) for(auto i: backgrounds) i->Reset();
     unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, nscan, tau);
     data_unfolded = unfold.get_output(true);
     data_unfolded_all = unfold.get_output(false);
@@ -631,6 +656,7 @@ int main(int argc, char* argv[])
         MODEL_BIAS.push_back(dummy);
         vector<TH2*> dummy2;
         CovModel.push_back(dummy2);
+        CovModelStat.push_back(dummy2);
         for(unsigned int j=0; j<model_name[i].size(); j++){
           cout << "***********************" << endl;
           cout << " UNFOLDING OF " << model_name[i][j] << endl;
@@ -640,16 +666,44 @@ int main(int argc, char* argv[])
           TH1* output = unfold_model->get_output(true);
           MODEL_OUTPUT[i].push_back(output);
           TH1* delta = GetModelDelta(output, model_truth[i][j]);
-          MODEL_DELTA[i].push_back(delta);
+          if(!do_chi2modelsys) MODEL_DELTA[i].push_back(delta);
           TH1* bias = unfold_model->GetBiasDistribution();
           MODEL_BIAS[i].push_back(bias);
           TH2* cov = CreateCovFromDelta(delta, CovInputStat);
-          CovModel[i].push_back(cov);
+          if(!do_chi2modelsys) CovModel[i].push_back(cov);
+          TH2* statc = unfold_model->GetInputStatCov(); // for chi2sys only
+          CovModelStat[i].push_back(statc);
+
           //delete output;
           delete unfold_model;
           cout << "unfolding finished" << endl;
         }
       }
+    }
+
+    /*
+ ██████ ██   ██ ██ ██████      ███    ███  ██████  ██████  ███████ ██          ███████ ██    ██ ███████
+██      ██   ██ ██      ██     ████  ████ ██    ██ ██   ██ ██      ██          ██       ██  ██  ██
+██      ███████ ██  █████      ██ ████ ██ ██    ██ ██   ██ █████   ██          ███████   ████   ███████
+██      ██   ██ ██ ██          ██  ██  ██ ██    ██ ██   ██ ██      ██               ██    ██         ██
+ ██████ ██   ██ ██ ███████     ██      ██  ██████  ██████  ███████ ███████     ███████    ██    ███████
+*/
+
+
+
+    if(do_chi2modelsys && do_model){
+      cout << "---------------------------------------" << endl;
+      for(unsigned int i=0; i<model_name.size(); i++){
+        for(unsigned int j=0; j<model_name[i].size(); j++){
+          cout << "Variation: " << model_name[i][j] << endl;
+          chi2sys chi2sysmodel = chi2sys(MODEL_OUTPUT[i][j], CovModelStat[i][j], model_truth[i][j]);
+          cout << "factor applied = " << chi2sysmodel.GetFactor() << endl;
+          CovModel[i].push_back(chi2sysmodel.GetCov());
+          MODEL_DELTA[i].push_back(chi2sysmodel.GetDelta());
+          cout << endl;
+        }
+      }
+      cout << "---------------------------------------" << endl;
     }
 
     /*
@@ -737,9 +791,9 @@ int main(int argc, char* argv[])
     std::cout.rdbuf(coutbuf);
 
     if(do_model){
-      MODEL_rel.push_back(STAT_REL);        // put in stat to get total
-      MODEL_rel_total = AddSys(MODEL_rel);  // calculate total
-      MODEL_rel.pop_back();                 // remove stat from list
+      MODEL_rel.push_back(STAT_REL);            // put in stat to get total
+      MODEL_rel_total = AddSys(MODEL_rel);      // calculate total
+      MODEL_rel.pop_back();                     // remove stat from list
     }
 
     cout << "******************************************************" << endl;
@@ -1020,7 +1074,7 @@ int FindLargestVariation(vector<TH1*> variations){
   double max_value = 0;
   int position = -1;
   for(unsigned int i=0; i<entry.size(); i++){
-    if(entry[i] > max_value){
+    if(entry[i] >= max_value){
       max_value = entry[i];
       position = i;
     }

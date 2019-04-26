@@ -6,7 +6,7 @@
   <!ENTITY channel "muon">
 
  <!ENTITY PROOFdir "/nfs/dust/cms/user/schwarzd/proof">
- <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon"> 
+ <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon">
  <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon">
 
 
@@ -34,7 +34,7 @@
 
 
       <!-- ********TTbar**************************************** -->
-  
+
     <InputData Version="TTbar_Mtt0000to0700" Lumi="92847.91" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
@@ -43,7 +43,7 @@
 
     <InputData Version="TTbar_Mtt1000toInft" Lumi="1189652.930" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-   
+
 
 <!-- ================================================================================================================================== -->
 <!-- ====================================================== User Config =============================================================== -->
@@ -62,7 +62,7 @@
 	<Item Name="GenTopJetCollection"     Value="ak8GenJetsSoftDrop" />
 
 	<Item Name="additionalBranches" Value="weight xconeCHS xconeCHS_noJEC xconeCHS_Corrected genXCone33TopJets genXCone33TopJets_softdrop genXCone23TopJets XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined GEN_XCone23_had_Combined GEN_XCone23_lep_Combined passed_gensel_2 passed_recsel_2"/>
- 
+
 	<Item Name="METName" Value="slimmedMETs"/>
 
 	<Item Name="use_sframe_weight" Value="true"/>
@@ -70,8 +70,8 @@
 	<Item Name="dopvfilter" Value="true" />
 	<Item Name="channel" Value="&channel;"/>
 
-	<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists.root"/>
-	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" /> 
+	<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_muon.root"/>
+	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/CSVv2_Moriond17_B_H.csv" />
 
 
 	<Item Name="ScaleVariationMuR" Value="none"/>

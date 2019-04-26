@@ -3,7 +3,7 @@
 
   <!ENTITY NEVT "-1">
 
- <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon">
+ <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet/Selection/muon/AllHad">
  <!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon">
 
 <!-- =============================================== ttbar =========================================================================== -->

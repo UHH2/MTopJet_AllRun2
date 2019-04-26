@@ -682,6 +682,7 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
     else if (UncertNames[i] == "ElTrigger") leg->AddEntry(delta[i],"electron trigger","l");
     else if (UncertNames[i] == "ElID")      leg->AddEntry(delta[i],"electron ID","l");
     else if (UncertNames[i] == "ElReco")    leg->AddEntry(delta[i],"electron reconstruction","l");
+    else if (UncertNames[i] == "hdamp")     leg->AddEntry(delta[i],"h_{damp}","l");
     else                                    leg->AddEntry(delta[i],UncertNames[i],"l");
   }
   leg->Draw();
