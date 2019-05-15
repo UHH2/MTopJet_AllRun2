@@ -17,61 +17,102 @@ TH1F* DummyConstVariation(TH1F* Central, double factor);
 
 int main(int argc, char* argv[])
 {
+  bool doelec = false;
 
-  std::vector<TFile*> ScaleVariations_f, BTagVariations_f, PUVariations_f;
+  if(argc > 1){
+    if(strcmp(argv[1], "elec") == 0){
+      doelec = true;
+    }
+  }
+
+  std::vector<TFile*> ScaleVariations_f, BTagVariationsLight_f, BTagVariationsHeavy_f, PUVariations_f;
   std::vector<TFile*> MuIdVariations_f, MuTrVariations_f;
+  std::vector<TFile*> ElIdVariations_f, ElTrVariations_f, ElRecoVariations_f;
   std::vector<TFile*> JECVariations_f, JERVariations_f, CORVariations_f;
-  std::vector<TFile*> GeneratorVariations_f, ShowerVariations_f, PDFVariations_f;
+  std::vector<TFile*> GeneratorVariations_f, ISRVariations_f, FSRVariations_f, HdampVariations_f,PDFVariations_f;
 
-  ScaleVariations_f.push_back(new TFile(dir+"SCALE_upup/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  ScaleVariations_f.push_back(new TFile(dir+"SCALE_upnone/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  ScaleVariations_f.push_back(new TFile(dir+"SCALE_noneup/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  ScaleVariations_f.push_back(new TFile(dir+"SCALE_downdown/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  ScaleVariations_f.push_back(new TFile(dir+"SCALE_downnone/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  ScaleVariations_f.push_back(new TFile(dir+"SCALE_nonedown/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariations_f.push_back(new TFile(dir+"BTAG_bc_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariations_f.push_back(new TFile(dir+"BTAG_bc_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariations_f.push_back(new TFile(dir+"BTAG_udsg_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariations_f.push_back(new TFile(dir+"BTAG_udsg_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  PUVariations_f.push_back(new TFile(dir+"PU_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  PUVariations_f.push_back(new TFile(dir+"PU_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  MuIdVariations_f.push_back(new TFile(dir+"MUID_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  MuIdVariations_f.push_back(new TFile(dir+"MUID_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  MuTrVariations_f.push_back(new TFile(dir+"MUTR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  MuTrVariations_f.push_back(new TFile(dir+"MUTR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  JECVariations_f.push_back(new TFile(dir+"JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  JECVariations_f.push_back(new TFile(dir+"JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  JERVariations_f.push_back(new TFile(dir+"JER_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  JERVariations_f.push_back(new TFile(dir+"JER_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  CORVariations_f.push_back(new TFile(dir+"COR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  CORVariations_f.push_back(new TFile(dir+"COR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  GeneratorVariations_f.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root"));
-  ShowerVariations_f.push_back(new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar_powheg-herwig.root"));
-  PDFVariations_f.push_back(new TFile(dir+"PDF_up/PDF_Variations.root"));
-  PDFVariations_f.push_back(new TFile(dir+"PDF_down/PDF_Variations.root"));
+  TString directory = dir;
+  if(doelec) directory = dir_elec;
 
-  TFile* WJets_f = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.WJets.root");
-  TFile* SingleTop_f = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.SingleTop.root");
-  TFile* Other_f = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.other.root");
+  ScaleVariations_f.push_back(new TFile(directory+"SCALE_upup/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  ScaleVariations_f.push_back(new TFile(directory+"SCALE_upnone/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  ScaleVariations_f.push_back(new TFile(directory+"SCALE_noneup/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  ScaleVariations_f.push_back(new TFile(directory+"SCALE_downdown/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  ScaleVariations_f.push_back(new TFile(directory+"SCALE_downnone/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  ScaleVariations_f.push_back(new TFile(directory+"SCALE_nonedown/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  BTagVariationsHeavy_f.push_back(new TFile(directory+"BTAG_bc_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  BTagVariationsHeavy_f.push_back(new TFile(directory+"BTAG_bc_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  BTagVariationsLight_f.push_back(new TFile(directory+"BTAG_udsg_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  BTagVariationsLight_f.push_back(new TFile(directory+"BTAG_udsg_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  PUVariations_f.push_back(new TFile(directory+"PU_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  PUVariations_f.push_back(new TFile(directory+"PU_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  if(!doelec){
+    MuIdVariations_f.push_back(new TFile(directory+"MUID_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    MuIdVariations_f.push_back(new TFile(directory+"MUID_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    MuTrVariations_f.push_back(new TFile(directory+"MUTR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    MuTrVariations_f.push_back(new TFile(directory+"MUTR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElIdVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElIdVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElTrVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElTrVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElRecoVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElRecoVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  }
+  else{
+    MuIdVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    MuIdVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    MuTrVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    MuTrVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElIdVariations_f.push_back(new TFile(directory+"ELID_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElIdVariations_f.push_back(new TFile(directory+"ELID_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElTrVariations_f.push_back(new TFile(directory+"ELTR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElTrVariations_f.push_back(new TFile(directory+"ELTR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElRecoVariations_f.push_back(new TFile(directory+"ELRECO_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+    ElRecoVariations_f.push_back(new TFile(directory+"ELRECO_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  }
+  JECVariations_f.push_back(new TFile(directory+"JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  JECVariations_f.push_back(new TFile(directory+"JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  JERVariations_f.push_back(new TFile(directory+"JER_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  JERVariations_f.push_back(new TFile(directory+"JER_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  CORVariations_f.push_back(new TFile(directory+"COR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  CORVariations_f.push_back(new TFile(directory+"COR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  GeneratorVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root"));
+  ISRVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_isrup.root"));
+  ISRVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_isrdown.root"));
+  FSRVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_fsrup.root"));
+  FSRVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_fsrdown.root"));
+  HdampVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_hdampup.root"));
+  HdampVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown.root"));
+  PDFVariations_f.push_back(new TFile(directory+"PDF_up/PDF_Variations.root"));
+  PDFVariations_f.push_back(new TFile(directory+"PDF_down/PDF_Variations.root"));
 
-  TFile * Central_f = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
-  TFile * Data_f = new TFile(dir+"uhh2.AnalysisModuleRunner.DATA.DATA.root");
+  TFile* WJets_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.WJets.root");
+  TFile* SingleTop_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.SingleTop.root");
+  TFile* Other_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.other.root");
 
+  TFile * Central_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
+  TFile * Data_f = new TFile(directory+"uhh2.AnalysisModuleRunner.DATA.DATA.root");
+
+  cout << "test" << endl;
 
   TString histdir, histname;
-  histdir = "XCone_cor/";
-  histname = "M_jet1";
+  histdir = "XCone_cor_SF/";
+  histname = "M_jet1_";
 
-  std::vector<TH1F*> ScaleVariations,BTagVariations,PUVariations;
+  std::vector<TH1F*> ScaleVariations,BTagVariationsLight, BTagVariationsHeavy,PUVariations;
   std::vector<TH1F*>  MuIdVariations, MuTrVariations;
+  std::vector<TH1F*>  ElIdVariations, ElTrVariations, ElRecoVariations;
   std::vector<TH1F*>  JECVariations, JERVariations, CORVariations;
-  std::vector<TH1F*> GeneratorVariations, ShowerVariations, PDFVariations;
+  std::vector<TH1F*> GeneratorVariations, ISRVariations, FSRVariations, HdampVariations, PDFVariations;
 
   for(unsigned int i=0; i<ScaleVariations_f.size(); i++){
     ScaleVariations.push_back((TH1F*)ScaleVariations_f[i]->Get(histdir + histname));
   }
-  for(unsigned int i=0; i<BTagVariations_f.size(); i++){
-    BTagVariations.push_back((TH1F*)BTagVariations_f[i]->Get(histdir + histname));
+  for(unsigned int i=0; i<BTagVariationsHeavy_f.size(); i++){
+    BTagVariationsHeavy.push_back((TH1F*)BTagVariationsHeavy_f[i]->Get(histdir + histname));
+  }
+  for(unsigned int i=0; i<BTagVariationsLight_f.size(); i++){
+    BTagVariationsLight.push_back((TH1F*)BTagVariationsLight_f[i]->Get(histdir + histname));
   }
   for(unsigned int i=0; i<PUVariations_f.size(); i++){
     PUVariations.push_back((TH1F*)PUVariations_f[i]->Get(histdir + histname));
@@ -81,6 +122,15 @@ int main(int argc, char* argv[])
   }
   for(unsigned int i=0; i<MuTrVariations_f.size(); i++){
     MuTrVariations.push_back((TH1F*)MuTrVariations_f[i]->Get(histdir + histname));
+  }
+  for(unsigned int i=0; i<ElIdVariations_f.size(); i++){
+    ElIdVariations.push_back((TH1F*)ElIdVariations_f[i]->Get(histdir + histname));
+  }
+  for(unsigned int i=0; i<ElTrVariations_f.size(); i++){
+    ElTrVariations.push_back((TH1F*)ElTrVariations_f[i]->Get(histdir + histname));
+  }
+  for(unsigned int i=0; i<ElRecoVariations_f.size(); i++){
+    ElRecoVariations.push_back((TH1F*)ElRecoVariations_f[i]->Get(histdir + histname));
   }
   for(unsigned int i=0; i<JECVariations_f.size(); i++){
     JECVariations.push_back((TH1F*)JECVariations_f[i]->Get(histdir + histname));
@@ -94,8 +144,14 @@ int main(int argc, char* argv[])
   for(unsigned int i=0; i<GeneratorVariations_f.size(); i++){
     GeneratorVariations.push_back((TH1F*)GeneratorVariations_f[i]->Get(histdir + histname));
   }
-  for(unsigned int i=0; i<ShowerVariations_f.size(); i++){
-    ShowerVariations.push_back((TH1F*)ShowerVariations_f[i]->Get(histdir + histname));
+  for(unsigned int i=0; i<ISRVariations_f.size(); i++){
+    ISRVariations.push_back((TH1F*)ISRVariations_f[i]->Get(histdir + histname));
+  }
+  for(unsigned int i=0; i<FSRVariations_f.size(); i++){
+    FSRVariations.push_back((TH1F*)FSRVariations_f[i]->Get(histdir + histname));
+  }
+  for(unsigned int i=0; i<HdampVariations_f.size(); i++){
+    HdampVariations.push_back((TH1F*)HdampVariations_f[i]->Get(histdir + histname));
   }
   for(unsigned int i=0; i<PDFVariations_f.size(); i++){
     // pdf variations have a slightly different directory structure
@@ -144,17 +200,29 @@ int main(int argc, char* argv[])
   ErrorSym.push_back(ScaleErrorSym);
   CovMatrix.push_back(GetCovMatrix(ScaleErrorSym));
 
-  TH1F* BTagEnvelopeUp = GetEnvelopeUp(BTagVariations);
-  TH1F* BTagErrorUp = GetError(Central, BTagEnvelopeUp);
-  TH1F* BTagEnvelopeDown = GetEnvelopeDown(BTagVariations);
-  TH1F* BTagErrorDown = GetError(Central, BTagEnvelopeDown);
-  TH1F* BTagErrorSym = GetSymmetricError(BTagErrorUp, BTagErrorDown);
-  EnvelopeUp.push_back(BTagEnvelopeUp);
-  EnvelopeDown.push_back(BTagEnvelopeDown);
-  ErrorUp.push_back(BTagErrorUp);
-  ErrorDown.push_back(BTagErrorDown);
-  ErrorSym.push_back(BTagErrorSym);
-  CovMatrix.push_back(GetCovMatrix(BTagErrorSym));
+  TH1F* BTagHeavyEnvelopeUp = GetEnvelopeUp(BTagVariationsHeavy);
+  TH1F* BTagHeavyErrorUp = GetError(Central, BTagHeavyEnvelopeUp);
+  TH1F* BTagHeavyEnvelopeDown = GetEnvelopeDown(BTagVariationsHeavy);
+  TH1F* BTagHeavyErrorDown = GetError(Central, BTagHeavyEnvelopeDown);
+  TH1F* BTagHeavyErrorSym = GetSymmetricError(BTagHeavyErrorUp, BTagHeavyErrorDown);
+  EnvelopeUp.push_back(BTagHeavyEnvelopeUp);
+  EnvelopeDown.push_back(BTagHeavyEnvelopeDown);
+  ErrorUp.push_back(BTagHeavyErrorUp);
+  ErrorDown.push_back(BTagHeavyErrorDown);
+  ErrorSym.push_back(BTagHeavyErrorSym);
+  CovMatrix.push_back(GetCovMatrix(BTagHeavyErrorSym));
+
+  TH1F* BTagLightEnvelopeUp = GetEnvelopeUp(BTagVariationsLight);
+  TH1F* BTagLightErrorUp = GetError(Central, BTagLightEnvelopeUp);
+  TH1F* BTagLightEnvelopeDown = GetEnvelopeDown(BTagVariationsLight);
+  TH1F* BTagLightErrorDown = GetError(Central, BTagLightEnvelopeDown);
+  TH1F* BTagLightErrorSym = GetSymmetricError(BTagLightErrorUp, BTagLightErrorDown);
+  EnvelopeUp.push_back(BTagLightEnvelopeUp);
+  EnvelopeDown.push_back(BTagLightEnvelopeDown);
+  ErrorUp.push_back(BTagLightErrorUp);
+  ErrorDown.push_back(BTagLightErrorDown);
+  ErrorSym.push_back(BTagLightErrorSym);
+  CovMatrix.push_back(GetCovMatrix(BTagLightErrorSym));
 
   TH1F* PUEnvelopeUp = GetEnvelopeUp(PUVariations);
   TH1F* PUErrorUp = GetError(Central, PUEnvelopeUp);
@@ -191,6 +259,42 @@ int main(int argc, char* argv[])
   ErrorDown.push_back(MuTrErrorDown);
   ErrorSym.push_back(MuTrErrorSym);
   CovMatrix.push_back(GetCovMatrix(MuTrErrorSym));
+
+  TH1F* ElIdEnvelopeUp = GetEnvelopeUp(ElIdVariations);
+  TH1F* ElIdErrorUp = GetError(Central, ElIdEnvelopeUp);
+  TH1F* ElIdEnvelopeDown = GetEnvelopeDown(ElIdVariations);
+  TH1F* ElIdErrorDown = GetError(Central, ElIdEnvelopeDown);
+  TH1F* ElIdErrorSym = GetSymmetricError(ElIdErrorUp, ElIdErrorDown);
+  EnvelopeUp.push_back(ElIdEnvelopeUp);
+  EnvelopeDown.push_back(ElIdEnvelopeDown);
+  ErrorUp.push_back(ElIdErrorUp);
+  ErrorDown.push_back(ElIdErrorDown);
+  ErrorSym.push_back(ElIdErrorSym);
+  CovMatrix.push_back(GetCovMatrix(ElIdErrorSym));
+
+  TH1F* ElTrEnvelopeUp = GetEnvelopeUp(ElTrVariations);
+  TH1F* ElTrErrorUp = GetError(Central, ElTrEnvelopeUp);
+  TH1F* ElTrEnvelopeDown = GetEnvelopeDown(ElTrVariations);
+  TH1F* ElTrErrorDown = GetError(Central, ElTrEnvelopeDown);
+  TH1F* ElTrErrorSym = GetSymmetricError(ElTrErrorUp, ElTrErrorDown);
+  EnvelopeUp.push_back(ElTrEnvelopeUp);
+  EnvelopeDown.push_back(ElTrEnvelopeDown);
+  ErrorUp.push_back(ElTrErrorUp);
+  ErrorDown.push_back(ElTrErrorDown);
+  ErrorSym.push_back(ElTrErrorSym);
+  CovMatrix.push_back(GetCovMatrix(ElTrErrorSym));
+
+  TH1F* ElRecoEnvelopeUp = GetEnvelopeUp(ElRecoVariations);
+  TH1F* ElRecoErrorUp = GetError(Central, ElRecoEnvelopeUp);
+  TH1F* ElRecoEnvelopeDown = GetEnvelopeDown(ElRecoVariations);
+  TH1F* ElRecoErrorDown = GetError(Central, ElRecoEnvelopeDown);
+  TH1F* ElRecoErrorSym = GetSymmetricError(ElRecoErrorUp, ElRecoErrorDown);
+  EnvelopeUp.push_back(ElRecoEnvelopeUp);
+  EnvelopeDown.push_back(ElRecoEnvelopeDown);
+  ErrorUp.push_back(ElRecoErrorUp);
+  ErrorDown.push_back(ElRecoErrorDown);
+  ErrorSym.push_back(ElRecoErrorSym);
+  CovMatrix.push_back(GetCovMatrix(ElRecoErrorSym));
 
   TH1F* JECEnvelopeUp = GetEnvelopeUp(JECVariations);
   TH1F* JECErrorUp = GetError(Central, JECEnvelopeUp);
@@ -240,17 +344,41 @@ int main(int argc, char* argv[])
   ErrorSym.push_back(GeneratorErrorSym);
   CovMatrix.push_back(GetCovMatrix(GeneratorErrorSym));
 
-  TH1F* ShowerEnvelopeUp = GetEnvelopeUp(ShowerVariations);
-  TH1F* ShowerErrorUp = GetError(Central, ShowerEnvelopeUp);
-  TH1F* ShowerEnvelopeDown = GetEnvelopeDown(ShowerVariations);
-  TH1F* ShowerErrorDown = GetError(Central, ShowerEnvelopeDown);
-  TH1F* ShowerErrorSym = GetSymmetricError(ShowerErrorUp, ShowerErrorDown);
-  EnvelopeUp.push_back(ShowerEnvelopeUp);
-  EnvelopeDown.push_back(ShowerEnvelopeDown);
-  ErrorUp.push_back(ShowerErrorUp);
-  ErrorDown.push_back(ShowerErrorDown);
-  ErrorSym.push_back(ShowerErrorSym);
-  CovMatrix.push_back(GetCovMatrix(ShowerErrorSym));
+  TH1F* ISREnvelopeUp = GetEnvelopeUp(ISRVariations);
+  TH1F* ISRErrorUp = GetError(Central, ISREnvelopeUp);
+  TH1F* ISREnvelopeDown = GetEnvelopeDown(ISRVariations);
+  TH1F* ISRErrorDown = GetError(Central, ISREnvelopeDown);
+  TH1F* ISRErrorSym = GetSymmetricError(ISRErrorUp, ISRErrorDown);
+  EnvelopeUp.push_back(ISREnvelopeUp);
+  EnvelopeDown.push_back(ISREnvelopeDown);
+  ErrorUp.push_back(ISRErrorUp);
+  ErrorDown.push_back(ISRErrorDown);
+  ErrorSym.push_back(ISRErrorSym);
+  CovMatrix.push_back(GetCovMatrix(ISRErrorSym));
+
+  TH1F* FSREnvelopeUp = GetEnvelopeUp(FSRVariations);
+  TH1F* FSRErrorUp = GetError(Central, FSREnvelopeUp);
+  TH1F* FSREnvelopeDown = GetEnvelopeDown(FSRVariations);
+  TH1F* FSRErrorDown = GetError(Central, FSREnvelopeDown);
+  TH1F* FSRErrorSym = GetSymmetricError(FSRErrorUp, FSRErrorDown);
+  EnvelopeUp.push_back(FSREnvelopeUp);
+  EnvelopeDown.push_back(FSREnvelopeDown);
+  ErrorUp.push_back(FSRErrorUp);
+  ErrorDown.push_back(FSRErrorDown);
+  ErrorSym.push_back(FSRErrorSym);
+  CovMatrix.push_back(GetCovMatrix(FSRErrorSym));
+
+  TH1F* HdampEnvelopeUp = GetEnvelopeUp(HdampVariations);
+  TH1F* HdampErrorUp = GetError(Central, HdampEnvelopeUp);
+  TH1F* HdampEnvelopeDown = GetEnvelopeDown(HdampVariations);
+  TH1F* HdampErrorDown = GetError(Central, HdampEnvelopeDown);
+  TH1F* HdampErrorSym = GetSymmetricError(HdampErrorUp, HdampErrorDown);
+  EnvelopeUp.push_back(HdampEnvelopeUp);
+  EnvelopeDown.push_back(HdampEnvelopeDown);
+  ErrorUp.push_back(HdampErrorUp);
+  ErrorDown.push_back(HdampErrorDown);
+  ErrorSym.push_back(HdampErrorSym);
+  CovMatrix.push_back(GetCovMatrix(HdampErrorSym));
 
   TH1F* PDFEnvelopeUp = GetEnvelopeUp(PDFVariations);
   TH1F* PDFErrorUp = GetError(Central, PDFEnvelopeUp);
@@ -272,7 +400,7 @@ int main(int argc, char* argv[])
   TH1F* DummyErrorSym = GetSymmetricError(DummyErrorUp, DummyErrorDown);
   TH2D* DummyCov = GetCovMatrix(DummyErrorSym);
 
-  TFile* Dummy = new TFile(dir+"SYS_DUMMY.root","RECREATE");
+  TFile* Dummy = new TFile(directory+"SYS_DUMMY.root","RECREATE");
   Dummy->mkdir("CovMatrix");
   Dummy->mkdir("ErrorUp");
   Dummy->mkdir("ErrorDown");
@@ -296,7 +424,7 @@ int main(int argc, char* argv[])
 
   TFile *Stat, *BKG;
 
-  Stat = new TFile(dir+"STAT.root","RECREATE");
+  Stat = new TFile(directory+"STAT.root","RECREATE");
   Stat->mkdir("Up");
   Stat->mkdir("Down");
   Stat->cd("Up");
@@ -307,18 +435,24 @@ int main(int argc, char* argv[])
 
 
   std::vector<TFile*> SysFiles;
-  SysFiles.push_back(new TFile(dir+"SYS_BKG.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_SCALE.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_BTAG.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_PU.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_MUID.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_MUTR.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_JEC.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_JER.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_COR.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_GENERATOR.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_SHOWER.root","RECREATE"));
-  SysFiles.push_back(new TFile(dir+"SYS_PDF.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_BKG.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_SCALE.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_BTAGudsg.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_BTAGbc.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_PU.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_MUID.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_MUTR.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_ELID.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_ELTR.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_ELRECO.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_JEC.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_JER.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_COR.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_GENERATOR.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_ISR.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_FSR.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_HDAMP.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_PDF.root","RECREATE"));
 
   if( SysFiles.size() != EnvelopeUp.size() ) cout << "Not same number of Files and Envelope Up Hists!" << endl;
   if( SysFiles.size() != EnvelopeDown.size() ) cout << "Not same number of Files and Envelope Down Hists!" << endl;

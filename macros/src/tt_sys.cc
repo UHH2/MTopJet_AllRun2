@@ -28,7 +28,9 @@ int main(int argc, char* argv[]){
   TFile* SCALE_F = new TFile(dir+"SYS_SCALE.root");
   TFile* BKG_F = new TFile(dir+"SYS_BKG.root");
   TFile *GENERATOR_F = new TFile(dir+"SYS_GENERATOR.root");
-  TFile *SHOWER_F = new TFile(dir+"SYS_SHOWER.root");
+  TFile *ISR_F = new TFile(dir+"SYS_ISR.root");
+  TFile *FSR_F = new TFile(dir+"SYS_FSR.root");
+  TFile *HDAMP_F = new TFile(dir+"SYS_HDAMP.root");
   TFile *PDF_F = new TFile(dir+"SYS_PDF.root");
 
   TFile * CENTRAL_F = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
@@ -54,8 +56,12 @@ int main(int argc, char* argv[]){
   TH1F* BKG_DOWN = (TH1F*)BKG_F->Get("ErrorDown/hist");
   TH1F* GENERATOR_UP = (TH1F*)GENERATOR_F->Get("ErrorUp/hist");
   TH1F* GENERATOR_DOWN = (TH1F*)GENERATOR_F->Get("ErrorDown/hist");
-  TH1F* SHOWER_UP = (TH1F*)SHOWER_F->Get("ErrorUp/hist");
-  TH1F* SHOWER_DOWN = (TH1F*)SHOWER_F->Get("ErrorDown/hist");
+  TH1F* ISR_UP = (TH1F*)ISR_F->Get("ErrorUp/hist");
+  TH1F* ISR_DOWN = (TH1F*)ISR_F->Get("ErrorDown/hist");
+  TH1F* FSR_UP = (TH1F*)FSR_F->Get("ErrorUp/hist");
+  TH1F* FSR_DOWN = (TH1F*)FSR_F->Get("ErrorDown/hist");
+  TH1F* HDAMP_UP = (TH1F*)HDAMP_F->Get("ErrorUp/hist");
+  TH1F* HDAMP_DOWN = (TH1F*)HDAMP_F->Get("ErrorDown/hist");
   TH1F* PDF_UP = (TH1F*)PDF_F->Get("ErrorUp/hist");
   TH1F* PDF_DOWN = (TH1F*)PDF_F->Get("ErrorDown/hist");
 
@@ -73,7 +79,9 @@ int main(int argc, char* argv[]){
   TH1F* SCALE = GetLargestError(SCALE_UP, SCALE_DOWN);
   TH1F* BKG = GetLargestError(BKG_UP, BKG_DOWN);
   TH1F* Generator = GetLargestError(GENERATOR_UP, GENERATOR_DOWN);
-  TH1F* Shower = GetLargestError(SHOWER_UP, SHOWER_DOWN);
+  TH1F* ISR = GetLargestError(ISR_UP, ISR_DOWN);
+  TH1F* FSR = GetLargestError(FSR_UP, FSR_DOWN);
+  TH1F* HDAMP = GetLargestError(HDAMP_UP, HDAMP_DOWN);
   TH1F* PDF = GetLargestError(PDF_UP, PDF_DOWN);
 
 
@@ -102,7 +110,9 @@ int main(int argc, char* argv[]){
   vector<TH1F*> Model_v;
   Model_v.push_back(SCALE);
   Model_v.push_back(Generator);
-  Model_v.push_back(Shower);
+  Model_v.push_back(ISR);
+  Model_v.push_back(FSR);
+  Model_v.push_back(HDAMP);
   Model_v.push_back(PDF);
   Model_v.push_back(STAT);
   TH1F* MODELSYS = AddUncertaintyHists(Model_v);
@@ -118,7 +128,9 @@ int main(int argc, char* argv[]){
   TH1F* Scale_rel = ConvertToRelative(CENTRAL, SCALE);
   TH1F* BKG_rel = ConvertToRelative(CENTRAL, BKG);
   TH1F* Generator_rel = ConvertToRelative(CENTRAL, Generator);
-  TH1F* Shower_rel = ConvertToRelative(CENTRAL, Shower);
+  TH1F* ISR_rel = ConvertToRelative(CENTRAL, ISR);
+  TH1F* FSR_rel = ConvertToRelative(CENTRAL, FSR);
+  TH1F* HDAMP_rel = ConvertToRelative(CENTRAL, HDAMP);
   TH1F* PDF_rel = ConvertToRelative(CENTRAL, PDF);
 
   TH1F* Model_rel = ConvertToRelative(CENTRAL, MODELSYS);
@@ -259,7 +271,7 @@ int main(int argc, char* argv[]){
   Model_rel->GetYaxis()->SetNdivisions(505);
   Model_rel->GetYaxis()->SetTitleOffset(1.5);
 
-  for(auto i:{STAT_rel, Scale_rel, Generator_rel, Shower_rel, PDF_rel}){
+  for(auto i:{STAT_rel, Scale_rel, Generator_rel, ISR_rel, FSR_rel, HDAMP_rel, PDF_rel}){
     i->SetLineWidth(4);
     i->SetMarkerStyle(0);
   }
@@ -270,7 +282,9 @@ int main(int argc, char* argv[]){
 
   Scale_rel->SetLineColor(kAzure+7);
   Generator_rel->SetLineColor(kGreen);
-  Shower_rel->SetLineColor(kRed);
+  ISR_rel->SetLineColor(kRed);
+  FSR_rel->SetLineColor(kBlue);
+  HDAMP_rel->SetLineColor(kYellow);
   PDF_rel->SetLineColor(798);
 
   STAT_rel->SetLineColor(1);
@@ -280,7 +294,9 @@ int main(int argc, char* argv[]){
   STAT_rel->Draw("PX SAME");
   Scale_rel->Draw("PX SAME");
   Generator_rel->Draw("PX SAME");
-  Shower_rel->Draw("PX SAME");
+  ISR_rel->Draw("PX SAME");
+  FSR_rel->Draw("PX SAME");
+  HDAMP_rel->Draw("PX SAME");
   PDF_rel->Draw("PX SAME");
 
   TLegend *leg3 = new TLegend(0.63,0.6,0.88,0.88);
@@ -289,7 +305,9 @@ int main(int argc, char* argv[]){
   leg3->AddEntry(Scale_rel,"#mu_{f} and #mu_{r} scales","l");
   leg3->AddEntry(PDF_rel,"PDF","l");
   leg3->AddEntry(Generator_rel,"MC Generator","l");
-  leg3->AddEntry(Shower_rel,"Shower Model","l");
+  leg3->AddEntry(ISR_rel,"ISR Model","l");
+  leg3->AddEntry(FSR_rel,"FSR Model","l");
+  leg3->AddEntry(HDAMP_rel,"HDAMP Model","l");
 
   leg3->Draw();
 

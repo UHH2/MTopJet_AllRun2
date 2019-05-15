@@ -37,12 +37,13 @@ void chi2fit::SetRange(double lower, double upper){
 }
 
 void chi2fit::SetBins(std::vector<TH1D*> masspoints){
-  // when calculating the chi2, one degree of freedom is lost by normalisation  
+  // when calculating the chi2, one degree of freedom is lost by normalisation
   // therefore covariance matrix is only invertable if one excludes one bin from chi2
   // this bin is selected randomly (chi2 should not change depending on the bin)
   // for every masspoint, the bins that should be used are written into a vector
   bool skip;
-  int rand_bin = rand()%(upper_-lower_+1)+lower_; 
+  int rand_bin = rand()%(upper_-lower_+1)+lower_;
+  std::cout << "Exclude bin " << rand_bin << " from chi2" << std::endl;
   for(unsigned int j=0; j<masspoints.size(); j++){
     std::vector<int> bins_this;
     for(int i=lower_; i<=upper_; i++){
@@ -76,7 +77,7 @@ void chi2fit::CalculateChi2(){
   TF1*f1 = new TF1("f1","pol2",0,500);
   chi2Hist->Fit("f1","R");
   fit_ = chi2Hist->GetFunction("f1");
-  
+
   return;
 }
 
@@ -117,10 +118,10 @@ double chi2fit::ComputeChi2(TH1D* MC, std::vector<int> bins){
   TH2D* cov_sc = (TH2D*)cov_->Clone("cov_sc");
   TH1D* MC_sc = (TH1D*)MC->Clone("MC_sc");
 
-  // bins 
+  // bins
   int N =  bins.size();
 
-  //vectors and matrices 
+  //vectors and matrices
   TVectorD vdata(N);
   TVectorD vMC(N);
   TMatrixDSym mat(N);
@@ -158,10 +159,10 @@ double chi2fit::ComputeChi2(TH1D* MC, std::vector<int> bins){
       printf("(%3d,%3d)   %9.3f",i,i,mat[i][i]);
       if ( mat[i][i] < 1.e-10 ) printf("   <<<<<<<< \n");
       else printf("\n");
-    } 
+    }
     exit(3);
   }
- 
+
   // calculate chi2
   double chi2 = 0;
 
@@ -171,4 +172,3 @@ double chi2fit::ComputeChi2(TH1D* MC, std::vector<int> bins){
   std::cout << "Chi2 = " << chi2 << std::endl;
   return chi2;
 }
-

@@ -379,7 +379,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
   bool passed_recsel;
   if(isTTbar) passed_recsel = event.get(h_recsel);
-  passed_recsel = true;
+  else passed_recsel = true;
 
 
   // fill ttbargen class

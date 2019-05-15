@@ -4,9 +4,9 @@
 RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
 
-  HadJetMass = book<TH1F>("M_jet1", "Leading-Jet Mass [GeV]", 50, 0, 500);
-  HadJetMass_B = book<TH1F>("M_jet1_B", "Leading-Jet Mass [GeV]", 100, 0, 500);
-  HadJetMass_rebin = book<TH1F>("M_jet1_", "Leading-Jet Mass [GeV]", 25, 0, 500);
+  HadJetMass = book<TH1F>("M_jet1", "m_{jet} [GeV]", 50, 0, 500);
+  HadJetMass_B = book<TH1F>("M_jet1_B", "m_{jet} [GeV]", 100, 0, 500);
+  HadJetMass_rebin = book<TH1F>("M_jet1_", "m_{jet} [GeV]", 25, 0, 500);
 
   LepJetMass = book<TH1F>("M_jet2", "m_{jet + lepton}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);

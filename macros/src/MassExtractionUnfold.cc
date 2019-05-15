@@ -92,8 +92,8 @@ int main(int argc, char* argv[]){
   masses_stat->GetXaxis()->SetLimits(xmin, xmax);
   masses_stat->GetHistogram()->SetMinimum(ymin);
   masses_stat->GetHistogram()->SetMaximum(ymax);
-  masses_stat->GetXaxis()->SetTitle("m_{top} truth [GeV]");
-  masses_stat->GetYaxis()->SetTitle("m_{top} measured [GeV]");
+  masses_stat->GetXaxis()->SetTitle("m_{t} truth [GeV]");
+  masses_stat->GetYaxis()->SetTitle("m_{t} measured [GeV]");
   masses_stat->GetYaxis()->SetTitleOffset(1.5);
   masses_stat->GetXaxis()->SetNdivisions(505);
   masses_stat->GetYaxis()->SetNdivisions(505);
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]){
   // up->Draw("l SAME");
   // down->Draw("l SAME");
   TLegend *leg = new TLegend(0.6,0.15,0.88,0.38);
-  leg->AddEntry(masses_stat, "extracted m_{top}^{MC} (stat only)", "pl");
+  leg->AddEntry(masses_stat, "extracted m_{t} (stat only)", "pl");
   leg->AddEntry(diag_line, "perfect measurement", "l");
   // leg->AddEntry(fit3, "calibration fit", "l");
   // leg->AddEntry(Area, "fit uncertainty", "f");
@@ -128,8 +128,8 @@ int main(int argc, char* argv[]){
   masses->GetXaxis()->SetLimits(xmin, xmax);
   masses->GetHistogram()->SetMinimum(ymin);
   masses->GetHistogram()->SetMaximum(ymax);
-  masses->GetXaxis()->SetTitle("m_{top} truth [GeV]");
-  masses->GetYaxis()->SetTitle("m_{top} measured [GeV]");
+  masses->GetXaxis()->SetTitle("m_{t} truth [GeV]");
+  masses->GetYaxis()->SetTitle("m_{t} measured [GeV]");
   masses->GetYaxis()->SetTitleOffset(1.5);
   masses->GetXaxis()->SetNdivisions(505);
   masses->GetYaxis()->SetNdivisions(505);
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]){
   // up->Draw("l SAME");
   // down->Draw("l SAME");
   TLegend *leg2 = new TLegend(0.6,0.15,0.88,0.38);
-  leg2->AddEntry(masses, "extracted m_{top}^{MC}", "pl");
+  leg2->AddEntry(masses, "extracted m_{t}^{MC}", "pl");
   leg2->AddEntry(diag_line, "perfect measurement", "l");
   // leg->AddEntry(fit3, "calibration fit", "l");
   // leg->AddEntry(Area, "fit uncertainty", "f");

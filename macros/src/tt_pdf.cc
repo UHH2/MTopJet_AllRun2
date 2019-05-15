@@ -10,6 +10,15 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+  bool doelec = false;
+
+  if(argc > 1){
+    if(strcmp(argv[1], "elec") == 0){
+      doelec = true;
+    }
+  }
+
+  if(doelec) dir = dir_elec;
 
   TFile* TT_f = new TFile(dir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
   TH1F* CentralA = (TH1F*)TT_f->Get("XCone_cor/M_jet1_");  // 20 GeV bins

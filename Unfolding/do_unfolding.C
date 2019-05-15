@@ -358,7 +358,8 @@ int main(int argc, char* argv[])
 
 
   // read migrations from variations (vector of every source containing a vector of every variation e.g. up/down)
-  vector<TString> btag_name = {"btagbcup", "btagbcdown", "btagudsgup", "btagudsgdown"};
+  vector<TString> btagbc_name = {"btagbcup", "btagbcdown"};
+  vector<TString> btagudsg_name = {"btagudsgup", "btagudsgdown"};
   vector<TString> jec_name = {"jecup", "jecdown"};
   vector<TString> jer_name = {"jerup", "jerdown"};
   vector<TString> cor_name = {"corup", "cordown"};
@@ -368,15 +369,16 @@ int main(int argc, char* argv[])
   vector<TString> eltr_name = {"eltrup", "eltrdown"};
   vector<TString> elreco_name = {"elrecoup", "elrecodown"};
   vector<TString> pu_name = {"puup", "pudown"};
-  // vector< vector<TString> > sys_name = {btag_name, jec_name, jer_name, muid_name, mutr_name, pu_name};
   vector< vector<TString> > sys_name;
   vector<TString> sys_rel_name;
-  sys_name.push_back(btag_name);
+  sys_name.push_back(btagbc_name);
+  sys_name.push_back(btagudsg_name);
   sys_name.push_back(jec_name);
   sys_name.push_back(jer_name);
   sys_name.push_back(cor_name);
   sys_name.push_back(pu_name);
-  sys_rel_name.push_back("b-tagging");
+  sys_rel_name.push_back("b-tagging bc");
+  sys_rel_name.push_back("b-tagging udsg");
   sys_rel_name.push_back("jec");
   sys_rel_name.push_back("jer");
   sys_rel_name.push_back("cor");
@@ -525,6 +527,8 @@ int main(int argc, char* argv[])
   vector<TH2*> CovBgrScale;
   vector<TH1*> BGR_DELTA;
   TH1 *STAT_DELTA, *STAT_REL;
+
+  vector< vector<double> > ModelFactor;
 
   vector< vector<TH2*> > CovModel;
   vector< vector<TH2*> > CovModelStat;
@@ -694,10 +698,13 @@ int main(int argc, char* argv[])
     if(do_chi2modelsys && do_model){
       cout << "---------------------------------------" << endl;
       for(unsigned int i=0; i<model_name.size(); i++){
+        vector<double> dummy_factor;
+        ModelFactor.push_back(dummy_factor);
         for(unsigned int j=0; j<model_name[i].size(); j++){
           cout << "Variation: " << model_name[i][j] << endl;
           chi2sys chi2sysmodel = chi2sys(MODEL_OUTPUT[i][j], CovModelStat[i][j], model_truth[i][j]);
           cout << "factor applied = " << chi2sysmodel.GetFactor() << endl;
+          ModelFactor[i].push_back(chi2sysmodel.GetFactor());
           CovModel[i].push_back(chi2sysmodel.GetCov());
           MODEL_DELTA[i].push_back(chi2sysmodel.GetDelta());
           cout << endl;
@@ -787,6 +794,15 @@ int main(int argc, char* argv[])
       cout << "using " << model_name[i][j] << endl;
     }
 
+    // also store factors for model variations in txt file
+    if(do_model){
+      for(unsigned int i=0; i<model_name.size(); i++){
+        for(unsigned int j=0; j<model_name[i].size(); j++){
+          cout << "factor for " << model_name[i][j] << ": " << ModelFactor[i][j] << endl;
+        }
+      }
+    }
+
     // close sys file again
     std::cout.rdbuf(coutbuf);
 
@@ -835,8 +851,8 @@ int main(int argc, char* argv[])
   cout<< "Events not reconstrcted in gen measurement = " << histMCGenRec->Integral(1, 14,0,0) << endl;
 
 
-  data_unfolded->Write();
-  ProbMatrix->Write();
+  data_unfolded->Write("Unfold_events");
+  ProbMatrix->Write("ProbMatrix");
 
   /*
   ██████ ██   ██ ██     ██████
@@ -847,8 +863,8 @@ int main(int argc, char* argv[])
   */
 
   // parameters for chi2 fit
-  double lower = 120;
-  double upper = 250;
+  double lower = 112;
+  double upper = 230;
   bool NormToWidth = true;
 
   // normalise unfolding output
@@ -856,10 +872,11 @@ int main(int argc, char* argv[])
   TH1D* data_unfolded_stat_norm = normData_stat->GetHist(); // this hist is just for plotting
   TH2D* CovMatrix_stat_norm = normData_stat->GetMatrix();
 
-
   Normalise * normData = new Normalise(data_unfolded, CovTotal, lower, upper, NormToWidth);
   TH1D* data_unfolded_norm = normData->GetHist();
   TH2D* CovMatrix_norm = normData->GetMatrix();
+  TH1* delta_tot_norm = CreateDeltaFromCov(CovMatrix_norm); // only for cross check
+  TH1* delta_tot = CreateDeltaFromCov(CovTotal); // only for cross check
 
   // normalise mass samples
   vector<TH1D*> mc_mtop_templates_norm;
@@ -951,6 +968,7 @@ int main(int argc, char* argv[])
   plot->draw_matrix(CovInputStat, "COV_INPUT_STAT", false, false);
   plot->draw_matrix(CovMatrixStat, "COV_MATRIX_STAT", false, false);
   plot->draw_matrix(CovTotal, "COV_TOTAL", false, false);
+  plot->draw_matrix(CovMatrix_norm, "COV_TOTAL_NORM", false, false);
   // plot->draw_matrix(CovTotal_TUnfold, "COV_TOTAL_check", false);
   plot->draw_matrix(histMCGenRec, "Migration_Matrix", true, true);
   plot->draw_matrix(histMCGenRec_generator, "Migration_Matrix_Generator", true, true);
@@ -964,6 +982,10 @@ int main(int argc, char* argv[])
 
   plot->draw_delta(STAT_DELTA, "DELTA_STAT");
   plot->draw_delta_rel(STAT_DELTA, data_unfolded_sys, "DELTA_STAT_REL");
+  plot->draw_delta_rel(delta_tot_norm, data_unfolded_norm, "DELTA_TOTAL_NORM_REL");
+  plot->draw_delta_rel(delta_tot, data_unfolded_sys, "DELTA_TOTAL_REL");
+  plot->draw_delta(delta_tot_norm, "DELTA_TOTAL_NORM");
+  plot->draw_delta(delta_tot, "DELTA_TOTAL");
 
   for(unsigned int i=0; i<sys_name.size(); i++){
     for(unsigned int j=0; j<sys_name[i].size(); j++){
@@ -1040,6 +1062,8 @@ int main(int argc, char* argv[])
   // Convert to cross section
   TH1* data_crosssection = ConvertToCrossSection(data_unfolded_sys);
   TH1* data_crosssection_stat = ConvertToCrossSection(data_unfolded_stat);
+  data_crosssection->Write("Unfold_XS_totuncert");
+  data_crosssection_stat->Write("Unfold_XS_statuncert");
   vector<TH1D*> truth_crosssection = {ConvertToCrossSection(hist_mc_truth), ConvertToCrossSection(h_pseudodata_truth)};
   plot->draw_output_data(data_crosssection, data_crosssection_stat, truth_crosssection, legnames, false, "Unfold");
 

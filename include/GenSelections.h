@@ -161,6 +161,18 @@ namespace uhh2 {
     bool subjet_matching;
   };
 
+  class Matching_XCone33GEN : public Selection {
+
+  public:
+    explicit Matching_XCone33GEN(Context&, const std::string &, bool);
+    virtual bool passes(const Event&) override;
+
+  private:
+    uhh2::Event::Handle<std::vector<GenTopJet>> h_fatjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+    bool subjet_matching;
+  };
+
   class Matching_XCone_botlep_lep : public Selection {
 
   public:

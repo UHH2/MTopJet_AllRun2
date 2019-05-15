@@ -72,7 +72,10 @@ TH2D* Normalise::CalcMatrix(){
 TH2D* Normalise::MatrixErrorPropagation(TH2*old_cov){
   int nbins = upper_;
   TH2D* new_cov = new TH2D("new_cov", "new_cov", nbins, 1, upper_+1, nbins, 1, upper_+1);
+  // TH2D* new_cov = (TH2D*) old_cov->Clone();
   double integral = hist_->Integral(lower_, upper_);
+  // std::cout << "lower bin: "<< lower_ << std::endl;
+  // std::cout << "upper bin: "<< upper_ << std::endl;
   for(int i=1; i <= upper_; i++){
     for(int j=1; j <= upper_; j++){
       double sum = 0;
@@ -80,21 +83,22 @@ TH2D* Normalise::MatrixErrorPropagation(TH2*old_cov){
       double derivation_j = 0;
       double old_entry = 0;
       for(int k=1; k <= upper_; k++){
-	for(int l=1; l <= upper_; l++){
-	  old_entry = old_cov->GetBinContent(k,l);
-	  double binwidth_i = hist_->GetBinWidth(i);
-	  double binwidth_j = hist_->GetBinWidth(j);
-	  if(!width_){
-	    binwidth_i = 1.0;
-	    binwidth_j = 1.0;
-	  }
-	  if(i==k) derivation_i = (integral - hist_->GetBinContent(i)) / (pow(integral,2)) * (1/binwidth_i);
-	  else     derivation_i = - (hist_->GetBinContent(i))          / (pow(integral,2)) * (1/binwidth_i);
-	  if(j==l) derivation_j = (integral - hist_->GetBinContent(j)) / (pow(integral,2)) * (1/binwidth_j);
-	  else     derivation_j = - (hist_->GetBinContent(j))          / (pow(integral,2)) * (1/binwidth_j);
-	  sum += derivation_i * derivation_j * old_entry;
-	}
+        for(int l=1; l <= upper_; l++){
+          old_entry = old_cov->GetBinContent(k,l);
+          double binwidth_i = hist_->GetBinWidth(i);
+          double binwidth_j = hist_->GetBinWidth(j);
+          if(!width_){
+            binwidth_i = 1.0;
+            binwidth_j = 1.0;
+          }
+          if(i==k) derivation_i = (integral - hist_->GetBinContent(i)) / (pow(integral,2)) * (1/binwidth_i);
+          else     derivation_i = - (hist_->GetBinContent(i))          / (pow(integral,2)) * (1/binwidth_i);
+          if(j==l) derivation_j = (integral - hist_->GetBinContent(j)) / (pow(integral,2)) * (1/binwidth_j);
+          else     derivation_j = - (hist_->GetBinContent(j))          / (pow(integral,2)) * (1/binwidth_j);
+          sum += derivation_i * derivation_j * old_entry;
+        }
       }
+      // std::cout << sum << std::endl;
       new_cov->Fill(i, j, sum);
     }
   }

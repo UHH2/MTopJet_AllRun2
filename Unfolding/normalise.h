@@ -15,7 +15,7 @@
 #include <TVectorD.h>
 #include <TDecompLU.h>
 #include <iostream>
-#include <iomanip>  
+#include <iomanip>
 #include <TF1.h>
 
 class Normalise{

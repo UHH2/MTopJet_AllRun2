@@ -44,5 +44,6 @@ class plotter{
  private:
   TH1* add_error_bar(TH1* hist, std::vector<double> errors);
   TString directory;
+  void CMSLabel();
 
 };

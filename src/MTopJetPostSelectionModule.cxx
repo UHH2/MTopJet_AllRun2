@@ -40,7 +40,8 @@
 #include "UHH2/MTopJet/include/CorrectionFactor.h"
 #include "UHH2/MTopJet/include/tt_width_reweight.h"
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
-#include <UHH2/MTopJet/include/ElecTriggerScaleFactor.h>
+#include <UHH2/MTopJet/include/ElecTriggerSF.h>
+#include "UHH2/MTopJet/include/WeightHists.h"
 
 #include <vector>
 
@@ -70,6 +71,8 @@ protected:
   std::unique_ptr<uhh2::Selection> njet_had;
   std::unique_ptr<uhh2::Selection> njet_lep;
   std::unique_ptr<uhh2::Selection> pt_sel;
+  std::unique_ptr<uhh2::Selection> pt450_sel;
+  std::unique_ptr<uhh2::Selection> pt530_sel;
   std::unique_ptr<uhh2::Selection> pt2_sel;
   std::unique_ptr<uhh2::Selection> eta_sel;
   std::unique_ptr<uhh2::Selection> pt350_gensel;
@@ -81,6 +84,8 @@ protected:
   std::unique_ptr<uhh2::Selection> mass_gensel;
   std::unique_ptr<uhh2::Selection> pt_gensel23;
   std::unique_ptr<uhh2::Selection> mass_gensel23;
+  std::unique_ptr<uhh2::Selection> matched_sub_GEN;
+  std::unique_ptr<uhh2::Selection> matched_fat_GEN;
   std::unique_ptr<uhh2::Selection> matched_sub;
   std::unique_ptr<uhh2::Selection> matched_fat;
   std::unique_ptr<uhh2::Selection> subjet_quality;
@@ -149,15 +154,20 @@ protected:
   std::unique_ptr<AnalysisModule> PUreweight;
 
   // store Hist collection as member variables
-  std::unique_ptr<Hists> h_Muon_PreSel, h_Muon_PreSel_highpt, h_Elec_PreSel, h_MTopJet_PreSel, h_Jets_PreSel, h_XCone_cor_PreSel;
+  std::unique_ptr<Hists> h_Muon_PreSel01, h_Elec_PreSel01, h_MTopJet_PreSel01, h_Jets_PreSel01, h_XCone_cor_PreSel01;
+  std::unique_ptr<Hists> h_Muon_PreSel02, h_Elec_PreSel02, h_MTopJet_PreSel02, h_Jets_PreSel02, h_XCone_cor_PreSel02;
+  std::unique_ptr<Hists> h_Muon_PreSel03, h_Elec_PreSel03, h_MTopJet_PreSel03, h_Jets_PreSel03, h_XCone_cor_PreSel03;
+  std::unique_ptr<Hists> h_Muon_PreSel04, h_Elec_PreSel04, h_MTopJet_PreSel04, h_Jets_PreSel04, h_XCone_cor_PreSel04;
 
-  std::unique_ptr<Hists> h_Muon, h_Muon_highpt, h_Elec, h_MTopJet, h_Jets;
+  std::unique_ptr<Hists> h_Muon, h_Elec, h_MTopJet, h_Jets;
   std::unique_ptr<Hists> h_CorrectionHists, h_CorrectionHists_after, h_CorrectionHists_WJets;
   std::unique_ptr<Hists> h_RecGenHists_ak4, h_RecGenHists_ak4_noJEC;
+  std::unique_ptr<Hists> h_weights01, h_weights02, h_weights03, h_weights04;
 
   std::unique_ptr<Hists> h_XCone_cor, h_XCone_jec, h_XCone_raw;
   std::unique_ptr<Hists> h_XCone_puppi;
   std::unique_ptr<Hists> h_XCone_cor_SF, h_XCone_jec_SF, h_XCone_raw_SF;
+  std::unique_ptr<Hists> h_XCone_cor_SF_pt400, h_XCone_cor_SF_pt450, h_XCone_cor_SF_pt530;
   std::unique_ptr<Hists> h_XCone_cor_pt350, h_XCone_cor_noptcut;
   std::unique_ptr<Hists> h_XCone_cor_subjets, h_XCone_jec_subjets, h_XCone_raw_subjets;
   std::unique_ptr<Hists> h_XCone_cor_subjets_SF, h_XCone_jec_subjets_SF, h_XCone_raw_subjets_SF;
@@ -170,7 +180,8 @@ protected:
 
 
   std::unique_ptr<Hists> h_RecGenHists_lowPU, h_RecGenHists_medPU, h_RecGenHists_highPU, h_RecGenHists_lowPU_noJEC, h_RecGenHists_medPU_noJEC, h_RecGenHists_highPU_noJEC, h_RecGenHists_RecOnly_corr;
-  std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_GenOnly, h_XCone_GEN_Both;
+  std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_Both;
+  std::unique_ptr<Hists> h_XCone_GEN_GenOnly, h_XCone_GEN_GenOnly_matched, h_XCone_GEN_GenOnly_unmatched, h_XCone_GEN_GenOnly_matched_fat, h_XCone_GEN_GenOnly_unmatched_fat;
   std::unique_ptr<Hists> h_RecGenHists_GenOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly_noJEC;
@@ -202,6 +213,7 @@ protected:
   string MuTrigger_variation ="nominal";
   string ElID_variation ="nominal";
   string ElReco_variation ="nominal";
+  string ElTrigger_variation ="nominal";
   string PU_variation ="nominal";
 
 };
@@ -321,6 +333,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   subjet_quality.reset(new SubjetQuality(ctx, jet_label_had, 30, 2.5));
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
+  pt450_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 450));
+  pt530_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 530));
   pt2_sel.reset(new LeadingRecoJetPT(ctx, jet_label_lep, 10));
   eta_sel.reset(new LeadingRecoJetETA(ctx, jet_label_had, 2.5));
   pt350_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 350));
@@ -348,6 +362,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   mass_gensel.reset(new MassCut_gen(ctx, "GEN_XCone33_had_Combined", "GEN_XCone33_lep_Combined"));
   pt_gensel23.reset(new LeadingJetPT_gen(ctx, "GEN_XCone23_had_Combined", 400));
   mass_gensel23.reset(new MassCut_gen(ctx, "GEN_XCone23_had_Combined", "GEN_XCone23_lep_Combined"));
+  matched_sub_GEN.reset(new Matching_XCone33GEN(ctx, "GEN_XCone33_had_Combined", true));
+  matched_fat_GEN.reset(new Matching_XCone33GEN(ctx, "GEN_XCone33_had_Combined", false));
+
+
 
   // Selection for matching reco jets to gen particles
   if(isTTbar) matched_sub.reset(new Matching_XCone33(ctx, true));
@@ -366,11 +384,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   MuTrigger_variation = ctx.get("MuTrigger_variation","nominal");
   ElID_variation = ctx.get("ElID_variation","nominal");
   ElReco_variation = ctx.get("ElReco_variation","nominal");
+  ElTrigger_variation = ctx.get("ElTrigger_variation","nominal");
 
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
-  ele_trigger_SF.reset(new ElectronTriggerSF(ctx)); // approved at https://indico.cern.ch/event/662745/
+  ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
   ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
   ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
   /*************************** Set up Hists classes **********************************************************************************/
@@ -386,6 +405,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_XCone_raw_SF.reset(new RecoHists_xcone(ctx, "XCone_raw_SF", "raw"));
   h_XCone_cor_SF.reset(new RecoHists_xcone(ctx, "XCone_cor_SF", "cor"));
   h_XCone_jec_SF.reset(new RecoHists_xcone(ctx, "XCone_jec_SF", "jec"));
+
+  h_XCone_cor_SF_pt400.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt400", "cor"));
+  h_XCone_cor_SF_pt450.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt450", "cor"));
+  h_XCone_cor_SF_pt530.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt530", "cor"));
 
   h_XCone_cor_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_pt350", "cor"));
   h_XCone_cor_noptcut.reset(new RecoHists_xcone(ctx, "XCone_cor_noptcut", "cor"));
@@ -429,18 +452,41 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isTTbar) h_XCone_cor_m_fat.reset(new RecoHists_xcone(ctx, "XCone_cor_matched_fat", "cor"));
   if(isTTbar) h_XCone_cor_u_fat.reset(new RecoHists_xcone(ctx, "XCone_cor_unmatched_fat", "cor"));
 
+  // Weight Hists
+  h_weights01.reset(new WeightHists(ctx, "WeightHists01_noSF"));
+  h_weights02.reset(new WeightHists(ctx, "WeightHists02_PU"));
+  h_weights03.reset(new WeightHists(ctx, "WeightHists03_Lepton"));
+  h_weights04.reset(new WeightHists(ctx, "WeightHists04_BTag"));
+
+
   h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
   h_Muon.reset(new MuonHists(ctx, "MuonHists"));
-  // h_Muon_highpt.reset(new MuonHists(ctx, "MuonHists_highpt"));
   h_Elec.reset(new ElectronHists(ctx, "ElecHists"));
   h_Jets.reset(new JetHists(ctx, "JetHits"));
 
-  h_MTopJet_PreSel.reset(new MTopJetHists(ctx, "EventHists_PreSel"));
-  h_Muon_PreSel.reset(new MuonHists(ctx, "MuonHits_PreSel"));
-  // h_Muon_PreSel_highpt.reset(new MuonHists(ctx, "MuonHits_PreSel_highpt"));
-  h_Elec_PreSel.reset(new ElectronHists(ctx, "ElecHits_PreSel"));
-  h_Jets_PreSel.reset(new JetHists(ctx, "JetHits_PreSel"));
-  h_XCone_cor_PreSel.reset(new RecoHists_xcone(ctx, "XCone_cor_PreSel", "cor"));
+  h_MTopJet_PreSel01.reset(new MTopJetHists(ctx, "PreSel01_Event"));
+  h_Muon_PreSel01.reset(new MuonHists(ctx, "PreSel01_Muon"));
+  h_Elec_PreSel01.reset(new ElectronHists(ctx, "PreSel01_Elec"));
+  h_Jets_PreSel01.reset(new JetHists(ctx, "PreSel01_Jet"));
+  h_XCone_cor_PreSel01.reset(new RecoHists_xcone(ctx, "PreSel01_XCone", "cor"));
+
+  h_MTopJet_PreSel02.reset(new MTopJetHists(ctx, "PreSel02_Event"));
+  h_Muon_PreSel02.reset(new MuonHists(ctx, "PreSel02_Muon"));
+  h_Elec_PreSel02.reset(new ElectronHists(ctx, "PreSel02_Elec"));
+  h_Jets_PreSel02.reset(new JetHists(ctx, "PreSel02_Jet"));
+  h_XCone_cor_PreSel02.reset(new RecoHists_xcone(ctx, "PreSel02_XCone", "cor"));
+
+  h_MTopJet_PreSel03.reset(new MTopJetHists(ctx, "PreSel03_Event"));
+  h_Muon_PreSel03.reset(new MuonHists(ctx, "PreSel03_Muon"));
+  h_Elec_PreSel03.reset(new ElectronHists(ctx, "PreSel03_Elec"));
+  h_Jets_PreSel03.reset(new JetHists(ctx, "PreSel03_Jet"));
+  h_XCone_cor_PreSel03.reset(new RecoHists_xcone(ctx, "PreSel03_XCone", "cor"));
+
+  h_MTopJet_PreSel04.reset(new MTopJetHists(ctx, "PreSel04_Event"));
+  h_Muon_PreSel04.reset(new MuonHists(ctx, "PreSel04_Muon"));
+  h_Elec_PreSel04.reset(new ElectronHists(ctx, "PreSel04_Elec"));
+  h_Jets_PreSel04.reset(new JetHists(ctx, "PreSel04_Jet"));
+  h_XCone_cor_PreSel04.reset(new RecoHists_xcone(ctx, "PreSel04_XCone", "cor"));
 
   if(isMC){
     if(isTTbar) h_CorrectionHists.reset(new CorrectionHists_subjets(ctx, "CorrectionHists", "jec"));
@@ -454,6 +500,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_XCone_GEN_Sel_ptsub.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_ptsub"));
 
     h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
+    h_XCone_GEN_GenOnly_matched.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_matched"));
+    h_XCone_GEN_GenOnly_unmatched.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_unmatched"));
+    h_XCone_GEN_GenOnly_matched_fat.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_matched_fat"));
+    h_XCone_GEN_GenOnly_unmatched_fat.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_unmatched_fat"));
     h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
     h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
 
@@ -617,6 +667,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
 
+  // FILL CONTROL PLOTS
+  if(passed_recsel){
+    h_MTopJet_PreSel01->fill(event);
+    h_Muon_PreSel01->fill(event);
+    h_Elec_PreSel01->fill(event);
+    h_Jets_PreSel01->fill(event);
+    h_XCone_cor_PreSel01->fill(event);
+  }
+
+
   if(isTTbar)h_GenParticles_SM->fill(event);
 
   // choose if tt bar sample width should be reweighted
@@ -635,7 +695,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   scale_variation->process(event); // do this again because scale variation should change gen weight and event.weight, but not rec weight!!!
 
   // if(reweight_ttbar) ttbar_reweight->process(event);
-
+  h_weights01->fill(event);
 
   /** store weights for pdf variation *********************/
   std::vector<double> pdf_weights;
@@ -650,7 +710,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /** PU Reweighting *********************/
   PUreweight->process(event);
-
+  h_weights02->fill(event);
+  // FILL CONTROL PLOTS
+  if(passed_recsel){
+    h_MTopJet_PreSel02->fill(event);
+    h_Muon_PreSel02->fill(event);
+    h_Elec_PreSel02->fill(event);
+    h_Jets_PreSel02->fill(event);
+    h_XCone_cor_PreSel02->fill(event);
+  }
   /** muon SF *********************/
   if(channel_ == muon){
     muo_tight_noniso_SF->process(event);
@@ -659,9 +727,17 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else{
     ele_id_SF->process(event);
     ele_reco_SF->process(event);
-    // ele_trigger_SF->process(event);
+    ele_trigger_SF->process(event);
   }
-
+  h_weights03->fill(event);
+  // FILL CONTROL PLOTS
+  if(passed_recsel){
+    h_MTopJet_PreSel03->fill(event);
+    h_Muon_PreSel03->fill(event);
+    h_Elec_PreSel03->fill(event);
+    h_Jets_PreSel03->fill(event);
+    h_XCone_cor_PreSel03->fill(event);
+  }
   /** b-tagging *********************/
   int jetbtagN(0);
   bool passed_btag;
@@ -681,6 +757,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(jetbtagN_loose >= 1) passed_btag_loose = true;
   else passed_btag_loose = false;
   BTagScaleFactors->process(event);
+  h_weights04->fill(event);
+
+
 
   /** calculate recweight now *********************/
   double rec_weight;
@@ -690,7 +769,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /**********************************/
   bool passed_presel_rec = (passed_recsel && passed_btag);
-
+  // FILL CONTROL PLOTS
+  if(passed_presel_rec){
+    h_MTopJet_PreSel04->fill(event);
+    h_Muon_PreSel04->fill(event);
+    h_Elec_PreSel04->fill(event);
+    h_Jets_PreSel04->fill(event);
+    h_XCone_cor_PreSel04->fill(event);
+  }
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 *******************************************************/
 
   bool pass_measurement_rec;
@@ -781,17 +867,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool is_matched_sub = false;
   bool is_matched_fat = false;
 
-  // hists after PreSel on REC Level
-  if(passed_presel_rec){
-    h_MTopJet_PreSel->fill(event);
-    h_Muon_PreSel->fill(event);
-    // if(muon_highpt_sel->passes(event)) h_Muon_PreSel_highpt->fill(event);
-    h_Elec_PreSel->fill(event);
-    h_Jets_PreSel->fill(event);
-    h_XCone_cor_PreSel->fill(event);
-  }
-
-
   // Hists for 750GeV phase space
   if(passes_750_ak8) h_750_ak8->fill(event);
   if(passes_750_xcone) h_750_xcone->fill(event);
@@ -881,13 +956,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_jec_SF->fill(event);
     h_XCone_cor_SF->fill(event);
 
+    if(!pt450_sel->passes(event)) h_XCone_cor_SF_pt400->fill(event);
+    if(pt450_sel->passes(event) && !pt530_sel->passes(event)) h_XCone_cor_SF_pt450->fill(event);
+    if(pt530_sel->passes(event)) h_XCone_cor_SF_pt530->fill(event);
+
     h_XCone_raw_subjets_SF->fill(event);
     h_XCone_jec_subjets_SF->fill(event);
     h_XCone_cor_subjets_SF->fill(event);
 
     h_MTopJet->fill(event);
     h_Muon->fill(event);
-    // if(muon_highpt_sel->passes(event)) h_Muon_highpt->fill(event);
     h_Elec->fill(event);
     h_Jets->fill(event);
 
@@ -925,6 +1003,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /*************************** fill hists with gen sel applied *************************************************************************************/
   if(pass_measurement_gen){
     h_XCone_GEN_GenOnly->fill(event);
+    if(matched_sub_GEN->passes(event)) h_XCone_GEN_GenOnly_matched->fill(event);
+    else                               h_XCone_GEN_GenOnly_unmatched->fill(event);
+    if(matched_fat_GEN->passes(event)) h_XCone_GEN_GenOnly_matched_fat->fill(event);
+    else                               h_XCone_GEN_GenOnly_unmatched_fat->fill(event);
     if(isTTbar) h_GenParticles_GenOnly->fill(event);
     h_RecGenHists_GenOnly->fill(event);
   }

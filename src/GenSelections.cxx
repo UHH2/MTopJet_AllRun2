@@ -414,6 +414,76 @@ bool uhh2::Matching_XCone33::passes(const uhh2::Event& event){
   return matched;
 }
 
+
+////////////////////////////////////////////////////////
+
+uhh2::Matching_XCone33GEN::Matching_XCone33GEN(uhh2::Context& ctx, const std::string & jetname, bool subjet_matching_):
+h_fatjets(ctx.get_handle<std::vector<GenTopJet>>(jetname)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+subjet_matching(subjet_matching_){}
+
+bool uhh2::Matching_XCone33GEN::passes(const uhh2::Event& event){
+  // get jets
+  std::vector<GenTopJet> fatjets = event.get(h_fatjets);
+  GenTopJet fathadjet = fatjets[0];
+
+  // get decay products from ttbar
+  const auto & ttbargen = event.get(h_ttbargen);
+
+  // get stable particles from ttbar decay and sort them into leptonic and hadronic
+  GenParticle bot, q1, q2;
+  if(ttbargen.IsTopHadronicDecay()){
+    bot = ttbargen.bTop();
+    q1 = ttbargen.Wdecay1();
+    q2 = ttbargen.Wdecay2();
+  }
+  else if(ttbargen.IsAntiTopHadronicDecay()){
+    bot = ttbargen.bAntitop();
+    q1 = ttbargen.WMinusdecay1();
+    q2 = ttbargen.WMinusdecay2();
+  }
+  else return false;
+
+  bool matched = false;
+  bool matched_q1 = false;
+  bool matched_q2 = false;
+  bool matched_bot = false;
+
+  // if merging is selected, only confirm if top decay products are inside R=1.2 cone of fatjets.
+
+  if(!subjet_matching){
+    if(deltaR(q1, fathadjet) < 1.2) matched_q1 = true;
+    if(deltaR(q2, fathadjet) < 1.2) matched_q2 = true;
+    if(deltaR(bot, fathadjet) < 1.2) matched_bot = true;
+  }
+  if(matched_q1 && matched_q2 && matched_bot) matched = true;
+
+  // continue here if matching should be performed to subjets
+  // to pass, every subjet has to contain exactly one genparticle
+  else if (subjet_matching){
+    std::vector<Particle> jets = fathadjet.subjets();
+    std::vector<GenParticle> partons = {q1, q2, bot};
+    for(unsigned int i=0; i<jets.size(); i++){
+      double minR = 100;
+      int j_remove = -1;
+      for(unsigned int j=0; j<partons.size(); j++){
+        if(deltaR(jets[i], partons[j]) < minR){
+          minR = deltaR(jets[i], partons[j]);
+          j_remove = j;
+        }
+      }
+      // if no parton found, return false
+      if(minR > 0.2 || minR == 100 || j_remove==-1) return false;
+      // remove the matched parton
+      partons.erase(partons.begin()+j_remove);
+    }
+    // if the event still arrives here, it is matched!
+    matched = true;
+  }
+
+  return matched;
+}
+
 ////////////////////////////////////////////////////////
 
 uhh2::Matching_XCone_botlep_lep::Matching_XCone_botlep_lep(uhh2::Context& ctx, const std::string & name):
