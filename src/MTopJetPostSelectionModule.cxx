@@ -108,6 +108,8 @@ protected:
   std::unique_ptr<TopPtReweight> ttbar_reweight;
 
   // handles for output
+  Event::Handle<double>h_musf_central;
+
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
   Event::Handle<bool>h_matched;
@@ -386,9 +388,11 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ElReco_variation = ctx.get("ElReco_variation","nominal");
   ElTrigger_variation = ctx.get("ElTrigger_variation","nominal");
 
+
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
+
   ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
   ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
   ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
@@ -556,6 +560,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_weight = ctx.get_handle<double>("weight");
   h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
   h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
+  h_musf_central = ctx.get_handle<double>("passed_recsel_2");
 
   // undeclare event output (jet collections etc) to get small root files
   ctx.undeclare_all_event_output();

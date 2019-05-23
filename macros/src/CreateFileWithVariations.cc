@@ -13,8 +13,16 @@ int main(int argc, char* argv[]){
   TString histname = "XCone_cor_SF/M_jet1_";
   TString histname_for_file = "M_jet1";
 
+  // TString histname = "PreSel04_Muon/pt_1";
+  // TString histname_for_file = "pt_1";
+
+
   TString dirname = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/combine/";
+  // TString dirname = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/";
+
   TString name_out = "MjetSYS";
+  // TString name_out = "PtMuonSYS";
+
   vector<TString> processes = {"DATA", "TTbar", "WJets", "SingleTop", "other"};
 
   TFile * file_out = new TFile(dirname+name_out+".root","RECREATE");
@@ -38,7 +46,8 @@ int main(int argc, char* argv[]){
   }
 
 
-  vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAGudsg", "BTAGbc", "PDF", "ISR", "FSR", "HDAMP", "GENERATOR", "SCALE"};
+  vector<TString> sys = {"BTAGudsg", "BTAGbc"};
+  // vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAGudsg", "BTAGbc", "PDF", "ISR", "FSR", "HDAMP", "GENERATOR", "SCALE"};
   // vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAGudsg", "BTAGbc"};
   vector<TString> shift = {"EnvelopeUp", "EnvelopeDown"};
 

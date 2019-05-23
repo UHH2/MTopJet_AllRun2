@@ -61,17 +61,17 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
 
   TCanvas *c = new TCanvas("c","",600,600);
   double ymax;
-  gPad->SetLeftMargin(0.15);
+  gPad->SetLeftMargin(0.19);
 
   if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.5 * truth->GetMaximum();
   else ymax = 1.5 * output->GetMaximum();
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
   output->GetXaxis()->SetTitle("m_{jet} [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
-  output->GetYaxis()->SetTitleOffset(1.1);
+  output->GetYaxis()->SetTitleOffset(1.5);
   output->GetXaxis()->SetTitleOffset(0.9);
   output->GetYaxis()->SetTitleSize(0.05);
   output->GetXaxis()->SetTitleSize(0.05);
@@ -91,7 +91,7 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   else                       l=new TLegend(0.5,0.6,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
-  l->AddEntry(output,"data unfolded","pl");
+  l->AddEntry(output,"Data","ple");
   l->AddEntry(truth,"MC particle level","pl");
   l->SetTextSize(0.04);
   l->Draw();
@@ -126,14 +126,14 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   double ymax = 1.5 * max;
 
   TCanvas *c = new TCanvas("c","",600,600);
-  gPad->SetLeftMargin(0.15);
-  TGaxis::SetMaxDigits(3);
+  gPad->SetLeftMargin(0.19);
+  // TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
   output->GetXaxis()->SetTitle("m_{jet} [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("#frac{d#sigma}{dm_{jet}} [#frac{fb}{GeV}]");
-  output->GetYaxis()->SetTitleOffset(1.1);
+  output->GetYaxis()->SetTitleOffset(1.5);
   output->GetXaxis()->SetTitleOffset(0.9);
   output->GetYaxis()->SetTitleSize(0.05);
   output->GetXaxis()->SetTitleSize(0.05);
@@ -159,16 +159,17 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   stat->Draw("E1 SAME");
   output->Draw("E1 SAME");
 
-  TLegend *l=new TLegend(0.55,0.67,0.85,0.87);
+  TLegend *l=new TLegend(0.56,0.65,0.78,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
-  l->AddEntry(output,"data unfolded","pl");
+  l->AddEntry(output,"Data","ple");
   for(unsigned int i=0; i<truth.size(); i++){
     l->AddEntry(truth[i],legnames[i],"l");
   }
-  l->SetTextSize(0.03);
+  l->SetTextSize(0.04);
   l->Draw();
   CMSLabel();
+  LumiInfo();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
@@ -195,17 +196,17 @@ void plotter::draw_output_smear(std::vector<TH1*> output_, TH1D* truth_, TString
 
   TCanvas *c = new TCanvas("c","",600,600);
   double ymax;
-  gPad->SetLeftMargin(0.15);
+  gPad->SetLeftMargin(0.19);
 
   if(truth->GetMaximum() > outputs[0]->GetMaximum()) ymax = 1.5 * truth->GetMaximum();
   else ymax = 1.5 * outputs[0]->GetMaximum();
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   for(auto output: outputs){
     output->SetTitle(" ");
     output->GetYaxis()->SetRangeUser(0., ymax);
     output->GetXaxis()->SetTitle("m_{jet} [GeV]");
     output->GetYaxis()->SetTitle("events");
-    output->GetYaxis()->SetTitleOffset(1.1);
+    output->GetYaxis()->SetTitleOffset(1.5);
     output->GetXaxis()->SetTitleOffset(0.9);
     output->GetYaxis()->SetTitleSize(0.05);
     output->GetXaxis()->SetTitleSize(0.05);
@@ -252,17 +253,17 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
 
   TCanvas *c = new TCanvas("c","",600,600);
   double ymax;
-  gPad->SetLeftMargin(0.15);
+  gPad->SetLeftMargin(0.19);
 
   if(truth->GetMaximum() > output->GetMaximum()) ymax = 1.5 * truth->GetMaximum();
   else ymax = 1.5 * output->GetMaximum();
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
   output->GetXaxis()->SetTitle("m_{jet} [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
-  output->GetYaxis()->SetTitleOffset(1.1);
+  output->GetYaxis()->SetTitleOffset(1.5);
   output->GetXaxis()->SetTitleOffset(0.9);
   output->GetYaxis()->SetTitleSize(0.05);
   output->GetXaxis()->SetTitleSize(0.05);
@@ -287,7 +288,7 @@ void plotter::draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm
   TLegend *l=new TLegend(0.5,0.65,0.85,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
-  l->AddEntry(output,"data unfolded","pl");
+  l->AddEntry(output,"Data","ple");
   l->AddEntry(truth,"MC particle level","pl");
   l->SetTextSize(0.04);
   l->Draw();
@@ -314,7 +315,7 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   }
 
   TCanvas *c = new TCanvas("c","",600,600);
-  gPad->SetLeftMargin(0.15);
+  gPad->SetLeftMargin(0.19);
 
   double max = output->GetMaximum();
   for(unsigned int i = 0; i < mtop_templates.size(); i++){
@@ -325,13 +326,13 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   }
   double ymax = 1.5 * max;
 
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   output->SetTitle(" ");
   output->GetYaxis()->SetRangeUser(0., ymax);
   output->GetXaxis()->SetTitle("m_{jet} [GeV]");
   if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
   else output->GetYaxis()->SetTitle("events");
-  output->GetYaxis()->SetTitleOffset(1.1);
+  output->GetYaxis()->SetTitleOffset(1.5);
   output->GetXaxis()->SetTitleOffset(0.9);
   output->GetYaxis()->SetTitleSize(0.05);
   output->GetXaxis()->SetTitleSize(0.05);
@@ -374,7 +375,7 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   TLegend *l=new TLegend(0.56,0.65,0.78,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
-  l->AddEntry(output,"data unfolded","pl");
+  l->AddEntry(output,"Data","ple");
   if(show[0]) l->AddEntry(mtop_templates[0],"m_{t} = 166.5 GeV","pl");
   if(show[1]) l->AddEntry(mtop_templates[1],"m_{t} = 169.5 GeV","pl");
   if(show[2]) l->AddEntry(mtop_templates[2],"m_{t} = 171.5 GeV","pl");
@@ -385,6 +386,7 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   l->SetTextSize(0.04);
   l->Draw();
   CMSLabel();
+  LumiInfo();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
@@ -438,7 +440,7 @@ void plotter::draw_lcurve(TGraph *lcurve, double x1, double y1,  double x2, doub
 void plotter::draw_rhotau(TSpline *rhotau, double tau, TString file_name){
   TCanvas *c = new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   double logtau = TMath::Log10(tau);
   std::vector<double> Xpoint = {logtau};
   std::vector<double> Ypoint = {rhotau->Eval(logtau)};
@@ -621,10 +623,14 @@ void plotter::draw_delta_rel(TH1* hist_, TH1* result_, TString file_name){
   TH1* hist = (TH1*) hist_->Clone("hist");
   TH1* result = (TH1*) result_->Clone("result");
   int Nbins = result->GetXaxis()->GetNbins();
+  std::ofstream outs(directory+file_name+".txt");
+  auto coutbuf = std::cout.rdbuf(outs.rdbuf());
   for(unsigned int i=1; i<=Nbins; i++){
-    double percent = 100*hist->GetBinContent(i)/result->GetBinContent(i);
+    double percent = fabs(100*hist->GetBinContent(i)/result->GetBinContent(i));
     hist->SetBinContent(i, percent);
+    std::cout << "bin " << i << ": " << percent << "%" << std::endl;
   }
+  std::cout.rdbuf(coutbuf);
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15);
   hist->SetTitle(file_name);
@@ -760,7 +766,7 @@ void plotter::draw_output_pseudo(TH1* output_, TH1D* pseudotruth_, TH1D* mctruth
 
   TCanvas *c= new TCanvas("Particle Level","",600,600);
   gPad->SetLeftMargin(0.15);
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   pseudotruth->Draw("HIST SAME");
   mctruth->Draw("HIST SAME");
   output->Draw("E1 SAME");
@@ -813,7 +819,7 @@ void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_nam
 
   TCanvas *c= new TCanvas("Purity","",600,600);
   gPad->SetLeftMargin(0.15);
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   purity->Draw("E1");
   gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
@@ -838,7 +844,7 @@ void plotter::draw_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<dou
   TGraph* chi_hist = new TGraph(masses,chi2);
   TCanvas *c = new TCanvas("Chi2", "", 600, 600);
   gPad->SetLeftMargin(0.15);
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   chi_hist->SetTitle(" ");
   chi_hist->GetXaxis()->SetTitle("m_{t} [GeV]");
   chi_hist->GetYaxis()->SetTitle("#chi^{2}");
@@ -894,7 +900,7 @@ void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_nam
   double ymax = 1.5 * ymax_temp;
 
   TCanvas *c= new TCanvas("Bias Distribution","",600,600);
-  TGaxis::SetMaxDigits(3);
+  // TGaxis::SetMaxDigits(3);
   gPad->SetLeftMargin(0.15);
   truth->SetTitle(file_name);
   truth->GetYaxis()->SetRangeUser(0., ymax);
@@ -998,9 +1004,22 @@ void plotter::CMSLabel(){
   TLatex *text = new TLatex(3.5, 24, cmstext);
   text->SetNDC();
   text->SetTextAlign(13);
-  text->SetX(0.21);
+  text->SetX(0.25);
   text->SetTextFont(62);
   text->SetTextSize(0.07);
   text->SetY(0.83);
   text->Draw();
+}
+
+void plotter::LumiInfo(){
+  double lumi = 35.9;
+  TString infotext = TString::Format("%3.1f fb^{-1} (13 TeV)", lumi);
+  TLatex *text1 = new TLatex(3.5, 24, infotext);
+  text1->SetNDC();
+  text1->SetTextAlign(33);
+  text1->SetTextFont(42);
+  text1->SetTextSize(0.04);
+  text1->SetX(0.90);
+  text1->SetY(0.945);
+  text1->Draw();
 }

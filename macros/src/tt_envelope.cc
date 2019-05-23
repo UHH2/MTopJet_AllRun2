@@ -93,11 +93,12 @@ int main(int argc, char* argv[])
   TFile * Central_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
   TFile * Data_f = new TFile(directory+"uhh2.AnalysisModuleRunner.DATA.DATA.root");
 
-  cout << "test" << endl;
-
   TString histdir, histname;
   histdir = "XCone_cor_SF/";
   histname = "M_jet1_";
+
+  // histdir = "PreSel04_Muon/";
+  // histname = "pt_1";
 
   std::vector<TH1F*> ScaleVariations,BTagVariationsLight, BTagVariationsHeavy,PUVariations;
   std::vector<TH1F*>  MuIdVariations, MuTrVariations;

@@ -15,6 +15,7 @@
 #include <TF1.h>
 #include <vector>
 #include <TLatex.h>
+#include <fstream>
 
 class plotter{
 
@@ -45,5 +46,6 @@ class plotter{
   TH1* add_error_bar(TH1* hist, std::vector<double> errors);
   TString directory;
   void CMSLabel();
+  void LumiInfo();
 
 };

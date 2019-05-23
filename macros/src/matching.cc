@@ -36,6 +36,12 @@ int main(int argc, char* argv[]){
   TH1F * h1_m = (TH1F*)file->Get(dirmatch+histname);
   TH1F * h1_u = (TH1F*)file->Get(dirunmatch+histname);
 
+  double lo = 140;
+  double hi = 200;
+  int b1 = h1->FindBin(lo);
+  int b2 = h1->FindBin(hi);
+  double frac = h1_m->Integral(b1,b2)/h1->Integral(b1,b2);
+  cout << "matched fraction between " << lo << " and " << hi << ": " << frac << endl;
 
   //// ---------------------------------------------------------------------------------------------------------------------
   //// ---------------------------- set up lines and titles ----------------------------------------------------------------

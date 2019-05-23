@@ -16,6 +16,9 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   LepJetEta = book<TH1F>("eta_jet2", "#eta", 50, -5, 5);
   LepJetPhi = book<TH1F>("phi_jet2", "#phi", 50, -2*M_PI, 2*M_PI);
 
+  DeltaR_btagM_nextjet = book<TH1F>("DeltaR_btagM_nextjet", "#Delta R (b-tag medium, next jet) ", 40, 0, 4);
+  DeltaR_btagT_nextjet = book<TH1F>("DeltaR_btagT_nextjet", "#Delta R (b-tag tight, next jet) ", 40, 0, 4);
+
 
   SoftdropMass_had = book<TH1F>("SoftdropMass_had", "Soft Drop Mass [GeV]", 25, 0, 500);
   SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "Soft Drop Mass [GeV]", 25, 0, 500);
@@ -173,8 +176,29 @@ void RecoHists_xcone::fill(const Event & event){
   JER_factor->Fill(JER_f, weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-
-
+  for(unsigned int i=0; i<event.jets->size(); i++){
+    Jet jet1 = event.jets->at(i);
+    double dRminT = 100;
+    if(CSVBTag(CSVBTag::WP_TIGHT)(jet1, event)){
+      for(unsigned int j=0; j<event.jets->size(); j++){
+        if(i==j) continue;
+        Jet jet2 = event.jets->at(j);
+        double dR = deltaR(jet1, jet2);
+        if(dR < dRminT && jet2.pt()>50) dRminT = dR;
+      }
+      if(dRminT < 100) DeltaR_btagT_nextjet->Fill(dRminT, weight);
+    }
+    double dRminM = 100;
+    if(CSVBTag(CSVBTag::WP_MEDIUM)(jet1, event)){
+      for(unsigned int j=0; j<event.jets->size(); j++){
+        if(i==j) continue;
+        Jet jet2 = event.jets->at(j);
+        double dR = deltaR(jet1, jet2);
+        if(dR < dRminM && jet2.pt()>50) dRminM = dR;
+      }
+      if(dRminM < 100) DeltaR_btagM_nextjet->Fill(dRminM, weight);
+    }
+  }
   //---------------------------------------------------------------------------------------
   //--------------------------------- Clear all used objects ------------------------------
   //---------------------------------------------------------------------------------------

@@ -103,14 +103,12 @@ protected:
 
   bool isMC; //define here to use it in "process" part
 
-
   std::unique_ptr<Hists> h_pass, h_all;
 };
 
 MTopJetElecSFModule::MTopJetElecSFModule(uhh2::Context& ctx){
 
   isMC = (ctx.get("dataset_type") == "MC");
-
 
   h_recsel = ctx.get_handle<bool>("passed_recsel");
 
@@ -271,12 +269,8 @@ bool MTopJetElecSFModule::process(uhh2::Event& event){
   // HERE FILL PT AND ETA HISTS FOR PASSING AND NOT PASSING ELEC TRIGGER
   bool passed_elec_trigger = true;
   // note that at least one of pass_elec1 and pass_elec2 has to be true here!
-  if(!pass_elec2){
-    if(!trigger_el_A->passes(event)) passed_elec_trigger = false;
-  }
-  else{
-    if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_elec_trigger = false;
-  }
+  if(pass_elec1 && !pass_elec2) passed_elec_trigger = trigger_el_A->passes(event);
+  else passed_elec_trigger = (trigger_el_B->passes(event) || trigger_el_C->passes(event));
 
   event.set(h_pt, event.electrons->at(0).pt());
   event.set(h_eta, event.electrons->at(0).eta());

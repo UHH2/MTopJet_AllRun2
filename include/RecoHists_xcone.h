@@ -2,6 +2,8 @@
 #include "UHH2/core/include/Hists.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
+#include <UHH2/common/include/MCWeight.h>
+
 
 #include <math.h>
 #include <vector>
@@ -31,6 +33,8 @@ protected:
   TH1F *RhoA, *RhoA_fat, *RhoA_diff, *E_diff;
   TH2F *Mass_Vertices;
   TH1F *JER_factor;
+  TH1F *DeltaR_btagT_nextjet, *DeltaR_btagM_nextjet;
+
 
   uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;
   uhh2::Event::Handle<std::vector<TopJet>>h_lepjets;

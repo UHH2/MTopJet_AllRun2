@@ -93,7 +93,7 @@ protected:
   std::unique_ptr<uhh2::Selection> trigger_el_C;
   std::unique_ptr<uhh2::Selection> muon_sel;
   std::unique_ptr<uhh2::Selection> elec_sel;
-  std::unique_ptr<uhh2::Selection> elec_sel_125;
+  std::unique_ptr<uhh2::Selection> elec_sel_120;
   std::unique_ptr<uhh2::Selection> elec_sel_triggerA;
   std::unique_ptr<uhh2::Selection> elec_sel_triggerB;
   std::unique_ptr<uhh2::Selection> elec_etaveto;
@@ -137,6 +137,8 @@ protected:
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
   bool recsel_only;
+  bool isElectronStream;
+  bool isPhotonStream;
 
   string corvar ="nominal";
   string nonclosureSYS = "false";
@@ -166,6 +168,26 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
   ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
+
+  if(ctx.get("dataset_version") == "SingleElecB" ||
+     ctx.get("dataset_version") == "SingleElecC" ||
+     ctx.get("dataset_version") == "SingleElecD" ||
+     ctx.get("dataset_version") == "SingleElecE" ||
+     ctx.get("dataset_version") == "SingleElecF" ||
+     ctx.get("dataset_version") == "SingleElecG" ||
+     ctx.get("dataset_version") == "SingleElecHver2" ||
+     ctx.get("dataset_version") == "SingleElecHver3") isElectronStream = true;
+  else isElectronStream = false;
+
+  if(ctx.get("dataset_version") == "SinglePhotonB" ||
+     ctx.get("dataset_version") == "SinglePhotonC" ||
+     ctx.get("dataset_version") == "SinglePhotonD" ||
+     ctx.get("dataset_version") == "SinglePhotonE" ||
+     ctx.get("dataset_version") == "SinglePhotonF" ||
+     ctx.get("dataset_version") == "SinglePhotonG" ||
+     ctx.get("dataset_version") == "SinglePhotonHver2" ||
+     ctx.get("dataset_version") == "SinglePhotonHver3") isPhotonStream = true;
+  else isPhotonStream = false;
 
   // ttbar gen
   const std::string ttbar_gen_label("ttbargen");
@@ -241,7 +263,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // this is only used for cleaner and electron veto
   ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight_noIso);
   // this is used to decide which ele trigger is used
-  ElectronId eleid_noiso125 = AndId<Electron>(PtEtaSCCut(125., 2.4), ElectronID_Spring16_tight_noIso);
+  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Spring16_tight_noIso);
   // this is used in combination with iso trigger
   ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight);
   // jet ids
@@ -267,7 +289,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   }
   elec_etaveto.reset(new ElectronEtaVeto(1.44, 1.57));
   elec_sel_triggerA.reset(new NElectronSelection(1, 1, eleid_iso55));
-  elec_sel_125.reset(new NElectronSelection(1, 1, eleid_noiso125));
+  elec_sel_120.reset(new NElectronSelection(1, 1, eleid_noiso120));
 
   double metcut = 0;
   if(channel_ == muon)      metcut = 50;
@@ -433,17 +455,27 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       }
     }
   }
-  // only use triggerA and isolation if elec pt < 125
-  // for pt > 125 use triggerB || triggerC
+  // only use triggerA and isolation if elec pt < 120
+  // for pt > 120 use triggerB || triggerC
   else if(channel_ == elec){
     if(passed_recsel){
-      if(!elec_sel_125->passes(event)){
+      if(!elec_sel_120->passes(event)){
+        if(isPhotonStream) passed_recsel = false;
         if(!trigger_el_A->passes(event))      passed_recsel = false;
         if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
         if(passed_recsel) elec_is_isolated = false;
       }
       else{
-        if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
+        if(isMC){
+          if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
+        }
+        else if(isElectronStream){
+          if(!trigger_el_B->passes(event))  passed_recsel = false;
+        }
+        else if(isPhotonStream){
+          if(trigger_el_B->passes(event))  passed_recsel = false;
+          if(!trigger_el_C->passes(event))  passed_recsel = false;
+        }
       }
     }
   }
@@ -473,6 +505,8 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     }
   }
   ////
+
+
 
   bool presel = passed_recsel;
 

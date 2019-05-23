@@ -64,10 +64,18 @@ int main(int argc, char* argv[]){
   h_pt_data.push_back(new TH1F("h_pt_pass_data","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_data.push_back(new TH1F("h_pt_all_data_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_data.push_back(new TH1F("h_pt_pass_data_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_data.push_back(new TH1F("h_pt_all_data_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_data.push_back(new TH1F("h_pt_pass_data_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_data.push_back(new TH1F("h_pt_all_data_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_data.push_back(new TH1F("h_pt_pass_data_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_mc.push_back(new TH1F("h_pt_all_mc","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_mc.push_back(new TH1F("h_pt_pass_mc","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_mc.push_back(new TH1F("h_pt_all_mc_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_mc.push_back(new TH1F("h_pt_pass_mc_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_mc.push_back(new TH1F("h_pt_all_mc_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_mc.push_back(new TH1F("h_pt_pass_mc_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_mc.push_back(new TH1F("h_pt_all_mc_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
+  // h_pt_mc.push_back(new TH1F("h_pt_pass_mc_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
 
   vector<double> eta_bins = {-2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5};
   vector<TH1F*> h_eta_data, h_eta_mc;
@@ -275,7 +283,7 @@ void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString 
   h_data->GetXaxis()->SetTitleOffset(1.3);
   h_data->GetXaxis()->SetNdivisions(505);
   h_data->GetYaxis()->SetNdivisions(505);
-  h_data->GetYaxis()->SetRangeUser(0.8, 1.1);
+  h_data->GetYaxis()->SetRangeUser(0.0, 1.0);
 
   h_data->SetLineColor(kBlack);
   h_data->SetMarkerColor(kBlack);
@@ -297,7 +305,7 @@ void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString 
   gPad->SetBottomMargin(0.1);
   h_data->Draw("AP");
   h_mc->Draw("P SAME");
-  TLegend *leg = new TLegend(0.53,0.70,0.86,0.83);
+  TLegend *leg = new TLegend(0.33,0.20,0.66,0.33);
   leg->AddEntry(h_data,"data","pl");
   leg->AddEntry(h_mc,"simulation","pl");
   leg->Draw("");
@@ -352,7 +360,7 @@ void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname){
   h_SF[0]->GetXaxis()->SetTitleOffset(1.3);
   h_SF[0]->GetXaxis()->SetNdivisions(505);
   h_SF[0]->GetYaxis()->SetNdivisions(505);
-  h_SF[0]->GetYaxis()->SetRangeUser(0.9, 1.05);
+  h_SF[0]->GetYaxis()->SetRangeUser(0.7, 1.05);
   h_SF[0]->SetLineColor(kBlack);
   h_SF[0]->SetLineWidth(3);
   h_SF[0]->SetFillColor(13);
@@ -379,7 +387,7 @@ void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname){
   h_SF[2]->Draw("HIST SAME");
   h_SF[0]->Draw("E1 SAME");
 
-  TLegend *leg = new TLegend(0.53,0.70,0.86,0.83);
+  TLegend *leg = new TLegend(0.33,0.20,0.66,0.33);
   leg->AddEntry(h_SF[0],"scale factor","l");
   leg->AddEntry(h_SF[1],"uncertainty","f");
   leg->Draw();

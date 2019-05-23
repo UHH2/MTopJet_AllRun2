@@ -62,6 +62,8 @@ protected:
   Event::Handle<std::vector<TopJet>>h_fatjets;
 
   bool isMC;
+  bool isPhotonStream;
+  bool isElectronStream;
 
   // store Hist collection as member variables
   // std::unique_ptr<Hists> h_ttbar;
@@ -76,6 +78,11 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   else isherwig = false;
 
   isMC = (ctx.get("dataset_type") == "MC");
+
+
+
+
+
 
   // const std::string& channel = ctx.get("channel", ""); //define Channel
   // if     (channel == "muon") channel_ = muon;
@@ -159,8 +166,6 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
     if(jet.pt() > ptcut) passed_fatpt = true;
   }
   ///
-
-
 
   bool pass_semilep;
   if(isMC)pass_semilep = SemiLepDecay->passes(event);

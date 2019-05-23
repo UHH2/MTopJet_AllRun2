@@ -20,6 +20,15 @@
   <!ENTITY SingleElecHver2 "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleElecHver2.root">
   <!ENTITY SingleElecHver3 "&INdir;/uhh2.AnalysisModuleRunner.Data.SingleElecHver3.root">
 
+  <!ENTITY SinglePhotonB     "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonB.root">
+  <!ENTITY SinglePhotonC     "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonC.root">
+  <!ENTITY SinglePhotonD     "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonD.root">
+  <!ENTITY SinglePhotonE     "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonE.root">
+  <!ENTITY SinglePhotonF     "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonF.root">
+  <!ENTITY SinglePhotonG     "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonG.root">
+  <!ENTITY SinglePhotonHver2 "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonHver2.root">
+  <!ENTITY SinglePhotonHver3 "&INdir;/uhh2.AnalysisModuleRunner.Data.SinglePhotonHver3.root">
+
 <!-- =============================================== Single Top ===================================================================== -->
   <!ENTITY ST_t-channel_antitop    "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_t-channel_antitop.root">
   <!ENTITY ST_t-channel_top        "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_t-channel_top.root">
@@ -126,6 +135,23 @@
     <In FileName="&SingleElecHver2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="SingleElecHver3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&SingleElecHver3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="SinglePhotonB" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonB;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonC" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonD" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonD;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonE" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonF" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonF;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonG" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonG;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonHver2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonHver2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <InputData Version="SinglePhotonHver3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&SinglePhotonHver3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
     <!--
