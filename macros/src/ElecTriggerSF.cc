@@ -83,12 +83,16 @@ int main(int argc, char* argv[]){
   h_eta_data.push_back(new TH1F("h_eta_pass_data","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_all_data_lowpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_pass_data_lowpt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_data.push_back(new TH1F("h_eta_all_data_midpt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_data.push_back(new TH1F("h_eta_pass_data_midpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_all_data_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_pass_data_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_all_mc","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_all_mc_lowpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc_lowpt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_mc.push_back(new TH1F("h_eta_all_mc_midpt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_mc.push_back(new TH1F("h_eta_pass_mc_midpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_all_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
 
@@ -109,8 +113,10 @@ int main(int argc, char* argv[]){
   PlotHist(h_eta_data[1], "#eta", "data_eta_pass");
   PlotHist(h_eta_data[2], "#eta", "data_eta_lowpt_all");
   PlotHist(h_eta_data[3], "#eta", "data_eta_lowpt_pass");
-  PlotHist(h_eta_data[4], "#eta", "data_eta_highpt_all");
-  PlotHist(h_eta_data[5], "#eta", "data_eta_highpt_pass");
+  PlotHist(h_eta_data[4], "#eta", "data_eta_midpt_all");
+  PlotHist(h_eta_data[5], "#eta", "data_eta_midpt_pass");
+  PlotHist(h_eta_data[6], "#eta", "data_eta_highpt_all");
+  PlotHist(h_eta_data[7], "#eta", "data_eta_highpt_pass");
 
   PlotHist(h_pt_mc[0], "p_{T}", "mc_pt_all");
   PlotHist(h_pt_mc[1], "p_{T}", "mc_pt_pass");
@@ -120,27 +126,33 @@ int main(int argc, char* argv[]){
   PlotHist(h_eta_mc[1], "#eta", "mc_eta_pass");
   PlotHist(h_eta_mc[2], "#eta", "mc_eta_lowpt_all");
   PlotHist(h_eta_mc[3], "#eta", "mc_eta_lowpt_pass");
-  PlotHist(h_eta_mc[4], "#eta", "mc_eta_highpt_all");
-  PlotHist(h_eta_mc[5], "#eta", "mc_eta_highpt_pass");
+  PlotHist(h_eta_mc[4], "#eta", "mc_eta_midpt_all");
+  PlotHist(h_eta_mc[5], "#eta", "mc_eta_midpt_pass");
+  PlotHist(h_eta_mc[6], "#eta", "mc_eta_highpt_all");
+  PlotHist(h_eta_mc[7], "#eta", "mc_eta_highpt_pass");
 
   TGraphAsymmErrors* h_effi_pt_data = new TGraphAsymmErrors(h_pt_data[1], h_pt_data[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_data = new TGraphAsymmErrors(h_eta_data[1], h_eta_data[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_lowpt_data = new TGraphAsymmErrors(h_eta_data[3], h_eta_data[2],"cl=0.683 b(1,1) mode");
-  TGraphAsymmErrors* h_effi_eta_highpt_data = new TGraphAsymmErrors(h_eta_data[5], h_eta_data[4],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_eta_midpt_data = new TGraphAsymmErrors(h_eta_data[5], h_eta_data[4],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_eta_highpt_data = new TGraphAsymmErrors(h_eta_data[7], h_eta_data[6],"cl=0.683 b(1,1) mode");
 
   TGraphAsymmErrors* h_effi_pt_mc = new TGraphAsymmErrors(h_pt_mc[1], h_pt_mc[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_mc = new TGraphAsymmErrors(h_eta_mc[1], h_eta_mc[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_lowpt_mc = new TGraphAsymmErrors(h_eta_mc[3], h_eta_mc[2],"cl=0.683 b(1,1) mode");
-  TGraphAsymmErrors* h_effi_eta_highpt_mc = new TGraphAsymmErrors(h_eta_mc[5], h_eta_mc[4],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_eta_midpt_mc = new TGraphAsymmErrors(h_eta_mc[5], h_eta_mc[4],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_eta_highpt_mc = new TGraphAsymmErrors(h_eta_mc[7], h_eta_mc[6],"cl=0.683 b(1,1) mode");
 
   PlotEfficiency(h_effi_pt_data, h_effi_pt_mc, "p_{T}", "effi_pt");
   PlotEfficiency(h_effi_eta_data, h_effi_eta_mc, "#eta", "effi_eta");
   PlotEfficiency(h_effi_eta_lowpt_data, h_effi_eta_lowpt_mc, "#eta", "effi_eta_lowpt");
+  PlotEfficiency(h_effi_eta_midpt_data, h_effi_eta_midpt_mc, "#eta", "effi_eta_midpt");
   PlotEfficiency(h_effi_eta_highpt_data, h_effi_eta_highpt_mc, "#eta", "effi_eta_highpt");
 
   vector<TH1F*> h_SF_pt = GetSF(h_effi_pt_data, h_effi_pt_mc, h_pt_data[0]);
   vector<TH1F*> h_SF_eta = GetSF(h_effi_eta_data, h_effi_eta_mc, h_eta_data[0]);
   vector<TH1F*> h_SF_eta_lowpt = GetSF(h_effi_eta_lowpt_data, h_effi_eta_lowpt_mc, h_eta_data[2]);
+  vector<TH1F*> h_SF_eta_midpt = GetSF(h_effi_eta_midpt_data, h_effi_eta_midpt_mc, h_eta_data[4]);
   vector<TH1F*> h_SF_eta_highpt = GetSF(h_effi_eta_highpt_data, h_effi_eta_highpt_mc, h_eta_data[4]);
 
 
@@ -153,6 +165,7 @@ int main(int argc, char* argv[]){
   PlotSF(h_SF_pt, "p_{T}", "SF_pt");
   PlotSF(h_SF_eta, "#eta", "SF_eta");
   PlotSF(h_SF_eta_lowpt, "#eta", "SF_eta_lowpt");
+  PlotSF(h_SF_eta_midpt, "#eta", "SF_eta_midpt");
   PlotSF(h_SF_eta_highpt, "#eta", "SF_eta_highpt");
 
   if(argc == 1){
@@ -167,6 +180,9 @@ int main(int argc, char* argv[]){
     h_SF_eta_lowpt[0]->Write("Central_eta_lowpt");
     h_SF_eta_lowpt[1]->Write("Up_eta_lowpt");
     h_SF_eta_lowpt[2]->Write("Down_eta_lowpt");
+    h_SF_eta_midpt[0]->Write("Central_eta_midpt");
+    h_SF_eta_midpt[1]->Write("Up_eta_midpt");
+    h_SF_eta_midpt[2]->Write("Down_eta_midpt");
     h_SF_eta_highpt[0]->Write("Central_eta_highpt");
     h_SF_eta_highpt[1]->Write("Up_eta_highpt");
     h_SF_eta_highpt[2]->Write("Down_eta_highpt");
@@ -200,8 +216,9 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
 
     h_pt[0]->Fill(pt, weight);
     h_eta[0]->Fill(eta, weight);
-    if(pt < 120) h_eta[2]->Fill(eta, weight);
-    else         h_eta[4]->Fill(eta, weight);
+    if(pt < 120)             h_eta[2]->Fill(eta, weight);
+    else if(pt>120 && pt<200)h_eta[4]->Fill(eta, weight);
+    else if(pt>200)          h_eta[6]->Fill(eta, weight);
 
     if(passed){
       // cout << pt << ", " << eta << endl;
@@ -215,8 +232,9 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
       else weight_pass = weight;
       h_pt[1]->Fill(pt, weight_pass);
       h_eta[1]->Fill(eta, weight_pass);
-      if(pt < 120) h_eta[3]->Fill(eta, weight_pass);
-      else         h_eta[5]->Fill(eta, weight_pass);
+      if(pt < 120)             h_eta[3]->Fill(eta, weight_pass);
+      else if(pt>120 && pt<200)h_eta[5]->Fill(eta, weight_pass);
+      else if(pt>200)          h_eta[7]->Fill(eta, weight_pass);
     }
   }
   return;

@@ -29,6 +29,8 @@ private:
   void get_function();
   void get_additionalSYS();
   double get_factor(double, double);
+  uhh2::Event::Handle<vector<float>>h_cor_factor_had;
+  uhh2::Event::Handle<vector<float>>h_cor_factor_lep;
   uhh2::Event::Handle<std::vector<TopJet>>h_oldjets;
   uhh2::Event::Handle<std::vector<TopJet>>h_newjets;
   //double arr[6][12]; // values from table

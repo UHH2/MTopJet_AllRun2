@@ -33,8 +33,10 @@ protected:
   TH1F *RhoA, *RhoA_fat, *RhoA_diff, *E_diff;
   TH2F *Mass_Vertices;
   TH1F *JER_factor;
-  TH1F *DeltaR_btagT_nextjet, *DeltaR_btagM_nextjet;
-
+  TH1F *DeltaR_btagT_nextjet, *DeltaR_btagM_nextjet, *DeltaR_btagT_xcone;
+  TH1F *pt_probe1, *pt_probe2;
+  TH1F *csvmax;
+  TH1F *number_smalldR_all,*number_smalldR_pass,*number_largedR_all,*number_largedR_pass;
 
   uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;
   uhh2::Event::Handle<std::vector<TopJet>>h_lepjets;

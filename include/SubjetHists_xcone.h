@@ -51,6 +51,7 @@ protected:
     TH1F *JEC_L1_had_subjets_ETA_24to28;
     TH1F *JEC_L1_had_subjets_ETA_28to40;
 
+    TH1F *COR_factor_had, *COR_factor_lep;
 
     TH1F *pt_check;
     TH1F *area_final;
@@ -59,5 +60,7 @@ protected:
     TH2F *AreaVsPT, *AreaVsPT_ak4;
 
     uhh2::Event::Handle<std::vector<TopJet>>h_recfatjets;
+    uhh2::Event::Handle<std::vector<float>>h_cor_factor_had;
+    uhh2::Event::Handle<std::vector<float>>h_cor_factor_lep;
 
 };

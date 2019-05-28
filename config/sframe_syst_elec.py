@@ -23,10 +23,12 @@ sys_uncerts = {
      'ELTR_down'             : {'ElTrigger_variation':'down'},
      'ELRECO_up'             : {'ElReco_variation':'up'},
      'ELRECO_down'           : {'ElReco_variation':'down'},
-     'BTAG_bc_up'            : {'BTag_variation':'up_bc'},
-     'BTAG_bc_down'          : {'BTag_variation':'down_bc'},
-     'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
-     'BTAG_udsg_down'        : {'BTag_variation':'down_udsg'},
+     'BTAG_up'               : {'BTag_variation':'up'},
+     'BTAG_down'             : {'BTag_variation':'down'},
+     # 'BTAG_bc_up'            : {'BTag_variation':'up_bc'},
+     # 'BTAG_bc_down'          : {'BTag_variation':'down_bc'},
+     # 'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
+     # 'BTAG_udsg_down'        : {'BTag_variation':'down_udsg'},
 }
 start_all_parallel = True
 

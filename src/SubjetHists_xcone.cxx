@@ -30,6 +30,8 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
 
   match_to_subjet = book<TH1F>("match_to_subjet", "ak4 b-tag matched to XCone subjet", 4, -1.5, 2.5);
 
+
+
   // Because the v4 is set again in 'cor' jets, the JEC factor ist set to the default value 1
   // So, in lep jets the JEC factor should not change from 'jec' to 'cor'
   // for had jets the factors are 1 in 'cor' jets
@@ -59,6 +61,9 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   JEC_L1_had_subjets_ETA_24to28 = book<TH1F>("JEC_L1_had_subjets_ETA_24to28", "JEC factor", 100, 0, 2);
   JEC_L1_had_subjets_ETA_28to40 = book<TH1F>("JEC_L1_had_subjets_ETA_28to40", "JEC factor", 100, 0, 2);
   ////
+
+  COR_factor_had = book<TH1F>("COR_factor_had", "COR factor had", 200, 0, 2);
+  COR_factor_lep = book<TH1F>("COR_factor_lep", "COR factor lep", 200, 0, 2);
 
   pt_check = book<TH1F>("pt_check", "p_{T}^{all subjets} * 1/JEC_SF", 100, 0, 500);
 
@@ -96,6 +101,10 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   if(type == "raw") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_noJEC");
   else if(type == "jec") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   else if(type == "cor") h_recfatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
+
+  h_cor_factor_had=ctx.get_handle<std::vector<float>>("cor_factor_had");
+  h_cor_factor_lep=ctx.get_handle<std::vector<float>>("cor_factor_lep");
+
 }
 
 
@@ -110,6 +119,10 @@ void SubjetHists_xcone::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   // define all objects needed
   std::vector<TopJet> rec_fatjets = event.get(h_recfatjets);
+
+  std::vector<float> cor_factor_had = event.get(h_cor_factor_had);
+  std::vector<float> cor_factor_lep = event.get(h_cor_factor_lep);
+
   // std::vector<Jet> ak4_jets = event.jets;
 
   std::vector<Jet> had_subjets, lep_subjets;
@@ -272,6 +285,9 @@ void SubjetHists_xcone::fill(const Event & event){
     }
   }
   ////
+
+  for(auto fac: cor_factor_had) COR_factor_had->Fill(fac, weight);
+  for(auto fac: cor_factor_lep) COR_factor_lep->Fill(fac, weight);
 
   double tot_area=0;
   pt_had_subjet1_fine->Fill(had_subjets.at(0).pt(), weight);

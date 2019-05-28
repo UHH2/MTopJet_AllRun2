@@ -109,10 +109,8 @@ int main(int argc, char* argv[]){
   // fill SYS
   vector<TString> sys_name;
   vector<TString> subdir;
-  sys_name.push_back("btagbcup");
-  sys_name.push_back("btagbcdown");
-  sys_name.push_back("btagudsgup");
-  sys_name.push_back("btagudsgdown");
+  sys_name.push_back("btagup");
+  sys_name.push_back("btagdown");
   sys_name.push_back("jecup");
   sys_name.push_back("jecdown");
   sys_name.push_back("jerup");
@@ -136,10 +134,8 @@ int main(int argc, char* argv[]){
     sys_name.push_back("elrecodown");
   }
 
-  subdir.push_back("BTAG_bc_up");
-  subdir.push_back("BTAG_bc_down");
-  subdir.push_back("BTAG_udsg_up");
-  subdir.push_back("BTAG_udsg_down");
+  subdir.push_back("BTAG_up");
+  subdir.push_back("BTAG_down");
   subdir.push_back("JEC_up");
   subdir.push_back("JEC_down");
   subdir.push_back("JER_up");

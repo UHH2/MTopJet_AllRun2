@@ -361,8 +361,7 @@ int main(int argc, char* argv[])
 
 
   // read migrations from variations (vector of every source containing a vector of every variation e.g. up/down)
-  vector<TString> btagbc_name = {"btagbcup", "btagbcdown"};
-  vector<TString> btagudsg_name = {"btagudsgup", "btagudsgdown"};
+  vector<TString> btag_name = {"btagup", "btagdown"};
   vector<TString> jec_name = {"jecup", "jecdown"};
   vector<TString> jer_name = {"jerup", "jerdown"};
   vector<TString> cor_name = {"corup", "cordown"};
@@ -374,14 +373,12 @@ int main(int argc, char* argv[])
   vector<TString> pu_name = {"puup", "pudown"};
   vector< vector<TString> > sys_name;
   vector<TString> sys_rel_name;
-  sys_name.push_back(btagbc_name);
-  sys_name.push_back(btagudsg_name);
+  sys_name.push_back(btag_name);
   sys_name.push_back(jec_name);
   sys_name.push_back(jer_name);
   sys_name.push_back(cor_name);
   sys_name.push_back(pu_name);
-  sys_rel_name.push_back("b-tagging bc");
-  sys_rel_name.push_back("b-tagging udsg");
+  sys_rel_name.push_back("b-tagging");
   sys_rel_name.push_back("jec");
   sys_rel_name.push_back("jer");
   sys_rel_name.push_back("cor");
@@ -430,10 +427,10 @@ int main(int argc, char* argv[])
     name += i;
     pdf.push_back(name);
   }
-  vector< vector<TString> > model_name = {generator, scale, mass, isr, fsr, hdamp, pdf};
-  vector<TString> model_rel_name = {"generator", "scale", "mass", "ISR", "FSR", "hdamp", "pdf"};
-  // vector< vector<TString> > model_name = {fsr};
-  // vector<TString> model_rel_name = {"FSR"};
+  vector< vector<TString> > model_name = {scale, mass, isr, fsr, hdamp, pdf};
+  vector<TString> model_rel_name = {"scale", "mass", "ISR", "FSR", "hdamp", "pdf"};
+  // vector< vector<TString> > model_name = {generator, scale, mass, isr, fsr, hdamp, pdf};
+  // vector<TString> model_rel_name = {"generator", "scale", "mass", "ISR", "FSR", "hdamp", "pdf"};
   vector< vector<TH1D*> > model_input;
   vector< vector<TH1D*> > model_truth;
   for(unsigned int i=0; i<model_name.size(); i++){

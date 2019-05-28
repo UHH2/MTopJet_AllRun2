@@ -159,6 +159,7 @@ protected:
   std::unique_ptr<Hists> h_Muon_PreSel01, h_Elec_PreSel01, h_MTopJet_PreSel01, h_Jets_PreSel01, h_XCone_cor_PreSel01;
   std::unique_ptr<Hists> h_Muon_PreSel02, h_Elec_PreSel02, h_MTopJet_PreSel02, h_Jets_PreSel02, h_XCone_cor_PreSel02;
   std::unique_ptr<Hists> h_Muon_PreSel03, h_Elec_PreSel03, h_MTopJet_PreSel03, h_Jets_PreSel03, h_XCone_cor_PreSel03;
+  std::unique_ptr<Hists> h_Muon_PreSel03b, h_Elec_PreSel03b, h_MTopJet_PreSel03b, h_Jets_PreSel03b, h_XCone_cor_PreSel03b;
   std::unique_ptr<Hists> h_Muon_PreSel04, h_Elec_PreSel04, h_MTopJet_PreSel04, h_Jets_PreSel04, h_XCone_cor_PreSel04;
 
   std::unique_ptr<Hists> h_Muon, h_Elec, h_MTopJet, h_Jets;
@@ -205,7 +206,7 @@ protected:
   bool isTTbar; //define here to use it in "process" part
   int counter;
 
-  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors;
+  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors, BTagReshape;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
   std::unique_ptr<uhh2::AnalysisModule> ele_id_SF, ele_trigger_SF, ele_reco_SF;
 
@@ -388,8 +389,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ElReco_variation = ctx.get("ElReco_variation","nominal");
   ElTrigger_variation = ctx.get("ElTrigger_variation","nominal");
 
-
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
+  BTagReshape.reset(new MCCSVv2ShapeSystematic(ctx, "jets", BTag_variation, "iterativefit", "", "BTagCalibration"));
+  // BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
 
@@ -485,6 +486,12 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_Elec_PreSel03.reset(new ElectronHists(ctx, "PreSel03_Elec"));
   h_Jets_PreSel03.reset(new JetHists(ctx, "PreSel03_Jet"));
   h_XCone_cor_PreSel03.reset(new RecoHists_xcone(ctx, "PreSel03_XCone", "cor"));
+
+  h_MTopJet_PreSel03b.reset(new MTopJetHists(ctx, "PreSel03b_Event"));
+  h_Muon_PreSel03b.reset(new MuonHists(ctx, "PreSel03b_Muon"));
+  h_Elec_PreSel03b.reset(new ElectronHists(ctx, "PreSel03b_Elec"));
+  h_Jets_PreSel03b.reset(new JetHists(ctx, "PreSel03b_Jet"));
+  h_XCone_cor_PreSel03b.reset(new RecoHists_xcone(ctx, "PreSel03b_XCone", "cor"));
 
   h_MTopJet_PreSel04.reset(new MTopJetHists(ctx, "PreSel04_Event"));
   h_Muon_PreSel04.reset(new MuonHists(ctx, "PreSel04_Muon"));
@@ -744,6 +751,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_cor_PreSel03->fill(event);
   }
   /** b-tagging *********************/
+  // first do cvs reshape (instead of SF)
+  BTagReshape->process(event);
+  if(passed_recsel){
+    h_MTopJet_PreSel03b->fill(event);
+    h_Muon_PreSel03b->fill(event);
+    h_Elec_PreSel03b->fill(event);
+    h_Jets_PreSel03b->fill(event);
+    h_XCone_cor_PreSel03b->fill(event);
+  }
   int jetbtagN(0);
   bool passed_btag;
   int jetbtagN_medium(0);
@@ -761,7 +777,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else passed_btag_medium = false;
   if(jetbtagN_loose >= 1) passed_btag_loose = true;
   else passed_btag_loose = false;
-  BTagScaleFactors->process(event);
+  // BTagScaleFactors->process(event);
   h_weights04->fill(event);
 
 

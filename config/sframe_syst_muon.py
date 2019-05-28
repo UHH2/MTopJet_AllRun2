@@ -21,10 +21,12 @@ sys_uncerts = {
      'MUID_down'             : {'MuScale_variation':'down'},
      'MUTR_up'               : {'MuTrigger_variation':'up'},
      'MUTR_down'             : {'MuTrigger_variation':'down'},
-     'BTAG_bc_up'            : {'BTag_variation':'up_bc'},
-     'BTAG_bc_down'          : {'BTag_variation':'down_bc'},
-     'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
-     'BTAG_udsg_down'        : {'BTag_variation':'down_udsg'},
+     'BTAG_up'               : {'BTag_variation':'up'},
+     'BTAG_down'             : {'BTag_variation':'down'},
+     # 'BTAG_bc_up'            : {'BTag_variation':'up_bc'},
+     # 'BTAG_bc_down'          : {'BTag_variation':'down_bc'},
+     # 'BTAG_udsg_up'          : {'BTag_variation':'up_udsg'},
+     # 'BTAG_udsg_down'        : {'BTag_variation':'down_udsg'},
 }
 start_all_parallel = True
 

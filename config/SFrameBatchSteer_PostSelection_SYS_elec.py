@@ -29,7 +29,7 @@ if __name__ == "__main__":
     variations = ['up','down']
 
     systematics_btag = [ ['BTag_variation','BTAG'] ]
-    variations_btag = ['up_bc','down_bc', 'up_udsg', 'down_udsg']
+    variations_btag = ['up','down']
 
     # things are different for scale since the folder should always be named "SCALE_x"
     # and two values muR and muF have to be varied simultaneously

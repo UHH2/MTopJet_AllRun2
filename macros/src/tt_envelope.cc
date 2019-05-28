@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::vector<TFile*> ScaleVariations_f, BTagVariationsLight_f, BTagVariationsHeavy_f, PUVariations_f;
+  std::vector<TFile*> ScaleVariations_f, BTagVariationsHeavy_f, PUVariations_f;
   std::vector<TFile*> MuIdVariations_f, MuTrVariations_f;
   std::vector<TFile*> ElIdVariations_f, ElTrVariations_f, ElRecoVariations_f;
   std::vector<TFile*> JECVariations_f, JERVariations_f, CORVariations_f;
@@ -40,10 +40,8 @@ int main(int argc, char* argv[])
   ScaleVariations_f.push_back(new TFile(directory+"SCALE_downdown/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   ScaleVariations_f.push_back(new TFile(directory+"SCALE_downnone/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   ScaleVariations_f.push_back(new TFile(directory+"SCALE_nonedown/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariationsHeavy_f.push_back(new TFile(directory+"BTAG_bc_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariationsHeavy_f.push_back(new TFile(directory+"BTAG_bc_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariationsLight_f.push_back(new TFile(directory+"BTAG_udsg_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
-  BTagVariationsLight_f.push_back(new TFile(directory+"BTAG_udsg_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  BTagVariationsHeavy_f.push_back(new TFile(directory+"BTAG_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
+  BTagVariationsHeavy_f.push_back(new TFile(directory+"BTAG_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   PUVariations_f.push_back(new TFile(directory+"PU_up/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   PUVariations_f.push_back(new TFile(directory+"PU_down/uhh2.AnalysisModuleRunner.MC.TTbar.root"));
   if(!doelec){
@@ -100,7 +98,7 @@ int main(int argc, char* argv[])
   // histdir = "PreSel04_Muon/";
   // histname = "pt_1";
 
-  std::vector<TH1F*> ScaleVariations,BTagVariationsLight, BTagVariationsHeavy,PUVariations;
+  std::vector<TH1F*> ScaleVariations, BTagVariationsHeavy,PUVariations;
   std::vector<TH1F*>  MuIdVariations, MuTrVariations;
   std::vector<TH1F*>  ElIdVariations, ElTrVariations, ElRecoVariations;
   std::vector<TH1F*>  JECVariations, JERVariations, CORVariations;
@@ -111,9 +109,6 @@ int main(int argc, char* argv[])
   }
   for(unsigned int i=0; i<BTagVariationsHeavy_f.size(); i++){
     BTagVariationsHeavy.push_back((TH1F*)BTagVariationsHeavy_f[i]->Get(histdir + histname));
-  }
-  for(unsigned int i=0; i<BTagVariationsLight_f.size(); i++){
-    BTagVariationsLight.push_back((TH1F*)BTagVariationsLight_f[i]->Get(histdir + histname));
   }
   for(unsigned int i=0; i<PUVariations_f.size(); i++){
     PUVariations.push_back((TH1F*)PUVariations_f[i]->Get(histdir + histname));
@@ -212,18 +207,6 @@ int main(int argc, char* argv[])
   ErrorDown.push_back(BTagHeavyErrorDown);
   ErrorSym.push_back(BTagHeavyErrorSym);
   CovMatrix.push_back(GetCovMatrix(BTagHeavyErrorSym));
-
-  TH1F* BTagLightEnvelopeUp = GetEnvelopeUp(BTagVariationsLight);
-  TH1F* BTagLightErrorUp = GetError(Central, BTagLightEnvelopeUp);
-  TH1F* BTagLightEnvelopeDown = GetEnvelopeDown(BTagVariationsLight);
-  TH1F* BTagLightErrorDown = GetError(Central, BTagLightEnvelopeDown);
-  TH1F* BTagLightErrorSym = GetSymmetricError(BTagLightErrorUp, BTagLightErrorDown);
-  EnvelopeUp.push_back(BTagLightEnvelopeUp);
-  EnvelopeDown.push_back(BTagLightEnvelopeDown);
-  ErrorUp.push_back(BTagLightErrorUp);
-  ErrorDown.push_back(BTagLightErrorDown);
-  ErrorSym.push_back(BTagLightErrorSym);
-  CovMatrix.push_back(GetCovMatrix(BTagLightErrorSym));
 
   TH1F* PUEnvelopeUp = GetEnvelopeUp(PUVariations);
   TH1F* PUErrorUp = GetError(Central, PUEnvelopeUp);
@@ -438,8 +421,7 @@ int main(int argc, char* argv[])
   std::vector<TFile*> SysFiles;
   SysFiles.push_back(new TFile(directory+"SYS_BKG.root","RECREATE"));
   SysFiles.push_back(new TFile(directory+"SYS_SCALE.root","RECREATE"));
-  SysFiles.push_back(new TFile(directory+"SYS_BTAGudsg.root","RECREATE"));
-  SysFiles.push_back(new TFile(directory+"SYS_BTAGbc.root","RECREATE"));
+  SysFiles.push_back(new TFile(directory+"SYS_BTAG.root","RECREATE"));
   SysFiles.push_back(new TFile(directory+"SYS_PU.root","RECREATE"));
   SysFiles.push_back(new TFile(directory+"SYS_MUID.root","RECREATE"));
   SysFiles.push_back(new TFile(directory+"SYS_MUTR.root","RECREATE"));

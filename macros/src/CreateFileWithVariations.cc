@@ -46,9 +46,9 @@ int main(int argc, char* argv[]){
   }
 
 
-  vector<TString> sys = {"BTAGudsg", "BTAGbc"};
-  // vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAGudsg", "BTAGbc", "PDF", "ISR", "FSR", "HDAMP", "GENERATOR", "SCALE"};
-  // vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAGudsg", "BTAGbc"};
+  //vector<TString> sys = {"BTAG"};
+  // vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAG", "PDF", "ISR", "FSR", "HDAMP", "GENERATOR", "SCALE"};
+  vector<TString> sys = {"BKG", "JEC", "JER", "COR", "MUID", "MUTR", "ELID", "ELTR", "ELRECO", "PU", "BTAG"};
   vector<TString> shift = {"EnvelopeUp", "EnvelopeDown"};
 
   TString filename = "SYS_";

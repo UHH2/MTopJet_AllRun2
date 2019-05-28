@@ -696,8 +696,7 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   for(unsigned int i=0; i<delta.size(); i++){
     if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"choice of m_{t}","l");
     else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
-    else if (UncertNames[i] == "b-tagging bc")   leg->AddEntry(delta[i],"b tagging bc","l");
-    else if (UncertNames[i] == "b-tagging udsg") leg->AddEntry(delta[i],"b tagging udsg","l");
+    else if (UncertNames[i] == "b-tagging") leg->AddEntry(delta[i],"b tagging","l");
     else if (UncertNames[i] == "pile-up")   leg->AddEntry(delta[i],"pileup","l");
     else if (UncertNames[i] == "jec")       leg->AddEntry(delta[i],"jet energy scale","l");
     else if (UncertNames[i] == "jer")       leg->AddEntry(delta[i],"jet energy resolution","l");

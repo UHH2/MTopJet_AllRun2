@@ -16,8 +16,17 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   LepJetEta = book<TH1F>("eta_jet2", "#eta", 50, -5, 5);
   LepJetPhi = book<TH1F>("phi_jet2", "#phi", 50, -2*M_PI, 2*M_PI);
 
+  DeltaR_btagT_xcone = book<TH1F>("DeltaR_btagT_xcone", "#Delta R (b-tag medium, next jet) ", 40, 0, 4);
   DeltaR_btagM_nextjet = book<TH1F>("DeltaR_btagM_nextjet", "#Delta R (b-tag medium, next jet) ", 40, 0, 4);
   DeltaR_btagT_nextjet = book<TH1F>("DeltaR_btagT_nextjet", "#Delta R (b-tag tight, next jet) ", 40, 0, 4);
+  number_smalldR_all = book<TH1F>("number_smalldR_all", "number", 1, 0.5, 1.5);
+  number_smalldR_pass = book<TH1F>("number_smalldR_pass", "number", 1, 0.5, 1.5);
+  number_largedR_all = book<TH1F>("number_largedR_all", "number", 1, 0.5, 1.5);
+  number_largedR_pass = book<TH1F>("number_largedR_pass", "number", 1, 0.5, 1.5);
+
+
+
+  csvmax = book<TH1F>("csvmax", "csv max", 50, 0, 1);
 
 
   SoftdropMass_had = book<TH1F>("SoftdropMass_had", "Soft Drop Mass [GeV]", 25, 0, 500);
@@ -176,10 +185,19 @@ void RecoHists_xcone::fill(const Event & event){
   JER_factor->Fill(JER_f, weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
+  int nT = 0;
+  int nM = 0;
+  for(unsigned int i=0; i<event.jets->size(); i++){
+    if(CSVBTag(CSVBTag::WP_TIGHT)(event.jets->at(i), event)) nT++;
+    if(CSVBTag(CSVBTag::WP_MEDIUM)(event.jets->at(i), event)) nM++;
+  }
+
+
   for(unsigned int i=0; i<event.jets->size(); i++){
     Jet jet1 = event.jets->at(i);
     double dRminT = 100;
     if(CSVBTag(CSVBTag::WP_TIGHT)(jet1, event)){
+      DeltaR_btagT_xcone->Fill(deltaR(hadjets[0], jet1), weight);
       for(unsigned int j=0; j<event.jets->size(); j++){
         if(i==j) continue;
         Jet jet2 = event.jets->at(j);
@@ -187,6 +205,14 @@ void RecoHists_xcone::fill(const Event & event){
         if(dR < dRminT && jet2.pt()>50) dRminT = dR;
       }
       if(dRminT < 100) DeltaR_btagT_nextjet->Fill(dRminT, weight);
+      if(dRminT < M_PI/2){
+        number_smalldR_all->Fill(1, weight);
+        if(nT==2) number_smalldR_pass->Fill(1,weight);
+      }
+      else{
+        number_largedR_all->Fill(1, weight);
+        if(nT==2) number_largedR_pass->Fill(1, weight);
+      }
     }
     double dRminM = 100;
     if(CSVBTag(CSVBTag::WP_MEDIUM)(jet1, event)){
@@ -199,6 +225,13 @@ void RecoHists_xcone::fill(const Event & event){
       if(dRminM < 100) DeltaR_btagM_nextjet->Fill(dRminM, weight);
     }
   }
+  double maxcsv = -1;
+  for(unsigned int i=0; i<event.jets->size(); i++){
+    if(event.jets->at(i).btag_combinedSecondaryVertex() > maxcsv){
+      maxcsv = event.jets->at(i).btag_combinedSecondaryVertex();
+    }
+  }
+  csvmax->Fill(maxcsv, weight);
   //---------------------------------------------------------------------------------------
   //--------------------------------- Clear all used objects ------------------------------
   //---------------------------------------------------------------------------------------

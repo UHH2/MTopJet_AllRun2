@@ -119,6 +119,8 @@ Particle GetLepton(uhh2::Event & event){
 CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar, bool allHad_):
 h_oldjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS")),
 h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name)),
+h_cor_factor_had(ctx.declare_event_output<std::vector<float>>("cor_factor_had")),
+h_cor_factor_lep(ctx.declare_event_output<std::vector<float>>("cor_factor_lep")),
 allHad(allHad_)
 {
   CorUp = false;
@@ -150,6 +152,9 @@ bool CorrectionFactor::process(uhh2::Event & event){
   // leave lep subjets unchanged (dont do this anymore!!)
   // if(!allHad) newjets.at(lep_nr).set_subjets(oldjets.at(lep_nr).subjets());
 
+  vector<float> factors_had;
+  vector<float> factors_lep;
+
   // now correct had subjets
   std::vector<Jet> oldsubjets = oldjets.at(0).subjets();
   std::vector<Jet> newsubjets;
@@ -162,6 +167,7 @@ bool CorrectionFactor::process(uhh2::Event & event){
     newjet = oldsubjets.at(i); // this acutally is not required
     newjet.set_v4(newjet_v4);  // Because of this, all JEC factors are set to the defaul value of 1
     newsubjets.push_back(newjet);
+    factors_had.push_back(factor);
   }
   newjets.at(0).set_subjets(newsubjets);
 
@@ -177,10 +183,12 @@ bool CorrectionFactor::process(uhh2::Event & event){
     newjet2 = oldsubjets2.at(i); // this acutally is not required
     newjet2.set_v4(newjet2_v4);  // Because of this, all JEC factors are set to the defaul value of 1
     newsubjets2.push_back(newjet2);
+    factors_lep.push_back(factor2);
   }
   newjets.at(1).set_subjets(newsubjets2);
 
-
+  event.set(h_cor_factor_had, factors_had);
+  event.set(h_cor_factor_lep, factors_lep);
   event.set(h_newjets, newjets);
 
   return true;
