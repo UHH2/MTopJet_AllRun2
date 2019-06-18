@@ -71,8 +71,8 @@ TH2D* Normalise::CalcMatrix(){
 
 TH2D* Normalise::MatrixErrorPropagation(TH2*old_cov){
   int nbins = upper_;
-  TH2D* new_cov = new TH2D("new_cov", "new_cov", nbins, 1, upper_+1, nbins, 1, upper_+1);
-  // TH2D* new_cov = (TH2D*) old_cov->Clone();
+  TH2D* new_cov = (TH2D*) old_cov->Clone();
+  new_cov->Reset();
   double integral = hist_->Integral(lower_, upper_);
   // std::cout << "lower bin: "<< lower_ << std::endl;
   // std::cout << "upper bin: "<< upper_ << std::endl;
@@ -99,7 +99,7 @@ TH2D* Normalise::MatrixErrorPropagation(TH2*old_cov){
         }
       }
       // std::cout << sum << std::endl;
-      new_cov->Fill(i, j, sum);
+      new_cov->SetBinContent(i, j, sum);
     }
   }
   return new_cov;

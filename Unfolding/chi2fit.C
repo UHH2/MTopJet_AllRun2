@@ -87,6 +87,11 @@ double chi2fit::GetMass(){
   return mass;
 }
 
+double chi2fit::GetMin(){
+  double minY = fit_->GetMinimum();
+  return minY;
+}
+
 double chi2fit::GetUncertainty(){
   double minY = fit_->GetMinimum();
   double minX = fit_->GetX(minY, 140, 200);

@@ -22,6 +22,7 @@ void fill_background(TTree *, TString);
 void fill_matrix(TTree *, TString);
 void fill_modelsys(TTree *, TString);
 void fill_pdf(TTree *);
+void fill_breweight(TTree *, TString);
 
 
 
@@ -58,6 +59,8 @@ Bool_t passed_btagmigration_rec;
 Double_t gen_weight, rec_weight, gen_ttfactor; //weights
 Double_t gen_2width_factor, gen_4width_factor, gen_8width_factor; //factor to change width
 
+// b quark pt
+vector<double> *pt_b = new vector<double>(2);
 
 //weights
 Double_t w_central;

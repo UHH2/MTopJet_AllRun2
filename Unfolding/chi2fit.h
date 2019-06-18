@@ -15,7 +15,7 @@
 #include <TVectorD.h>
 #include <TDecompLU.h>
 #include <iostream>
-#include <iomanip>  
+#include <iomanip>
 #include <TF1.h>
 
 class chi2fit{
@@ -27,6 +27,7 @@ class chi2fit{
   TF1* GetChi2Fit();
   std::vector<double> GetChi2Values();
   double GetMass();
+  double GetMin();
   double GetUncertainty();
 
  private:

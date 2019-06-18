@@ -114,9 +114,10 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   TH1* output = (TH1*) output_->Clone("output");
   TH1* stat = (TH1*) stat_->Clone("stat");
 
-  std::vector<TH1D*> truth;
+  std::vector<TH1D*> truth, truth2;
   for(auto t: truth_){
     truth.push_back( (TH1D*) t->Clone() );
+    truth2.push_back( (TH1D*) t->Clone() );
   }
 
   double max = output->GetMaximum();
@@ -148,13 +149,25 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   stat->SetMarkerStyle(8);
   stat->SetMarkerSize(1);
   gStyle->SetEndErrorSize(5);
-  Color_t color[] = {kRed-4, kAzure+7, kGreen, 798};
-  Int_t style[] = {1, 2, 9, 7};
+  Int_t color[] = {TColor::GetColor("#0059b3"), TColor::GetColor("#e67300")};
+  Int_t fillcolor[] = {TColor::GetColor("#99ccff"), TColor::GetColor("#ff8000")};
+  // Color_t color[] = {kAzure+2, kOrange+7};
+  // Color_t fillcolor[] = {kAzure+10, 798};
+  Int_t style[] = {1, 2};
+  Int_t fillstyle[] = {3144, 3153};
+
   for(unsigned int i=0; i<truth.size(); i++){
     truth[i]->SetLineWidth(3);
     truth[i]->SetLineColor(color[i]);
     truth[i]->SetLineStyle(style[i]);
-    truth[i]->Draw("HIST SAME");
+    truth[i]->SetMarkerStyle(0);
+    truth[i]->SetFillColor(fillcolor[i]);
+    // truth[i]->SetFillStyle(fillstyle[i]);
+    if(i==0) truth[i]->Draw("E2 SAME");
+    truth2[i]->SetLineWidth(3);
+    truth2[i]->SetLineColor(color[i]);
+    truth2[i]->SetLineStyle(style[i]);
+    truth2[i]->Draw("HIST SAME");
   }
   stat->Draw("E1 SAME");
   output->Draw("E1 SAME");
@@ -164,7 +177,9 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   l->SetFillStyle(0);
   l->AddEntry(output,"Data","ple");
   for(unsigned int i=0; i<truth.size(); i++){
-    l->AddEntry(truth[i],legnames[i],"l");
+    // l->AddEntry(truth[i],legnames[i],"l");
+    if(i==0) l->AddEntry(truth[i],legnames[i],"fl");
+    else     l->AddEntry(truth[i],legnames[i],"l");
   }
   l->SetTextSize(0.04);
   l->Draw();
@@ -309,9 +324,10 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   TH1* output = (TH1*) output_->Clone("output");
   TH1* stat = (TH1*) stat_->Clone("stat");
 
-  std::vector<TH1D*> mtop_templates;
+  std::vector<TH1D*> mtop_templates, mtop_templates2;
   for(unsigned int i = 0; i < mtop_templates_.size(); i++){
     mtop_templates.push_back((TH1D*) mtop_templates_[i]->Clone(""));
+    mtop_templates2.push_back((TH1D*) mtop_templates_[i]->Clone(""));
   }
 
   TCanvas *c = new TCanvas("c","",600,600);
@@ -348,41 +364,43 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   stat->SetMarkerSize(1);
   gStyle->SetEndErrorSize(5);
 
-  mtop_templates[0]->SetLineColor(kRed);
-  mtop_templates[1]->SetLineColor(kRed);
-  mtop_templates[2]->SetLineColor(kRed);
-  mtop_templates[3]->SetLineColor(13);
-  mtop_templates[4]->SetLineColor(kAzure+7);
-  mtop_templates[5]->SetLineColor(kAzure+7);
-  mtop_templates[6]->SetLineColor(kAzure+7);
 
-  mtop_templates[0]->SetLineStyle(3);
-  mtop_templates[1]->SetLineStyle(3);
-  mtop_templates[2]->SetLineStyle(3);
-  mtop_templates[3]->SetLineStyle(1);
-  mtop_templates[4]->SetLineStyle(2);
-  mtop_templates[5]->SetLineStyle(2);
-  mtop_templates[6]->SetLineStyle(2);
+  Color_t lcols[] = {kRed-4, kRed-4, kRed-4, TColor::GetColor("#0059b3"), 14, 14, 14};
+  Color_t fcols[] = {kRed-10, kRed-10, kRed-10, TColor::GetColor("#99ccff"), 16, 16, 16};
+  Color_t style[] = {3, 3, 3, 1, 2, 2, 2};
 
 
   for(unsigned int i = 0; i < mtop_templates.size(); i++){
+    mtop_templates[i]->SetLineColor(lcols[i]);
+    mtop_templates[i]->SetLineStyle(style[i]);
+    mtop_templates[i]->SetFillColor(fcols[i]);
+    // mtop_templates[i]->SetFillStyle(3144);
     mtop_templates[i]->SetLineWidth(3);
-    if(show[i]) mtop_templates[i]->Draw("HIST SAME");
+    mtop_templates2[i]->SetLineColor(lcols[i]);
+    mtop_templates2[i]->SetLineStyle(style[i]);
+    mtop_templates2[i]->SetLineWidth(3);
+    if(show[i]){
+      mtop_templates[i]->Draw("E2 SAME");
+      mtop_templates2[i]->Draw("HIST SAME");
+    }
   }
-  mtop_templates[3]->Draw("HIST SAME");
+  mtop_templates[3]->Draw("E2 SAME");
+  mtop_templates2[3]->Draw("HIST SAME");
+
+
   stat->Draw("E1 SAME");
   output->Draw("E1 SAME"); // draw again to set markers in front
   TLegend *l=new TLegend(0.56,0.65,0.78,0.85);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(output,"Data","ple");
-  if(show[0]) l->AddEntry(mtop_templates[0],"m_{t} = 166.5 GeV","pl");
-  if(show[1]) l->AddEntry(mtop_templates[1],"m_{t} = 169.5 GeV","pl");
-  if(show[2]) l->AddEntry(mtop_templates[2],"m_{t} = 171.5 GeV","pl");
-  if(show[3]) l->AddEntry(mtop_templates[3],"m_{t} = 172.5 GeV","pl");
-  if(show[4]) l->AddEntry(mtop_templates[4],"m_{t} = 173.5 GeV","pl");
-  if(show[5]) l->AddEntry(mtop_templates[5],"m_{t} = 175.5 GeV","pl");
-  if(show[6]) l->AddEntry(mtop_templates[6],"m_{t} = 178.5 GeV","pl");
+  if(show[0]) l->AddEntry(mtop_templates[0],"m_{t} = 166.5 GeV","fl");
+  if(show[1]) l->AddEntry(mtop_templates[1],"m_{t} = 169.5 GeV","fl");
+  if(show[2]) l->AddEntry(mtop_templates[2],"m_{t} = 171.5 GeV","fl");
+  if(show[3]) l->AddEntry(mtop_templates[3],"m_{t} = 172.5 GeV","fl");
+  if(show[4]) l->AddEntry(mtop_templates[4],"m_{t} = 173.5 GeV","fl");
+  if(show[5]) l->AddEntry(mtop_templates[5],"m_{t} = 175.5 GeV","fl");
+  if(show[6]) l->AddEntry(mtop_templates[6],"m_{t} = 178.5 GeV","fl");
   l->SetTextSize(0.04);
   l->Draw();
   CMSLabel();
@@ -390,6 +408,64 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+
+
+/*
+████████ ██   ██ ███████  ██████
+   ██    ██   ██ ██      ██    ██
+   ██    ███████ █████   ██    ██
+   ██    ██   ██ ██      ██    ██
+   ██    ██   ██ ███████  ██████
+*/
+
+void plotter::draw_theo(TH1D* truth_, std::vector<TH1D*> variations_, bool norm, TString file_name){
+
+  TH1D* truth = (TH1D*) truth_->Clone("truth");
+
+  std::vector<TH1D*> variations;
+  for(auto var: variations_){
+    TH1D* temp = (TH1D*) var->Clone();
+    variations.push_back(temp);
+  }
+  if(norm){
+    truth->Scale(1/truth->Integral());
+    for(auto var: variations) var->Scale(1/var->Integral());
+  }
+
+  TCanvas *c = new TCanvas("c","",600,600);
+  gPad->SetLeftMargin(0.19);
+  double ymax = 1.5 * truth->GetMaximum();
+  // TGaxis::SetMaxDigits(3);
+  truth->SetTitle(" ");
+  truth->GetYaxis()->SetRangeUser(0., ymax);
+  truth->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  if(norm) truth->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
+  else truth->GetYaxis()->SetTitle("events");
+  truth->GetYaxis()->SetTitleOffset(1.5);
+  truth->GetXaxis()->SetTitleOffset(0.9);
+  truth->GetYaxis()->SetTitleSize(0.05);
+  truth->GetXaxis()->SetTitleSize(0.05);
+  truth->GetYaxis()->SetNdivisions(505);
+  truth->SetLineColor(kAzure+1);
+  truth->SetLineWidth(3);
+  truth->Draw("HIST");
+  for(auto var: variations){
+    var->SetLineWidth(3);
+    var->SetLineColor(kRed);
+    var->Draw("HIST SAME");
+  }
+  truth->Draw("HIST SAME");
+  TLegend *l=new TLegend(0.5,0.65,0.85,0.85);
+  l->SetBorderSize(0);
+  l->SetFillStyle(0);
+  l->AddEntry(truth,"nominal sample","pl");
+  l->AddEntry(variations[0],"variations","pl");
+  l->SetTextSize(0.04);
+  l->Draw();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
 /*
 ██           ██████ ██    ██ ██████  ██    ██ ███████
 ██          ██      ██    ██ ██   ██ ██    ██ ██
@@ -593,6 +669,51 @@ void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
 }
+
+/*
+██████  ██ ███    ██ ██   ██ ██ ███████ ████████ ███████
+██   ██ ██ ████   ██ ██   ██ ██ ██         ██    ██
+██████  ██ ██ ██  ██ ███████ ██ ███████    ██    ███████
+██   ██ ██ ██  ██ ██ ██   ██ ██      ██    ██         ██
+██████  ██ ██   ████ ██   ██ ██ ███████    ██    ███████
+*/
+
+
+void plotter::draw_binhist(TGraph* hist_, TString file_name, double xmin, double xmax){
+  TGraph* hist = (TGraph*) hist_->Clone();
+  TCanvas *c= new TCanvas(" ","",600,600);
+  gPad->SetLeftMargin(0.15);
+  hist->SetTitle(" ");
+  // hist->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  // hist->GetYaxis()->SetTitle("events");
+  hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->SetLineColor(kBlack);
+  hist->SetMarkerColor(kBlack);
+  hist->SetMarkerStyle(20);
+  hist->Draw("AP");
+  TF1*f1 = new TF1("f1","pol1",0,500);
+  hist->Fit("f1","R");
+  TF1* fit = hist->GetFunction("f1");
+  fit->SetLineColor(kRed);
+  fit->Draw("SAME");
+  double y1 = fit->Eval(xmin);
+  double y2 = fit->Eval(xmax);
+  TLine* l1 = new TLine(169, y1, 176, y1);
+  TLine* l2 = new TLine(169, y2, 176, y2);
+  l1->SetLineWidth(3);
+  l1->SetLineColor(13);
+  l1->SetLineStyle(2);
+  l2->SetLineWidth(3);
+  l2->SetLineColor(13);
+  l2->SetLineStyle(2);
+  l1->Draw("SAME");
+  l2->Draw("SAME");
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
 /*
 ██████  ███████ ██   ████████  █████
 ██   ██ ██      ██      ██    ██   ██
@@ -647,14 +768,39 @@ void plotter::draw_delta_rel(TH1* hist_, TH1* result_, TString file_name){
   delete c;
 }
 
-void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString category, TString file_name){
+void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString file_name){
   TH1* total = (TH1*) total_->Clone();
   TH1* stat = (TH1*) stat_->Clone();
   std::vector<TH1*> delta;
   for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
     delta.push_back( (TH1*) MODEL_DELTA[i]->Clone() );
   }
-
+  // print out values in txt
+  std::ofstream outs(directory+file_name+".txt");
+  int Nbins = total->GetXaxis()->GetNbins();
+  auto coutbuf = std::cout.rdbuf(outs.rdbuf());
+  std::cout << "total ";
+  for(unsigned int bin=1; bin<=Nbins; bin++){
+    double percent = total->GetBinContent(bin);
+    std::cout << std::fixed << std::setprecision(2) << percent << " ";
+  }
+  std::cout << std::endl;
+  std::cout << "stat ";
+  for(unsigned int bin=1; bin<=Nbins; bin++){
+    double percent = stat->GetBinContent(bin);
+    std::cout << std::fixed << std::setprecision(2) << percent << " ";
+  }
+  std::cout << std::endl;
+  for(unsigned int i=0; i<delta.size(); i++){
+    std::cout << UncertNames[i] << " ";
+    for(unsigned int bin=1; bin<=Nbins; bin++){
+      double percent = delta[i]->GetBinContent(bin);
+      std::cout << std::fixed << std::setprecision(2) << percent << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout.rdbuf(coutbuf);
+  //
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
   total->SetTitle("");
@@ -677,7 +823,6 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
 
   Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta, 13, kAzure, 14, kRed+5, kGreen-8};
   int i=0;
-  int nbtaghists = 0;
   for(auto hist: delta){
     hist->SetLineColor(col[i]);
     hist->SetLineWidth(4);
@@ -690,12 +835,10 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   TLegend *leg = new TLegend(0.4,0.6,0.88,0.88);
   leg->SetFillStyle(0);
   leg->SetNColumns(2);
-  if(category == "exp")        leg->AddEntry(total, "stat #oplus exp. sys", "f");
-  else if(category == "model") leg->AddEntry(total, "stat #oplus model sys", "f");
+  leg->AddEntry(total, "stat #oplus exp. sys", "f");
   leg->AddEntry(stat, "stat", "l");
   for(unsigned int i=0; i<delta.size(); i++){
-    if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"choice of m_{t}","l");
-    else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
+    if      (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
     else if (UncertNames[i] == "b-tagging") leg->AddEntry(delta[i],"b tagging","l");
     else if (UncertNames[i] == "pile-up")   leg->AddEntry(delta[i],"pileup","l");
     else if (UncertNames[i] == "jec")       leg->AddEntry(delta[i],"jet energy scale","l");
@@ -706,6 +849,85 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
     else if (UncertNames[i] == "ElTrigger") leg->AddEntry(delta[i],"electron trigger","l");
     else if (UncertNames[i] == "ElID")      leg->AddEntry(delta[i],"electron ID","l");
     else if (UncertNames[i] == "ElReco")    leg->AddEntry(delta[i],"electron reconstruction","l");
+    else                                    leg->AddEntry(delta[i],UncertNames[i],"l");
+  }
+  leg->Draw();
+
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+void plotter::draw_delta_comparison_model( TH1* total_, TH1* stat_, std::vector<TH1*> MODEL_DELTA, std::vector<TString> UncertNames, TString file_name){
+  TH1* total = (TH1*) total_->Clone();
+  TH1* stat = (TH1*) stat_->Clone();
+  std::vector<TH1*> delta;
+  for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
+    delta.push_back( (TH1*) MODEL_DELTA[i]->Clone() );
+  }
+  // print out values in txt
+  std::ofstream outs(directory+file_name+".txt");
+  int Nbins = total->GetXaxis()->GetNbins();
+  auto coutbuf = std::cout.rdbuf(outs.rdbuf());
+  std::cout << "total ";
+  for(unsigned int bin=1; bin<=Nbins; bin++){
+    double percent = total->GetBinContent(bin);
+    std::cout << std::fixed << std::setprecision(2) << percent << " ";
+  }
+  std::cout << std::endl;
+  std::cout << "stat ";
+  for(unsigned int bin=1; bin<=Nbins; bin++){
+    double percent = stat->GetBinContent(bin);
+    std::cout << std::fixed << std::setprecision(2) << percent << " ";
+  }
+  std::cout << std::endl;
+  for(unsigned int i=0; i<delta.size(); i++){
+    std::cout << UncertNames[i] << " ";
+    for(unsigned int bin=1; bin<=Nbins; bin++){
+      double percent = delta[i]->GetBinContent(bin);
+      std::cout << std::fixed << std::setprecision(2) << percent << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout.rdbuf(coutbuf);
+  //
+  TCanvas *c= new TCanvas("c","",600,600);
+  gPad->SetLeftMargin(0.15);
+  total->SetTitle("");
+  total->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  total->GetYaxis()->SetTitle("relative uncertainty [%]");
+  total->GetYaxis()->SetTitleOffset(1.5);
+  total->GetYaxis()->SetNdivisions(505);
+  total->GetYaxis()->SetRangeUser(0, 100);
+  total->SetFillColor(13);
+  total->SetFillStyle(3144);
+  total->SetLineColor(13);
+  total->SetMarkerStyle(-1);
+  total->Draw("HIST");
+  stat->SetLineColor(kBlack);
+  stat->SetLineWidth(4);
+  stat->SetMarkerStyle(0);
+  stat->Draw("B SAME");
+
+
+
+  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta, 13, kAzure, 14, kRed+5, kGreen-8};
+  for(unsigned int i=0; i<delta.size(); i++){
+    delta[i]->SetLineColor(col[i]);
+    delta[i]->SetLineWidth(4);
+    delta[i]->SetMarkerStyle(0);
+    delta[i]->Draw("B SAME");
+  }
+
+  // LEGEND
+  TLegend *leg = new TLegend(0.4,0.6,0.88,0.88);
+  leg->SetFillStyle(0);
+  leg->SetNColumns(2);
+  leg->AddEntry(total, "stat #oplus model sys", "f");
+  leg->AddEntry(stat, "stat", "l");
+  for(unsigned int i=0; i<delta.size(); i++){
+    if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"choice of m_{t}","l");
+    else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
     else if (UncertNames[i] == "hdamp")     leg->AddEntry(delta[i],"h_{damp}","l");
     else                                    leg->AddEntry(delta[i],UncertNames[i],"l");
   }
@@ -797,11 +1019,10 @@ void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_nam
   TH1D* numerator = (TH1D*) numerator_->Clone("numerator");
   TH1D* denominator = (TH1D*) denominator_->Clone("denominator");
 
-  TH1D* purity = numerator; // just to set correct binning
-  purity->Divide(numerator, denominator, 1., 1., "B");
+  TGraphAsymmErrors* purity = new TGraphAsymmErrors(numerator, denominator,"cl=0.683 b(1,1) mode");
 
   purity->SetTitle(" ");
-  purity->GetXaxis()->SetTitle("m_{gen}");
+  purity->GetXaxis()->SetTitle("m_{rec}");
   purity->GetYaxis()->SetTitle("purity");
   purity->GetYaxis()->SetRangeUser(0,1);
 
@@ -819,7 +1040,39 @@ void plotter::draw_purity(TH1D* numerator_, TH1D* denominator_, TString file_nam
   TCanvas *c= new TCanvas("Purity","",600,600);
   gPad->SetLeftMargin(0.15);
   // TGaxis::SetMaxDigits(3);
-  purity->Draw("E1");
+  purity->Draw("AP");
+  gPad->RedrawAxis();
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
+void plotter::draw_stability(TH1D* numerator_, TH1D* denominator_, TString file_name){
+  TH1D* numerator = (TH1D*) numerator_->Clone("numerator");
+  TH1D* denominator = (TH1D*) denominator_->Clone("denominator");
+
+
+  TGraphAsymmErrors* stability = new TGraphAsymmErrors(numerator, denominator,"cl=0.683 b(1,1) mode");
+
+  stability->SetTitle(" ");
+  stability->GetXaxis()->SetTitle("m_{gen}");
+  stability->GetYaxis()->SetTitle("stability");
+  stability->GetYaxis()->SetRangeUser(0,1);
+
+  stability->GetXaxis()->SetTitleSize(0.05);
+  stability->GetYaxis()->SetTitleSize(0.05);
+  stability->GetXaxis()->SetTitleOffset(0.9);
+  stability->GetYaxis()->SetTitleOffset(0.8);
+  stability->GetXaxis()->SetNdivisions(505);
+  stability->GetYaxis()->SetNdivisions(505);
+
+  stability->SetMarkerStyle(20);
+  stability->SetMarkerSize(0.8);
+  stability->SetLineColor(1);
+
+  TCanvas *c= new TCanvas("Purity","",600,600);
+  gPad->SetLeftMargin(0.15);
+  // TGaxis::SetMaxDigits(3);
+  stability->Draw("AP");
   gPad->RedrawAxis();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
@@ -940,7 +1193,7 @@ void plotter::draw_bias(TH1* output_, TH1D* truth_, TH1* bias_, TString file_nam
 ███████ ███    ███ ███████  █████  ██████
 ██      ████  ████ ██      ██   ██ ██   ██
 ███████ ██ ████ ██ █████   ███████ ██████
-     ██ ██  ██  ██ ██      ██   ██ ██   ██
+██ ██  ██  ██ ██      ██   ██ ██   ██
 ███████ ██      ██ ███████ ██   ██ ██   ██
 */
 
