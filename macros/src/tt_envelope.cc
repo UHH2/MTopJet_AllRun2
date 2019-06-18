@@ -81,8 +81,8 @@ int main(int argc, char* argv[])
   FSRVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_fsrdown.root"));
   HdampVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_hdampup.root"));
   HdampVariations_f.push_back(new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown.root"));
-  PDFVariations_f.push_back(new TFile(directory+"PDF_up/PDF_Variations.root"));
-  PDFVariations_f.push_back(new TFile(directory+"PDF_down/PDF_Variations.root"));
+  // PDFVariations_f.push_back(new TFile(directory+"PDF_up/PDF_Variations.root"));
+  // PDFVariations_f.push_back(new TFile(directory+"PDF_down/PDF_Variations.root"));
 
   TFile* WJets_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.WJets.root");
   TFile* SingleTop_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.SingleTop.root");
@@ -97,6 +97,9 @@ int main(int argc, char* argv[])
 
   // histdir = "PreSel04_Muon/";
   // histname = "pt_1";
+
+  // histdir = "XCone_cor_subjets_SF/";
+  // histname = "min_mass_Wjet";
 
   std::vector<TH1F*> ScaleVariations, BTagVariationsHeavy,PUVariations;
   std::vector<TH1F*>  MuIdVariations, MuTrVariations;
@@ -149,10 +152,10 @@ int main(int argc, char* argv[])
   for(unsigned int i=0; i<HdampVariations_f.size(); i++){
     HdampVariations.push_back((TH1F*)HdampVariations_f[i]->Get(histdir + histname));
   }
-  for(unsigned int i=0; i<PDFVariations_f.size(); i++){
-    // pdf variations have a slightly different directory structure
-    PDFVariations.push_back((TH1F*)PDFVariations_f[i]->Get(histname));
-  }
+  // pdf variations have a slightly different directory structure
+  // for(unsigned int i=0; i<PDFVariations_f.size(); i++){
+  //   PDFVariations.push_back((TH1F*)PDFVariations_f[i]->Get(histname));
+  // }
 
   TH1F* Central = (TH1F*)Central_f->Get(histdir + histname);
 
@@ -364,17 +367,17 @@ int main(int argc, char* argv[])
   ErrorSym.push_back(HdampErrorSym);
   CovMatrix.push_back(GetCovMatrix(HdampErrorSym));
 
-  TH1F* PDFEnvelopeUp = GetEnvelopeUp(PDFVariations);
-  TH1F* PDFErrorUp = GetError(Central, PDFEnvelopeUp);
-  TH1F* PDFEnvelopeDown = GetEnvelopeDown(PDFVariations);
-  TH1F* PDFErrorDown = GetError(Central, PDFEnvelopeDown);
-  TH1F* PDFErrorSym = GetSymmetricError(PDFErrorUp, PDFErrorDown);
-  EnvelopeUp.push_back(PDFEnvelopeUp);
-  EnvelopeDown.push_back(PDFEnvelopeDown);
-  ErrorUp.push_back(PDFErrorUp);
-  ErrorDown.push_back(PDFErrorDown);
-  ErrorSym.push_back(PDFErrorSym);
-  CovMatrix.push_back(GetCovMatrix(PDFErrorSym));
+  // TH1F* PDFEnvelopeUp = GetEnvelopeUp(PDFVariations);
+  // TH1F* PDFErrorUp = GetError(Central, PDFEnvelopeUp);
+  // TH1F* PDFEnvelopeDown = GetEnvelopeDown(PDFVariations);
+  // TH1F* PDFErrorDown = GetError(Central, PDFEnvelopeDown);
+  // TH1F* PDFErrorSym = GetSymmetricError(PDFErrorUp, PDFErrorDown);
+  // EnvelopeUp.push_back(PDFEnvelopeUp);
+  // EnvelopeDown.push_back(PDFEnvelopeDown);
+  // ErrorUp.push_back(PDFErrorUp);
+  // ErrorDown.push_back(PDFErrorDown);
+  // ErrorSym.push_back(PDFErrorSym);
+  // CovMatrix.push_back(GetCovMatrix(PDFErrorSym));
 
   // create a dummy sys with constant shift (for testing)
   TH1F* DummyUp = DummyConstVariation(Central, 2);
@@ -435,7 +438,7 @@ int main(int argc, char* argv[])
   SysFiles.push_back(new TFile(directory+"SYS_ISR.root","RECREATE"));
   SysFiles.push_back(new TFile(directory+"SYS_FSR.root","RECREATE"));
   SysFiles.push_back(new TFile(directory+"SYS_HDAMP.root","RECREATE"));
-  SysFiles.push_back(new TFile(directory+"SYS_PDF.root","RECREATE"));
+  // SysFiles.push_back(new TFile(directory+"SYS_PDF.root","RECREATE"));
 
   if( SysFiles.size() != EnvelopeUp.size() ) cout << "Not same number of Files and Envelope Up Hists!" << endl;
   if( SysFiles.size() != EnvelopeDown.size() ) cout << "Not same number of Files and Envelope Down Hists!" << endl;

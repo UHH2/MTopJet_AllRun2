@@ -33,10 +33,30 @@ int main(int argc, char* argv[]){
   for(auto h: h2) mean2.push_back(h->GetMean());
 
   vector<TLine*> line1, line2;
-  double ymax1 = h1[1]->GetMaximum() * 1.1;
+  double ymax1 = 0;
+  double ymax2 = 0;
+  for(auto h: h1){
+    if(h->GetMaximum() > ymax1) ymax1 = h->GetMaximum();
+  }
+  for(auto h: h2){
+    if(h->GetMaximum() > ymax2) ymax2 = h->GetMaximum();
+  }
+  ymax1 *= 1.2;
+  ymax2 *= 1.2;
   for(auto m: mean1) line1.push_back(new TLine(m, 0, m, ymax1));
-  double ymax2 = h2[1]->GetMaximum() * 1.1;
   for(auto m: mean2) line2.push_back(new TLine(m, 0, m, ymax2));
+
+  cout << " Channel = " << channel << endl;
+  cout << " -- had" << endl;
+  cout << "    - mean central = " << 100*mean1[0] << "%" << endl;
+  cout << "    - diff to up   = " << 100*fabs(mean1[0]-mean1[1]) << "%" << endl;
+  cout << "    - diff to down = " << 100*fabs(mean1[0]-mean1[2]) << "%" << endl;
+  cout << " -- lep" << endl;
+  cout << "    - mean central = " << 100*mean2[0] << "%" << endl;
+  cout << "    - diff to up   = " << 100*fabs(mean2[0]-mean2[1]) << "%" << endl;
+  cout << "    - diff to down = " << 100*fabs(mean2[0]-mean2[2]) << "%" << endl;
+
+
 
   for(auto h: h1){
     h->SetLineWidth(2);
@@ -70,6 +90,7 @@ for(unsigned int i=0; i<h1.size(); i++){
   TCanvas *a = new TCanvas("a", " ", 600, 600);
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.1);
+  h1[i]->GetXaxis()->SetRangeUser(0.7, 1.3);
   h1[i]->GetYaxis()->SetRangeUser(0, ymax1);
   h1[i]->GetXaxis()->SetNdivisions(505);
   h1[i]->GetYaxis()->SetNdivisions(505);
@@ -85,7 +106,7 @@ for(unsigned int i=0; i<h1.size(); i++){
   leg->AddEntry(h1[i], "cor factor", "f");
   leg->AddEntry(line1[i], meantitle, "l");
   leg->Draw();
-  TString name = "had";
+  TString name = "had_";
   if(i==0) name += "central";
   else if(i==1) name += "up";
   else if(i==2) name += "down";
@@ -97,7 +118,7 @@ for(unsigned int i=0; i<h2.size(); i++){
   TCanvas *a = new TCanvas("a", " ", 600, 600);
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.1);
-  h2[i]->GetYaxis()->SetRangeUser(0, ymax1);
+  h2[i]->GetYaxis()->SetRangeUser(0, ymax2);
   h2[i]->GetXaxis()->SetNdivisions(505);
   h2[i]->GetYaxis()->SetNdivisions(505);
   h2[i]->GetYaxis()->SetTitleOffset(1.6);

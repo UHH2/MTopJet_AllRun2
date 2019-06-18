@@ -12,6 +12,9 @@ Double_t weight_sfeta;
 Double_t weight_sfetapt;
 Double_t weight_sfetaptUP;
 Double_t weight_sfetaptDOWN;
+Int_t run;
+Int_t lumi;
+Int_t eventnr;
 bool passed;
 TString weighttag;
 
@@ -87,6 +90,7 @@ int main(int argc, char* argv[]){
   h_eta_data.push_back(new TH1F("h_eta_pass_data_midpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_all_data_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_pass_data_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_data.push_back(new TH1F("h_eta_fail_data_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_all_mc","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_all_mc_lowpt","eta", eta_bins.size()-1, &eta_bins[0]));
@@ -95,6 +99,7 @@ int main(int argc, char* argv[]){
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc_midpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_all_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_mc.push_back(new TH1F("h_eta_fail_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
 
   TFile *f_data=new TFile("/nfs/dust/cms/user/schwarzd/MTopJet/ElecSF/uhh2.AnalysisModuleRunner.DATA.DATA.root");
   fill_pteta((TTree *) f_data->Get("AnalysisTree"), h_pt_data, h_eta_data);
@@ -107,8 +112,8 @@ int main(int argc, char* argv[]){
 
   PlotHist(h_pt_data[0], "p_{T}", "data_pt_all");
   PlotHist(h_pt_data[1], "p_{T}", "data_pt_pass");
-  PlotHist(h_pt_data[2], "p_{T}", "data_pt_all_weirdBin");
-  PlotHist(h_pt_data[3], "p_{T}", "data_pt_pass_weirdBin");
+  PlotHist(h_pt_data[2], "p_{T}", "data_pt_fail_highpt");
+  PlotHist(h_pt_data[3], "p_{T}", "data_pt_pass_highpt");
   PlotHist(h_eta_data[0], "#eta", "data_eta_all");
   PlotHist(h_eta_data[1], "#eta", "data_eta_pass");
   PlotHist(h_eta_data[2], "#eta", "data_eta_lowpt_all");
@@ -117,11 +122,12 @@ int main(int argc, char* argv[]){
   PlotHist(h_eta_data[5], "#eta", "data_eta_midpt_pass");
   PlotHist(h_eta_data[6], "#eta", "data_eta_highpt_all");
   PlotHist(h_eta_data[7], "#eta", "data_eta_highpt_pass");
+  PlotHist(h_eta_data[8], "#eta", "data_eta_highpt_fail");
 
   PlotHist(h_pt_mc[0], "p_{T}", "mc_pt_all");
   PlotHist(h_pt_mc[1], "p_{T}", "mc_pt_pass");
-  PlotHist(h_pt_mc[2], "p_{T}", "mc_pt_all_weirdBin");
-  PlotHist(h_pt_mc[3], "p_{T}", "mc_pt_pass_weirdBin");
+  PlotHist(h_pt_mc[2], "p_{T}", "mc_pt_fail_highpt");
+  PlotHist(h_pt_mc[3], "p_{T}", "mc_pt_pass_highpt");
   PlotHist(h_eta_mc[0], "#eta", "mc_eta_all");
   PlotHist(h_eta_mc[1], "#eta", "mc_eta_pass");
   PlotHist(h_eta_mc[2], "#eta", "mc_eta_lowpt_all");
@@ -130,6 +136,7 @@ int main(int argc, char* argv[]){
   PlotHist(h_eta_mc[5], "#eta", "mc_eta_midpt_pass");
   PlotHist(h_eta_mc[6], "#eta", "mc_eta_highpt_all");
   PlotHist(h_eta_mc[7], "#eta", "mc_eta_highpt_pass");
+  PlotHist(h_eta_mc[8], "#eta", "mc_eta_highpt_fail");
 
   TGraphAsymmErrors* h_effi_pt_data = new TGraphAsymmErrors(h_pt_data[1], h_pt_data[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_data = new TGraphAsymmErrors(h_eta_data[1], h_eta_data[0],"cl=0.683 b(1,1) mode");
@@ -209,6 +216,10 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
   tree->SetBranchAddress("weight_sfetaptUP",&weight_sfetaptUP);
   tree->SetBranchAddress("weight_sfetaptDOWN",&weight_sfetaptDOWN);
   tree->SetBranchAddress("weight",&weight);
+  tree->SetBranchAddress("run",&run);
+  tree->SetBranchAddress("lumi",&lumi);
+  tree->SetBranchAddress("eventnr",&eventnr);
+
   tree->SetBranchStatus("*",1);
 
   for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
@@ -219,6 +230,17 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
     if(pt < 120)             h_eta[2]->Fill(eta, weight);
     else if(pt>120 && pt<200)h_eta[4]->Fill(eta, weight);
     else if(pt>200)          h_eta[6]->Fill(eta, weight);
+
+    if(!passed){
+      if(pt>200){
+        h_pt[2]->Fill(pt, weight);
+        h_eta[8]->Fill(eta, weight);
+        cout << "--------------------" << endl;
+        cout << "run:        " << run << endl;
+        cout << "lumi block: " << lumi << endl;
+        cout << "event nr:   " << eventnr << endl;
+      }
+    }
 
     if(passed){
       // cout << pt << ", " << eta << endl;
@@ -235,6 +257,8 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
       if(pt < 120)             h_eta[3]->Fill(eta, weight_pass);
       else if(pt>120 && pt<200)h_eta[5]->Fill(eta, weight_pass);
       else if(pt>200)          h_eta[7]->Fill(eta, weight_pass);
+
+      if(pt>200) h_pt[3]->Fill(pt, weight);
     }
   }
   return;
@@ -346,7 +370,7 @@ void PlotHist(TH1F* hist, TString xaxis, TString histname){
   hist->GetXaxis()->SetTitleOffset(1.3);
   hist->GetXaxis()->SetNdivisions(505);
   hist->GetYaxis()->SetNdivisions(505);
-  hist->GetYaxis()->SetRangeUser(0, 5000);
+  hist->GetYaxis()->SetRangeUser(0, hist->GetMaximum()*1.2);
   hist->SetLineColor(kBlack);
   hist->SetFillColor(13);
   gStyle->SetOptStat(kFALSE);

@@ -5,7 +5,7 @@ using namespace std;
 int main(int argc, char* argv[]){
 
   // declare files
-  TFile *file = new TFile("/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/Unfolding/Histograms.root");
+  TFile *file = new TFile("/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/Unfolding/Histograms_combine.root");
 
   // get matrix
   TH2F* matrix = (TH2F*)file->Get("mc_matrix");
