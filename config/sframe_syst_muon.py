@@ -83,7 +83,7 @@ class MySFrameBatch(SFrame):
 
 
 sframe_tools = ToolChain(
-    'SFrameUncertsSR',
+    'SFrameUncertsSR_muon',
     list(
         SFrame(
             cfg_filename=sys.argv[1],

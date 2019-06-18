@@ -165,6 +165,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_isrdown"        ||
   ctx.get("dataset_version") == "TTbar_hdampup"        ||
   ctx.get("dataset_version") == "TTbar_hdampdown"      ||
+  ctx.get("dataset_version") == "TTbar_tuneup"        ||
+  ctx.get("dataset_version") == "TTbar_tunedown"      ||
   ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
   ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;

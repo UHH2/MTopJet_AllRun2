@@ -29,16 +29,19 @@ ElecTriggerSF::ElecTriggerSF(uhh2::Context & ctx, std::string var, TString pe){
   if(pteta == "pt"){
     cout << "ElecTriggerSF: You selected the pt dependent SF: " << histname << endl;
     h_sf_lo = (TH1F*)file->Get(histname+"_pt");
+    h_sf_me = (TH1F*)file->Get(histname+"_pt");
     h_sf_hi = (TH1F*)file->Get(histname+"_pt");
   }
   else if(pteta == "eta"){
     cout << "ElecTriggerSF: You selected the eta dependent SF: " << histname << endl;
     h_sf_lo = (TH1F*)file->Get(histname+"_eta");
+    h_sf_me = (TH1F*)file->Get(histname+"_eta");
     h_sf_hi = (TH1F*)file->Get(histname+"_eta");
   }
   else{
     cout << "ElecTriggerSF: You selected the eta (pt bins) dependent SF: " << histname << endl;
     h_sf_lo = (TH1F*)file->Get(histname+"_eta_lowpt");
+    h_sf_me = (TH1F*)file->Get(histname+"_eta_midpt");
     h_sf_hi = (TH1F*)file->Get(histname+"_eta_highpt");
   }
 }
@@ -61,7 +64,11 @@ bool ElecTriggerSF::process(uhh2::Event & event){
     bin = h_sf_lo->GetXaxis()->FindBin(UsedVariable);
     sf  = h_sf_lo->GetBinContent(bin);
   }
-  else{
+  else if(pt > 120 && pt < 200){
+    bin = h_sf_me->GetXaxis()->FindBin(UsedVariable);
+    sf  = h_sf_me->GetBinContent(bin);
+  }
+  else if(pt > 200){
     bin = h_sf_hi->GetXaxis()->FindBin(UsedVariable);
     sf  = h_sf_hi->GetBinContent(bin);
   }

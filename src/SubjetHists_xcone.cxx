@@ -76,12 +76,12 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   mass_had_combine = book<TH1F>("mass_had_combine", "M^{had combined}", 50, 0, 500);
   mass_had_combine_cut = book<TH1F>("mass_had_combine_cut", "M^{had combined}", 50, 0, 500);
 
-  min_mass_Wjet = book<TH1F>("min_mass_Wjet", "min M_{ij}", 50, 50, 150);
-  min_mass_Wjet_ptlow = book<TH1F>("min_mass_Wjet_ptlow", "min M_{ij}", 50, 50, 150);
-  min_mass_Wjet_pthigh = book<TH1F>("min_mass_Wjet_pthigh", "min M_{ij}", 50, 50, 150);
-  all_mass_Wjet = book<TH1F>("all_mass_Wjet", "all M_{ij}", 50, 50, 150);
+  min_mass_Wjet = book<TH1F>("min_mass_Wjet", "min m_{ij}", 36, 0, 180);
+  min_mass_Wjet_ptlow = book<TH1F>("min_mass_Wjet_ptlow", "min m_{ij}", 50, 50, 150);
+  min_mass_Wjet_pthigh = book<TH1F>("min_mass_Wjet_pthigh", "min m_{ij}", 50, 50, 150);
+  all_mass_Wjet = book<TH1F>("all_mass_Wjet", "all m_{ij}", 50, 50, 150);
 
-  min_mass_Wjet_zoom = book<TH1F>("min_mass_Wjet_zoom", "min M_{ij}", 60, 60, 120);
+  min_mass_Wjet_zoom = book<TH1F>("min_mass_Wjet_zoom", "min m_{ij}", 60, 60, 120);
   pt_Wjet = book<TH1F>("pt_Wjet", "p_{T,ij}", 100, 0, 500);
   pt_Wjet_i = book<TH1F>("pt_Wjet_i", "p_{T,i}", 100, 0, 500);
   pt_Wjet_j = book<TH1F>("pt_Wjet_j", "p_{T,j}", 100, 0, 500);

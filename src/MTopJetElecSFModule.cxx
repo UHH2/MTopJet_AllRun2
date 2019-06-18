@@ -96,6 +96,9 @@ protected:
   Event::Handle<double>h_weight_SFetaptUP;
   Event::Handle<double>h_weight_SFetaptDOWN;
   Event::Handle<bool>h_passed;
+  Event::Handle<int>h_run;
+  Event::Handle<int>h_lumi;
+  Event::Handle<int>h_eventnr;
 
   std::unique_ptr<uhh2::AnalysisModule> ele_id_SF, ele_trigger_SFpt, ele_trigger_SFeta, ele_reco_SF;
   std::unique_ptr<uhh2::AnalysisModule> ele_trigger_SFetapt, ele_trigger_SFetaptUP, ele_trigger_SFetaptDOWN;
@@ -123,6 +126,9 @@ MTopJetElecSFModule::MTopJetElecSFModule(uhh2::Context& ctx){
   h_weight_SFetaptUP = ctx.declare_event_output<double>("weight_sfetaptUP");
   h_weight_SFetaptDOWN = ctx.declare_event_output<double>("weight_sfetaptDOWN");
   h_passed = ctx.declare_event_output<bool>("passed");
+  h_run = ctx.declare_event_output<int>("run");
+  h_lumi = ctx.declare_event_output<int>("lumi");
+  h_eventnr = ctx.declare_event_output<int>("eventnr");
 
   // define IDs
   MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
@@ -276,6 +282,26 @@ bool MTopJetElecSFModule::process(uhh2::Event& event){
   event.set(h_eta, event.electrons->at(0).eta());
   event.set(h_weight, event.weight);
   event.set(h_passed, passed_elec_trigger);
+
+
+  int run = 0;
+  int lumi = 0;
+  int eventnr = 0;
+
+  if(!isMC){
+    run = event.run;
+    lumi = event.luminosityBlock;
+    eventnr = event.event;
+  }
+
+  event.set(h_run, run);
+  event.set(h_lumi, lumi);
+  event.set(h_eventnr, eventnr);
+
+
+
+
+
 
   // now apply SF and store weight after SF
   // first store raw weight

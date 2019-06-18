@@ -26,7 +26,8 @@ public:
 
 private:
   TH1F *h_sf_lo;
-  TH1F *h_sf_hi;  
+  TH1F *h_sf_me;
+  TH1F *h_sf_hi;
   bool isMC;
   TString pteta;
 

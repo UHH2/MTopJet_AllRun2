@@ -109,6 +109,7 @@ protected:
 
   // handles for output
   Event::Handle<double>h_musf_central;
+  uhh2::Event::Handle<TTbarGen>h_ttbargen;
 
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
@@ -139,6 +140,7 @@ protected:
   Event::Handle<double>h_factor_2width;
   Event::Handle<double>h_factor_4width;
   Event::Handle<double>h_factor_8width;
+  Event::Handle<std::vector<double>>h_bquark_pt;
   Event::Handle<std::vector<double>>h_pdf_weights;
 
   Event::Handle<std::vector<TopJet>>h_recjets_had;
@@ -284,6 +286,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_isrdown"        ||
   ctx.get("dataset_version") == "TTbar_hdampup"        ||
   ctx.get("dataset_version") == "TTbar_hdampdown"      ||
+  ctx.get("dataset_version") == "TTbar_tuneup"        ||
+  ctx.get("dataset_version") == "TTbar_tunedown"      ||
   ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
   ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
@@ -291,6 +295,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   // ttbar gen
   const std::string ttbar_gen_label("ttbargen");
   if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
+  h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
+
 
   const std::string& channel = ctx.get("channel", ""); //define Channel
   if     (channel == "muon") channel_ = muon;
@@ -601,6 +607,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_factor_4width = ctx.declare_event_output<double>("factor_4width");
   h_factor_8width = ctx.declare_event_output<double>("factor_8width");
   h_pdf_weights = ctx.declare_event_output<vector<double>>("pdf_weights");
+  h_bquark_pt = ctx.declare_event_output<vector<double>>("bquark_pt");
 
 
 
@@ -666,11 +673,25 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_pt_gen33, 0.);   // set gen pt to 0 for data
   }
 
+  // also set bquark pt
+  vector<double> bquark_pt = {0.0, 0.0};
+  if(isTTbar){
+    if(passed_gensel33 || passed_gensel23){
+      const auto & ttbargen = event.get(h_ttbargen);
+      GenParticle bot1 = ttbargen.bTop();
+      GenParticle bot2 = ttbargen.bAntitop();
+      bquark_pt[0] = bot1.pt();
+      bquark_pt[1] = bot2.pt();
+    }
+  }
+  event.set(h_bquark_pt, bquark_pt);
+
+
 
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
-  double SF_tt = 0.8;
+  double SF_tt = 0.846817;  // estimated in combined channel
 
   // get lumi weight = genweight (inkl scale variation)
   scale_variation->process(event); // here, it is only executed to be filled into the gen weight is has to be done again to appear in the event.weight
