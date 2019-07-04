@@ -46,6 +46,8 @@
   <!ENTITY TTbar_hdampdown "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown.root">
   <!ENTITY TTbar_tuneup   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_tuneup.root">
   <!ENTITY TTbar_tunedown "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_tunedown.root">
+  <!ENTITY TTbar_gluonmove "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_gluonmove.root">
+  <!ENTITY TTbar_mpibased  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mpibased.root">
 
   <!ENTITY  TTbar_amcatnlo-pythia   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root">
   <!ENTITY  TTbar_powheg-herwig   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_powheg-herwig.root">
@@ -195,12 +197,17 @@
     <InputData Version="TTbar_hdampdown" Lumi="69830.925" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="TTbar_tuneup" Lumi="70876.319" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <!-- <InputData Version="TTbar_tuneup" Lumi="70876.319" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_tuneup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="TTbar_tunedown" Lumi="70136.434" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&TTbar_tunedown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <In FileName="&TTbar_tunedown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
+    <InputData Version="TTbar_gluonmove" Lumi="67493.056" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_gluonmove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_mpibased" Lumi="35998.950" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_mpibased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <!-- <InputData Version="TTbar_amcatnlo-pythia" Lumi="117772160.207" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_amcatnlo-pythia;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>

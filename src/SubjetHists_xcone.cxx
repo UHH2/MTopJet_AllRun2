@@ -30,6 +30,7 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
 
   match_to_subjet = book<TH1F>("match_to_subjet", "ak4 b-tag matched to XCone subjet", 4, -1.5, 2.5);
 
+  WMass_Vertices = book<TH2F>("WMass_Vertices", "x=Pile-up y=m_{ij}", 50, 0, 50, 50, 0, 500);
 
 
   // Because the v4 is set again in 'cor' jets, the JEC factor ist set to the default value 1
@@ -250,6 +251,7 @@ void SubjetHists_xcone::fill(const Event & event){
 
   if(M_min != 1000){
     min_mass_Wjet->Fill(M_min, weight);
+    WMass_Vertices->Fill(event.pvs->size(), M_min, weight);
     min_mass_Wjet_zoom->Fill(M_min, weight);
   }
   all_mass_Wjet->Fill(M12, weight);

@@ -29,6 +29,9 @@ int main(int argc, char* argv[]){
     return 0;
   }
 
+  cout << "CHANNEL: " << argv[1] << endl;
+
+
   // true masses
   // vector<double> truth = {169.5, 171.5, 172.5, 173.5, 175.5};
   vector<double> truth = {169.5, 171.5, 173.5, 175.5};
@@ -42,18 +45,27 @@ int main(int argc, char* argv[]){
   string directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding/";
   // vector<string> massdir = {"Pseudo1695/", "Pseudo1715/", "Pseudo1/", "Pseudo1735/", "Pseudo1755/"};
   vector<string> massdir = {"Pseudo1695/", "Pseudo1715/", "Pseudo1735/", "Pseudo1755/"};
+  int i=0;
   for(auto mdir: massdir){
     std::ifstream infile(directory+mdir+channel+"/Mass.txt");
     double m, e, m2, e2;
     while (infile >> m >> e >> m2 >> e2){
-      cout << "stat only:        " << m << " +- " << e << endl;
-      cout << "with mass uncert: " << m2 << " +- " << e2 << endl;
+      cout << "------------------------------------------" << endl;
+      cout << "truth:            " << truth[i] << endl;
+      cout << "stat only:        " << m << " +- " << e;
+      if(fabs(truth[i]-m) > e) cout << "  <-- NOT COMPATIBLE";
+      cout << endl;
+      cout << "with mass uncert: " << m2 << " +- " << e2;
+      if(fabs(truth[i]-m2) > e2) cout << "  <-- NOT COMPATIBLE";
+      cout << endl;
       measured_stat.push_back(m);
       error_stat.push_back(e);
       measured.push_back(m2);
       error.push_back(e2);
     }
+    i++;
   }
+  cout << "------------------------------------------" << endl;
 
   TGraphErrors* masses_stat = new TGraphErrors(5, &truth[0], &measured_stat[0], 0, &error_stat[0]);
   TGraphErrors* masses = new TGraphErrors(5, &truth[0], &measured[0], 0, &error[0]);
@@ -111,6 +123,8 @@ int main(int argc, char* argv[]){
   masses_stat->Draw("P SAME");
   // up->Draw("l SAME");
   // down->Draw("l SAME");
+  CMSLabel(true, 0.2, 0.85);
+
   TLegend *leg = new TLegend(0.6,0.15,0.88,0.38);
   leg->AddEntry(masses_stat, "extracted m_{t} (stat only)", "pl");
   leg->AddEntry(diag_line, "perfect measurement", "l");
@@ -147,6 +161,8 @@ int main(int argc, char* argv[]){
   masses->Draw("P SAME");
   // up->Draw("l SAME");
   // down->Draw("l SAME");
+  CMSLabel(true, 0.2, 0.85);
+
   TLegend *leg2 = new TLegend(0.6,0.15,0.88,0.38);
   leg2->AddEntry(masses, "extracted m_{t}^{MC}", "pl");
   leg2->AddEntry(diag_line, "perfect measurement", "l");

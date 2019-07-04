@@ -9,23 +9,35 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
-  // select which Hist to draw
   TString histname = "XCone_cor_SF/M_jet1_";
   TString histname_for_file = "M_jet1";
-
-  // TString histname = "PreSel04_Muon/pt_1";
-  // TString histname_for_file = "pt_1";
-
-  // TString histname = "XCone_cor_subjets_SF/min_mass_Wjet";
-  // TString histname_for_file = "min_mass_Wjet";
+  TString name_out = "MjetSYS";
 
 
   TString dirname = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/combine/";
   // TString dirname = "/nfs/dust/cms/user/schwarzd/MTopJet/PostSelection/muon/";
 
-  TString name_out = "MjetSYS";
-  // TString name_out = "PtMuonSYS";
-  // TString name_out = "WmassSYS";
+
+  if(argc > 1){
+    if(strcmp(argv[1], "Wmass") == 0){
+      name_out = "WmassSYS";
+      histname = "XCone_cor_subjets_SF/min_mass_Wjet";
+      histname_for_file = "min_mass_Wjet";
+    }
+    if(strcmp(argv[1], "sub1") == 0){
+      name_out = "sub1SYS";
+      histname = "XCone_cor_subjets_SF/pt_had_subjet1";
+      histname_for_file = "pt_had_subjet1";    }
+    if(strcmp(argv[1], "sub2") == 0){
+      name_out = "sub2SYS";
+      histname = "XCone_cor_subjets_SF/pt_had_subjet2";
+      histname_for_file = "pt_had_subjet2";    }
+    if(strcmp(argv[1], "sub3") == 0){
+      name_out = "sub3SYS";
+      histname = "XCone_cor_subjets_SF/pt_had_subjet3";
+      histname_for_file = "pt_had_subjet3";    }
+  }
+
 
   vector<TString> processes = {"DATA", "TTbar", "WJets", "SingleTop", "other"};
 

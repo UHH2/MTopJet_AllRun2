@@ -42,12 +42,12 @@ RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & 
   PtReso_pt5_rec = book<TH1F>("PtResolution_pt5_rec", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
   PtReso_pt6_rec = book<TH1F>("PtResolution_pt6_rec", "(p^{rec}_{T, jet1} - p^{gen}_{T, jet1}) / p^{gen}_{T, jet1}) ", 90, -1.5, 1.5);
 
-  MassReso_pt1 = book<TH1F>("MassResolution_pt1", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
-  MassReso_pt2 = book<TH1F>("MassResolution_pt2", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
-  MassReso_pt3 = book<TH1F>("MassResolution_pt3", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
-  MassReso_pt4 = book<TH1F>("MassResolution_pt4", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
-  MassReso_pt5 = book<TH1F>("MassResolution_pt5", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
-  MassReso_pt6 = book<TH1F>("MassResolution_pt6", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
+  MassReso_pt1 = book<TH1F>("MassResolution_pt1", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 180, -1.5, 1.5);
+  MassReso_pt2 = book<TH1F>("MassResolution_pt2", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 180, -1.5, 1.5);
+  MassReso_pt3 = book<TH1F>("MassResolution_pt3", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 180, -1.5, 1.5);
+  MassReso_pt4 = book<TH1F>("MassResolution_pt4", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 180, -1.5, 1.5);
+  MassReso_pt5 = book<TH1F>("MassResolution_pt5", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 180, -1.5, 1.5);
+  MassReso_pt6 = book<TH1F>("MassResolution_pt6", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 180, -1.5, 1.5);
   MassReso_pt1_rec = book<TH1F>("MassResolution_pt1_rec", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
   MassReso_pt2_rec = book<TH1F>("MassResolution_pt2_rec", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);
   MassReso_pt3_rec = book<TH1F>("MassResolution_pt3_rec", "(M^{rec}_{jet1} - M^{gen}_{jet1}) / M^{gen}_{jet1}) ", 90, -1.5, 1.5);

@@ -47,6 +47,8 @@
   <!ENTITY TTbar_hdampdown "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown.root">
   <!ENTITY TTbar_tuneup   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_tuneup.root">
   <!ENTITY TTbar_tunedown "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_tunedown.root">
+  <!ENTITY TTbar_gluonmove "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_gluonmove.root">
+  <!ENTITY TTbar_mpibased  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mpibased.root">
 
   <!ENTITY  TTbar_amcatnlo-pythia   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_amcatnlo-pythia.root">
   <!ENTITY  TTbar_powheg-herwig   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_powheg-herwig.root">
@@ -192,7 +194,7 @@
   -->
 
 
-    <!-- <InputData Version="SingleMuonB" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="SingleMuonB" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&SingleMuonB;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="SingleMuonC" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&SingleMuonC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -205,7 +207,7 @@
     <InputData Version="SingleMuonG" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&SingleMuonG;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="SingleMuonH" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&SingleMuonH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+    <In FileName="&SingleMuonH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
     <!--
@@ -216,7 +218,7 @@
     ███████ ██ ██   ████  ██████  ███████ ███████        ██     ██████  ██
     -->
 
-    <!-- <InputData Version="ST_t-channel_antitop" Lumi="48523.533" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="ST_t-channel_antitop" Lumi="48523.533" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&ST_t-channel_antitop;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="ST_t-channel_top" Lumi="44063.888" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -229,7 +231,7 @@
     <In FileName="&ST_tW_antitop;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="ST_tW_top" Lumi="443952.854" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&ST_tW_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+    <In FileName="&ST_tW_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <!--
   ██████  ██ ██████   ██████  ███████  ██████  ███    ██
@@ -239,12 +241,12 @@
   ██████  ██ ██████   ██████  ███████  ██████  ██   ████
     -->
 
-    <!-- <InputData Version="WW" Lumi="67236.849" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="WW" Lumi="67236.849" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&WW;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="WZ" Lumi="84782.050" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&WZ;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="ZZ" Lumi="120321.310" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&ZZ;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+    <In FileName="&ZZ;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
     <!--
@@ -256,12 +258,12 @@
     -->
 
 
-    <!-- <InputData Version="TTbar_Mtt0000to0700" Lumi="92478.840" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="TTbar_Mtt0000to0700" Lumi="92478.840" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="TTbar_Mtt0700to1000" Lumi="503319.757" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_Mtt0700to1000;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
     <InputData Version="TTbar_Mtt1000toInft" Lumi="1192545.000" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&TTbar_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+    <In FileName="&TTbar_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <!-- <InputData Version="TTbar_fsrup" Lumi="183053.487" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_fsrup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -281,12 +283,17 @@
     <InputData Version="TTbar_hdampdown" Lumi="69830.925" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-    <InputData Version="TTbar_tuneup" Lumi="70876.319" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <!-- <InputData Version="TTbar_tuneup" Lumi="70876.319" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&TTbar_tuneup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="TTbar_tunedown" Lumi="70136.434" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&TTbar_tunedown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    <In FileName="&TTbar_tunedown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
+    <!-- <InputData Version="TTbar_gluonmove" Lumi="67493.056" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_gluonmove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+    <InputData Version="TTbar_mpibased" Lumi="35998.950" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <In FileName="&TTbar_mpibased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <!--
     <InputData Version="TTbar_Mtt0000to0700_std_jec" Lumi="92478.840" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -431,7 +438,7 @@
  ███ ███   █████  ███████    ██    ███████
 -->
 
-        <!-- <InputData Version="WJetsToLNu_Pt0100to0250" Lumi="263484952.900" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+        <InputData Version="WJetsToLNu_Pt0100to0250" Lumi="263484952.900" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
         <In FileName="&WJetsToLNu_Pt0100to0250;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
         <InputData Version="WJetsToLNu_Pt0250to0400" Lumi="25783015.152" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -441,7 +448,7 @@
         <In FileName="&WJetsToLNu_Pt0400to0600;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
         <InputData Version="WJetsToLNu_Pt0600toInft" Lumi="4045167.759" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-        <In FileName="&WJetsToLNu_Pt0600toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+        <In FileName="&WJetsToLNu_Pt0600toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <!--
 ██████  ██    ██
@@ -451,7 +458,7 @@
 ██████     ██
     -->
 
-    <!-- <InputData Version="DYJetsToLL_LO_M50_HT0070to0100" Lumi="44597.090" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="DYJetsToLL_LO_M50_HT0070to0100" Lumi="44597.090" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     <In FileName="&DYJetsToLL_LO_M50_HT0070to0100;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="DYJetsToLL_LO_M50_HT0100to0200" Lumi="57443.271" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -473,7 +480,7 @@
     <In FileName="&DYJetsToLL_LO_M50_HT1200to2500;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
    <InputData Version="DYJetsToLL_LO_M50_HT2500toInft" Lumi="91026579.551" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    <In FileName="&DYJetsToLL_LO_M50_HT2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+    <In FileName="&DYJetsToLL_LO_M50_HT2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
    <!--
     ██████   ██████ ██████
@@ -484,7 +491,7 @@
        ▀▀
    -->
 
-   <!-- <InputData Version="QCD_Pt-0015to0020_MuEnrichedPt5" Lumi="1.074" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+   <InputData Version="QCD_Pt-0015to0020_MuEnrichedPt5" Lumi="1.074" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
    <In FileName="&QCD_Pt-0015to0020_MuEnrichedPt5;" Lumi="0.0"/>  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
    <InputData Version="QCD_Pt-0020to0030_MuEnrichedPt5" Lumi="10.242" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -518,7 +525,7 @@
    <In FileName="&QCD_Pt-0800to1000_MuEnrichedPt5;" Lumi="0.0"/>  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
    <InputData Version="QCD_Pt-1000toInft_MuEnrichedPt5" Lumi="8022248.975" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-   <In FileName="&QCD_Pt-1000toInft_MuEnrichedPt5;" Lumi="0.0"/>  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+   <In FileName="&QCD_Pt-1000toInft_MuEnrichedPt5;" Lumi="0.0"/>  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
 <!-- ================================================================================================================================== -->

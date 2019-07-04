@@ -28,8 +28,8 @@ int main(int argc, char* argv[]){
 
   vector<double> bins_rec = {0.5, 78.5, 120.5, 144.5, 168.5, 174.5, 200.5};
   vector<double> subbins_rec = {26.5, 52.5, 92.5, 106.5};
-  vector<double> bins_gen = {0.5, 14.5, 28.5, 35.5, 48.5, 55.5};
-  vector<double> subbins_gen = {7.5, 21.5};
+  vector<double> bins_gen = {0.5, 22.5, 40.5, 48.5, 65.5, 72.5};
+  vector<double> subbins_gen = {11.5, 31.5};
 
   vector<TLine*> lines_rec, sublines_rec;
   vector<TLine*> lines_gen, sublines_gen;

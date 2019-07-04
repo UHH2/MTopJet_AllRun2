@@ -18,11 +18,14 @@
 #include "TUnfoldDensity.h"
 #include <TString.h>
 
+using namespace std;
+
 class unfolding{
 
  public:
-  unfolding(TH1D* input, std::vector<TH1D*> backgrounds,  std::vector<TString> bgr_name, TH1D* signal, TH2* migration_matrix, std::vector< std::vector<TH2*> > sys_matrix, std::vector< std::vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, bool do_lcurve, int nscan, double tau_);
+  unfolding(TH1D* input, std::vector<TH1D*> backgrounds,  std::vector<TString> bgr_name, TH1D* signal, TH2* migration_matrix, std::vector< std::vector<TH2*> > sys_matrix, std::vector< std::vector<TString> > sys_name, TUnfoldBinning *binning_rec, TUnfoldBinning *binning_gen, TUnfoldBinning *binning_gen20_, bool do_lcurve, int nscan, double tau_);
   TH1* get_output(bool);
+  TH1* get_output_fine();
   TH2* get_prob_matrix();
   TH2* get_cor_matrix();
   TH1* GetBiasDistribution();
@@ -44,7 +47,12 @@ class unfolding{
 
  private:
   TH2* CreateCovMatrixFromDelta(TH1* delta);
+  TH1* ConvertToNewBinning(TH1*, vector<int>);
+  TH2* ConvertToNewBinning(TH2*, vector<int>);
+  // TH1* ConvertToNewBinning(TH1*);
+  // TH2* ConvertToNewBinning(TH2*);
   TH1 *output;
+  TH1 *output_fine;
   TH1 *output_all;
   TH2 *CorM;
   TH2 *ProbM;
@@ -64,5 +72,8 @@ class unfolding{
   TH2* CovInputStat;
   TH2* CovMatrixStat;
   // TH2* CovTotal;
+
+  const TUnfoldBinning *measurement_gen20;
+
 
 };

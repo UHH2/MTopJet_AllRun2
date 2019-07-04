@@ -99,6 +99,38 @@ void plotter::draw_output(TH1* output_, TH1D* truth_, bool norm, TString file_na
   delete c;
 }
 
+void plotter::draw_output_fine(TH1* output_, bool norm, TString file_name){
+  // std::vector<double> sys = get_sys_errors();
+  // TH1* output_sys = add_error_bar(output, sys);
+
+  TH1* output = (TH1*) output_->Clone("output");
+
+  TCanvas *c = new TCanvas("c","",600,600);
+  double ymax;
+  gPad->SetLeftMargin(0.19);
+
+  ymax = 1.5 * output->GetMaximum();
+  // TGaxis::SetMaxDigits(3);
+  output->SetTitle(" ");
+  output->GetYaxis()->SetRangeUser(0., ymax);
+  output->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  if(norm) output->GetYaxis()->SetTitle("#frac{1}{#sigma} #frac{d#sigma}{dm_{jet}} [#frac{1}{GeV}]");
+  else output->GetYaxis()->SetTitle("events");
+  output->GetYaxis()->SetTitleOffset(1.5);
+  output->GetXaxis()->SetTitleOffset(0.9);
+  output->GetYaxis()->SetTitleSize(0.05);
+  output->GetXaxis()->SetTitleSize(0.05);
+  output->GetYaxis()->SetNdivisions(505);
+  output->SetLineColor(kBlack);
+  output->SetMarkerColor(kBlack);
+  output->SetMarkerStyle(8);
+  output->SetMarkerSize(1);
+  output->Draw("E1 SAME");
+  gStyle->SetEndErrorSize(5);
+  c->SaveAs(directory + file_name + ".pdf");
+  delete c;
+}
+
 /*
 ██████  ██    ██ ████████ ██████  ██    ██ ████████     ██████   █████  ████████  █████
 ██    ██ ██    ██    ██    ██   ██ ██    ██    ██        ██   ██ ██   ██    ██    ██   ██
@@ -183,7 +215,7 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   }
   l->SetTextSize(0.04);
   l->Draw();
-  CMSLabel();
+  CMSLabel(false);
   LumiInfo();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
@@ -364,28 +396,53 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   stat->SetMarkerSize(1);
   gStyle->SetEndErrorSize(5);
 
+  Color_t lcol_d = kRed-4;
+  Color_t lcol_c = TColor::GetColor("#0059b3");
+  Color_t lcol_u = 14;
 
-  Color_t lcols[] = {kRed-4, kRed-4, kRed-4, TColor::GetColor("#0059b3"), 14, 14, 14};
-  Color_t fcols[] = {kRed-10, kRed-10, kRed-10, TColor::GetColor("#99ccff"), 16, 16, 16};
-  Color_t style[] = {3, 3, 3, 1, 2, 2, 2};
+  Color_t fcol_d = kRed-10;
+  Color_t fcol_c = TColor::GetColor("#99ccff");
+  Color_t fcol_u = 16;
 
+  Int_t style_d = 3;
+  Int_t style_c = 1;
+  Int_t style_u = 2;
+
+  int index_central = (mtop_templates.size() - 1)/2;
 
   for(unsigned int i = 0; i < mtop_templates.size(); i++){
-    mtop_templates[i]->SetLineColor(lcols[i]);
-    mtop_templates[i]->SetLineStyle(style[i]);
-    mtop_templates[i]->SetFillColor(fcols[i]);
-    // mtop_templates[i]->SetFillStyle(3144);
+    Color_t lcol = 1;
+    Color_t fcol = 1;
+    Int_t style = 1;
+    if(i<index_central){
+      lcol = lcol_d;
+      fcol = fcol_d;
+      style = style_d;
+    }
+    else if(i==index_central){
+      lcol = lcol_c;
+      fcol = fcol_c;
+      style = style_c;
+    }
+    else if(i>index_central){
+      lcol = lcol_u;
+      fcol = fcol_u;
+      style = style_u;
+    }
+    mtop_templates[i]->SetLineColor(lcol);
+    mtop_templates[i]->SetLineStyle(style);
+    mtop_templates[i]->SetFillColor(fcol);
     mtop_templates[i]->SetLineWidth(3);
-    mtop_templates2[i]->SetLineColor(lcols[i]);
-    mtop_templates2[i]->SetLineStyle(style[i]);
+    mtop_templates2[i]->SetLineColor(lcol);
+    mtop_templates2[i]->SetLineStyle(style);
     mtop_templates2[i]->SetLineWidth(3);
     if(show[i]){
       mtop_templates[i]->Draw("E2 SAME");
       mtop_templates2[i]->Draw("HIST SAME");
     }
   }
-  mtop_templates[3]->Draw("E2 SAME");
-  mtop_templates2[3]->Draw("HIST SAME");
+  mtop_templates[index_central]->Draw("E2 SAME");
+  mtop_templates2[index_central]->Draw("HIST SAME");
 
 
   stat->Draw("E1 SAME");
@@ -396,14 +453,22 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   l->AddEntry(output,"Data","ple");
   if(show[0]) l->AddEntry(mtop_templates[0],"m_{t} = 166.5 GeV","fl");
   if(show[1]) l->AddEntry(mtop_templates[1],"m_{t} = 169.5 GeV","fl");
-  if(show[2]) l->AddEntry(mtop_templates[2],"m_{t} = 171.5 GeV","fl");
-  if(show[3]) l->AddEntry(mtop_templates[3],"m_{t} = 172.5 GeV","fl");
-  if(show[4]) l->AddEntry(mtop_templates[4],"m_{t} = 173.5 GeV","fl");
-  if(show[5]) l->AddEntry(mtop_templates[5],"m_{t} = 175.5 GeV","fl");
-  if(show[6]) l->AddEntry(mtop_templates[6],"m_{t} = 178.5 GeV","fl");
+  if(show[2]) l->AddEntry(mtop_templates[2],"m_{t} = 170.0 GeV","fl");
+  if(show[3]) l->AddEntry(mtop_templates[3],"m_{t} = 170.5 GeV","fl");
+  if(show[4]) l->AddEntry(mtop_templates[4],"m_{t} = 171.0 GeV","fl");
+  if(show[5]) l->AddEntry(mtop_templates[5],"m_{t} = 171.5 GeV","fl");
+  if(show[6]) l->AddEntry(mtop_templates[6],"m_{t} = 172.0 GeV","fl");
+  if(show[7]) l->AddEntry(mtop_templates[7],"m_{t} = 172.5 GeV","fl");
+  if(show[8]) l->AddEntry(mtop_templates[8],"m_{t} = 173.0 GeV","fl");
+  if(show[9]) l->AddEntry(mtop_templates[9],"m_{t} = 173.5 GeV","fl");
+  if(show[10]) l->AddEntry(mtop_templates[10],"m_{t} = 174.0 GeV","fl");
+  if(show[11]) l->AddEntry(mtop_templates[11],"m_{t} = 174.5 GeV","fl");
+  if(show[12]) l->AddEntry(mtop_templates[12],"m_{t} = 175.0 GeV","fl");
+  if(show[13]) l->AddEntry(mtop_templates[13],"m_{t} = 175.5 GeV","fl");
+  if(show[14])l->AddEntry(mtop_templates[14],"m_{t} = 178.5 GeV","fl");
   l->SetTextSize(0.04);
   l->Draw();
-  CMSLabel();
+  CMSLabel(false);
   LumiInfo();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
@@ -615,7 +680,7 @@ void plotter::draw_rec(TH1D* data_, TH1D* sig_, TH1D* bgr_, TString file_name){
   gPad->SetLeftMargin(0.15);
   sig->Add(bgr, 1.);
   sig->SetTitle(" ");
-  sig->GetYaxis()->SetRangeUser(0., 250);
+  sig->GetYaxis()->SetRangeUser(0., 500);
   sig->GetXaxis()->SetTitle("detector binning");
   sig->GetYaxis()->SetTitle("events");
   sig->GetYaxis()->SetTitleOffset(1.5);
@@ -679,8 +744,8 @@ void plotter::draw_1D_hist(TH1D* hist_, TString file_name){
 */
 
 
-void plotter::draw_binhist(TGraph* hist_, TString file_name, double xmin, double xmax){
-  TGraph* hist = (TGraph*) hist_->Clone();
+void plotter::draw_binhist(TGraphErrors* hist_, TString file_name, double xmin, double xmax){
+  TGraphErrors* hist = (TGraphErrors*) hist_->Clone();
   TCanvas *c= new TCanvas(" ","",600,600);
   gPad->SetLeftMargin(0.15);
   hist->SetTitle(" ");
@@ -699,8 +764,8 @@ void plotter::draw_binhist(TGraph* hist_, TString file_name, double xmin, double
   fit->Draw("SAME");
   double y1 = fit->Eval(xmin);
   double y2 = fit->Eval(xmax);
-  TLine* l1 = new TLine(169, y1, 176, y1);
-  TLine* l2 = new TLine(169, y2, 176, y2);
+  TLine* l1 = new TLine(168, y1, 177, y1);
+  TLine* l2 = new TLine(168, y2, 177, y2);
   l1->SetLineWidth(3);
   l1->SetLineColor(13);
   l1->SetLineStyle(2);
@@ -747,7 +812,7 @@ void plotter::draw_delta_rel(TH1* hist_, TH1* result_, TString file_name){
   std::ofstream outs(directory+file_name+".txt");
   auto coutbuf = std::cout.rdbuf(outs.rdbuf());
   for(unsigned int i=1; i<=Nbins; i++){
-    double percent = fabs(100*hist->GetBinContent(i)/result->GetBinContent(i));
+    double percent = 100*hist->GetBinContent(i)/result->GetBinContent(i);
     hist->SetBinContent(i, percent);
     std::cout << "bin " << i << ": " << percent << "%" << std::endl;
   }
@@ -757,7 +822,7 @@ void plotter::draw_delta_rel(TH1* hist_, TH1* result_, TString file_name){
   hist->SetTitle(file_name);
   hist->GetXaxis()->SetTitle("m_{jet} [GeV]");
   hist->GetYaxis()->SetTitle("relative uncertainty [%]");
-  hist->GetYaxis()->SetRangeUser(0, 50);
+  hist->GetYaxis()->SetRangeUser(-50, 50);
   hist->GetYaxis()->SetTitleOffset(1.5);
   hist->GetYaxis()->SetNdivisions(505);
   hist->SetFillColor(810);
@@ -791,6 +856,12 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
     std::cout << std::fixed << std::setprecision(2) << percent << " ";
   }
   std::cout << std::endl;
+  std::cout << "exp ";
+  for(unsigned int bin=1; bin<=Nbins; bin++){
+    double percent = sqrt(total->GetBinContent(bin)*total->GetBinContent(bin) - stat->GetBinContent(bin)*stat->GetBinContent(bin));
+    std::cout << std::fixed << std::setprecision(2) << percent << " ";
+  }
+  std::cout << std::endl;
   for(unsigned int i=0; i<delta.size(); i++){
     std::cout << UncertNames[i] << " ";
     for(unsigned int bin=1; bin<=Nbins; bin++){
@@ -809,9 +880,9 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   total->GetYaxis()->SetTitleOffset(1.5);
   total->GetYaxis()->SetNdivisions(505);
   total->GetYaxis()->SetRangeUser(0, 100);
-  total->SetFillColor(13);
-  total->SetFillStyle(3144);
-  total->SetLineColor(13);
+  total->SetFillColor(15);
+  // total->SetFillStyle(3144);
+  total->SetLineColor(15);
   total->SetMarkerStyle(-1);
   total->Draw("HIST");
   stat->SetLineColor(kBlack);
@@ -821,23 +892,36 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
 
 
 
-  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta, 13, kAzure, 14, kRed+5, kGreen-8};
-  int i=0;
-  for(auto hist: delta){
-    hist->SetLineColor(col[i]);
-    hist->SetLineWidth(4);
-    hist->SetMarkerStyle(0);
-    hist->Draw("B SAME");
-    i++;
+  Color_t col[] = {kAzure+7, kGreen, 798, kRed-4, kBlue, kOrange-3, kMagenta, 13, kAzure, 14, kRed+5, kGreen-8};
+  for(unsigned int i=0; i<delta.size(); i++){
+    delta[i]->SetLineColor(col[i]);
+    delta[i]->SetLineWidth(4);
+    delta[i]->SetMarkerStyle(0);
+    if(UncertNames[i] == "MuTrigger" ||
+      UncertNames[i] == "pile-up" ||
+      UncertNames[i] == "MuID" ||
+      UncertNames[i] == "ElTrigger" ||
+      UncertNames[i] == "ElID" ||
+      UncertNames[i] == "ElReco") continue;
+    delta[i]->Draw("B SAME");
   }
+
+  CMSLabel(true, 0.18, 0.87);
 
   // LEGEND
   TLegend *leg = new TLegend(0.4,0.6,0.88,0.88);
   leg->SetFillStyle(0);
   leg->SetNColumns(2);
-  leg->AddEntry(total, "stat #oplus exp. sys", "f");
+  leg->AddEntry(total, "stat #oplus exp", "f");
   leg->AddEntry(stat, "stat", "l");
   for(unsigned int i=0; i<delta.size(); i++){
+    if(UncertNames[i] == "MuTrigger" ||
+      UncertNames[i] == "pile-up" ||
+      UncertNames[i] == "MuID" ||
+      UncertNames[i] == "ElTrigger" ||
+      UncertNames[i] == "ElID" ||
+      UncertNames[i] == "ElReco") continue;
+
     if      (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
     else if (UncertNames[i] == "b-tagging") leg->AddEntry(delta[i],"b tagging","l");
     else if (UncertNames[i] == "pile-up")   leg->AddEntry(delta[i],"pileup","l");
@@ -881,6 +965,12 @@ void plotter::draw_delta_comparison_model( TH1* total_, TH1* stat_, std::vector<
     std::cout << std::fixed << std::setprecision(2) << percent << " ";
   }
   std::cout << std::endl;
+  std::cout << "model ";
+  for(unsigned int bin=1; bin<=Nbins; bin++){
+    double percent = sqrt(total->GetBinContent(bin)*total->GetBinContent(bin) - stat->GetBinContent(bin)*stat->GetBinContent(bin));
+    std::cout << std::fixed << std::setprecision(2) << percent << " ";
+  }
+  std::cout << std::endl;
   for(unsigned int i=0; i<delta.size(); i++){
     std::cout << UncertNames[i] << " ";
     for(unsigned int bin=1; bin<=Nbins; bin++){
@@ -899,9 +989,9 @@ void plotter::draw_delta_comparison_model( TH1* total_, TH1* stat_, std::vector<
   total->GetYaxis()->SetTitleOffset(1.5);
   total->GetYaxis()->SetNdivisions(505);
   total->GetYaxis()->SetRangeUser(0, 100);
-  total->SetFillColor(13);
-  total->SetFillStyle(3144);
-  total->SetLineColor(13);
+  total->SetFillColor(15);
+  // total->SetFillStyle(3144);
+  total->SetLineColor(15);
   total->SetMarkerStyle(-1);
   total->Draw("HIST");
   stat->SetLineColor(kBlack);
@@ -911,24 +1001,30 @@ void plotter::draw_delta_comparison_model( TH1* total_, TH1* stat_, std::vector<
 
 
 
-  Color_t col[] = {kRed-4, kAzure+7, kGreen, 798, kBlue, kOrange-3, kMagenta, 13, kAzure, 14, kRed+5, kGreen-8};
+  Color_t col[] = {kAzure+7, kGreen, kRed-4, 798, kBlue, kOrange-3, kMagenta, 13, kAzure, 14, kRed+5, kGreen-8};
   for(unsigned int i=0; i<delta.size(); i++){
     delta[i]->SetLineColor(col[i]);
     delta[i]->SetLineWidth(4);
     delta[i]->SetMarkerStyle(0);
+    if(UncertNames[i] == "pdf" || UncertNames[i] == "scale") continue;
     delta[i]->Draw("B SAME");
   }
 
+  CMSLabel(true, 0.18, 0.87);
+
   // LEGEND
-  TLegend *leg = new TLegend(0.4,0.6,0.88,0.88);
+  TLegend *leg = new TLegend(0.42,0.6,0.88,0.88);
   leg->SetFillStyle(0);
   leg->SetNColumns(2);
-  leg->AddEntry(total, "stat #oplus model sys", "f");
+  leg->AddEntry(total, "stat #oplus model", "f");
   leg->AddEntry(stat, "stat", "l");
   for(unsigned int i=0; i<delta.size(); i++){
+    if(UncertNames[i] == "pdf" || UncertNames[i] == "scale") continue;
+
     if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"choice of m_{t}","l");
     else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
     else if (UncertNames[i] == "hdamp")     leg->AddEntry(delta[i],"h_{damp}","l");
+    else if (UncertNames[i] == "UEtune")    leg->AddEntry(delta[i],"UE tune","l");
     else                                    leg->AddEntry(delta[i],UncertNames[i],"l");
   }
   leg->Draw();
@@ -1251,16 +1347,28 @@ TH1D* get_difference(TH1D* hist1_, TH1D* hist2_){
 }
 
 
-void plotter::CMSLabel(){
+void plotter::CMSLabel(bool prelim, double x, double y){
   TString cmstext = "CMS";
   TLatex *text = new TLatex(3.5, 24, cmstext);
   text->SetNDC();
   text->SetTextAlign(13);
-  text->SetX(0.25);
+  text->SetX(x);
   text->SetTextFont(62);
   text->SetTextSize(0.07);
-  text->SetY(0.83);
+  text->SetY(y);
   text->Draw();
+
+  if(prelim){
+    TString simtext = "Preliminary";
+    TLatex *text3 = new TLatex(3.5, 24, simtext);
+    text3->SetNDC();
+    text3->SetTextAlign(13);
+    text3->SetX(x);
+    text3->SetTextFont(52);
+    text3->SetTextSize(0.05);
+    text3->SetY(y-0.06);
+    text3->Draw();
+  }
 }
 
 void plotter::LumiInfo(){

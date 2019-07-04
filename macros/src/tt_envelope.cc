@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
     }
   }
 
+
+
   std::vector<TFile*> ScaleVariations_f, BTagVariationsHeavy_f, PUVariations_f;
   std::vector<TFile*> MuIdVariations_f, MuTrVariations_f;
   std::vector<TFile*> ElIdVariations_f, ElTrVariations_f, ElRecoVariations_f;
@@ -91,15 +93,33 @@ int main(int argc, char* argv[])
   TFile * Central_f = new TFile(directory+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
   TFile * Data_f = new TFile(directory+"uhh2.AnalysisModuleRunner.DATA.DATA.root");
 
-  TString histdir, histname;
-  histdir = "XCone_cor_SF/";
-  histname = "M_jet1_";
 
-  // histdir = "PreSel04_Muon/";
-  // histname = "pt_1";
+  TString histdir = "XCone_cor_SF/";
+  TString histname = "M_jet1_";
 
-  // histdir = "XCone_cor_subjets_SF/";
-  // histname = "min_mass_Wjet";
+  if(argc > 2){
+    if(strcmp(argv[2], "Wmass") == 0){
+      histdir = "XCone_cor_subjets_SF/";
+      histname = "min_mass_Wjet";
+      cout << "Wmass" << endl;
+    }
+    if(strcmp(argv[2], "sub1") == 0){
+      histdir = "XCone_cor_subjets_SF/";
+      histname = "pt_had_subjet1";
+      cout << "sub1" << endl;
+    }
+    if(strcmp(argv[2], "sub2") == 0){
+      histdir = "XCone_cor_subjets_SF/";
+      histname = "pt_had_subjet2";
+      cout << "sub2" << endl;
+    }
+    if(strcmp(argv[2], "sub3") == 0){
+      histdir = "XCone_cor_subjets_SF/";
+      histname = "pt_had_subjet3";
+      cout << "sub3" << endl;
+    }
+  }
+
 
   std::vector<TH1F*> ScaleVariations, BTagVariationsHeavy,PUVariations;
   std::vector<TH1F*>  MuIdVariations, MuTrVariations;

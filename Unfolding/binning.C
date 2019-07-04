@@ -24,15 +24,6 @@ int main(int argc, char* argv[])
   cout << "set up binning" << endl;
 
   /******************* RECO BINNING ***********************************/
-  // Double_t BINS_REC_MASS[] = {123, 147, 157, 164, 170, 176, 182, 188, 197, 213, 240, 293, 400};
-  // Double_t BINS_REC_PT[] = {400, 450, 530, 10000};
-  // Double_t BINS_REC_MASS_PTMIGRATION[] = {100, 153, 167, 179, 192, 224, 400};
-  // Double_t BINS_REC_PT_PTMIGRATION[] = {350, 365, 380, 400};
-  // Double_t BINS_REC_MASS_SUBPTMIGRATION[] = {45, 100, 118, 130, 141, 153, 161, 170, 182, 197, 240, 400};
-  // Double_t BINS_REC_MASS_MASSMIGRATION[] = {40, 70, 95, 115, 135, 155, 165, 175, 185, 205, 235, 400};
-  // Double_t BINS_REC_MASS_BTAGMIGRATION[] = {100, 138, 153, 161, 167, 173, 179, 185, 192, 203, 224, 263, 400};
-  // Double_t BINS_REC_MASS_LEPTONPTMIGRATION[] = {45, 180, 400};
-
   Double_t BINS_REC_MASS[] = {123, 138, 147, 153, 157, 161, 164, 167, 170, 173, 176, 179, 182, 185, 188, 192, 197, 203, 213, 224, 240, 263, 293, 343, 400};
   Double_t BINS_REC_PT[] = {400, 450, 530, 10000};
   Double_t BINS_REC_MASS_PTMIGRATION[] = {100, 138, 153, 161, 167, 173, 179, 185, 192, 203, 224, 263, 400};
@@ -56,28 +47,29 @@ int main(int argc, char* argv[])
   // here some actions with arrays are needed to have different possible array sizes
 
   // 1. set-up binning in vectors
-  std::vector<Double_t> MASS;
-  MASS = {112, 132, 152, 172, 192, 232};
-  // MASS = {110, 137, 157, 172, 187, 220, 250};
+  std::vector<Double_t> MASS, MASS20;
+  MASS20 = {112, 132, 152, 172, 192, 232}; // original binning
+  MASS = {112, 132, 142, 152, 162, 172, 192, 232, 312, 392};
 
 
   std::vector<Double_t> MASS_MASSMIGRATION;
-  MASS_MASSMIGRATION = {50, 120, 135, 150, 165, 180, 195, 210, 225, 240, 270, 300};
+  MASS_MASSMIGRATION = {50, 75, 85, 95, 105, 120, 135, 150, 165, 180, 195, 210, 225, 240, 270, 300};
 
   std::vector<Double_t> MASS_PTMIGRATION;
-  MASS_PTMIGRATION = MASS;
+  MASS_PTMIGRATION = {112, 132, 142, 152, 162, 172, 192, 232};
 
   std::vector<Double_t> PT = {400, 500, 10000};
   std::vector<Double_t> PT_PTMIGRATION = {350, 380, 400};
 
   std::vector<Double_t> MASS_SUBPTMIGRATION;
-  MASS_SUBPTMIGRATION = MASS;
+  MASS_SUBPTMIGRATION = {92, 112, 132, 152, 172, 192, 232};
 
   std::vector<Double_t> MASS_LEPTONPTMIGRATION;
-  MASS_LEPTONPTMIGRATION = MASS;
+  MASS_LEPTONPTMIGRATION = MASS20;
 
   // 2. get number of bins from every vector
   int N_BINS_GEN_MASS = MASS.size() - 1;
+  int N_BINS_GEN_MASS20 = MASS20.size() - 1;
   int N_BINS_GEN_PT = PT.size() - 1;
   int N_BINS_GEN_PT_PTMIGRATION = PT_PTMIGRATION.size() - 1;
   int N_BINS_GEN_MASS_MASSMIGRATION = MASS_MASSMIGRATION.size() - 1;
@@ -87,6 +79,7 @@ int main(int argc, char* argv[])
 
   // 3. create arrays from vectors arrays with correct size
   Double_t *BINS_GEN_MASS = MASS.data();
+  Double_t *BINS_GEN_MASS20 = MASS20.data();
   Double_t *BINS_GEN_PT = PT.data();
   Double_t *BINS_GEN_MASS_PTMIGRATION = MASS_PTMIGRATION.data();
   Double_t *BINS_GEN_PT_PTMIGRATION = PT_PTMIGRATION.data();
@@ -217,9 +210,27 @@ int main(int argc, char* argv[])
                                 true // overflow bin
                                 );
 
+  // =======================================================================================================
+  //
+  // GEN BINNING
+  //
+  TUnfoldBinning *binning_gen20=new TUnfoldBinning("binning_gen20");
+
+  TUnfoldBinning *measurement_gen20 = binning_gen20->AddBinning("measurement_gen20");
+  measurement_gen20->AddAxis("mass",N_BINS_GEN_MASS20,BINS_GEN_MASS20,
+                                true, // no underflow bin
+                                true // overflow bin
+                                );
+  measurement_gen20->AddAxis("pt",N_BINS_GEN_PT,BINS_GEN_PT,
+                                false, // no underflow bin
+                                false // overflow bin
+                                );
+
+
   cout << "wirte binning scheme to root file" << endl;
   binning_rec->Write();
   binning_gen->Write();
+  binning_gen20->Write();
 
 
   cout << "wirte binning scheme to readable txt file" << endl;
@@ -249,6 +260,7 @@ int main(int argc, char* argv[])
   cout << "wirte binning scheme to xml file" << endl;
   ofstream xmlOut(binning_xml);
   TUnfoldBinningXML::ExportXML(*binning_rec,xmlOut,kTRUE,kFALSE);
+  TUnfoldBinningXML::ExportXML(*binning_gen20,xmlOut,kFALSE,kFALSE);
   TUnfoldBinningXML::ExportXML(*binning_gen,xmlOut,kFALSE,kTRUE);
   TUnfoldBinningXML::WriteDTD();
   xmlOut.close();

@@ -77,107 +77,62 @@ void SetupGlobalStyle()
 
 }
 
-void CMSLabel(bool bratio = false, double xl=0., bool ontop=false)
-{
+void CMSLabel(bool prelim, double x=0.25, double y=0.83){
   TString cmstext = "CMS";
-  TLatex *text2 = new TLatex(3.5, 24, cmstext);
-  text2->SetNDC();
-  text2->SetTextAlign(13);
-  text2->SetX(0.24+xl);
-  text2->SetTextFont(62);
-  if (bratio){
-    text2->SetTextSize(0.08);
-    if (ontop){
-      text2->SetY(0.97);
-    } else {
-      text2->SetY(0.90);
-    }
-  } else {
-    text2->SetTextSize(0.05);
-    if (ontop){
-      text2->SetY(0.995);
-    } else {
-      text2->SetY(0.90);
-    }
+  TLatex *text = new TLatex(3.5, 24, cmstext);
+  text->SetNDC();
+  text->SetTextAlign(13);
+  text->SetX(x);
+  text->SetTextFont(62);
+  text->SetTextSize(0.07);
+  text->SetY(y);
+  text->Draw();
+
+  if(prelim){
+    TString simtext = "Preliminary";
+    TLatex *text3 = new TLatex(3.5, 24, simtext);
+    text3->SetNDC();
+    text3->SetTextAlign(13);
+    text3->SetX(x);
+    text3->SetTextFont(52);
+    text3->SetTextSize(0.05);
+    text3->SetY(y-0.06);
+    text3->Draw();
   }
-  text2->Draw();
 }
 
-void CMSSimLabel(bool bratio = false)
-{
+void CMSSimLabel(bool prelim, double x=0.24, double y=0.9){
   TString cmstext = "CMS";
   TLatex *text2 = new TLatex(3.5, 24, cmstext);
   text2->SetNDC();
   text2->SetTextAlign(13);
-  text2->SetX(0.24);
+  text2->SetX(x);
   text2->SetTextFont(62);
-  if (bratio){
-    text2->SetTextSize(0.09);
-    text2->SetY(0.90);
-  } else {
-    text2->SetTextSize(0.06);
-    text2->SetY(0.90);
-  }
+  text2->SetTextSize(0.06);
+  text2->SetY(y);
   text2->Draw();
 
   TString simtext = "Simulation";
   TLatex *text3 = new TLatex(3.5, 24, simtext);
   text3->SetNDC();
   text3->SetTextAlign(13);
-  text3->SetX(0.24);
+  text3->SetX(x);
   text3->SetTextFont(52);
-  if (bratio){
-    text3->SetTextSize(0.08);
-    text3->SetY(0.84);
-  } else {
-    text3->SetTextSize(0.05);
-    text3->SetY(0.84);
-  }
+  text3->SetTextSize(0.05);
+  text3->SetY(y-0.06);
   text3->Draw();
 
-}
-
-void SetHist(TH1F *hist, bool bPlotRatio = false){
-
-  hist->GetXaxis()->SetTitleFont(42);
-  hist->GetXaxis()->SetLabelFont(42);
-  hist->GetYaxis()->SetTitleFont(42);
-  hist->GetYaxis()->SetLabelFont(42);
-
-  if (bPlotRatio){
-
-    // x-axis
-    hist->GetXaxis()->SetTickLength(0.05);
-
-    // y-axis
-    hist->GetYaxis()->SetTitleSize(0.07);
-    hist->GetYaxis()->SetLabelSize(0.062);
-    hist->GetYaxis()->SetLabelOffset(0.01);
-    hist->GetYaxis()->SetTitleOffset(1.15);
-    hist->GetYaxis()->SetTickLength(0.02);
-
-    // only this histogram
-  } else {
-
-    hist->GetYaxis()->SetTitleOffset(1.7);
-    hist->GetYaxis()->SetTitleSize(0.05);
-    hist->GetYaxis()->SetLabelSize(0.045);
-    // hist->SetLabelSize(0.045);
-    hist->GetYaxis()->SetTickLength(0.02);
-    hist->GetYaxis()->SetLabelOffset(0.011);
-
+  if(prelim){
+    TString simtext = "Preliminary";
+    TLatex *text4 = new TLatex(3.5, 24, simtext);
+    text4->SetNDC();
+    text4->SetTextAlign(13);
+    text4->SetX(x);
+    text4->SetTextFont(52);
+    text4->SetTextSize(0.05);
+    text4->SetY(y-0.12);
+    text4->Draw();
   }
-  hist->GetXaxis()->SetLabelSize(0.045);
-  hist->GetXaxis()->SetLabelOffset(0.008);
-  hist->GetXaxis()->SetTickLength(0.03);
-  hist->GetXaxis()->SetTitleSize(0.05);
-  hist->GetXaxis()->SetTitleOffset(1.2);
-  hist->GetXaxis()->SetNdivisions(505);
-
-
-  // hist->GetYaxis()->SetNdivisions(505);
-  
-  hist->SetLineWidth(2);
 }
 
 

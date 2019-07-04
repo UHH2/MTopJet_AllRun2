@@ -11,6 +11,9 @@
 #include "TUnfoldBinningXML.h"
 #include <time.h>
 #include <vector>
+#include <TCanvas.h>
+#include <TStyle.h>
+#include <TGraphErrors.h>
 
 
 using namespace std;
@@ -23,6 +26,10 @@ void fill_matrix(TTree *, TString);
 void fill_modelsys(TTree *, TString);
 void fill_pdf(TTree *);
 void fill_breweight(TTree *, TString);
+void fill_additionaltemplates(TString channel);
+
+TH1* CreateNewSample(vector<TF1*>, double, TH1*, TString);
+void PlotBinHists(vector<TGraphErrors*>, vector<TF1*>, TString);
 
 
 
@@ -32,11 +39,19 @@ TFile *outputFile_bins;
 bool fast;
 int fast_factor;
 
+// axis steering
+const char *axissteer = "pt[C]";
+const char *axissteer_purity = "pt[C]";
+
+
 // binning schemes
 TUnfoldBinning *binning_rec;
 TUnfoldBinning *binning_gen;
+TUnfoldBinning *binning_gen20;
+
 const TUnfoldBinning *measurement_rec;
 const TUnfoldBinning *measurement_gen;
+const TUnfoldBinning *measurement_gen20;
 const TUnfoldBinning *ptmigration_rec;
 const TUnfoldBinning *ptmigration_gen;
 const TUnfoldBinning *subptmigration_rec;
@@ -78,3 +93,6 @@ Double_t w_rec;
 Double_t w_gen_w2;
 Double_t w_gen_w4;
 Double_t w_gen_w8;
+
+// store mtop truth seperately for additional templates
+vector<TH1*> h_mtop_truth;

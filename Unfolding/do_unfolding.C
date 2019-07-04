@@ -5,6 +5,7 @@ using namespace std;
 TH1* SetSysError(TH1* data_unfolded, TH2* CovTotal);
 TH1D* SetSysError(TH1D* data_unfolded, TH2* CovTotal);
 TH1D* SetSysError(TH1D* data_unfolded, TH2D* CovTotal);
+TH1* ConstructAverage(vector<TH1*> variations, int varfrom);
 int FindLargestVariation(vector<TH1*> variations);
 int FindLargestVariationByMean(vector<TH1D*> truth, vector<TH1*> variations, bool use_significance);
 TH1* GetModelDelta(TH1* unfolded, TH1* truth);
@@ -21,8 +22,8 @@ TH1D* ConvertToCrossSection(TH1D* hist);
 vector<double> GetTotalCrossSection(TH1* hist, TH2* cov);
 vector<double> GetTotalCrossSectionMC(TH1* hist, TH1* up, TH1* down);
 void ScaleErrorToData(TH1* hist);
-vector<TGraph*> GetBinHistsForMTop(vector<TH1*>);
-vector<TF1*> FitBinHistsForMTop(vector<TGraph*> hists);
+vector<TGraphErrors*> GetBinHistsForMTop(vector<TH1*>);
+vector<TF1*> FitBinHistsForMTop(vector<TGraphErrors*> hists);
 TH1* GetDeltaFromBinHists(vector<TF1*> fits, TH1* dummy, double xmin, double xmax);
 
 int main(int argc, char* argv[])
@@ -154,6 +155,7 @@ int main(int argc, char* argv[])
 
   // read binning schemes in XML format
   TUnfoldBinning *binning_rec,*binning_gen;
+  TUnfoldBinning *binning_gen20;
   TDOMParser parser;
   binning_xml = "Binning.xml";
 
@@ -163,6 +165,7 @@ int main(int argc, char* argv[])
   TXMLDocument const *XMLdocument=parser.GetXMLDocument();
   binning_rec = TUnfoldBinningXML::ImportXML(XMLdocument,"binning_rec");
   binning_gen = TUnfoldBinningXML::ImportXML(XMLdocument,"binning_gen");
+  binning_gen20 = TUnfoldBinningXML::ImportXML(XMLdocument,"binning_gen20");
 
   if((!binning_rec)||(!binning_gen)) {
     cout<<"problem to read binning schemes\n";
@@ -172,6 +175,7 @@ int main(int argc, char* argv[])
   // save binning schemes to output file
   binning_rec->Write();
   binning_gen->Write();
+  binning_gen20->Write();
 
   cout << "Get Histograms" << endl;
 
@@ -193,9 +197,17 @@ int main(int argc, char* argv[])
 
   TH1D* mc_mtop1665_truth;
   TH1D* mc_mtop1695_truth;
+  TH1D* mc_mtop1700_truth;
+  TH1D* mc_mtop1705_truth;
+  TH1D* mc_mtop1710_truth;
   TH1D* mc_mtop1715_truth;
+  TH1D* mc_mtop1720_truth;
   TH1D* mc_mtop1725_truth;
+  TH1D* mc_mtop1730_truth;
   TH1D* mc_mtop1735_truth;
+  TH1D* mc_mtop1740_truth;
+  TH1D* mc_mtop1745_truth;
+  TH1D* mc_mtop1750_truth;
   TH1D* mc_mtop1755_truth;
   TH1D* mc_mtop1785_truth;
   std::vector<TH1D*> mc_mtop_templates;
@@ -226,17 +238,33 @@ int main(int argc, char* argv[])
   else if(same)       inputFile->GetObject("pseudo1_truth",h_pseudodata_truth);
   inputFile->GetObject("mc_mtop1665_truth",mc_mtop1665_truth);
   inputFile->GetObject("mc_mtop1695_truth",mc_mtop1695_truth);
+  inputFile->GetObject("mc_mtop1700_truth",mc_mtop1700_truth); // additional
+  inputFile->GetObject("mc_mtop1705_truth",mc_mtop1705_truth); // additional
+  inputFile->GetObject("mc_mtop1710_truth",mc_mtop1710_truth); // additional
   inputFile->GetObject("mc_mtop1715_truth",mc_mtop1715_truth);
+  inputFile->GetObject("mc_mtop1720_truth",mc_mtop1720_truth); // additional
+  inputFile->GetObject("mc_mtop1730_truth",mc_mtop1730_truth); // additional
   inputFile->GetObject("mc_mtop1735_truth",mc_mtop1735_truth);
+  inputFile->GetObject("mc_mtop1740_truth",mc_mtop1740_truth); // additional
+  inputFile->GetObject("mc_mtop1745_truth",mc_mtop1745_truth); // additional
+  inputFile->GetObject("mc_mtop1750_truth",mc_mtop1750_truth); // additional
   inputFile->GetObject("mc_mtop1755_truth",mc_mtop1755_truth);
   inputFile->GetObject("mc_mtop1785_truth",mc_mtop1785_truth);
   mc_mtop1725_truth = (TH1D*)hist_mc_truth->Clone("mc_mtop1725_truth");
 
   mc_mtop_templates.push_back(mc_mtop1665_truth);
   mc_mtop_templates.push_back(mc_mtop1695_truth);
+  mc_mtop_templates.push_back(mc_mtop1700_truth); // additional
+  mc_mtop_templates.push_back(mc_mtop1705_truth); // additional
+  mc_mtop_templates.push_back(mc_mtop1710_truth); // additional
   mc_mtop_templates.push_back(mc_mtop1715_truth);
+  mc_mtop_templates.push_back(mc_mtop1720_truth); // additional
   mc_mtop_templates.push_back(mc_mtop1725_truth);
+  mc_mtop_templates.push_back(mc_mtop1730_truth); // additional
   mc_mtop_templates.push_back(mc_mtop1735_truth);
+  mc_mtop_templates.push_back(mc_mtop1740_truth); // additional
+  mc_mtop_templates.push_back(mc_mtop1745_truth); // additional
+  mc_mtop_templates.push_back(mc_mtop1750_truth); // additional
   mc_mtop_templates.push_back(mc_mtop1755_truth);
   mc_mtop_templates.push_back(mc_mtop1785_truth);
 
@@ -255,9 +283,17 @@ int main(int argc, char* argv[])
   mc_mtop_inputs.push_back(mc_mtop1755_input);
   mc_mtop_inputs.push_back(mc_mtop1785_input);
 
-  std::vector<double> masses = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
-  std::vector<bool>     show = {false,  true, false,  true, false,  true, false}; // decides which masspoint is shown
+  std::vector<double> masses = {166.5, 169.5, 170.0, 170.5, 171.0, 171.5, 172.0, 172.5, 173.0, 173.5, 174.0, 174.5, 175.0, 175.5, 178.5};
+  std::vector<bool>     show = {false,  true, false, false, false, false, false,  true, false, false, false, false, false,  true, false}; // decides which masspoint is shown
+
+  // std::vector<double> masses = {166.5, 169.5, 171.5, 172.5, 173.5, 175.5, 178.5};
+  // std::vector<bool>     show = {false,  true, false,  true, false,  true, false}; // decides which masspoint is shown
   // std::vector<bool> show = {true, true, true, true, true, true, true};
+
+  if(mc_mtop_templates.size() != masses.size() || show.size() != masses.size()){
+    cout << "[ERROR] Counts of mass templates and masspoints does not fit!" << endl;
+    return 0;
+  }
 
   // read backgrounds
   vector<TString> bgr_name = {"WJets", "SingleTop", "other"};
@@ -377,6 +413,8 @@ int main(int argc, char* argv[])
 
 
   // read migrations from variations (vector of every source containing a vector of every variation e.g. up/down)
+  // vector<TString> tests_name = {"Testfsrup", "Testfsrdown", "Testisrup", "Testisrdown", "Test1695", "Test1715", "Test1735", "Test1755"}; // TEST
+  // vector<TString> tests_name = {"Test1695", "Test1715", "Test1735", "Test1755"}; // TEST
   vector<TString> btag_name = {"btagup", "btagdown"};
   vector<TString> jec_name = {"jecup", "jecdown"};
   vector<TString> jer_name = {"jerup", "jerdown"};
@@ -389,15 +427,17 @@ int main(int argc, char* argv[])
   vector<TString> pu_name = {"puup", "pudown"};
   vector< vector<TString> > sys_name;
   vector<TString> sys_rel_name;
-  sys_name.push_back(btag_name);
+  // sys_name.push_back(tests_name); // TEST
   sys_name.push_back(jec_name);
   sys_name.push_back(jer_name);
   sys_name.push_back(cor_name);
+  sys_name.push_back(btag_name);
   sys_name.push_back(pu_name);
-  sys_rel_name.push_back("b-tagging");
+  // sys_rel_name.push_back("test"); // TEST
   sys_rel_name.push_back("jec");
   sys_rel_name.push_back("jer");
   sys_rel_name.push_back("cor");
+  sys_rel_name.push_back("b-tagging");
   sys_rel_name.push_back("pile-up");
   if(channel == "muon" || channel == "combine"){
     sys_name.push_back(muid_name);
@@ -434,9 +474,11 @@ int main(int argc, char* argv[])
   vector<TString> hdamp = {"SHOWER_hdampup", "SHOWER_hdampdown"};
   vector<TString> tune = {"TUNE_up", "TUNE_down"};
   vector<TString> generator = {"Generator"};
-  vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
+  // vector<TString> scale = {"SCALE_upup", "SCALE_upnone", "SCALE_noneup", "SCALE_downdown", "SCALE_downnone", "SCALE_nonedown"};
+  vector<TString> scale = {"SCALE_upup", "SCALE_downdown"};
   vector<TString> mass = {"mc_mtop1695", "mc_mtop1715","mc_mtop1735","mc_mtop1755"};
-  // vector<TString> bweight = {"breweight_up", "breweight_down"};
+  vector<TString> bweight = {"breweight_up", "breweight_down"};
+  vector<TString> cr = {"CR_gluonmove", "CR_mpibased"};
   // vector<TString> mass = {"mc_mtop1715","mc_mtop1735"};
   vector<TString> pdf;
   for(unsigned int i=0; i<100; i++){
@@ -444,8 +486,10 @@ int main(int argc, char* argv[])
     name += i;
     pdf.push_back(name);
   }
-  vector< vector<TString> > model_name = {scale, mass, isr, fsr, hdamp, tune, pdf};
-  vector<TString> model_rel_name = {"scale", "mass", "ISR", "FSR", "hdamp", "UE tune", "pdf"};
+  vector< vector<TString> > model_name = {fsr, mass, cr, isr, hdamp, tune, scale, pdf};
+  vector<TString> model_rel_name = {"FSR", "mass", "CR", "ISR", "hdamp", "UEtune", "scale", "pdf"};
+  vector<bool> do_average =        { true,  false,false,  true,    true,     true,    true,  true};
+
   // vector< vector<TString> > model_name = {generator, scale, mass, isr, fsr, hdamp, pdf};
   // vector<TString> model_rel_name = {"generator", "scale", "mass", "ISR", "FSR", "hdamp", "pdf"};
   vector< vector<TH1D*> > model_input;
@@ -471,8 +515,8 @@ int main(int argc, char* argv[])
 
 
   vector<vector<TH1D*>> theo_variations;
-  vector< vector<TString> > theo_name = {scale, isr, fsr, hdamp};
-  vector<TString> theo_rel_name = {"scale", "ISR", "FSR", "hdamp"};
+  vector< vector<TString> > theo_name = {scale, isr, fsr, hdamp, tune, cr};
+  vector<TString> theo_rel_name = {"scale", "ISR", "FSR", "hdamp", "UEtune", "CR"};
   for(unsigned int i=0; i<theo_name.size(); i++){
     vector<TH1D*> dummy;
     theo_variations.push_back(dummy);
@@ -521,7 +565,7 @@ int main(int argc, char* argv[])
   double tau = 0.0;
 
   double mtopuncert_min = 170.5;
-  double mtopuncert_max = 172.5;
+  double mtopuncert_max = 174.5;
 
   if(nscan != 0){
     if(do_lcurve) cout << "    -- YOU SELECTED " << "L-curve scan" << endl;
@@ -538,6 +582,7 @@ int main(int argc, char* argv[])
   bool do_chi2modelsys = false;
   bool use_significance = false;
   bool do_newmtopuncert = true;
+  bool do_average_uncert = true;
 
 
   if(pseudo1695 || pseudo1715 || pseudo1735 || pseudo1755){
@@ -551,9 +596,11 @@ int main(int argc, char* argv[])
     do_masses_only = true;
     do_all_pdf = false;
     do_genvar = false;
+    do_newmtopuncert = false;
     nscan = 1;
   }
 
+  std::ofstream out_set(directory+"/Settings.txt");
   if(!do_model) cout << "    -- MODEL VARIATIONS ARE NOT UNFOLDED!" << endl  << endl;
   if(do_masses_only) cout << "    -- ONLY MASSES CONSIDERED AS MODEL VARIATIONS!" << endl  << endl;
   if(!do_all_pdf) cout << "    -- ONLY ONE PDF VARIATION IS UNFOLDED!" << endl  << endl;
@@ -562,19 +609,23 @@ int main(int argc, char* argv[])
   if(use_significance) cout << "    -- SIGNIFICANCE IS USED TO SELEC MODEL VARIATION!" << endl  << endl;
   if(!use_significance)cout << "    -- TOTAL SHIFT IS USED TO SELEC MODEL VARIATION!" << endl  << endl;
   if(do_newmtopuncert)cout << "    -- CHOICE OF M_T UNCERT IS CALCULATED WITH NEW METHOD!" << endl  << endl;
-
+  if(do_average_uncert)cout << "    -- SIZE OF UNCERTAINTY IS AVERAGE!" << endl  << endl;
+  auto coutbuf_set = std::cout.rdbuf(out_set.rdbuf());
+  std::cout.rdbuf(coutbuf_set);
 
   TH2 *CovStat, *CovInputStat, *CovMatrixStat, *CovM, *CovS;
   vector<TH2*> CovBgrStat;
 
   vector< vector<TH2*> > CovSys;
+  vector<TH2*> ChosenSysCov;
+  vector<TH2D*> ChosenSysCov_norm;
   vector< vector<TH2*> > CovSys_norm;
   vector< vector<TH1*> > SYS_DELTA;
+  vector<TH1*> SYS_DELTA_AVERAGE;
   vector< TH1* > SYS_rel;
   vector< TH1* > SYSnorm_rel;
   TH1 *SYS_rel_total;
   TH1 *SYSnorm_rel_total;
-
 
   vector<TH2*> CovBgrScale;
   vector<TH1*> BGR_DELTA;
@@ -583,8 +634,11 @@ int main(int argc, char* argv[])
   vector< vector<double> > ModelFactor;
 
   vector< vector<TH2*> > CovModel;
+  vector<TH2*> ChosenModelCov;
+  vector<TH2D*> ChosenModelCov_norm;
   vector< vector<TH2*> > CovModelStat;
   vector< vector<TH1*> > MODEL_DELTA;
+  vector<TH1*> MODEL_DELTA_AVERAGE;
   vector< vector<TH1*> > MODEL_BIAS;
   vector< vector<TH1*> > MODEL_OUTPUT;
   vector< TH1* > MODEL_rel;
@@ -593,18 +647,20 @@ int main(int argc, char* argv[])
   vector< TH1* > MODELnorm_rel;
   TH1 *MODELnorm_rel_total;
 
-
   vector<TH1*> Genvar_OUTPUT;
   TH1* Genvar_combination;
   vector<TF1*> Genvar_fits;
   vector<TH1D*> Genvar_variations;
 
   TH2* COV_MT;
-  vector<TGraph*> BinHists;
+  vector<TGraphErrors*> BinHists;
+  // vector<TGraphErrors*> BinHistsTEST;
   vector<TH1*> MTOP_OUTPUT;
   TH1* DELTA_MT;
 
   TH2 *CovTheo;
+  vector<TH2*> ChosenTheoCov;
+  vector<TH2D*> ChosenTheoCov_norm;
   vector< vector<TH1*> > THEO_DELTA;
   TH1D* hist_mc_truth_error;
   TH1D* h_pseudodata_truth_error;
@@ -625,7 +681,7 @@ int main(int argc, char* argv[])
   TSpline* rhotau;
   double tau_final;
 
-  TH1 *data_unfolded,*data_unfolded_sys,*data_unfolded_stat,*data_unfolded_all;
+  TH1 *data_unfolded,*data_unfolded_fine,*data_unfolded_sys,*data_unfolded_stat,*data_unfolded_all;
   TH1 * pseudodata_bias;
 
 
@@ -654,8 +710,9 @@ int main(int argc, char* argv[])
     cout << "***********************" << endl;
     cout << " UNFOLDING OF DATA" << endl;
     if(pseudo || same) for(auto i: backgrounds) i->Reset();
-    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, nscan, tau);
+    unfolding unfold(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, binning_gen20, do_lcurve, nscan, tau);
     data_unfolded = unfold.get_output(true);
+    data_unfolded_fine = unfold.get_output_fine();
     data_unfolded_all = unfold.get_output(false);
     CorMatrix = unfold.get_cor_matrix();
     ProbMatrix = unfold.get_prob_matrix();
@@ -673,7 +730,7 @@ int main(int argc, char* argv[])
     rhotau = unfold.GetRhoTau();
     tau_final = unfold.get_tau();
     // do unfold again with lcurve scan (only for plot)
-    unfolding unfold_lcurve(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, true, nscan, tau);
+    unfolding unfold_lcurve(hist_data, backgrounds, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, binning_gen20, true, nscan, tau);
     lcurve = unfold_lcurve.get_lcurve();
     lcurve_x = unfold_lcurve.get_best_point("x");
     lcurve_y = unfold_lcurve.get_best_point("y");
@@ -733,7 +790,7 @@ int main(int argc, char* argv[])
           cout << " UNFOLDING OF " << model_name[i][j] << endl;
           vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
           for(auto b: background_dummy) b->Reset();
-          unfolding* unfold_model = new unfolding(model_input[i][j], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, nscan, tau);
+          unfolding* unfold_model = new unfolding(model_input[i][j], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, binning_gen20, do_lcurve, nscan, tau);
           TH1* output = unfold_model->get_output(true);
           MODEL_OUTPUT[i].push_back(output);
           TH1* delta = GetModelDelta(output, model_truth[i][j]);
@@ -801,8 +858,8 @@ int main(int argc, char* argv[])
         vector<TH1D*> background_dummy = backgrounds; // create empty vector of backgrounds for model uncertainties
         for(auto b: background_dummy) b->Reset();
         unfolding* unfold_genvar;
-        if(i==0) unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, nscan, tau);
-        else     unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, do_lcurve, 0, t);
+        if(i==0) unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, binning_gen20, do_lcurve, nscan, tau);
+        else     unfold_genvar = new unfolding(GeneratorVariations[i], background_dummy, bgr_name, hist_mc_sig, histMCGenRec, sys_matrix, sys_name, binning_rec, binning_gen, binning_gen20, do_lcurve, 0, t);
         TH1* output = unfold_genvar->get_output(true);
         Genvar_OUTPUT.push_back(output);
         t = unfold_genvar->get_tau();
@@ -852,16 +909,35 @@ int main(int argc, char* argv[])
     ██   ██ ██████  ██████      ███████ ██   ██ ██
     */
 
-
+    // vector<TH1*> outputsTEST;
+    // for(unsigned int i=0; i<SYS_DELTA.size(); i++){
+    //   if(sys_rel_name[i] != "test") continue;
+    //   BinHistsTEST = GetBinHistsForMTop(SYS_DELTA[i]);
+    // }
 
     // then add sys cov (and convert used uncertainty to relative hist)
     cout << "sum up experimental sys cov matrices" << endl;
     for(unsigned int i=0; i<SYS_DELTA.size(); i++){
       int j = FindLargestVariation(SYS_DELTA[i]);
-      CovTotal->Add(CovSys[i][j]);
-      CovS->Add(CovSys[i][j]);
-      SYS_rel.push_back(ConvertToRelative(SYS_DELTA[i][j], data_unfolded));
-      cout << "using " << sys_name[i][j] << endl;
+      TH1* DELTA_AVERAGE = ConstructAverage(SYS_DELTA[i], j);
+      SYS_DELTA_AVERAGE.push_back(DELTA_AVERAGE);
+      TH2* COV_AVERAGE = CreateCovFromDelta(DELTA_AVERAGE, CovInputStat);
+      TH1* CHOSEN_DELTA;
+      TH2* CHOSEN_COV;
+      if(do_average_uncert){
+        CHOSEN_COV = COV_AVERAGE;
+        CHOSEN_DELTA = DELTA_AVERAGE;
+        cout << "using average for " << sys_rel_name[i] << ", correlations from " << sys_name[i][j] << endl;
+      }
+      else{
+        CHOSEN_COV = CovSys[i][j];
+        CHOSEN_DELTA = SYS_DELTA[i][j];
+        cout << "using " << sys_name[i][j] << endl;
+      }
+      ChosenSysCov.push_back(CHOSEN_COV);
+      CovTotal->Add(CHOSEN_COV);
+      CovS->Add(CHOSEN_COV);
+      SYS_rel.push_back(ConvertToRelative(CHOSEN_DELTA, data_unfolded));
     }
     SYS_rel.push_back(STAT_REL);      // put in stat to get total
     SYS_rel_total = AddSys(SYS_rel);  // calculate total
@@ -878,37 +954,48 @@ int main(int argc, char* argv[])
     ██   ██ ██████  ██████      ██      ██  ██████  ██████  ███████ ███████
     */
 
-    for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
-      if(model_rel_name[i] != "mass") continue;
-      BinHists = GetBinHistsForMTop(MODEL_DELTA[i]);
+    if(do_newmtopuncert){
+      for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
+        if(model_rel_name[i] != "mass") continue;
+        BinHists = GetBinHistsForMTop(MODEL_DELTA[i]);
+      }
+      vector<TF1*> BinHistsFits = FitBinHistsForMTop(BinHists);
+      DELTA_MT = GetDeltaFromBinHists(BinHistsFits, MODEL_DELTA[0][0], mtopuncert_min, mtopuncert_max);
+      COV_MT = CreateCovFromDelta(DELTA_MT, CovInputStat);
     }
-    vector<TF1*> BinHistsFits = FitBinHistsForMTop(BinHists);
-    DELTA_MT = GetDeltaFromBinHists(BinHistsFits, MODEL_DELTA[0][0], mtopuncert_min, mtopuncert_max);
-    COV_MT = CreateCovFromDelta(DELTA_MT, CovInputStat);
 
     if(!do_model) cout << "!!!! ATTENTION: MODEL UNCERTAINTIES SWITCHED OFF!!!!! " <<endl;
     cout << "sum up model sys cov matrices" << endl;
     for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
       int j = FindLargestVariationByMean(model_truth[i], MODEL_OUTPUT[i], use_significance);
-      // if(i==1) j=0;
-      if(do_model){
-        if(do_newmtopuncert && model_rel_name[i] == "mass"){
-          CovTotal->Add(COV_MT);
-          CovM->Add(COV_MT);
-        }
-        else{
-          CovTotal->Add(CovModel[i][j]);
-          CovM->Add(CovModel[i][j]);
-        }
-      }
+      TH1* DELTA_AVERAGE = ConstructAverage(MODEL_DELTA[i], j);
+      MODEL_DELTA_AVERAGE.push_back(DELTA_AVERAGE);
+      TH2* COV_AVERAGE = CreateCovFromDelta(DELTA_AVERAGE, CovInputStat);
+      TH1* CHOSEN_DELTA;
+      TH2* CHOSEN_COV;
       if(do_newmtopuncert && model_rel_name[i] == "mass"){
-        MODEL_rel.push_back(ConvertToRelative(DELTA_MT, data_unfolded));
-        cout << "using new mass uncertainty method" << endl;
+        CHOSEN_COV = COV_MT;
+        CHOSEN_DELTA = DELTA_MT;
+        cout << "using interpolation for 'choice of mtop'" << endl;
       }
       else{
-        MODEL_rel.push_back(ConvertToRelative(MODEL_DELTA[i][j], data_unfolded));
-        cout << "using " << model_name[i][j] << endl;
+        if(do_average_uncert && do_average[i]){
+          CHOSEN_COV = COV_AVERAGE;
+          CHOSEN_DELTA = DELTA_AVERAGE;
+          cout << "using average for " << model_rel_name[i] << endl;
+        }
+        else{
+          CHOSEN_COV = CovModel[i][j];
+          CHOSEN_DELTA = MODEL_DELTA[i][j];
+          cout << "using " << model_name[i][j] << endl;
+        }
       }
+      if(do_model){
+        ChosenModelCov.push_back(CHOSEN_COV);
+        CovTotal->Add(CHOSEN_COV);
+        CovM->Add(CHOSEN_COV);
+      }
+      MODEL_rel.push_back(ConvertToRelative(CHOSEN_DELTA, data_unfolded));
     }
     if(do_model){
       MODEL_rel.push_back(STAT_REL);            // put in stat to get total
@@ -953,6 +1040,7 @@ int main(int argc, char* argv[])
       THEO_DELTA.push_back(delta_temp);
       int index = FindLargestVariationByMean(truth_temp, variation_temp, use_significance);
       TH2* COV_temp = CreateCovFromDelta(delta_temp[index], CovInputStat);
+      ChosenTheoCov.push_back(COV_temp);
       CovTheo->Add(COV_temp);
     }
     hist_mc_truth_error = (TH1D*) SetSysError(hist_mc_truth, CovTheo);
@@ -1027,6 +1115,11 @@ int main(int argc, char* argv[])
   TH1* delta_tot_norm = CreateDeltaFromCov(CovMatrix_norm); // only for cross check
   TH1* delta_tot = CreateDeltaFromCov(CovTotal); // only for cross check
 
+  TH2* CovStatExp = (TH2*) CovStat->Clone();
+  CovStatExp->Add(CovS);
+  Normalise * normData_StatExp = new Normalise(data_unfolded, CovStatExp, lower, upper, NormToWidth);
+  TH2D* CovStatExp_norm = normData_StatExp->GetMatrix();
+
   TH2* CovTotalnoEXP = (TH2*) CovTotalChi2->Clone();
   CovTotalnoEXP->Add(CovS, -1);
   Normalise * normData_noEXP = new Normalise(data_unfolded, CovTotalnoEXP, lower, upper, NormToWidth);
@@ -1042,6 +1135,30 @@ int main(int argc, char* argv[])
   Normalise * normData_noTHEO = new Normalise(data_unfolded, CovTotalnoTHEO, lower, upper, NormToWidth);
   TH2D* CovTotalnoTHEO_norm = normData_noTHEO->GetMatrix();
 
+  for(auto chosen: ChosenSysCov){
+    TH2* cov = (TH2*) CovStat->Clone();
+    cov->Add(chosen);
+    Normalise * norm = new Normalise(data_unfolded, cov, lower, upper, NormToWidth);
+    TH2D* cov_norm = norm->GetMatrix();
+    ChosenSysCov_norm.push_back(cov_norm);
+  }
+
+  for(auto chosen: ChosenModelCov){
+    TH2* cov = (TH2*) CovTotalChi2->Clone();
+    cov->Add(chosen, -1);
+    Normalise * norm = new Normalise(data_unfolded, cov, lower, upper, NormToWidth);
+    TH2D* cov_norm = norm->GetMatrix();
+    ChosenModelCov_norm.push_back(cov_norm);
+  }
+
+  for(auto chosen: ChosenTheoCov){
+    TH2* cov = (TH2*) CovTotalChi2->Clone();
+    cov->Add(chosen, -1);
+    Normalise * norm = new Normalise(data_unfolded, cov, lower, upper, NormToWidth);
+    TH2D* cov_norm = norm->GetMatrix();
+    ChosenTheoCov_norm.push_back(cov_norm);
+  }
+
   // normalise mc truth
   Normalise * normMC = new Normalise(hist_mc_truth, CovTheo, lower, upper, NormToWidth);
   TH1D* hist_mc_truth_norm  = normMC->GetHist();
@@ -1056,7 +1173,6 @@ int main(int argc, char* argv[])
     TH1D* hist_error = SetSysError(hist, CovTheo_norm);
     mc_mtop_templates_norm.push_back(hist_error);
   }
-
   // normalise pseudo data truth
   h_pseudodata_truth_error = (TH1D*) SetSysError(h_pseudodata_truth, CovTheo);
   TH1D* h_pseudodata_truth_norm;
@@ -1088,6 +1204,7 @@ int main(int argc, char* argv[])
     CovModel_norm.push_back(dummy);
     int j_choice = FindLargestVariationByMean(model_truth[i], MODEL_OUTPUT[i], use_significance);
     for(unsigned int j=0; j<CovModel[i].size(); j++){
+      if(do_newmtopuncert && model_rel_name[i] == "mass") CovModel[i][j] = COV_MT;
       Normalise * norm = new Normalise(data_unfolded, CovModel[i][j], lower, upper, NormToWidth);
       TH2D* cov_norm = norm->GetMatrix();
       CovModel_norm[i].push_back(cov_norm);
@@ -1105,24 +1222,30 @@ int main(int argc, char* argv[])
   bool use_all_masses = false;
   vector<TH1D*> chi2_MassSamples;
   std::vector<double> chi2_masses;
+  int first = 0;
+  int last = mc_mtop_templates_norm.size() -1;
   for(unsigned int i=0; i<mc_mtop_templates_norm.size(); i++){
     if(!use_all_masses){
       // define here which masses not to use
       if(pseudo1695){
-        if(i==6) continue;
+        if(masses[i] == 169.5) continue;
+        if(i==last) continue;
       }
       else if(pseudo1715){
-        if(i==0 || i==6) continue;
+        if(masses[i] == 171.5) continue;
+        if(i==first || i==last) continue;
       }
       else if(pseudo1735){
-        if(i==0 || i==6) continue;
+        if(masses[i] == 173.5) continue;
+        if(i==first || i==last) continue;
       }
       else if(pseudo1755){
-        if(i==0) continue;
+        if(masses[i] == 175.5) continue;
+        if(i==first) continue;
       }
       else{
-        if( i == 0) continue;
-        if( i == 6) continue;
+        if( i == first) continue;
+        if( i == last) continue;
       }
     }
     chi2_MassSamples.push_back(mc_mtop_templates_norm[i]);
@@ -1138,6 +1261,16 @@ int main(int argc, char* argv[])
   std::vector<double> chi2values = chi2->GetChi2Values();
   TF1* chi2_fitfunction = chi2->GetChi2Fit();
   cout << " MASS = " << chi2->GetMass() << " +- " << chi2->GetUncertainty() << std::endl;
+
+  // perform chi2 fit without exp. uncertainties
+  cout << "*******************************" << endl;
+  cout << "******** chi 2 (stat+exp) *****" << endl;
+  cout << "*******************************" << endl;
+  chi2fit* chi2_StatExp = new chi2fit(data_unfolded_norm, CovStatExp_norm, chi2_MassSamples, chi2_masses, lower, upper, NormToWidth);
+  chi2_StatExp->CalculateChi2();
+  std::vector<double> chi2values_StatExp = chi2_StatExp->GetChi2Values();
+  TF1* chi2_fitfunction_StatExp = chi2_StatExp->GetChi2Fit();
+  cout << " MASS = " << chi2_StatExp->GetMass() << " +- " << chi2_StatExp->GetUncertainty() << std::endl;
 
   // perform chi2 fit without exp. uncertainties
   cout << "*******************************" << endl;
@@ -1183,7 +1316,7 @@ int main(int argc, char* argv[])
   double uncert_sta = chi2_stat->GetUncertainty();
   double uncert_tot = chi2->GetUncertainty();
   double uncert_mod = sqrt(uncert_tot*uncert_tot - chi2_noMODEL->GetUncertainty()*chi2_noMODEL->GetUncertainty());
-  double uncert_exp = sqrt(uncert_tot*uncert_tot - chi2_noEXP->GetUncertainty()*chi2_noEXP->GetUncertainty());
+  double uncert_exp = sqrt(chi2_StatExp->GetUncertainty()*chi2_StatExp->GetUncertainty() - uncert_sta*uncert_sta);
   double uncert_the = sqrt(uncert_tot*uncert_tot - chi2_noTHEO->GetUncertainty()*chi2_noTHEO->GetUncertainty());
   auto coutbuf = std::cout.rdbuf(out.rdbuf());
   cout << chi2_stat->GetMass() << " " << chi2_stat->GetUncertainty() << " ";
@@ -1192,6 +1325,55 @@ int main(int argc, char* argv[])
   cout << "mtop = " << chi2->GetMass() << " +- " << uncert_tot << " (tot)" << std::endl;
   cout << "chi2 min: " << chi2->GetMin() << std::endl;
   std::cout.rdbuf(coutbuf);
+
+
+  vector<double> sys_mass_uncert;
+  for(unsigned int i=0; i<ChosenSysCov_norm.size(); i++){
+    chi2fit* c2 = new chi2fit(data_unfolded_norm, ChosenSysCov_norm[i], chi2_MassSamples, chi2_masses, lower, upper, NormToWidth);
+    c2->CalculateChi2();
+    double uncert = c2->GetUncertainty();
+    double u = sqrt(uncert*uncert - uncert_sta*uncert_sta);
+    sys_mass_uncert.push_back(u);
+    cout << sys_rel_name[i] << " " << u << endl;
+  }
+  vector<double> model_mass_uncert;
+  for(unsigned int i=0; i<ChosenModelCov_norm.size(); i++){
+    chi2fit* c2 = new chi2fit(data_unfolded_norm, ChosenModelCov_norm[i], chi2_MassSamples, chi2_masses, lower, upper, NormToWidth);
+    c2->CalculateChi2();
+    double uncert = c2->GetUncertainty();
+    double u = sqrt(uncert_tot*uncert_tot - uncert*uncert);
+    if(uncert > uncert_tot) u = 0.0;
+    model_mass_uncert.push_back(u);
+    cout << model_rel_name[i] << " " << u << endl;
+  }
+  vector<double> theo_mass_uncert;
+  for(unsigned int i=0; i<ChosenTheoCov_norm.size(); i++){
+    chi2fit* c2 = new chi2fit(data_unfolded_norm, ChosenTheoCov_norm[i], chi2_MassSamples, chi2_masses, lower, upper, NormToWidth);
+    c2->CalculateChi2();
+    double uncert = c2->GetUncertainty();
+    double u = sqrt(uncert_tot*uncert_tot - uncert*uncert);
+    if(uncert > uncert_tot) u = 0.0;
+    theo_mass_uncert.push_back(u);
+  }
+
+  std::ofstream out_contr(directory+"/Mass_contribs.txt");
+  auto coutbuf_contr = std::cout.rdbuf(out_contr.rdbuf());
+  cout << "total " << uncert_tot << endl;
+  cout << "stat " << uncert_sta << endl;
+  cout << "exp " << uncert_exp << endl;
+  for(int i=0; i<sys_mass_uncert.size(); i++){
+    cout << sys_rel_name[i] << " " << sys_mass_uncert[i] << endl;
+  }
+  cout << "model " << uncert_mod << endl;
+  for(int i=0; i<model_mass_uncert.size(); i++){
+    cout << model_rel_name[i] << " " << model_mass_uncert[i] << endl;
+  }
+  cout << "theo " << uncert_the << endl;
+  for(int i=0; i<theo_mass_uncert.size(); i++){
+    cout << theo_rel_name[i] << " " << theo_mass_uncert[i] << endl;
+  }
+  std::cout.rdbuf(coutbuf_contr);
+
 
 
 
@@ -1206,6 +1388,7 @@ int main(int argc, char* argv[])
   plotter * plot = new plotter(directory);
   plot->draw_chi2(chi2_fitfunction, chi2_masses, chi2values, chi2->GetMass(), chi2->GetUncertainty(), "chi2fit");
   plot->draw_chi2(chi2_stat_fitfunction, chi2_masses, chi2values_stat, chi2_stat->GetMass(), chi2_stat->GetUncertainty(), "chi2fit_stat");
+  plot->draw_chi2(chi2_fitfunction_StatExp, chi2_masses, chi2values_StatExp, chi2_StatExp->GetMass(), chi2_StatExp->GetUncertainty(), "chi2fit_StatExp");
   plot->draw_chi2(chi2_fitfunction_noEXP, chi2_masses, chi2values_noEXP, chi2_noEXP->GetMass(), chi2_noEXP->GetUncertainty(), "chi2fit_noEXP");
   plot->draw_chi2(chi2_fitfunction_noMODEL, chi2_masses, chi2values_noMODEL, chi2_noMODEL->GetMass(), chi2_noMODEL->GetUncertainty(), "chi2fit_noMODEL");
   plot->draw_chi2(chi2_fitfunction_noTHEO, chi2_masses, chi2values_noTHEO, chi2_noTHEO->GetMass(), chi2_noTHEO->GetUncertainty(), "chi2fit_noTHEO");
@@ -1220,6 +1403,9 @@ int main(int argc, char* argv[])
   plot->draw_matrix(CovTotalnoTHEO_norm, "COV_TOTAL_noTHEO_NORM", false, false);
   plot->draw_matrix(CovM, "COV_MODEL", false, false);
   plot->draw_matrix(CovS, "COV_EXP", false, false);
+
+  CovTotal->Write("CovTotal");
+  CovMatrix_norm->Write("CovTotalNorm");
 
   // plot->draw_matrix(CovTotal_TUnfold, "COV_TOTAL_check", false);
   plot->draw_matrix(histMCGenRec, "Migration_Matrix", true, true);
@@ -1248,6 +1434,11 @@ int main(int argc, char* argv[])
       plot->draw_delta_rel(SYS_DELTA[i][j], data_unfolded_sys, "DELTA_"+sys_name[i][j]+"_REL");
     }
   }
+  for(unsigned int i=0; i<SYS_DELTA_AVERAGE.size(); i++){
+    plot->draw_delta(SYS_DELTA_AVERAGE[i], "DELTA_"+sys_rel_name[i]+"_AVERAGE");
+    plot->draw_delta_rel(SYS_DELTA_AVERAGE[i], data_unfolded_sys, "DELTA_"+sys_rel_name[i]+"_AVERAGE_REL");
+  }
+
   plot->draw_delta_comparison(SYS_rel_total, STAT_REL, SYS_rel, sys_rel_name, "SYS_EXP_COMPARISION");
   plot->draw_delta_comparison(SYSnorm_rel_total, Delta_stat_norm_REL, SYSnorm_rel, sys_rel_name, "SYS_EXP_COMPARISION_NORM");
 
@@ -1257,6 +1448,13 @@ int main(int argc, char* argv[])
   plot->draw_delta(DeltaLumi, "DELTA_Lumi");
   plot->draw_delta_rel(DeltaLumi, data_unfolded_sys, "DELTA_LUMI_REL");
 
+  // for(unsigned int i=0; i<BinHistsTEST.size(); i++){
+  //   TString name = "TESTbinhist_";
+  //   name += i;
+  //   plot->draw_binhist(BinHistsTEST[i], name, mtopuncert_min, mtopuncert_max);
+  // }
+
+
   if(do_model){
     for(unsigned int i=0; i<BinHists.size(); i++){
       TString name = "binhist_";
@@ -1264,6 +1462,7 @@ int main(int argc, char* argv[])
       plot->draw_binhist(BinHists[i], name, mtopuncert_min, mtopuncert_max);
     }
     plot->draw_delta(DELTA_MT, "DELTA_MTOP");
+    plot->draw_delta_rel(DELTA_MT, data_unfolded_sys, "DELTA_MTOP_REL");
     for(unsigned int i=0; i<model_name.size(); i++){
       for(unsigned int j=0; j<model_name[i].size(); j++){
         plot->draw_matrix(CovModel[i][j], "COV_"+model_name[i][j], false, false);
@@ -1271,6 +1470,10 @@ int main(int argc, char* argv[])
         plot->draw_delta_rel(MODEL_DELTA[i][j], data_unfolded_sys, "DELTA_"+model_name[i][j]+"_REL");
         plot->draw_bias(MODEL_OUTPUT[i][j], model_truth[i][j], MODEL_BIAS[i][j], "BIAS_"+model_name[i][j]);
       }
+    }
+    for(unsigned int i=0; i<model_rel_name.size(); i++){
+      plot->draw_delta(MODEL_DELTA_AVERAGE[i], "DELTA_"+model_rel_name[i]+"_AVERAGE");
+      plot->draw_delta_rel(MODEL_DELTA_AVERAGE[i], data_unfolded_sys, "DELTA_"+model_rel_name[i]+"_AVERAGE_REL");
     }
     plot->draw_delta_comparison_model(MODEL_rel_total, STAT_REL, MODEL_rel, model_rel_name, "SYS_MODEL_COMPARISION");
     plot->draw_delta_comparison_model(MODELnorm_rel_total, Delta_stat_norm_REL, MODELnorm_rel, model_rel_name, "SYS_MODEL_COMPARISION_NORM");
@@ -1311,6 +1514,7 @@ int main(int argc, char* argv[])
   if(pseudo) plot->draw_output_pseudo(data_unfolded_norm, h_pseudodata_truth_norm, hist_mc_truth_norm, true, "Unfold_pseudo_norm");
   if(pseudo) plot->draw_bias(data_unfolded, h_pseudodata_truth, pseudodata_bias, "Unfold_pseudo_bias");
   if(pseudo) plot->draw_output_pseudo(data_unfolded_all, hist_pseudo_gen, hist_mc_gen, false, "Unfold_pseudo_all");
+  plot->draw_output_fine(data_unfolded_fine, false, "Unfold_fine");
   plot->draw_output(data_unfolded_all, hist_mc_gen, false, "Unfold_all");
   plot->draw_output(data_unfolded_sys, hist_mc_truth, false, "Unfold_SYS");
   plot->draw_output_mass(data_unfolded_norm, data_unfolded_stat_norm, mc_mtop_templates_norm, show, true, "Unfold_masspoints_norm");
@@ -1322,11 +1526,11 @@ int main(int argc, char* argv[])
   plot->draw_purity(h_pur_samebin, h_pur_all, "Purity");
   plot->draw_stability(h_stb_samebin, h_stb_all, "Stability");
 
-
+  data_unfolded_norm->Write("Unfold_norm_totuncert");
 
   vector<TH1D*> truth = {hist_mc_truth, h_pseudodata_truth};
   vector<TH1D*> truth_norm = {hist_mc_truth_norm, h_pseudodata_truth_norm};
-  vector<TString> legnames = {"POWHEG", "MC@NLO"};
+  vector<TString> legnames = {"POWHEG", "aMC@NLO"};
   plot->draw_output_data(data_unfolded_sys, data_unfolded_stat, truth, legnames, false, "Unfold_events");
   plot->draw_output_data(data_unfolded_norm, data_unfolded_stat_norm, truth_norm, legnames, true, "Unfold_norm");
 
@@ -1350,6 +1554,8 @@ int main(int argc, char* argv[])
   vector<double> xsdataModel = GetTotalCrossSection(data_crosssection, CovModel_xs);
   vector<double> xsdataSys = GetTotalCrossSection(data_crosssection, CovSys_xs);
   vector<double> xsdataTotal = GetTotalCrossSection(data_crosssection, CovTotal_xs);
+
+  CovTotal_xs->Write("CovTotalXS");
 
   std::ofstream outxs(directory+"/XS.txt");
   auto coutbuf2 = std::cout.rdbuf(outxs.rdbuf());
@@ -1477,7 +1683,9 @@ TH1* GetModelDelta(TH1* unfolded, TH1* truth){
   int nbins = delta->GetXaxis()->GetNbins();
   for(int i=1; i<=nbins; i++){
     double diff = unfolded->GetBinContent(i) - truth->GetBinContent(i);
+    double err = unfolded->GetBinError(i) - truth->GetBinError(i);
     delta->SetBinContent(i, diff);
+    delta->SetBinError(i, err);
   }
   return delta;
 }
@@ -1543,7 +1751,7 @@ TH1* ConvertToRelative(TH1* sys, TH1* central){
   hist->Reset();
   for(int bin=1; bin<=nbins; bin++){
     double cont_central = central->GetBinContent(bin);
-    double cont_sys = abs(sys->GetBinContent(bin));
+    double cont_sys = fabs(sys->GetBinContent(bin));
     double percent;
     if(cont_central == 0) percent = 0;
     else percent = 100*cont_sys/cont_central;
@@ -1709,25 +1917,30 @@ vector<double> GetTotalCrossSectionMC(TH1* hist, TH1* up, TH1* down){
   return xs;
 }
 
-vector<TGraph*> GetBinHistsForMTop(vector<TH1*> hists){
-  vector<TGraph*> binhists;
+vector<TGraphErrors*> GetBinHistsForMTop(vector<TH1*> hists){
+  vector<TGraphErrors*> binhists;
   int nbins = hists[0]->GetXaxis()->GetNbins();
   vector<double> masses = {169.5, 171.5, 173.5, 175.5};
   for(unsigned int bin=1; bin<=nbins; bin++){
     vector<double> contents;
+    vector<double> x_errors, y_errors;
     for(unsigned int ihist=0; ihist<hists.size(); ihist++){
       int newbin = ihist+1;
       double content = hists[ihist]->GetBinContent(bin);
+      // flip some correlations by hand
       if(bin == 1 && ihist == 0) content *= -1;
+      ////
       contents.push_back(content);
+      x_errors.push_back(1.0);
+      y_errors.push_back(hists[ihist]->GetBinError(bin));
     }
-    TGraph * g = new TGraph(4, &masses[0], &contents[0]);
+    TGraphErrors * g = new TGraphErrors(4, &masses[0], &contents[0], &x_errors[0], &y_errors[0]);
     binhists.push_back(g);
   }
   return binhists;
 }
 
-vector<TF1*> FitBinHistsForMTop(vector<TGraph*> hists){
+vector<TF1*> FitBinHistsForMTop(vector<TGraphErrors*> hists){
   vector<TF1*> fits;
   for(auto h: hists){
     TF1*f1 = new TF1("f1","pol1",0,500);
@@ -1744,11 +1957,26 @@ TH1* GetDeltaFromBinHists(vector<TF1*> fits, TH1* dummy, double xmin, double xma
   for(unsigned int i=0; i<fits.size(); i++){
     double d1 = fits[i]->Eval(xmin);
     double d2 = fits[i]->Eval(xmax);
-    double d = fabs(d1);
-    if(fabs(d2) > fabs(d1)) d = fabs(d2);
-    // if(i==0 || i==2 || i==4) delta->SetBinContent(i+1,  d);
-    if(i==2 || i==4) delta->SetBinContent(i+1,  d);
-    else                     delta->SetBinContent(i+1, -d);
+    double d = (fabs(d1)+fabs(d2))/2;
+    if(i % 2 == 0) delta->SetBinContent(i+1,  d); // gerade bins
+    else           delta->SetBinContent(i+1, -d); // ungerade bins
   }
   return delta;
+}
+
+
+TH1* ConstructAverage(vector<TH1*> variations, int varfrom){
+  if(variations.size() == 0) cout << "AVERGAE CAN NOT BE CONSTRUCTED" << endl;
+  TH1* average = (TH1*) variations[0]->Clone();
+  average->Reset();
+  int nbins = average->GetXaxis()->GetNbins();
+  for(int bin=1; bin<=nbins; bin++){
+    int nvars = variations.size();
+    double sum = 0.0;
+    for(auto var: variations) sum += fabs(var->GetBinContent(bin));
+    double ave = sum/nvars;
+    if(variations[varfrom]->GetBinContent(bin) < 0) ave *= -1.0;
+    average->SetBinContent(bin, ave);
+  }
+  return average;
 }

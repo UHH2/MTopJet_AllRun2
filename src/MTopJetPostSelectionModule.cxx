@@ -186,12 +186,16 @@ protected:
 
   std::unique_ptr<Hists> h_RecGenHists_lowPU, h_RecGenHists_medPU, h_RecGenHists_highPU, h_RecGenHists_lowPU_noJEC, h_RecGenHists_medPU_noJEC, h_RecGenHists_highPU_noJEC, h_RecGenHists_RecOnly_corr;
   std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_Both;
+  std::unique_ptr<Hists> h_XCone_GEN_ST;
   std::unique_ptr<Hists> h_XCone_GEN_GenOnly, h_XCone_GEN_GenOnly_matched, h_XCone_GEN_GenOnly_unmatched, h_XCone_GEN_GenOnly_matched_fat, h_XCone_GEN_GenOnly_unmatched_fat;
+  std::unique_ptr<Hists> h_RecGenHists_GenSelRecInfo, h_RecGenHists_GenSelRecInfo_lowPU, h_RecGenHists_GenSelRecInfo_midPU, h_RecGenHists_GenSelRecInfo_highPU;
+  std::unique_ptr<Hists> h_RecGenHists_GenSelRecInfo_matched, h_RecGenHists_GenSelRecInfo_matched_lowPU, h_RecGenHists_GenSelRecInfo_matched_midPU, h_RecGenHists_GenSelRecInfo_matched_highPU;
   std::unique_ptr<Hists> h_RecGenHists_GenOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly;
   std::unique_ptr<Hists> h_RecGenHists_RecOnly_noJEC;
   std::unique_ptr<Hists> h_RecGenHists_Both, h_RecGenHists_Both_corr;
   std::unique_ptr<Hists> h_RecGenHists_subjets, h_RecGenHists_subjets_noJEC, h_RecGenHists_subjets_corrected, h_RecGenHists_subjets_matched;
+  std::unique_ptr<Hists> h_RecGenHistsST_subjets, h_RecGenHistsST_subjets_noJEC, h_RecGenHistsST_subjets_corrected;
   std::unique_ptr<Hists> h_RecGenHists_subjets_lowPU, h_RecGenHists_subjets_medPU, h_RecGenHists_subjets_highPU;
   std::unique_ptr<Hists> h_RecGenHists_subjets_noJEC_lowPU, h_RecGenHists_subjets_noJEC_medPU, h_RecGenHists_subjets_noJEC_highPU;
   std::unique_ptr<Hists> h_RecGenHists_subjets_WJets, h_RecGenHists_subjets_noJEC_WJets;
@@ -286,8 +290,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_isrdown"        ||
   ctx.get("dataset_version") == "TTbar_hdampup"        ||
   ctx.get("dataset_version") == "TTbar_hdampdown"      ||
-  ctx.get("dataset_version") == "TTbar_tuneup"        ||
-  ctx.get("dataset_version") == "TTbar_tunedown"      ||
+  ctx.get("dataset_version") == "TTbar_tuneup"         ||
+  ctx.get("dataset_version") == "TTbar_tunedown"       ||
+  ctx.get("dataset_version") == "TTbar_gluonmove"      ||
+  ctx.get("dataset_version") == "TTbar_mpibased"       ||
   ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
   ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
   else  isTTbar = false;
@@ -524,6 +530,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
     h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
 
+    h_XCone_GEN_ST.reset(new GenHists_xcone(ctx, "XCone_GEN_ST"));
+
     h_GenParticles_GenOnly.reset(new GenHists_particles(ctx, "GenParticles_GenOnly"));
     h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
     h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
@@ -545,6 +553,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_RecGenHists_subjets_WJets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_WJets", "jec"));
     h_RecGenHists_subjets_noJEC_WJets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_WJets", "raw"));
 
+    h_RecGenHistsST_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets", "jec"));
+    h_RecGenHistsST_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets_noJEC", "raw"));
+    h_RecGenHistsST_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets_corrected", "cor"));
+
 
     h_RecGenHists_ak4.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4", true));
     h_RecGenHists_ak4_noJEC.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4_noJEC", false));
@@ -563,6 +575,14 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_RecGenHists_RecOnly_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_corrected", "cor"));
     h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", "jec"));
     h_RecGenHists_Both_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_corrected", "cor"));
+    h_RecGenHists_GenSelRecInfo.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo", "cor"));
+    h_RecGenHists_GenSelRecInfo_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_lowPU", "cor"));
+    h_RecGenHists_GenSelRecInfo_midPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_midPU", "cor"));
+    h_RecGenHists_GenSelRecInfo_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_highPU", "cor"));
+    h_RecGenHists_GenSelRecInfo_matched.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched", "cor"));
+    h_RecGenHists_GenSelRecInfo_matched_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_lowPU", "cor"));
+    h_RecGenHists_GenSelRecInfo_matched_midPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_midPU", "cor"));
+    h_RecGenHists_GenSelRecInfo_matched_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_highPU", "cor"));
   }
 
   // PDF hists
@@ -979,6 +999,17 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_ak4_noJEC->fill(event);
   }
 
+  if(isMC){
+    std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
+    double pt = gen_hadjets33.at(0).v4().Pt();
+    double mjet = gen_hadjets33.at(0).v4().M();
+    if(pt > 400 && mjet > 120){
+      h_XCone_GEN_ST->fill(event);
+      h_RecGenHistsST_subjets->fill(event);
+      h_RecGenHistsST_subjets_noJEC->fill(event);
+      h_RecGenHistsST_subjets_corrected->fill(event);
+    }
+  }
 
   if(pass_measurement_rec){
     if(isTTbar) h_PDFHists->fill(event);
@@ -1051,7 +1082,21 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     else                               h_XCone_GEN_GenOnly_unmatched_fat->fill(event);
     if(isTTbar) h_GenParticles_GenOnly->fill(event);
     h_RecGenHists_GenOnly->fill(event);
+    // fill this only if event passes at least one reco sideband or measurement phase space
+    if(pass_measurement_rec || pass_pt350migration_rec || pass_massmigration_rec || pass_btagmigration_rec || pass_subptmigration_rec || pass_leptonptmigration_rec){
+      h_RecGenHists_GenSelRecInfo->fill(event);
+      if(lowPU)       h_RecGenHists_GenSelRecInfo_lowPU->fill(event);
+      else if(midPU)  h_RecGenHists_GenSelRecInfo_midPU->fill(event);
+      else if(highPU) h_RecGenHists_GenSelRecInfo_highPU->fill(event);
+      if(matched_sub_GEN->passes(event)){
+        h_RecGenHists_GenSelRecInfo_matched->fill(event);
+        if(lowPU)       h_RecGenHists_GenSelRecInfo_matched_lowPU->fill(event);
+        else if(midPU)  h_RecGenHists_GenSelRecInfo_matched_midPU->fill(event);
+        else if(highPU) h_RecGenHists_GenSelRecInfo_matched_highPU->fill(event);
+      }
+    }
   }
+
 
   /*************************** fill hists with reco+gen selection applied **************************************************************************/
   if(pass_measurement_rec && pass_measurement_gen){

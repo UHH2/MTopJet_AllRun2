@@ -24,6 +24,7 @@ class plotter{
   plotter(TString);
   void draw_matrix(TH2* hist, TString file_name, bool zlog, bool is_migration);
   void draw_output(TH1* output, TH1D* truth, bool norm, TString file_name);
+  void draw_output_fine(TH1* output, bool norm, TString file_name);
   void draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> truth_, std::vector<TString> legnames, bool norm, TString file_name);
   void draw_output_smear(std::vector<TH1*> output, TH1D* truth, TString file_name);
   void draw_output_stat(TH1* output_, TH1* stat_, TH1D* truth_, bool norm, TString file_name);
@@ -33,7 +34,7 @@ class plotter{
   void draw_rhotau(TSpline *rhotau, double tau, TString file_name);
   void draw_projection(TH1D* proj, TH1D* compare, TString file_name );
   void draw_1D_hist(TH1D* hist, TString file_name);
-  void draw_binhist(TGraph* hist, TString file_name, double xmin, double xmax);
+  void draw_binhist(TGraphErrors* hist, TString file_name, double xmin, double xmax);
   void draw_delta(TH1* hist, TString file_name);
   void draw_delta_rel(TH1* hist, TH1* result, TString file_name);
   void draw_rec(TH1D* data, TH1D* sig, TH1D* bgr, TString file_name);
@@ -50,7 +51,7 @@ class plotter{
  private:
   TH1* add_error_bar(TH1* hist, std::vector<double> errors);
   TString directory;
-  void CMSLabel();
+  void CMSLabel(bool, double x=0.25, double y=0.83);
   void LumiInfo();
 
 };

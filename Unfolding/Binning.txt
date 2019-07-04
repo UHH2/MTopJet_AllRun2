@@ -7,8 +7,8 @@ BINNING REC
   -- btagmigration_rec (bins 175 - 200)
 -------------------------------------------
 BINNING GEN
-  -- measurement_gen (bins 1 - 14)
-  -- ptmigration_gen (bins 15 - 28)
-  -- subptmigration_gen (bins 29 - 35)
-  -- massmigration_gen (bins 36 - 48)
-  -- leptonptmigration_gen (bins 49 - 55)
+  -- measurement_gen (bins 1 - 22)
+  -- ptmigration_gen (bins 23 - 40)
+  -- subptmigration_gen (bins 41 - 48)
+  -- massmigration_gen (bins 49 - 65)
+  -- leptonptmigration_gen (bins 66 - 72)

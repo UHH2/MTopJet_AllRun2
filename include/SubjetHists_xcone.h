@@ -32,6 +32,7 @@ protected:
     TH1F *match_to_subjet;
 
     TH1F *pt_had_combine, *pt_lep_combine;
+    TH2F *WMass_Vertices; 
     TH1F *mass_had_combine, *mass_had_combine_cut, *mass_lep_combine;
     TH1F *min_mass_Wjet, *min_mass_Wjet_zoom, *min_mass_Wjet_ptlow, *min_mass_Wjet_pthigh, *min_mass_Wjet_ptmix, *all_mass_Wjet;
     TH1F *pt_Wjet, *pt_Wjet_i, *pt_Wjet_j, *pt_Wjet_diff;

@@ -71,11 +71,13 @@ void Plot(TH1F* elec, TH1F* elec_stat, TH1F* muon, TH1F* muon_stat){
 
   gStyle->SetEndErrorSize(5);
 
+  CMSLabel(true, 0.2, 0.85);
+
   TLegend *l=new TLegend(0.55,0.68,0.85,0.87);
   l->SetBorderSize(0);
   l->SetFillStyle(0);
   l->AddEntry(elec,"elec channel","pf");
-  l->AddEntry(muon,"muon channel","pl");
+  l->AddEntry(muon,"muon channel","ple");
   l->SetTextSize(0.03);
   l->Draw();
   c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding/ChannelComparison.pdf");
