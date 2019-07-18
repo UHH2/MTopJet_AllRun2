@@ -72,8 +72,8 @@ void ConvertUncertTables(TH1* unfold, string directory, bool norm){
     cout << " & ";
     double width = unfold->GetBinWidth(bin);
     double entry = unfold->GetBinContent(bin);
-    if(norm) cout << std::fixed << std::setprecision(2);
-    else     cout << std::fixed << std::setprecision(0);
+    if(norm) cout << std::fixed << std::setprecision(2); // 2
+    else     cout << std::fixed << std::setprecision(0); // 0
     cout << entry*width;
   }
   cout << "\\\\" << endl;
@@ -99,24 +99,29 @@ void ConvertUncertTables(TH1* unfold, string directory, bool norm){
         cout << "\\hline" << endl;
         indent = false;
       }
-      if(uncert == "jec") uncert = "jet energy scale";
-      if(uncert == "jer") uncert = "jet energy resolution";
+      if(uncert == "jec") uncert = "Jet energy scale";
+      if(uncert == "jer") uncert = "Jet energy resolution";
       if(uncert == "cor") uncert = "XCone jet correction";
       if(uncert == "hdamp") uncert = "$h_\\textrm{damp}$";
-      if(uncert == "mass") uncert = "choice of \\mtop";
+      if(uncert == "mass") uncert = "Choice of \\mtop";
       if(uncert == "UEtune") uncert = "UE tune";
+      if(uncert == "b-tagging") uncert = "b tag";
+      if(uncert == "pile-up") uncert = "Pileup";
+      if(uncert == "scale") uncert = "Scale";
+      if(uncert == "pdf") uncert = "PDF";
+      if(uncert == "MCstat") uncert = "MC stat.";
       if(indent) cout << "\\hspace{3mm}";
       cout << std::fixed << std::setprecision(1);
       cout << uncert;
-      if(bin1 < 1.0) cout << " & < 1";
+      if(bin1 < 1.0) cout << " & $< 1$";
       else           cout << " & " << bin1;
-      if(bin2 < 1.0) cout << " & < 1";
+      if(bin2 < 1.0) cout << " & $< 1$";
       else           cout << " & " << bin2;
-      if(bin3 < 1.0) cout << " & < 1";
+      if(bin3 < 1.0) cout << " & $< 1$";
       else           cout << " & " << bin3;
-      if(bin4 < 1.0) cout << " & < 1";
+      if(bin4 < 1.0) cout << " & $< 1$";
       else           cout << " & " << bin4;
-      if(bin5 < 1.0) cout << " & < 1";
+      if(bin5 < 1.0) cout << " & $< 1$";
       else           cout << " & " << bin5;
       cout << "\\\\"<<endl;
     }
@@ -177,12 +182,17 @@ void ConvertMassContributions(string directory){
       cout << "\\hline" << endl;
       indent = false;
     }
-    if(name == "jec") name = "jet energy scale";
-    if(name == "jer") name = "jet energy resolution";
+    if(name == "jec") name = "Jet energy scale";
+    if(name == "jer") name = "Jet energy resolution";
     if(name == "cor") name = "XCone jet correction";
     if(name == "hdamp") name = "$h_\\textrm{damp}$";
-    if(name == "mass") name = "choice of \\mtop";
+    if(name == "mass") name = "Choice of \\mtop";
     if(name == "UEtune") name = "UE tune";
+    if(name == "b-tagging") name = "b tag";
+    if(name == "pile-up") name = "Pileup";
+    if(name == "scale") name = "Scale";
+    if(name == "pdf") name = "PDF";
+    if(name == "MCstat") name = "MC stat.";
     if(indent) cout << "\\hspace{3mm}";
     cout << std::fixed << std::setprecision(2);
     if(uncert < 0.01) cout << name << " & $< 0.01$ \\\\"<<endl;

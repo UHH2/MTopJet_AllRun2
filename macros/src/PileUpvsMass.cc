@@ -161,49 +161,110 @@ int main(int argc, char* argv[]){
   }
 
   TCanvas *a = new TCanvas("a", " ", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.13);
+  TPad *p1 = new TPad("p1","p1",0.0,0.5,1.0,1.0);
+  p1->SetLeftMargin(0.15);
+  p1->SetRightMargin(0.1);
+  p1->SetBottomMargin(0.0);
+  p1->SetBorderMode(0);
+  p1->Draw();
+  TPad *p2 = new TPad("p2","p2",0.0,0.0,1.0,0.501);
+  p2->SetTopMargin(0.);
+  p2->SetLeftMargin(0.15);
+  p1->SetRightMargin(0.1);
+  p2->SetBottomMargin(0.15);
+  p2->SetBorderMode(0);
+  p2->Draw();
+
+  p1->cd();
+  // mjetPU_data->GetXaxis()->SetLabelSize(0);
+  // mjetPU_data->GetXaxis()->SetTickLength(0);
   mjetPU_data->Draw("AP");
   mjetPU_data->GetXaxis()->SetRangeUser(0, 50);
-  mjetPU_data->GetYaxis()->SetRangeUser(0, 300);
-  mjetPU_data->GetXaxis()->SetTitle("number of primary vertices");
-  mjetPU_data->GetYaxis()->SetTitle("mean m_{jet} [GeV]");
+  mjetPU_data->GetYaxis()->SetRangeUser(159, 196);
+  mjetPU_data->GetXaxis()->SetTitle(" ");
+  mjetPU_data->GetYaxis()->SetTitle("<m_{jet}> [GeV]");
   mjetPU_data->SetTitle(" ");
   mjetPU_data->GetXaxis()->SetNdivisions(505);
   mjetPU_data->GetYaxis()->SetNdivisions(505);
-  mjetPU_data->GetYaxis()->SetTitleOffset(1.8);
-  mjetPU_data->GetXaxis()->SetTitleOffset(1.3);
+  mjetPU_data->GetYaxis()->SetTitleOffset(0.7);
+  // mjetPU_data->GetXaxis()->SetTitleOffset(0.9);
+  mjetPU_data->GetYaxis()->SetLabelSize(0.08);
+  mjetPU_data->GetYaxis()->SetTitleSize(0.1);
+  // mjetPU_data->GetXaxis()->SetTitleSize(0.05);
   mjetPU_data->SetLineColor(kBlack);
   mjetPU_data->SetMarkerColor(kBlack);
   mjetPU_data->SetMarkerStyle(8);
   mjetPU_data->SetMarkerSize(1);
-  mWPU_data->SetLineColor(14);
-  mWPU_data->SetMarkerColor(14);
-  mWPU_data->SetMarkerStyle(8);
-  mWPU_data->SetMarkerSize(1);
   mjetPU->SetLineColor(kRed);
   mjetPU->SetFillColor(kRed);
   mjetPU->SetMarkerColor(kRed);
   mjetPU->SetMarkerStyle(8);
   mjetPU->SetMarkerSize(0);
+  mjetPU->Draw("E2 SAME");
+  mjetPU_data->Draw("P SAME");
+  p1->RedrawAxis();
+
+  p2->cd();
+  mWPU_data->Draw("AP");
+  // mWPU_data->GetHistogram()->SetMaximum(85);
+  mWPU_data->GetXaxis()->SetRangeUser(0, 50);
+  mWPU_data->GetYaxis()->SetRangeUser(60, 97);
+  mWPU_data->GetXaxis()->SetTitle("number of primary vertices");
+  mWPU_data->GetYaxis()->SetTitle(" ");
+  mWPU_data->SetTitle(" ");
+  mWPU_data->GetXaxis()->SetNdivisions(505);
+  mWPU_data->GetYaxis()->SetNdivisions(505);
+  // mWPU_data->GetYaxis()->SetTitleOffset(1.1);
+  mWPU_data->GetXaxis()->SetTitleOffset(0.8);
+  // mWPU_data->GetYaxis()->SetTitleSize(0.05);
+  mWPU_data->GetXaxis()->SetTitleSize(0.09);
+  mWPU_data->GetXaxis()->SetLabelSize(0.08);
+  mWPU_data->GetYaxis()->SetLabelSize(0.08);
+  mWPU_data->SetLineColor(14);
+  mWPU_data->SetMarkerColor(14);
+  mWPU_data->SetMarkerStyle(8);
+  mWPU_data->SetMarkerSize(1);
   mWPU->SetLineColor(kOrange+7);
   mWPU->SetFillColor(kOrange+7);
   mWPU->SetMarkerColor(kOrange+7);
   mWPU->SetMarkerStyle(8);
   mWPU->SetMarkerSize(0);
-
-  mjetPU->Draw("E2 SAME");
-  mjetPU_data->Draw("P SAME");
   mWPU->Draw("E2 SAME");
   mWPU_data->Draw("P SAME");
-  CMSLabel(true, 0.2, 0.85);
+  p2->RedrawAxis();
 
-  TLegend* leg = new TLegend(0.50, 0.65, 0.85, 0.85);
+  a->cd();
+  CMSLabel(true, 0.2, 0.9);
+
+  TPad *b = new TPad("b","b",0.0,0.46,1.0,0.54);
+  b->SetBorderMode(0);
+  b->Draw();
+  b->cd();
+
+  gStyle->SetLineStyleString(17,"4 10");
+  TLine *line = new TLine(0.15,0.1,0.15,0.9); //vertical
+  line->SetLineWidth(2);
+  line->SetLineStyle(17);
+  line->Draw();
+  TLine *line2 = new TLine(0.9,0.1,0.9,0.9); //vertical
+  line2->SetLineWidth(2);
+  line2->SetLineStyle(17);
+  line2->Draw();
+  // line = new TLine(0.15,0.6,0.15,1); // vertical
+  // line->Draw();
+  // line = new TLine(0.13,0.1,0.17,0.7); //horizontal
+  // line->Draw();
+  // line = new TLine(0.13,0.3,0.17,0.9); // horizontal
+  // line->Draw();
+
+  a->cd();
+  TLegend* leg = new TLegend(0.50, 0.35, 0.85, 0.65);
   leg->AddEntry(mjetPU_data,"t decay data","pe");
   leg->AddEntry(mjetPU,"t decay t#bar{t}","pf");
   leg->AddEntry(mWPU_data,"W decay data","pe");
   leg->AddEntry(mWPU,"W decay t#bar{t}","pf");
   leg->Draw();
+
   TString filename = "/afs/desy.de/user/s/schwarzd/Plots/PileupVsMass/MjetVsPU.pdf";
   a->SaveAs(filename);
   delete a;

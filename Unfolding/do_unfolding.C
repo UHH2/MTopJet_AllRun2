@@ -613,7 +613,7 @@ int main(int argc, char* argv[])
   auto coutbuf_set = std::cout.rdbuf(out_set.rdbuf());
   std::cout.rdbuf(coutbuf_set);
 
-  TH2 *CovStat, *CovInputStat, *CovMatrixStat, *CovM, *CovS;
+  TH2 *CovStat, *CovInputStat, *CovMatrixStat, *CovM, *CovS, *CovMCStat, *CovBKG;
   vector<TH2*> CovBgrStat;
 
   vector< vector<TH2*> > CovSys;
@@ -626,6 +626,7 @@ int main(int argc, char* argv[])
   vector< TH1* > SYSnorm_rel;
   TH1 *SYS_rel_total;
   TH1 *SYSnorm_rel_total;
+  TH1 *DELTA_MCSTAT_REL;
 
   vector<TH2*> CovBgrScale;
   vector<TH1*> BGR_DELTA;
@@ -880,22 +881,42 @@ int main(int argc, char* argv[])
     // add up stat Cov
     cout << "sum up stat cov matrices" << endl;
     CovStat = (TH2*) CovInputStat->Clone();
-    CovStat->Add(CovMatrixStat);
-    for(auto bgrcov: CovBgrStat) CovStat->Add(bgrcov);
     STAT_DELTA = CreateDeltaFromCov(CovStat);
     STAT_REL = ConvertToRelative(STAT_DELTA, data_unfolded);
     // then add sys cov from backgrounds
     cout << "sum up background sys cov matrices" << endl;
     CovTotal = (TH2*) CovStat->Clone();
-    for(auto bgrcov: CovBgrScale) CovTotal->Add(bgrcov);
     CovM = (TH2*) CovStat->Clone();
     CovS = (TH2*) CovStat->Clone();
+    CovMCStat = (TH2*) CovStat->Clone();
+    CovBKG = (TH2*) CovStat->Clone();
     CovM->Reset();
     CovS->Reset();
+    CovMCStat->Reset();
+    CovBKG->Reset();
 
-    // add lumi and bkg to Exp. Uncert.
+    // add bkg stat
+    for(auto bgrcov: CovBgrStat) CovMCStat->Add(bgrcov);
+    for(auto bgrcov: CovBgrStat) CovTotal->Add(bgrcov);
+    for(auto bgrcov: CovBgrStat) CovS->Add(bgrcov);
+    // add matrix stat
+    CovMCStat->Add(CovMatrixStat);
+    CovTotal->Add(CovMatrixStat);
+    CovS->Add(CovMatrixStat);
+    // create delta for MC stat
+    TH1* DELTA_MCSTAT = CreateDeltaFromCov(CovMCStat);
+    DELTA_MCSTAT_REL = ConvertToRelative(DELTA_MCSTAT, data_unfolded);
+    // add bkg scale
     for(auto bgrcov: CovBgrScale) CovS->Add(bgrcov);
+    for(auto bgrcov: CovBgrScale) CovTotal->Add(bgrcov);
+    for(auto bgrcov: CovBgrScale) CovBKG->Add(bgrcov);
+    TH1* DELTA_BKG = CreateDeltaFromCov(CovBKG);
+    TH1* DELTA_BKG_REL = ConvertToRelative(DELTA_BKG, data_unfolded);
+
+    // add lumi
     CovS->Add(CovLumi);
+    CovTotal->Add(CovLumi);
+
 
     // write in a file which variations are used
     std::ofstream out(directory+"/SYS.txt");
@@ -939,12 +960,31 @@ int main(int argc, char* argv[])
       CovS->Add(CHOSEN_COV);
       SYS_rel.push_back(ConvertToRelative(CHOSEN_DELTA, data_unfolded));
     }
-    SYS_rel.push_back(STAT_REL);      // put in stat to get total
-    SYS_rel_total = AddSys(SYS_rel);  // calculate total
-    SYS_rel.pop_back();               // remove stat from list
+    // now also add MCstat, bkg rates, lumi
+    SYS_DELTA.push_back({DELTA_MCSTAT});
+    SYS_DELTA.push_back({DELTA_BKG});
+    SYS_DELTA.push_back({DeltaLumi});
+    SYS_rel.push_back(DELTA_MCSTAT_REL);
+    SYS_rel.push_back(DELTA_BKG_REL);
+    SYS_rel.push_back(ConvertToRelative(DeltaLumi,data_unfolded));
+    CovSys.push_back({CovMCStat});
+    CovSys.push_back({CovBKG});
+    CovSys.push_back({CovLumi});
+    ChosenSysCov.push_back({CovMCStat});
+    ChosenSysCov.push_back({CovBKG});
+    ChosenSysCov.push_back({CovLumi});    sys_rel_name.push_back("MCstat");
+    sys_rel_name.push_back("Background");
+    sys_rel_name.push_back("Luminosity");
+    sys_name.push_back({"MCstat"});
+    sys_name.push_back({"Background"});
+    sys_name.push_back({"Luminosity"});
 
-    // Add Lumi
-    CovTotal->Add(CovLumi);
+    // get one total delta
+    SYS_rel.push_back(STAT_REL);         // put in stat to get total
+    SYS_rel_total = AddSys(SYS_rel);     // calculate total
+    SYS_rel.pop_back();                  // remove stat from list
+
+
 
     /*
      █████  ██████  ██████      ███    ███  ██████  ██████  ███████ ██
@@ -954,7 +994,7 @@ int main(int argc, char* argv[])
     ██   ██ ██████  ██████      ██      ██  ██████  ██████  ███████ ███████
     */
 
-    if(do_newmtopuncert){
+    if(do_model && do_newmtopuncert){
       for(unsigned int i=0; i<MODEL_DELTA.size(); i++){
         if(model_rel_name[i] != "mass") continue;
         BinHists = GetBinHistsForMTop(MODEL_DELTA[i]);
@@ -1120,6 +1160,11 @@ int main(int argc, char* argv[])
   Normalise * normData_StatExp = new Normalise(data_unfolded, CovStatExp, lower, upper, NormToWidth);
   TH2D* CovStatExp_norm = normData_StatExp->GetMatrix();
 
+  TH2* CovMCStatStat = (TH2*) CovStat->Clone();
+  CovMCStatStat->Add(CovMCStat);
+  Normalise * normData_MCStatStat = new Normalise(data_unfolded, CovMCStatStat, lower, upper, NormToWidth);
+  TH2D* CovMCStatStat_norm = normData_MCStatStat->GetMatrix();
+
   TH2* CovTotalnoEXP = (TH2*) CovTotalChi2->Clone();
   CovTotalnoEXP->Add(CovS, -1);
   Normalise * normData_noEXP = new Normalise(data_unfolded, CovTotalnoEXP, lower, upper, NormToWidth);
@@ -1273,6 +1318,14 @@ int main(int argc, char* argv[])
   cout << " MASS = " << chi2_StatExp->GetMass() << " +- " << chi2_StatExp->GetUncertainty() << std::endl;
 
   // perform chi2 fit without exp. uncertainties
+  // cout << "*******************************" << endl;
+  // cout << "******** chi 2 (stat+MCstat) **" << endl;
+  // cout << "*******************************" << endl;
+  // chi2fit* chi2_MCStatStat = new chi2fit(data_unfolded_norm, CovMCStatStat_norm, chi2_MassSamples, chi2_masses, lower, upper, NormToWidth);
+  // chi2_MCStatStat->CalculateChi2();
+  // cout << " MASS = " << chi2_MCStatStat->GetMass() << " +- " << chi2_MCStatStat->GetUncertainty() << std::endl;
+
+  // perform chi2 fit without exp. uncertainties
   cout << "*******************************" << endl;
   cout << "******** chi 2 (noEXP) ********" << endl;
   cout << "*******************************" << endl;
@@ -1317,6 +1370,7 @@ int main(int argc, char* argv[])
   double uncert_tot = chi2->GetUncertainty();
   double uncert_mod = sqrt(uncert_tot*uncert_tot - chi2_noMODEL->GetUncertainty()*chi2_noMODEL->GetUncertainty());
   double uncert_exp = sqrt(chi2_StatExp->GetUncertainty()*chi2_StatExp->GetUncertainty() - uncert_sta*uncert_sta);
+  // double uncert_mcs = sqrt(chi2_MCStatStat->GetUncertainty()*chi2_MCStatStat->GetUncertainty() - uncert_sta*uncert_sta);
   double uncert_the = sqrt(uncert_tot*uncert_tot - chi2_noTHEO->GetUncertainty()*chi2_noTHEO->GetUncertainty());
   auto coutbuf = std::cout.rdbuf(out.rdbuf());
   cout << chi2_stat->GetMass() << " " << chi2_stat->GetUncertainty() << " ";
@@ -1333,6 +1387,7 @@ int main(int argc, char* argv[])
     c2->CalculateChi2();
     double uncert = c2->GetUncertainty();
     double u = sqrt(uncert*uncert - uncert_sta*uncert_sta);
+    if(uncert_sta > uncert) u = 0.0;
     sys_mass_uncert.push_back(u);
     cout << sys_rel_name[i] << " " << u << endl;
   }
@@ -1361,6 +1416,7 @@ int main(int argc, char* argv[])
   cout << "total " << uncert_tot << endl;
   cout << "stat " << uncert_sta << endl;
   cout << "exp " << uncert_exp << endl;
+  // cout << "MCstat " << uncert_mcs << endl;
   for(int i=0; i<sys_mass_uncert.size(); i++){
     cout << sys_rel_name[i] << " " << sys_mass_uncert[i] << endl;
   }
@@ -1591,6 +1647,7 @@ int main(int argc, char* argv[])
 // choose variation
 int FindLargestVariation(vector<TH1*> variations){
   if(variations.size() < 1) cout << "Vector of variations has size 0" << endl;
+  if(variations.size() == 1) return 0;
   int nbins = variations[0]->GetXaxis()->GetNbins();
   vector<double> entry;
   for(auto i:variations) entry.push_back(0);
@@ -1796,7 +1853,9 @@ TH1* CreateDeltaFromCov(TH2* Cov){
   bins.push_back(Cov->GetXaxis()->GetBinLowEdge(1));
   for(int i=1; i<=nbins; i++){
     bins.push_back(Cov->GetXaxis()->GetBinUpEdge(i));
-    values.push_back( sqrt(Cov->GetBinContent(i,i)) );
+    double val = Cov->GetBinContent(i,i);
+    if(val < 0.0000000000001) val = 0.0; // security to prevent nan vales
+    values.push_back( sqrt(val) );
   }
   TH1D* delta = new TH1D(" ", " ", nbins, &bins[0]);
   for(int i=1; i<=nbins; i++) delta->SetBinContent(i, values[i-1]);

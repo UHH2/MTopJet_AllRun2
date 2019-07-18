@@ -170,6 +170,8 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   output->GetXaxis()->SetTitleOffset(0.9);
   output->GetYaxis()->SetTitleSize(0.05);
   output->GetXaxis()->SetTitleSize(0.05);
+  // output->GetYaxis()->SetLabelSize(0.05);
+  // output->GetXaxis()->SetLabelSize(0.05);
   output->GetYaxis()->SetNdivisions(505);
   output->SetLineColor(kBlack);
   output->SetMarkerColor(kBlack);
@@ -215,7 +217,7 @@ void plotter::draw_output_data(TH1* output_, TH1* stat_, std::vector<TH1D*> trut
   }
   l->SetTextSize(0.04);
   l->Draw();
-  CMSLabel(false);
+  CMSLabel(true);
   LumiInfo();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
@@ -384,6 +386,8 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   output->GetXaxis()->SetTitleOffset(0.9);
   output->GetYaxis()->SetTitleSize(0.05);
   output->GetXaxis()->SetTitleSize(0.05);
+  // output->GetYaxis()->SetLabelSize(0.05);
+  // output->GetXaxis()->SetLabelSize(0.05);
   output->GetYaxis()->SetNdivisions(505);
   output->SetLineColor(kBlack);
   output->SetMarkerColor(kBlack);
@@ -468,7 +472,7 @@ void plotter::draw_output_mass(TH1* output_,  TH1* stat_, std::vector<TH1D*> mto
   if(show[14])l->AddEntry(mtop_templates[14],"m_{t} = 178.5 GeV","fl");
   l->SetTextSize(0.04);
   l->Draw();
-  CMSLabel(false);
+  CMSLabel(true);
   LumiInfo();
   c->SaveAs(directory + file_name + ".pdf");
   delete c;
@@ -874,10 +878,16 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   //
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.14);
   total->SetTitle("");
   total->GetXaxis()->SetTitle("m_{jet} [GeV]");
   total->GetYaxis()->SetTitle("relative uncertainty [%]");
   total->GetYaxis()->SetTitleOffset(1.5);
+  total->GetXaxis()->SetTitleOffset(1.1);
+  total->GetYaxis()->SetTitleSize(0.05);
+  total->GetXaxis()->SetTitleSize(0.05);
+  total->GetYaxis()->SetLabelSize(0.05);
+  total->GetXaxis()->SetLabelSize(0.05);
   total->GetYaxis()->SetNdivisions(505);
   total->GetYaxis()->SetRangeUser(0, 100);
   total->SetFillColor(15);
@@ -897,7 +907,10 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
     delta[i]->SetLineColor(col[i]);
     delta[i]->SetLineWidth(4);
     delta[i]->SetMarkerStyle(0);
-    if(UncertNames[i] == "MuTrigger" ||
+    if(UncertNames[i] == "MCstat" ||
+      UncertNames[i] == "Luminosity" ||
+      UncertNames[i] == "Background" ||
+      UncertNames[i] == "MuTrigger" ||
       UncertNames[i] == "pile-up" ||
       UncertNames[i] == "MuID" ||
       UncertNames[i] == "ElTrigger" ||
@@ -909,13 +922,16 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
   CMSLabel(true, 0.18, 0.87);
 
   // LEGEND
-  TLegend *leg = new TLegend(0.4,0.6,0.88,0.88);
+  TLegend *leg = new TLegend(0.42,0.6,0.88,0.88);
   leg->SetFillStyle(0);
-  leg->SetNColumns(2);
-  leg->AddEntry(total, "stat #oplus exp", "f");
-  leg->AddEntry(stat, "stat", "l");
+  // leg->SetNColumns(2);
+  leg->AddEntry(total, "Stat #oplus exp", "f");
+  leg->AddEntry(stat, "Stat", "l");
   for(unsigned int i=0; i<delta.size(); i++){
-    if(UncertNames[i] == "MuTrigger" ||
+    if(UncertNames[i] == "MCstat" ||
+      UncertNames[i] == "Luminosity" ||
+      UncertNames[i] == "Background" ||
+      UncertNames[i] == "MuTrigger" ||
       UncertNames[i] == "pile-up" ||
       UncertNames[i] == "MuID" ||
       UncertNames[i] == "ElTrigger" ||
@@ -923,10 +939,10 @@ void plotter::draw_delta_comparison( TH1* total_, TH1* stat_, std::vector<TH1*> 
       UncertNames[i] == "ElReco") continue;
 
     if      (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
-    else if (UncertNames[i] == "b-tagging") leg->AddEntry(delta[i],"b tagging","l");
+    else if (UncertNames[i] == "b-tagging") leg->AddEntry(delta[i],"b tag","l");
     else if (UncertNames[i] == "pile-up")   leg->AddEntry(delta[i],"pileup","l");
-    else if (UncertNames[i] == "jec")       leg->AddEntry(delta[i],"jet energy scale","l");
-    else if (UncertNames[i] == "jer")       leg->AddEntry(delta[i],"jet energy resolution","l");
+    else if (UncertNames[i] == "jec")       leg->AddEntry(delta[i],"Jet energy scale","l");
+    else if (UncertNames[i] == "jer")       leg->AddEntry(delta[i],"Jet energy resolution","l");
     else if (UncertNames[i] == "cor")       leg->AddEntry(delta[i],"XCone jet correction","l");
     else if (UncertNames[i] == "MuTrigger") leg->AddEntry(delta[i],"muon trigger","l");
     else if (UncertNames[i] == "MuID")      leg->AddEntry(delta[i],"muon ID","l");
@@ -983,10 +999,16 @@ void plotter::draw_delta_comparison_model( TH1* total_, TH1* stat_, std::vector<
   //
   TCanvas *c= new TCanvas("c","",600,600);
   gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.14);
   total->SetTitle("");
   total->GetXaxis()->SetTitle("m_{jet} [GeV]");
   total->GetYaxis()->SetTitle("relative uncertainty [%]");
   total->GetYaxis()->SetTitleOffset(1.5);
+  total->GetXaxis()->SetTitleOffset(1.1);
+  total->GetYaxis()->SetTitleSize(0.05);
+  total->GetXaxis()->SetTitleSize(0.05);
+  total->GetYaxis()->SetLabelSize(0.05);
+  total->GetXaxis()->SetLabelSize(0.05);
   total->GetYaxis()->SetNdivisions(505);
   total->GetYaxis()->SetRangeUser(0, 100);
   total->SetFillColor(15);
@@ -1016,13 +1038,13 @@ void plotter::draw_delta_comparison_model( TH1* total_, TH1* stat_, std::vector<
   TLegend *leg = new TLegend(0.42,0.6,0.88,0.88);
   leg->SetFillStyle(0);
   leg->SetNColumns(2);
-  leg->AddEntry(total, "stat #oplus model", "f");
-  leg->AddEntry(stat, "stat", "l");
+  leg->AddEntry(total, "Stat #oplus model", "f");
+  leg->AddEntry(stat, "Stat", "l");
   for(unsigned int i=0; i<delta.size(); i++){
     if(UncertNames[i] == "pdf" || UncertNames[i] == "scale") continue;
 
-    if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"choice of m_{t}","l");
-    else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"statistics","l");
+    if      (UncertNames[i] == "mass")      leg->AddEntry(delta[i],"Choice of m_{t}","l");
+    else if (UncertNames[i] == "stat")      leg->AddEntry(delta[i],"Statistics","l");
     else if (UncertNames[i] == "hdamp")     leg->AddEntry(delta[i],"h_{damp}","l");
     else if (UncertNames[i] == "UEtune")    leg->AddEntry(delta[i],"UE tune","l");
     else                                    leg->AddEntry(delta[i],UncertNames[i],"l");

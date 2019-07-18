@@ -119,14 +119,16 @@ int main(int argc, char* argv[]){
   gStyle->SetOptStat(kFALSE);
   gStyle->SetLegendBorderSize(0);
 
-  resolution->GetYaxis()->SetRangeUser(-0.1, 0.1);
+  resolution->GetYaxis()->SetRangeUser(-0.15, 0.15);
   resolution->GetXaxis()->SetNdivisions(505);
   resolution->GetYaxis()->SetNdivisions(505);
-  resolution->GetXaxis()->SetTitleSize(0.05);
+  resolution->GetXaxis()->SetTitleSize(0.06);
   resolution->GetYaxis()->SetTitleSize(0.04);
   resolution->GetXaxis()->SetTitleOffset(0.9);
-  resolution->GetYaxis()->SetTitleOffset(1.5);
-  resolution->GetXaxis()->SetTitle("p_{T}^{gen}");
+  resolution->GetYaxis()->SetTitleOffset(1.7);
+  resolution->GetXaxis()->SetLabelSize(0.05);
+  resolution->GetYaxis()->SetLabelSize(0.05);
+  resolution->GetXaxis()->SetTitle("p_{T,}^{gen} [GeV]");
   resolution->GetYaxis()->SetTitle(mean_median+" #left[ #frac{p_{T}^{rec} - p_{T}^{gen}}{p_{T}^{gen}} #right]");
   resolution->SetLineWidth(4);
   resolution->SetLineColor(kAzure+7);
@@ -135,14 +137,15 @@ int main(int argc, char* argv[]){
   resolution_cor->SetLineWidth(4);
   resolution_cor->SetLineColor(kRed+1);
 
-  resolution_jet1->GetYaxis()->SetRangeUser(-0.1, 0.1);
+
+  resolution_jet1->GetYaxis()->SetRangeUser(-0.15, 0.15);
   resolution_jet1->GetXaxis()->SetNdivisions(505);
   resolution_jet1->GetYaxis()->SetNdivisions(505);
-  resolution_jet1->GetXaxis()->SetTitleSize(0.05);
+  resolution_jet1->GetXaxis()->SetTitleSize(0.06);
   resolution_jet1->GetYaxis()->SetTitleSize(0.04);
   resolution_jet1->GetXaxis()->SetTitleOffset(0.9);
-  resolution_jet1->GetYaxis()->SetTitleOffset(1.5);
-  resolution_jet1->GetXaxis()->SetTitle("p_{T}^{gen}");
+  resolution_jet1->GetYaxis()->SetTitleOffset(1.7);
+  resolution_jet1->GetXaxis()->SetTitle("p_{T}^{gen} [GeV]");
   resolution_jet1->GetYaxis()->SetTitle(mean_median+" #left[ #frac{p_{T}^{rec} - p_{T}^{gen}}{p_{T}^{gen}} #right]");
   resolution_jet1->SetLineWidth(4);
   resolution_jet2->SetLineWidth(4);
@@ -168,28 +171,32 @@ int main(int argc, char* argv[]){
 
 
   TCanvas *c1 = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
+  gPad->SetTopMargin(0.02);
+  gPad->SetLeftMargin(0.17);
+  gPad->SetRightMargin(0.04);
+  gPad->SetBottomMargin(0.13);
   resolution->Draw("E1");
   zero_line->Draw("SAME");
   resolution->Draw("SAME E1");
   resolution_noJEC->Draw("SAME E1");
-  TLegend *leg1 = new TLegend(0.45,0.85,0.80,0.65);
-  leg1->AddEntry(resolution,"Standard JEC applied","l");
-  leg1->AddEntry(resolution_noJEC,"no JEC applied","l");
+  TLegend *leg1 = new TLegend(0.5,0.7,0.80,0.95);
+  leg1->AddEntry(resolution_noJEC,"no correction","le");
+  leg1->AddEntry(resolution,"AK4 correction","le");
   leg1->SetTextSize(0.05);
   leg1->Draw();
+  CMSSimLabel(true, 0.22, 0.93);
   TLatex text1;
   text1.SetNDC(kTRUE);
   text1.SetTextFont(43);
   text1.SetTextSize(18);
-  text1.DrawLatex(.2,.2, "all hadronic");
+  text1.DrawLatex(.22,.2, "all hadronic t#bar{t}");
   gPad->RedrawAxis();
   // first save without additional correction
   c1->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/AllHadronic/pt_"+mean_median+"_noAdditional.pdf");
   // and once again with the additional correction
   resolution_cor->Draw("SAME E1");
-  leg1->AddEntry(resolution_cor,"additional correction","l");
+  leg1->AddEntry(resolution_cor,"AK4 + additional correction","le");
+  // leg1->AddEntry((TObject*)0, "all hadronic t#bar{t}", "");
   c1->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Resolution_Subjets/AllHadronic/pt_"+mean_median+".pdf");
 
 

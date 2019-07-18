@@ -60,19 +60,23 @@ int main(int argc, char* argv[]){
   gStyle->SetLegendBorderSize(0);
 
   TCanvas *a = new TCanvas("a", " ", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.13);
+  gPad->SetLeftMargin(0.17);
+  gPad->SetBottomMargin(0.14);
   h_resos[0]->Draw("AP");
   h_resos[0]->GetXaxis()->SetRangeUser(405, 1495);
   h_resos[0]->GetYaxis()->SetRangeUser(0.0, 0.15);
-  h_resos[0]->GetXaxis()->SetTitle("p_{T, jet}^{gen}");
+  h_resos[0]->GetXaxis()->SetTitle("p_{T, jet}^{gen} [GeV]");
   // h_resos[0]->GetYaxis()->SetTitle("RMS #left[ #frac{m_{jet}^{rec} - m_{jet}^{gen}}{m_{jet}^{gen}} #right]");
   h_resos[0]->GetYaxis()->SetTitle("jet mass resolution");
   h_resos[0]->SetTitle(" ");
   h_resos[0]->GetXaxis()->SetNdivisions(505);
   h_resos[0]->GetYaxis()->SetNdivisions(505);
-  h_resos[0]->GetYaxis()->SetTitleOffset(1.8);
-  h_resos[0]->GetXaxis()->SetTitleOffset(1.3);
+  h_resos[0]->GetYaxis()->SetTitleOffset(1.4);
+  h_resos[0]->GetXaxis()->SetTitleOffset(1.1);
+  h_resos[0]->GetYaxis()->SetTitleSize(0.05);
+  h_resos[0]->GetXaxis()->SetTitleSize(0.05);
+  h_resos[0]->GetXaxis()->SetLabelSize(0.05);
+  h_resos[0]->GetYaxis()->SetLabelSize(0.05);
   Color_t col[] = {kAzure+10, 798, kRed, kBlack};
   for(int i=0; i<h_resos.size(); i++){
     h_resos[i]->SetLineColor(col[i]);

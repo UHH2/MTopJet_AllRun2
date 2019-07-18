@@ -106,7 +106,10 @@ int main(int argc, char* argv[]){
   masses_stat->GetHistogram()->SetMaximum(ymax);
   masses_stat->GetXaxis()->SetTitle("m_{t} truth [GeV]");
   masses_stat->GetYaxis()->SetTitle("m_{t} measured [GeV]");
-  masses_stat->GetYaxis()->SetTitleOffset(1.5);
+  masses_stat->GetYaxis()->SetTitleOffset(1.1);
+  masses_stat->GetXaxis()->SetTitleOffset(0.9);
+  masses_stat->GetYaxis()->SetTitleSize(0.05);
+  masses_stat->GetXaxis()->SetTitleSize(0.05);
   masses_stat->GetXaxis()->SetNdivisions(505);
   masses_stat->GetYaxis()->SetNdivisions(505);
   masses_stat->SetMarkerStyle(20);
@@ -123,9 +126,9 @@ int main(int argc, char* argv[]){
   masses_stat->Draw("P SAME");
   // up->Draw("l SAME");
   // down->Draw("l SAME");
-  CMSLabel(true, 0.2, 0.85);
+  CMSSimLabel(true, 0.2, 0.85);
 
-  TLegend *leg = new TLegend(0.6,0.15,0.88,0.38);
+  TLegend *leg = new TLegend(0.5,0.15,0.88,0.38);
   leg->AddEntry(masses_stat, "extracted m_{t} (stat only)", "pl");
   leg->AddEntry(diag_line, "perfect measurement", "l");
   // leg->AddEntry(fit3, "calibration fit", "l");
@@ -144,8 +147,10 @@ int main(int argc, char* argv[]){
   masses->GetHistogram()->SetMaximum(ymax);
   masses->GetXaxis()->SetTitle("m_{t} truth [GeV]");
   masses->GetYaxis()->SetTitle("m_{t} measured [GeV]");
-  masses->GetYaxis()->SetTitleOffset(1.5);
-  masses->GetXaxis()->SetNdivisions(505);
+  masses->GetYaxis()->SetTitleOffset(1.1);
+  masses->GetXaxis()->SetTitleOffset(0.9);
+  masses->GetYaxis()->SetTitleSize(0.05);
+  masses->GetXaxis()->SetTitleSize(0.05);  masses->GetXaxis()->SetNdivisions(505);
   masses->GetYaxis()->SetNdivisions(505);
   masses->SetMarkerStyle(20);
   masses->SetMarkerSize(1.3);
@@ -161,9 +166,9 @@ int main(int argc, char* argv[]){
   masses->Draw("P SAME");
   // up->Draw("l SAME");
   // down->Draw("l SAME");
-  CMSLabel(true, 0.2, 0.85);
+  CMSSimLabel(true, 0.2, 0.85);
 
-  TLegend *leg2 = new TLegend(0.6,0.15,0.88,0.38);
+  TLegend *leg2 = new TLegend(0.5,0.15,0.88,0.38);
   leg2->AddEntry(masses, "extracted m_{t}^{MC}", "pl");
   leg2->AddEntry(diag_line, "perfect measurement", "l");
   // leg->AddEntry(fit3, "calibration fit", "l");
