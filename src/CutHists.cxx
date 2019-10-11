@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/CutHists.h"
+#include <UHH2/MTopJet/include/CutHists.h>
 
 
 CutHists::CutHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
@@ -9,7 +9,7 @@ CutHists::CutHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx,
 
   // h_hadjets=ctx.get_handle<std::vector<Jet>>("XCone33_had_Combined");
   // h_lepjets=ctx.get_handle<std::vector<Jet>>("XCone33_lep_Combined");
- 
+
 }
 
 
@@ -71,8 +71,6 @@ void CutHists::fill(const Event & event){
   // hadjet_v4.Delete();
   // lepjet_v4.Delete();
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 }
-
-

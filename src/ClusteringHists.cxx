@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/ClusteringHists.h"
+#include <UHH2/MTopJet/include/ClusteringHists.h>
 
 
 ClusteringHists::ClusteringHists(uhh2::Context & ctx, const std::string & dirname, double phishift_): Hists(ctx, dirname){

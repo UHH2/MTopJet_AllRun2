@@ -66,9 +66,15 @@ protected:
   bool isElectronStream;
 
   // store Hist collection as member variables
-  // std::unique_ptr<Hists> h_ttbar;
-  // std::unique_ptr<Hists> h_PreSel_event, h_PreSel_event2, h_PreSel_elec, h_PreSel_muon, h_PreSel_jets;
 };
+
+/*
+███    ███  ██████  ██████  ██    ██ ██      ███████
+████  ████ ██    ██ ██   ██ ██    ██ ██      ██
+██ ████ ██ ██    ██ ██   ██ ██    ██ ██      █████
+██  ██  ██ ██    ██ ██   ██ ██    ██ ██      ██
+██      ██  ██████  ██████   ██████  ███████ ███████
+*/
 
 MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
@@ -78,9 +84,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   else isherwig = false;
 
   isMC = (ctx.get("dataset_type") == "MC");
-
-
-
 
 
 
@@ -105,8 +108,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   if(!isMC) lumi_sel.reset(new LumiSelection(ctx));
 
-
-
   /* GEN M-ttbar selection [TTbar MC "0.<M^{gen}_{ttbar}(GeV)<700.] */
   const std::string ttbar_gen_label("ttbargen");
 
@@ -116,10 +117,6 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
 
   /******************************************************************/
-
-  ////
-
-
 
   //// EVENT SELECTION REC
   met_sel.reset(new METCut  (40, uhh2::infinity));
@@ -137,6 +134,14 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   ////
 
 }
+
+/*
+██████  ██████   ██████   ██████ ███████ ███████ ███████
+██   ██ ██   ██ ██    ██ ██      ██      ██      ██
+██████  ██████  ██    ██ ██      █████   ███████ ███████
+██      ██   ██ ██    ██ ██      ██           ██      ██
+██      ██   ██  ██████   ██████ ███████ ███████ ███████
+*/
 
 bool MTopJetPreSelectionModule::process(uhh2::Event& event){
 
@@ -195,7 +200,7 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
       float dR1 = deltaR(lepton, jets.at(0));
       float dR2 = deltaR(lepton, jets.at(1));
 
-      std::vector<Particle> had_subjets;
+      std::vector<GenJet> had_subjets;
       if(dR2 < dR1) had_subjets = jets.at(0).subjets();
       else had_subjets = jets.at(1).subjets();
 
@@ -226,7 +231,6 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   event.set(h_gensel, passed_gensel);
 
   return true;
-
 
 }
 

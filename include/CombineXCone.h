@@ -5,7 +5,7 @@
 #include "UHH2/common/include/Utils.h"
 #include "UHH2/core/include/Jet.h"
 #include "UHH2/core/include/TopJet.h"
-#include "UHH2/core/include/GenJetWithParts.h"
+#include "UHH2/core/include/GenJet.h"
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/PFParticle.h"
 #include "UHH2/core/include/AnalysisModule.h"
@@ -27,7 +27,7 @@ class CombineXCone{
   Particle GetLepton(uhh2::Event &);
   TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax);
   GenParticle GetLepton_gen(uhh2::Event &);
-  GenTopJet CreateTopJetFromSubjets_gen(vector<Particle> subjets, double ptmin, double etamax);
+  GenTopJet CreateTopJetFromSubjets_gen(vector<GenJet> subjets, double ptmin, double etamax);
 };
 
 

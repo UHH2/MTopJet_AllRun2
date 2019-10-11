@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoGenHists_topjet.h"
+#include <UHH2/MTopJet/include/RecoGenHists_topjet.h>
 
 
 RecoGenHists_topjet::RecoGenHists_topjet(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
@@ -44,11 +44,11 @@ void RecoGenHists_topjet::fill(const Event & event){
 
   if(rec_jets.size()>1){
     rec_jet2 = rec_jets.at(1);
-    rec_jet2_v4.SetPxPyPzE(rec_jet2.v4().Px(), rec_jet2.v4().Py(), rec_jet2.v4().Pz(), rec_jet2.v4().E()); 
+    rec_jet2_v4.SetPxPyPzE(rec_jet2.v4().Px(), rec_jet2.v4().Py(), rec_jet2.v4().Pz(), rec_jet2.v4().E());
   }
   if(gen_jets.size()>1){
     gen_jet2 = gen_jets.at(1);
-    gen_jet2_v4.SetPxPyPzE(gen_jet2.v4().Px(), gen_jet2.v4().Py(), gen_jet2.v4().Pz(), gen_jet2.v4().E()); 
+    gen_jet2_v4.SetPxPyPzE(gen_jet2.v4().Px(), gen_jet2.v4().Py(), gen_jet2.v4().Pz(), gen_jet2.v4().E());
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -88,8 +88,6 @@ void RecoGenHists_topjet::fill(const Event & event){
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 }
-
-

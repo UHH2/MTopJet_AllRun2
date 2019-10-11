@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/GenHists_allHad.h"
+#include <UHH2/MTopJet/include/GenHists_allHad.h>
 
 
 GenHists_allHad::GenHists_allHad(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){

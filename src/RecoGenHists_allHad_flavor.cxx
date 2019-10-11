@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoGenHists_allHad_flavor.h"
+#include <UHH2/MTopJet/include/RecoGenHists_allHad_flavor.h>
 
 
 RecoGenHists_allHad_flavor::RecoGenHists_allHad_flavor(uhh2::Context & ctx, const std::string & dirname,  const std::string & type, double ptreccut_, double ptgencut_, TString flavor_): Hists(ctx, dirname){
@@ -139,8 +139,8 @@ void RecoGenHists_allHad_flavor::fill(const Event & event){
 
   std::vector<Jet> rec_sub1 = recjets.at(0).subjets();
   std::vector<Jet> rec_sub2 = recjets.at(1).subjets();
-  std::vector<Particle> gen_sub1 = genjets.at(i1).subjets();
-  std::vector<Particle> gen_sub2 = genjets.at(i2).subjets();
+  std::vector<GenJet> gen_sub1 = genjets.at(i1).subjets();
+  std::vector<GenJet> gen_sub2 = genjets.at(i2).subjets();
 
   sort_by_pt<Jet> (rec_sub1);
   sort_by_pt<Jet> (rec_sub2);

@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoHists.h"
+#include <UHH2/MTopJet/include/RecoHists.h>
 
 
 RecoHists::RecoHists(uhh2::Context & ctx, const std::string & dirname, const std::string & jetname): Hists(ctx, dirname){
@@ -8,14 +8,14 @@ RecoHists::RecoHists(uhh2::Context & ctx, const std::string & dirname, const std
   RecoJet1Mass = book<TH1F>("M_jet1", "M_{jet}", 50, 0, 500);
   RecoJet2Mass = book<TH1F>("M_jet2", "M_{jet}", 50, 0, 500);
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
- 
+
   RecoJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   RecoJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
   RecoJet1Jet2PT = book<TH1F>("pt_jet1-pt_jet2", "p_{T,jet1} - p_{T,jet2}", 80, -400, 400);
   RecoJet3PT = book<TH1F>("pt_jet3", "p_{T}", 50, 0, 1000);
   RecoJetPT = book<TH1F>("pt_all_jets", "p_{T}", 50, 0, 1000);
   LeptonPT = book<TH1F>("pt_lepton", "p_{T}", 50, 0, 1000);
-  NLepton = book<TH1F>("number_lep", "number", 10, 0, 10); 
+  NLepton = book<TH1F>("number_lep", "number", 10, 0, 10);
   RecoJet2Eta = book<TH1F>("eta_jet2", "#eta", 24, -3, 3);
 
 
@@ -57,7 +57,7 @@ void RecoHists::fill(const Event & event){
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 
 
@@ -102,8 +102,6 @@ void RecoHists::fill(const Event & event){
   lepton1_v4.Delete();
   jet2_lep_v4.Delete();
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 }
-
-

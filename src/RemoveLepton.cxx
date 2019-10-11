@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RemoveLepton.h"
+#include <UHH2/MTopJet/include/RemoveLepton.h>
 
 RemoveLepton::RemoveLepton(uhh2::Context & ctx, const std::string & name_jet):
 h_topjets(ctx.get_handle<std::vector<TopJet>>(name_jet)){}
@@ -81,7 +81,7 @@ bool RemoveLeptonGen::process(uhh2::Event & event){
   // corrected subjets in the end
   std::vector<GenTopJet> new_topjets;
   for(unsigned int i=0; i<topjets.size(); i++){
-    std::vector<Particle> new_subjets = topjets[i].subjets();
+    std::vector<GenJet> new_subjets = topjets[i].subjets();
     GenTopJet new_topjet;
     new_topjet.set_v4(topjets[i].v4());
     for(unsigned int j=0; j<leptons.size(); j++){

@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/GenHists_particles.h"
+#include <UHH2/MTopJet/include/GenHists_particles.h>
 
 
 GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){

@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/WeightHists.h"
+#include <UHH2/MTopJet/include/WeightHists.h>
 
 using namespace uhh2;
 

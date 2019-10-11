@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from datetime import datetime
 import sys, time, subprocess
-from ROOT import *
+# from ROOT import *
 from multiprocessing import Pool, Value
 import random
 import shutil
@@ -9,39 +9,59 @@ import glob
 import os
 
 Ndone = None # keep track of finished jobs by each worker
-
 def main():
     if len(sys.argv) < 3:
         print 'Usage: ./SFrameMainMultiCore.py <Name Workdir> <Number of Jobs>'
         exit(0)
 
-    workdir = sys.argv[1]
-    nworkers = int(sys.argv[2])
+    # workdir = sys.argv[1]
+    workdir = []
+    for dir in sys.argv[1:]:
+        if 'Workdir' in dir:
+            workdir.append(dir)
+            os.system('echo found workdir: %s ' %dir)
+
+    nworkers = int(sys.argv[len(sys.argv)-1])
 
     print '==============================='
     print '====== SFrame Multi Core ======'
     print '==============================='
 
-    print '  -- Workdir: '+workdir
+    for dir in workdir:
+        print '  -- Workdir: '+dir
     print '  -- Number of Jobs:',nworkers
 
-    if not os.path.isdir(workdir):
-        print '[ERROR] workdir ('+workdir+') does not exist!'
-        exit(0)
+    for dir in workdir:
+        if not os.path.isdir(dir):
+            print '[ERROR] workdir ('+dir+') does not exist!'
+            exit(0)
 
-    if not os.path.exists(workdir+"/missing_files.txt"):
-        print '[ERROR] not a proper sframe_batch workdir, missing_files.txt not found!'
-        exit(0)
+    for dir in workdir:
+        if not os.path.exists(dir+"/missing_files.txt"):
+            print '[ERROR] not a proper sframe_batch workdir, missing_files.txt not found!'
+            exit(0)
 
-    # read missing_files.txt
-    lines = read_missing_files(workdir)
+    # read missing_files.
+    lines =  []
+    for dir in workdir:
+        lines.append(read_missing_files(dir))
+
+    lines2 = []
+    for sublist in lines:
+        for xml in sublist:
+            lines2.append(xml)
+
+
 
     # remove everything but the name of the xml file
+
     xmls = []
-    for line in lines:
+    for line in lines2:
         if "  sframe_main " in line:
-            root, xml = line.split("  sframe_main ",1)
-            xmls.append(workdir+'/'+xml)
+            rest, xml = line.split("  sframe_main ",1)
+            dir, root = line.split("/")
+            xmls.append(dir+'/'+xml)
+            # print(xmls)
 
     # get number of xmls and calculate xmls per job
     nxmls = len(xmls)
@@ -93,8 +113,7 @@ def init(args):
 def submit_job(job_list):
     #print len(job_list)
     for xml in job_list:
-        # subprocess.call(['sframe_main',xml],stdout=subprocess.PIPE)
-        subprocess.call(['sframe_main',xml], stdout=open("/dev/null","w"), stderr=subprocess.STDOUT)
+        subprocess.call(['sframe_main',xml], stdout=open("/dev/null", "w"), stderr=subprocess.STDOUT)
         global Ndone
         with Ndone.get_lock():
             Ndone.value += 1
@@ -107,6 +126,8 @@ def read_missing_files(workdir):
     with open(workdir+"/missing_files.txt", "r") as ins:
         array = []
         for line in ins:
+            # if '_3.xml' in line or '_4.xml' in line or '_5.xml' in line:
+                # print line
             array.append(line.rstrip('\n'))
     return array
 

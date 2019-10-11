@@ -7,7 +7,7 @@
 #include "UHH2/core/include/TopJet.h"
 #include "UHH2/core/include/Particle.h"
 #include "UHH2/core/include/GenTopJet.h"
-#include "UHH2/core/include/GenJetWithParts.h"
+#include "UHH2/core/include/GenJet.h"
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/PFParticle.h"
 #include "UHH2/core/include/AnalysisModule.h"

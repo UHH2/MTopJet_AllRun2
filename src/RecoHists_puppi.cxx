@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoHists_puppi.h"
+#include <UHH2/MTopJet/include/RecoHists_puppi.h>
 
 
 RecoHists_puppi::RecoHists_puppi(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){

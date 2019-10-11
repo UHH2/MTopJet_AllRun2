@@ -37,7 +37,7 @@
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
-#include "UHH2/MTopJet/include/CorrectionFactor.h"
+#include <UHH2/MTopJet/include/CorrectionFactor.h>
 
 
 /*
@@ -131,15 +131,15 @@ MTopJetElecSFModule::MTopJetElecSFModule(uhh2::Context& ctx){
   h_eventnr = ctx.declare_event_output<int>("eventnr");
 
   // define IDs
-  MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
+  MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
   // this is only used for cleaner and electron veto
-  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight_noIso);
+  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight_noIso);
   // this is used to decide which ele trigger is used
-  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Spring16_tight_noIso);
+  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Summer16_tight_noIso);
   // this is used in combination with iso trigger
-  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight);
+  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
   // jet ids
-  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(30.0, 2.4));
   ////
 
   // define Trigger

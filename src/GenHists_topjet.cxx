@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/GenHists_topjet.h"
+#include <UHH2/MTopJet/include/GenHists_topjet.h>
 
 
 GenHists_topjet::GenHists_topjet(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
@@ -15,7 +15,7 @@ GenHists_topjet::GenHists_topjet(uhh2::Context & ctx, const std::string & dirnam
   Mass1Mass2 = book<TH1F>("M_jet1-M_jet2+lep", "M_{jet1} - M_{jet2 + lepton}", 40, -200, 200);
 
   GenJet1MassJet2LepMass = book<TH2F>("M_jet1_jet2", "x=M_{jet1} y=M_{jet2_lep}", 25, 0, 500, 25, 0, 500);
- 
+
   GenJet1PT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   GenJet2PT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
   GenJet1Jet2PT = book<TH1F>("pt_jet1-pt_jet2", "p_{T,jet1} - p_{T,jet2}", 80, -400, 400);
@@ -104,7 +104,7 @@ void GenHists_topjet::fill(const Event & event){
   //    cout<<"ID of genparticle nr. " << i <<" : "<< id << endl;
   // }
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 
   //---------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void GenHists_topjet::fill(const Event & event){
   }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  
+
 
 
   //---------------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ void GenHists_topjet::fill(const Event & event){
    }
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
- 
+
 
 
 
@@ -216,7 +216,7 @@ void GenHists_topjet::fill(const Event & event){
   GenParticle tophad = ttbargen.TopHad();
   float tophadpt = tophad.pt();
   TopHadPT->Fill(tophadpt, weight);
-  
+
   // pT of lep. top
   GenParticle toplep = ttbargen.TopLep();
   float topleppt = toplep.pt();
@@ -233,7 +233,7 @@ void GenHists_topjet::fill(const Event & event){
     GenJet2LepMassBool->Fill(mass0b, weight);
   }
 
-  
+
 
   // delta R Hists
   if(jets.size() > 0){
@@ -257,7 +257,7 @@ void GenHists_topjet::fill(const Event & event){
     deltaR_tophad_jet2->Fill(deltaR(jet2, tophad), weight);
     deltaR_toplep_jet2->Fill(deltaR(jet2, toplep), weight);
   }
-  
+
   // if(jets.size() > 2){
   //   deltaR_lep1_jet3->Fill(deltaR(jet3, lep1), weight);
   //   deltaR_lep2_jet3->Fill(deltaR(jet3, lep2), weight);
@@ -313,8 +313,6 @@ void GenHists_topjet::fill(const Event & event){
   lepton1_v4.Delete();
   jet2_lep_v4.Delete();
   //---------------------------------------------------------------------------------------
-  //--------------------------------------------------------------------------------------- 
+  //---------------------------------------------------------------------------------------
 
 }
-
-

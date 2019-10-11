@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/SubjetHists_xcone.h"
+#include <UHH2/MTopJet/include/SubjetHists_xcone.h>
 
 
 SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){

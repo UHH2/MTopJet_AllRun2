@@ -702,7 +702,7 @@ bool uhh2::JetFlavorSelection::passes(const uhh2::Event& event){
   int bottomN(0), charmN(0);
   for(const auto& j : *event.jets){
 
-    const int id = j.hadronFlavor();
+    const int id = j.hadronFlavour();
 
     if(std::abs(id) == 5) ++bottomN;
     if(std::abs(id) == 4) ++charmN;

@@ -32,12 +32,12 @@
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/SubjetHists_xcone.h>
-#include "UHH2/MTopJet/include/RecoGenHists_allHad.h"
-#include "UHH2/MTopJet/include/RecoGenHists_allHad_flavor.h"
-#include "UHH2/MTopJet/include/RecoGenHists_ak4.h"
-#include "UHH2/MTopJet/include/CorrectionHists_allHad.h"
-#include "UHH2/MTopJet/include/CorrectionFactor.h"
-#include "UHH2/MTopJet/include/tt_width_reweight.h"
+#include <UHH2/MTopJet/include/RecoGenHists_allHad.h>
+#include <UHH2/MTopJet/include/RecoGenHists_allHad_flavor.h>
+#include <UHH2/MTopJet/include/RecoGenHists_ak4.h>
+#include <UHH2/MTopJet/include/CorrectionHists_allHad.h>
+#include <UHH2/MTopJet/include/CorrectionFactor.h>
+#include <UHH2/MTopJet/include/tt_width_reweight.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
 
 #include <vector>
@@ -97,11 +97,11 @@ protected:
 MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh2::Context& ctx){
 
   /*
-  ██████ ████████ ██   ██
+   ██████ ████████ ██   ██
   ██         ██     ██ ██
   ██         ██      ███
   ██         ██     ██ ██
-  ██████    ██    ██   ██
+   ██████    ██    ██   ██
   */
 
   /*************************** CONFIGURATION **********************************************************************************/
@@ -137,7 +137,7 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
   pt_sel2.reset(new LeadingRecoJetPT(ctx, jet_label_lep, 400));
 
   // Scale factors
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,CSVBTag::WP_TIGHT,"jets","central"));
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,BTag::DEEPCSV,BTag::WP_TIGHT,"jets","central"));
 
   /*************************** Set up Hists classes **********************************************************************************/
 

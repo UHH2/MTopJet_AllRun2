@@ -1,19 +1,8 @@
-#include "UHH2/MTopJet/include/GenHists_xcone.h"
+#include <UHH2/MTopJet/include/GenHists_xcone.h>
 
 
 GenHists_xcone::GenHists_xcone(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
-
-  Mass_HadJet23 = book<TH1F>("Mass_HadJet23", "m_{jet}", 50, 0, 500);
-  Mass_HadJet23_rebin = book<TH1F>("Mass_HadJet23_rebin", "m_{jet}", 25, 0, 500);
-  Mass_LepJet23 = book<TH1F>("Mass_LepJet23", "m_{jet + lepton}", 50, 0, 500);
-  MassDiff23 = book<TH1F>("MassDiff23", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);
-
-  PT_HadJet23 = book<TH1F>("PT_HadJet23", "p_{T}", 50, 0, 1000);
-  PT_LepJet23 = book<TH1F>("PT_LepJet23", "p_{T}", 50, 0, 1000);
-
-  number_HadJet23 = book<TH1F>("number_HadJet23", "number", 10, 0, 10);
-  number_LepJet23 = book<TH1F>("number_LepJet23", "number", 10, 0, 10);
 
   Mass_HadJet33 = book<TH1F>("Mass_HadJet33", "m_{jet}", 50, 0, 500);
   Mass_HadJet33_B = book<TH1F>("Mass_HadJet33_B", "m_{jet}", 100, 0, 500);
@@ -31,14 +20,6 @@ GenHists_xcone::GenHists_xcone(uhh2::Context & ctx, const std::string & dirname)
 
   number_HadJet33 = book<TH1F>("number_HadJet33", "number", 10, 0, 10);
   number_LepJet33 = book<TH1F>("number_LepJet33", "number", 10, 0, 10);
-
-  DeltaR_23_33 = book<TH1F>("DeltaR_23_33", "#Delta R(jet2^{2+3}, jet2^{33})", 60, -3, 3);
-  DeltaMass_23_33 = book<TH1F>("DeltaMass_23_33", "#Delta Mass(jet2^{2+3}, jet2^{33})", 100, -100, 100);
-  DeltaPT_23_33 = book<TH1F>("DeltaPT_23_33", "#Delta p_{T}(jet2^{2+3}, jet2^{33})", 100, -100, 100);
-
-  DeltaR_jet2_23_33 = book<TH1F>("DeltaR_jet2_23_33", "#Delta R(jet2^{2+3}, jet2^{33})", 60, -3, 3);
-  DeltaMass_jet2_23_33 = book<TH1F>("DeltaMass_jet2_23_33", "#Delta Mass(jet2^{2+3}, jet2^{33})", 100, -100, 100);
-  DeltaPT_jet2_23_33 = book<TH1F>("DeltaPT_jet2_23_33", "#Delta p_{T}(jet2^{2+3}, jet2^{33})", 100, -100, 100);
 
   SoftDropMass = book<TH1F>("SoftDropMass", "M_{jet1}^{SD}", 50, 0, 500);
 
@@ -66,9 +47,6 @@ GenHists_xcone::GenHists_xcone(uhh2::Context & ctx, const std::string & dirname)
   h_hadjets33=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
   h_lepjets33=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined");
 
-  h_hadjets23=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone23_had_Combined");
-  h_lepjets23=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone23_lep_Combined");
-
   //h_softdrop=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets_softdrop");
 
 }
@@ -80,18 +58,13 @@ void GenHists_xcone::fill(const Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------- get jets  -------------------------------------------
   //---------------------------------------------------------------------------------------
-  std::vector<GenTopJet> hadjets23 = event.get(h_hadjets23);
-  std::vector<GenTopJet> lepjets23 = event.get(h_lepjets23);
   std::vector<GenTopJet> hadjets33 = event.get(h_hadjets33);
   std::vector<GenTopJet> lepjets33 = event.get(h_lepjets33);
   std::vector<GenTopJet> fatjets33 = event.get(h_fatjets33);
   //std::vector<GenTopJet> softdrop = event.get(h_softdrop);
 
-  if(hadjets23.size() == 0 || lepjets23.size() == 0) return;
   if(hadjets33.size() == 0 || lepjets33.size() == 0) return;
 
-  GenTopJet had23 = hadjets23.at(0);
-  GenTopJet lep23 = lepjets23.at(0);
   GenTopJet had33 = hadjets33.at(0);
   GenTopJet lep33 = lepjets33.at(0);
 
@@ -99,7 +72,7 @@ void GenHists_xcone::fill(const Event & event){
   int index_had = -1;
   if(deltaR(fatjets33[0], had33) < deltaR(fatjets33[0], lep33)) index_had = 0;
   else index_had = 1;
-  std::vector<Particle> had_subjets = fatjets33[index_had].subjets();
+  std::vector<GenJet> had_subjets = fatjets33[index_had].subjets();
 
   //---------------------------------------------------------------------------------------
   //--------------------------------- Fill Hists here -------------------------------------
@@ -108,7 +81,7 @@ void GenHists_xcone::fill(const Event & event){
   // get weight
   double weight = event.weight;
 
-  LorentzVector lep23_v4, lep33_v4;
+  LorentzVector lep33_v4;
 
   std::vector<GenParticle> leptons;
   bool is_semilep = false;
@@ -119,27 +92,11 @@ void GenHists_xcone::fill(const Event & event){
   }
   if(leptons.size() == 1) is_semilep = true;
   if(is_semilep){
-    lep23_v4 = lep23.v4() + leptons[0].v4();
     lep33_v4 = lep33.v4() + leptons[0].v4();
   }
   else{
-    lep23_v4 = lep23.v4();
     lep33_v4 = lep33.v4();
   }
-
-
-
-
-  Mass_HadJet23->Fill(had23.v4().M(), weight);
-  Mass_HadJet23_rebin->Fill(had23.v4().M(), weight);
-  Mass_LepJet23->Fill(lep23_v4.M(), weight);
-  MassDiff23->Fill(had23.v4().M() - lep23_v4.M(), weight);
-
-  PT_HadJet23->Fill(had23.pt(), weight);
-  PT_LepJet23->Fill(lep23.pt(), weight);
-
-  number_HadJet23->Fill(hadjets23.size(), weight);
-  number_LepJet23->Fill(lepjets23.size(), weight);
 
   Mass_HadJet33->Fill(had33.v4().M(), weight);
   Mass_HadJet33_rebin->Fill(had33.v4().M(), weight);
@@ -157,14 +114,6 @@ void GenHists_xcone::fill(const Event & event){
   number_HadJet33->Fill(hadjets33.size(), weight);
   number_LepJet33->Fill(lepjets33.size(), weight);
 
-
-  DeltaR_23_33->Fill(abs(deltaR(had23, had33)), weight);
-  DeltaMass_23_33->Fill(had23.v4().M() - had33.v4().M() ,weight);
-  DeltaPT_23_33->Fill(had23.pt() - had33.pt() ,weight);
-
-  DeltaR_jet2_23_33->Fill(abs(deltaR(lep23, lep33)), weight);
-  DeltaMass_jet2_23_33->Fill(lep23_v4.M() - lep33_v4.M() ,weight);
-  DeltaPT_jet2_23_33->Fill(lep23.pt() - lep33.pt() ,weight);
 
   //SoftDropMass->Fill(softdrop.at(had_nr).v4().M(), weight);
 

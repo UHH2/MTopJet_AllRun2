@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoGenHists_xcone.h"
+#include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 
 
 RecoGenHists_xcone::RecoGenHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){

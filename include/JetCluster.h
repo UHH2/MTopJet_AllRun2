@@ -12,7 +12,7 @@
 #include "UHH2/common/include/Utils.h"
 #include "UHH2/core/include/Jet.h"
 #include "UHH2/core/include/TopJet.h"
-#include "UHH2/core/include/GenJetWithParts.h"
+#include "UHH2/core/include/GenJet.h"
 #include "UHH2/core/include/GenParticle.h"
 #include "UHH2/core/include/PFParticle.h"
 #include "UHH2/core/include/AnalysisModule.h"
@@ -20,6 +20,7 @@
 #include <vector>
 #include <iostream>
 #include <math.h>
+#include <random>
 
 using namespace std;
 using namespace fastjet;

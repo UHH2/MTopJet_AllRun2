@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/CorrectionHists_subjets.h"
+#include <UHH2/MTopJet/include/CorrectionHists_subjets.h>
 #include <vector>
 
 CorrectionHists_subjets::CorrectionHists_subjets(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
@@ -113,7 +113,7 @@ void CorrectionHists_subjets::fill(const Event & event){
     }
   }
 
-  std::vector<Particle> gen_sub = genjets.at(i_genhad).subjets();
+  std::vector<GenJet> gen_sub = genjets.at(i_genhad).subjets();
 
   // do pt cut on subjets without JEC, only continue for pt > 30
   bool pt_valid = true;

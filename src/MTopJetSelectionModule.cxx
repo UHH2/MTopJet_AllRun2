@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 
-#include <UHH2/core/include/AnalysisModule.h>
+#include "UHH2/core/include/AnalysisModule.h"
 #include <UHH2/core/include/Event.h>
 #include <UHH2/core/include/Selection.h>
 
@@ -36,7 +36,7 @@
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
-#include "UHH2/MTopJet/include/CorrectionFactor.h"
+#include <UHH2/MTopJet/include/CorrectionFactor.h>
 
 
 /*
@@ -77,13 +77,11 @@ protected:
 
   // selections
   std::unique_ptr<uhh2::AnalysisModule> remove_lepton_rec;
-  std::unique_ptr<uhh2::AnalysisModule> remove_lepton_gen23;
   std::unique_ptr<uhh2::AnalysisModule> remove_lepton_gen33;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_pupppi;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
-  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
   std::unique_ptr<uhh2::AnalysisModule> copy_jet;
   std::unique_ptr<uhh2::Selection> trigger_mu_A;
@@ -110,7 +108,6 @@ protected:
 
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<std::vector<GenTopJet>>h_gen33fatjets;
-  Event::Handle<std::vector<GenTopJet>>h_gen23fatjets;
 
   // just for testing
   std::unique_ptr<TopPtReweight> ttbar_reweight;
@@ -144,33 +141,18 @@ protected:
   string nonclosureSYS = "false";
   bool do_nonClosure = false;
 
+  JetId btag_tight;
+
 };
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
+
   recsel_only = false;
 
   //// CONFIGURATION
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  ||
-  ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  ||
-  ctx.get("dataset_version") == "TTbar_Mtt1000toInft"  ||
-  ctx.get("dataset_version") == "TTbar_mtop1665"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1695"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1715"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1735"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1755"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1785"       ||
-  ctx.get("dataset_version") == "TTbar_fsrup"          ||
-  ctx.get("dataset_version") == "TTbar_fsrdown"        ||
-  ctx.get("dataset_version") == "TTbar_isrup"          ||
-  ctx.get("dataset_version") == "TTbar_isrdown"        ||
-  ctx.get("dataset_version") == "TTbar_hdampup"        ||
-  ctx.get("dataset_version") == "TTbar_hdampdown"      ||
-  ctx.get("dataset_version") == "TTbar_tuneup"         ||
-  ctx.get("dataset_version") == "TTbar_tunedown"       ||
-  ctx.get("dataset_version") == "TTbar_gluonmove"      ||
-  ctx.get("dataset_version") == "TTbar_mpibased"       ||
-  ctx.get("dataset_version") == "TTbar_amcatnlo-pythia"||
-  ctx.get("dataset_version") == "TTbar_powheg-herwig") isTTbar = true;
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_2016v3"  ||
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3") isTTbar = true;
   else  isTTbar = false;
 
   if(ctx.get("dataset_version") == "SingleElecB" ||
@@ -202,7 +184,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_gensel_2 = ctx.declare_event_output<bool>("passed_gensel_2");
   h_recsel_2 = ctx.declare_event_output<bool>("passed_recsel_2");
   h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
-  h_gen23fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone23TopJets");
   h_gen33fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
   isMC = (ctx.get("dataset_type") == "MC");
@@ -221,7 +202,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // remove lepton
   remove_lepton_rec.reset(new RemoveLepton(ctx, "xconeCHS"));
   if(isMC){
-    remove_lepton_gen23.reset(new RemoveLeptonGen(ctx, "genXCone23TopJets"));
     remove_lepton_gen33.reset(new RemoveLeptonGen(ctx, "genXCone33TopJets"));
   }
 
@@ -232,7 +212,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   copy_jet.reset(new CopyJets(ctx, "xconeCHS", "xconeCHS_noJEC"));
 
   if(isMC){
-    jetprod_gen23.reset(new CombineXCone23_gen(ctx));
     jetprod_gen33.reset(new CombineXCone33_gen(ctx));
   }
   ////
@@ -240,38 +219,34 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // write output
   output.reset(new WriteOutput(ctx));
   ////
-
   // just for testing
   // ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); // 8 TeV
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
-
   // double jecsysfactor = 1.0;
 
   corvar = ctx.get("JetCorrection_direction","nominal");
   nonclosureSYS = ctx.get("NonClosureUncertainty","false");
   if(nonclosureSYS == "true") do_nonClosure = true;
-
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
   JetCorrections->init(ctx, "xconeCHS");
-  // smear jets after Correction
+// smear jets after Correction
   JERSmearing.reset(new JER_Smearer_xcone());
   JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
   Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, false));
   NonClosureSYS.reset(new NonClosureUncertainty(ctx));
   //// EVENT SELECTION
 
-
   // define IDs
-  MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
+  MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
   // this is only used for cleaner and electron veto
-  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight_noIso);
+  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight_noIso);
   // this is used to decide which ele trigger is used
-  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Spring16_tight_noIso);
+  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Summer16_tight_noIso);
   // this is used in combination with iso trigger
-  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Spring16_tight);
+  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
   // jet ids
-  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(30.0, 2.4));
   ////
 
   // define Trigger
@@ -280,7 +255,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
   trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
   trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
-
 
   /*Only select event with exacly 1 muon or electron */
   if(channel_ == elec){
@@ -298,7 +272,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   double metcut = 0;
   if(channel_ == muon)      metcut = 50;
   else if(channel_ == elec) metcut = 50;
-  met_sel  .reset(new METCut  (metcut , uhh2::infinity));
+  met_sel.reset(new METCut  (metcut , uhh2::infinity));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
 
@@ -309,6 +283,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   common->switch_jetlepcleaner(true);
   common->switch_metcorrection();
   common->disable_mcpileupreweight(); // do this in PostSel
+  // common->disable_jersmear();
+  // common->disable_jec();
   common->init(ctx);
 
 
@@ -319,7 +295,8 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
 
   //
-  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
+  btag_tight = DeepJetBTag(DeepJetBTag::WP_TIGHT);
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",btag_tight));
 
   //// set up Hists classes:
   h_cuts_all.reset(new CutHists(ctx, "h_cuts_all"));
@@ -395,6 +372,15 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   //
 
 }
+
+/*
+██████  ██████   ██████   ██████ ███████ ███████ ███████
+██   ██ ██   ██ ██    ██ ██      ██      ██      ██
+██████  ██████  ██    ██ ██      █████   ███████ ███████
+██      ██   ██ ██    ██ ██      ██           ██      ██
+██      ██   ██  ██████   ██████ ███████ ███████ ███████
+*/
+
 
 
 bool MTopJetSelectionModule::process(uhh2::Event& event){
@@ -541,6 +527,9 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     }
   }
 
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // ------------------- NOCHMAL ANGUCKEN WENN E-CHANNEL ------------------------
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   if(elec_is_isolated) pass_twodcut = true; // do not do 2D cut for isolated electrons
   if(!pass_twodcut) passed_recsel = false;
   jet_cleaner2->process(event);
@@ -612,8 +601,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   std::vector<TopJet> jets = event.get(h_fatjets);
   if(jets.size() < 2) return false;
   if(!event.isRealData){
-    std::vector<GenTopJet> gen23jets = event.get(h_gen23fatjets);
-    if(gen23jets.size() < 2) return false;
     std::vector<GenTopJet> gen33jets = event.get(h_gen33fatjets);
     if(gen33jets.size() < 2) return false;
   }
@@ -622,13 +609,11 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // cout << "before removing" << endl;
   remove_lepton_rec->process(event);
   if(!event.isRealData){
-    remove_lepton_gen23->process(event);
     remove_lepton_gen33->process(event);
   }
   // cout << "after removing" << endl;
 
   if(!event.isRealData){
-    jetprod_gen23->process(event);
     jetprod_gen33->process(event);
   }
 

@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/CorrectionHists_allHad.h"
+#include <UHH2/MTopJet/include/CorrectionHists_allHad.h>
 #include <vector>
 
 CorrectionHists_allHad::CorrectionHists_allHad(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
@@ -86,8 +86,8 @@ void CorrectionHists_allHad::fill(const Event & event){
 
   std::vector<Jet> rec_sub1 = recjets.at(0).subjets();
   std::vector<Jet> rec_sub2 = recjets.at(1).subjets();
-  std::vector<Particle> gen_sub1 = genjets.at(i1).subjets();
-  std::vector<Particle> gen_sub2 = genjets.at(i2).subjets();
+  std::vector<GenJet> gen_sub1 = genjets.at(i1).subjets();
+  std::vector<GenJet> gen_sub2 = genjets.at(i2).subjets();
 
 
   // do pt cut on subjets and fatjets

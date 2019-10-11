@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/NonClosureUncertainty.h"
+#include <UHH2/MTopJet/include/NonClosureUncertainty.h>
 
 double NonClosureUncertainty::get_factor(double pt){
   // factor is zero for pt > 400 anyways

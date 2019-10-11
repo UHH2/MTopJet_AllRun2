@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/GenSelections.h"
+#include <UHH2/MTopJet/include/GenSelections.h>
 #include <iostream>
 
 uhh2::SubjetQuality_gen::SubjetQuality_gen(uhh2::Context& ctx, const std::string & name, float ptmin_, float etamax_):
@@ -10,7 +10,7 @@ bool uhh2::SubjetQuality_gen::passes(const uhh2::Event& event){
   bool pass = true;
   std::vector<GenTopJet> jets = event.get(h_jets);
   if(jets.size() == 0) return false;
-  std::vector<Particle> subjets = jets[0].subjets();
+  std::vector<GenJet> subjets = jets[0].subjets();
   if(subjets.size() != 3) pass = false;
   for(auto subjet: subjets){
     if(subjet.pt() < ptmin) pass = false;
@@ -461,7 +461,7 @@ bool uhh2::Matching_XCone33GEN::passes(const uhh2::Event& event){
   // continue here if matching should be performed to subjets
   // to pass, every subjet has to contain exactly one genparticle
   else if (subjet_matching){
-    std::vector<Particle> jets = fathadjet.subjets();
+    std::vector<GenJet> jets = fathadjet.subjets();
     std::vector<GenParticle> partons = {q1, q2, bot};
     for(unsigned int i=0; i<jets.size(); i++){
       double minR = 100;

@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoHists_xcone.h"
+#include <UHH2/MTopJet/include/RecoHists_xcone.h>
 
 
 RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
@@ -181,7 +181,7 @@ void RecoHists_xcone::fill(const Event & event){
   E_diff->Fill((fatjets.at(nr_hadjet).v4().E() - hadjet_v4.E()), weight);
 
 
-  double JER_f = 1./(hadjets.at(0).JER_factor_raw());
+  double JER_f = 1./(hadjets.at(0).JEC_factor_raw());
   JER_factor->Fill(JER_f, weight);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------

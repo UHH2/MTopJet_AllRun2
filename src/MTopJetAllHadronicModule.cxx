@@ -90,8 +90,8 @@ MTopJetAllHadronicModule::MTopJetAllHadronicModule(uhh2::Context& ctx){
 
   ////
 
-  MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
-  ElectronId eleid = AndId<Electron>(ElectronID_Spring16_medium_noIso, PtEtaCut(55., 2.4));
+  MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
+  ElectronId eleid = AndId<Electron>(ElectronID_Summer16_medium_noIso, PtEtaCut(55., 2.4));
 
   muoSR_cleaner.reset(new     MuonCleaner(muid));
   eleSR_cleaner.reset(new ElectronCleaner(eleid));

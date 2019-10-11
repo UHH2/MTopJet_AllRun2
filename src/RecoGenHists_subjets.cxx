@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoGenHists_subjets.h"
+#include <UHH2/MTopJet/include/RecoGenHists_subjets.h>
 
 
 RecoGenHists_subjets::RecoGenHists_subjets(uhh2::Context & ctx, const std::string & dirname,  const std::string & type): Hists(ctx, dirname){

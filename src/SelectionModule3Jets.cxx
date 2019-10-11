@@ -33,7 +33,7 @@
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
-#include "UHH2/MTopJet/include/CorrectionFactor.h"
+#include <UHH2/MTopJet/include/CorrectionFactor.h>
 
 
 /*
@@ -119,6 +119,8 @@ class SelectionModule3Jets : public ModuleBASE {
 
   string corvar ="nominal";
 
+  JetId btag_tight;
+
 };
 
 SelectionModule3Jets::SelectionModule3Jets(uhh2::Context& ctx){
@@ -175,10 +177,10 @@ SelectionModule3Jets::SelectionModule3Jets(uhh2::Context& ctx){
 
 
   // define IDs
-  MuonId muid = AndId<Muon>(MuonIDTight(), PtEtaCut(55., 2.4));
-  ElectronId eleid = AndId<Electron>(ElectronID_Spring16_medium_noIso, PtEtaCut(55., 2.4));
-  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(30.0, 2.4));
-  JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE), PtEtaCut(50.0, 2.4));
+  MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
+  ElectronId eleid = AndId<Electron>(ElectronID_Summer16_medium_noIso, PtEtaCut(55., 2.4));
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(30.0, 2.4));
+  JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(50.0, 2.4));
   ////
 
   // define Trigger
@@ -226,7 +228,8 @@ SelectionModule3Jets::SelectionModule3Jets(uhh2::Context& ctx){
   jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
 
   //
-  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",CSVBTag::WP_TIGHT));
+  btag_tight = CSVBTag(CSVBTag::WP_TIGHT);
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",btag_tight));
 
   //// set up Hists classes:
   h_cuts_all.reset(new CutHists(ctx, "h_cuts_all"));

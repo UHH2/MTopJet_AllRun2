@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/GenHists.h"
+#include <UHH2/MTopJet/include/GenHists.h>
 
 using namespace uhh2;
 

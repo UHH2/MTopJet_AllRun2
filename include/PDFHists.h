@@ -1,6 +1,6 @@
 #pragma once
-#include "UHH2/core/include/Hists.h"
-#include "UHH2/core/include/Event.h"
+#include <UHH2/core/include/Hists.h>
+#include <UHH2/core/include/Event.h>
 #include <math.h>
 #include <sstream>
 #include "TH1F.h"

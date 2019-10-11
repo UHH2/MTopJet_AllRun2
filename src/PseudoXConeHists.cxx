@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/PseudoXConeHists.h"
+#include <UHH2/MTopJet/include/PseudoXConeHists.h>
 
 
 PseudoXConeHists::PseudoXConeHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){

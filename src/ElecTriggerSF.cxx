@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/ElecTriggerSF.h"
+#include <UHH2/MTopJet/include/ElecTriggerSF.h>
 
 ElecTriggerSF::ElecTriggerSF(uhh2::Context & ctx, std::string var, TString pe){
   pteta = pe;

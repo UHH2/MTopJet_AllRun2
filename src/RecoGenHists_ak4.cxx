@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/RecoGenHists_ak4.h"
+#include <UHH2/MTopJet/include/RecoGenHists_ak4.h>
 
 
 RecoGenHists_ak4::RecoGenHists_ak4(uhh2::Context & ctx, const std::string & dirname, bool use_JEC_): Hists(ctx, dirname){
@@ -31,7 +31,7 @@ void RecoGenHists_ak4::fill(const Event & event){
   // define all objects needed
 
   std::vector<Jet> rec_jet = *event.jets;
-  std::vector<Particle> gen_jet = *event.genjets;
+  std::vector<GenJet> gen_jet = *event.genjets;
 
   if(rec_jet.size() < 1) return;
   if(gen_jet.size() < 1) return;

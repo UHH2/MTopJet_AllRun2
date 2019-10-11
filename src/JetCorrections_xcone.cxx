@@ -1,9 +1,9 @@
-#include "UHH2/MTopJet/include/JetCorrections_xcone.h"
-#include "UHH2/common/include/Utils.h"
-#include "UHH2/core/include/Utils.h"
+#include <UHH2/MTopJet/include/JetCorrections_xcone.h>
+#include <UHH2/common/include/Utils.h>
+#include <UHH2/core/include/Utils.h>
 
-#include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "UHH2/JetMETObjects/interface/JetCorrectorParameters.h"
+#include <UHH2/JetMETObjects/interface/FactorizedJetCorrector.h>
+#include <UHH2/JetMETObjects/interface/JetCorrectorParameters.h>
 
 #include <string>
 
@@ -38,7 +38,7 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
 
   // setup JEC for XCone
   isMC = (ctx.get("dataset_type") == "MC");
-  jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_L123_AK4PFchs_MC, jet_collection_rec));
+  jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_07Aug2017_V20_L123_AK4PFchs_MC, jet_collection_rec));
 
   // vector<vector<string>> JERfiles_flavor = {JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorUD,
   //                                           JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorS,
@@ -48,10 +48,10 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
 
   // jet_corrector_MC_flavor.reset(new GenericSubJetCorrector_flavor(ctx, JERfiles_flavor, jet_collection_rec));
 
-  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA, jet_collection_rec));
-  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA, jet_collection_rec));
-  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA, jet_collection_rec));
-  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA, jet_collection_rec));
+  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
+  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
+  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
+  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
 }
 
 bool JetCorrections_xcone::process(uhh2::Event & event){
@@ -80,7 +80,7 @@ void JER_Smearer_xcone::init(uhh2::Context & ctx, const std::string& jet_collect
   h_gentopjets_ = ctx.get_handle<std::vector<GenTopJet> >(jet_collection_gen);
   if(fat_sub == "sub") use_subjets = true;
   else                 use_subjets = false;
-  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, false,  JERSmearing::SF_13TeV_2016_07Aug2017_v1, "Spring16_25nsV10_MC_PtResolution_AK4PFchs.txt"));
+  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, JERSmearing::SF_13TeV_2016_03Feb2017, "2017/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
 }
 
 bool JER_Smearer_xcone::process(uhh2::Event & event){
@@ -111,11 +111,11 @@ bool JER_Smearer_xcone::process(uhh2::Event & event){
     for(unsigned int j=0; j<rec_topjets->at(0).subjets().size(); j++){
       rec_subjets0.push_back((rec_topjets->at(0).subjets().at(j)));
     }
-    std::vector<Particle> gen_subjets0;
+    std::vector<GenJet> gen_subjets0;
     for(unsigned int j=0; j<gen_topjets->at(i0).subjets().size(); j++){
       gen_subjets0.push_back((gen_topjets->at(i0).subjets().at(j)) );
     }
-    JER_Smearer->apply_JER_smearing(rec_subjets0, gen_subjets0, met, 0.4, event.rho);
+    JER_Smearer->apply_JER_smearing(rec_subjets0, gen_subjets0, 0.4, event.rho);
     rec_topjets->at(0).set_subjets(rec_subjets0);
 
     // then smear subjets of topjet with index 1
@@ -123,11 +123,11 @@ bool JER_Smearer_xcone::process(uhh2::Event & event){
     for(unsigned int j=0; j<rec_topjets->at(1).subjets().size(); j++){
       rec_subjets1.push_back((rec_topjets->at(1).subjets().at(j)));
     }
-    std::vector<Particle> gen_subjets1;
+    std::vector<GenJet> gen_subjets1;
     for(unsigned int j=0; j<gen_topjets->at(i1).subjets().size(); j++){
       gen_subjets1.push_back((gen_topjets->at(i1).subjets().at(j)) );
     }
-    JER_Smearer->apply_JER_smearing(rec_subjets1, gen_subjets1, met, 0.4, event.rho);
+    JER_Smearer->apply_JER_smearing(rec_subjets1, gen_subjets1, 0.4, event.rho);
     rec_topjets->at(1).set_subjets(rec_subjets1);
   }
   else

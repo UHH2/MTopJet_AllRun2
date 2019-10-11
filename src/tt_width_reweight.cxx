@@ -1,4 +1,4 @@
-#include "UHH2/MTopJet/include/tt_width_reweight.h"
+#include <UHH2/MTopJet/include/tt_width_reweight.h>
 
 
 tt_width_reweight::tt_width_reweight(uhh2::Context & ctx, double width_factor_):
