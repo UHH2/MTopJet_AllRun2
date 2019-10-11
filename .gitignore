@@ -8,3 +8,12 @@ core/python/__init__.py
 *.local
 VLQToHiggsPairProd/*
 ZprimeSemiLeptonic/*
+
+#ignore workdir & jobTempOutput
+Workdir*
+jobTempOutput*
+*workdir
+backup
+
+#ignore obj
+obj

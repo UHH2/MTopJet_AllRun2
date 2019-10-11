@@ -63,7 +63,7 @@ public:
 protected:
   enum lepton { muon, elec };
   lepton channel_;
-
+JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
   // cleaners & Correctors
   // std::unique_ptr<uhh2::AnalysisModule> Correction;
 
@@ -338,9 +338,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   wp_medium = BTag::WP_MEDIUM;
   wp_tight = BTag::WP_TIGHT;
 
-  JetId DeepjetLoose = BTag(btag_algo, wp_loose);
-  JetId DeepjetMedium = BTag(btag_algo, wp_medium);
-  JetId DeepjetTight = BTag(btag_algo, wp_tight);
+  DeepjetLoose = BTag(btag_algo, wp_loose);
+  DeepjetMedium = BTag(btag_algo, wp_medium);
+  DeepjetTight = BTag(btag_algo, wp_tight);
 
   // Scale factors
   BTag_variation = ctx.get("BTag_variation","central");
@@ -351,7 +351,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ElTrigger_variation = ctx.get("ElTrigger_variation","nominal");
 
   //BTagReshape.reset(new MCCSVv2ShapeSystematic(ctx, "jets", BTag_variation, "iterativefit", "", "BTagCalibration"));
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx,DeepjetTight,"jets",BTag_variation));
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx, btag_algo, wp_tight,"jets",BTag_variation));
   muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
   muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
 
@@ -755,9 +755,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   int jetbtagN_loose(0);
   bool passed_btag_loose;
   for(const auto& j : *event.jets){
-    if(DeepjetLoose)(j, event)) ++jetbtagN;
-    if(DeepjetMedium)(j, event)) ++jetbtagN_medium;
-    if(DeepjetTight)(j, event)) ++jetbtagN_loose;
+    if(DeepjetLoose (j, event)) ++jetbtagN;
+    if(DeepjetMedium (j, event)) ++jetbtagN_medium;
+    if(DeepjetTight (j, event)) ++jetbtagN_loose;
   }
 
   if(jetbtagN >= 1) passed_btag = true;
