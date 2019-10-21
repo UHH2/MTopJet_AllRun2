@@ -7,7 +7,7 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 
 <!-- PROOFdir ?????????????????? -->
-  <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PreSel">
+  <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PreSel/2016">
 
 
 <!-- ================================================================================================================================ -->
@@ -102,7 +102,7 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
 
 <!--
    <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="40" />
-   <ConfigSGE RAM ="4" DISK ="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PreSel"/>
+   <ConfigSGE RAM ="4" DISK ="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PreSel_2016"/>
 -->
 
 <JobConfiguration JobName="MTopJetPreSelectionJob" OutputLevel="INFO">

@@ -202,6 +202,8 @@ JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
   std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350, h_XCone_GEN_Sel_ptsub;
   std::unique_ptr<Hists> h_PDFHists;
 
+  std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
+
   bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
   int counter;
@@ -226,18 +228,28 @@ JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   /*
-  ██████ ████████ ██   ██
+  .██████ ████████ ██   ██
   ██         ██     ██ ██
   ██         ██      ███
   ██         ██     ██ ██
-  ██████    ██    ██   ██
+  .██████    ██    ██   ██
   */
 
   /*************************** CONFIGURATION **********************************************************************************/
   isMC = (ctx.get("dataset_type") == "MC");
   if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3"  ||
   ctx.get("dataset_version") == "TTbar_Mtt0700to1000_2016v3"  ||
-  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3") isTTbar = true;
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3"||
+  ctx.get("dataset_version") == "TTbar_mtop1695_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_mtop1715_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_mtop1735_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_mtop1755_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_fsrup_2016v3"          ||
+  ctx.get("dataset_version") == "TTbar_fsrdown_2016v3"        ||
+  ctx.get("dataset_version") == "TTbar_isrup_2016v3"          ||
+  ctx.get("dataset_version") == "TTbar_isrdown_2016v3"        ||
+  ctx.get("dataset_version") == "TTbar_hdampup_2016v3"        ||
+  ctx.get("dataset_version") == "TTbar_hdampdown_2016v3"      ) isTTbar = true;
   else  isTTbar = false;
 
   // ttbar gen
@@ -352,13 +364,15 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   //BTagReshape.reset(new MCCSVv2ShapeSystematic(ctx, "jets", BTag_variation, "iterativefit", "", "BTagCalibration"));
   BTagScaleFactors.reset(new MCBTagScaleFactor(ctx, btag_algo, wp_tight,"jets",BTag_variation));
-  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", true, MuScale_variation));
-  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", true, MuTrigger_variation));
+  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", false, MuScale_variation));
+  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", false, MuTrigger_variation));
 
   ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
-  ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
-  ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/common/data/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
+  ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
+  ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
   /*************************** Set up Hists classes **********************************************************************************/
+  //BTagMCEfficiencyHists
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",DeepjetTight));
 
   //750GeV hists
   h_750_ak8.reset(new RecoHists_topjet(ctx, "750_ak8", "topjets"));
@@ -648,7 +662,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
-  double SF_tt = 0.846817;  // estimated in combined channel
+  // double SF_tt = 0.846817;  // estimated in combined channel FROM DENNIS
+  double SF_tt = 0.720007; // estimated in muon 2
 
   // get lumi weight = genweight (inkl scale variation)
   scale_variation->process(event); // here, it is only executed to be filled into the gen weight is has to be done again to appear in the event.weight
@@ -734,19 +749,13 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_Elec_PreSel03->fill(event);
     h_Jets_PreSel03->fill(event);
     h_XCone_cor_PreSel03->fill(event);
+    if(!event.isRealData) BTagEffHists->fill(event);
   }
 
   /** b-tagging *********************/
   // first do cvs reshape (instead of SF)
   //BTagReshape->process(event);
 
-  if(passed_recsel){
-    h_MTopJet_PreSel03b->fill(event);
-    h_Muon_PreSel03b->fill(event);
-    h_Elec_PreSel03b->fill(event);
-    h_Jets_PreSel03b->fill(event);
-    h_XCone_cor_PreSel03b->fill(event);
-  }
 
   int jetbtagN(0);
   bool passed_btag;
@@ -755,9 +764,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   int jetbtagN_loose(0);
   bool passed_btag_loose;
   for(const auto& j : *event.jets){
-    if(DeepjetLoose (j, event)) ++jetbtagN;
-    if(DeepjetMedium (j, event)) ++jetbtagN_medium;
-    if(DeepjetTight (j, event)) ++jetbtagN_loose;
+    if(DeepjetTight(j, event)) ++jetbtagN;
+    if(DeepjetMedium(j, event)) ++jetbtagN_medium;
+    if(DeepjetLoose(j, event)) ++jetbtagN_loose;
   }
 
   if(jetbtagN >= 1) passed_btag = true;
@@ -766,7 +775,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else passed_btag_medium = false;
   if(jetbtagN_loose >= 1) passed_btag_loose = true;
   else passed_btag_loose = false;
-  // BTagScaleFactors->process(event);
+
+  if(passed_recsel && passed_btag){
+    h_MTopJet_PreSel03b->fill(event);
+    h_Muon_PreSel03b->fill(event);
+    h_Elec_PreSel03b->fill(event);
+    h_Jets_PreSel03b->fill(event);
+    h_XCone_cor_PreSel03b->fill(event);
+  }
+
+  BTagScaleFactors->process(event);
   h_weights04->fill(event);
 
 
@@ -958,7 +976,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
 
   if(pass_measurement_rec){
-    if(isTTbar) h_PDFHists->fill(event);
+    h_PDFHists->fill(event);
 
     h_XCone_raw->fill(event);
     h_XCone_jec->fill(event);

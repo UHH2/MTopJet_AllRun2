@@ -66,6 +66,7 @@ protected:
   bool isElectronStream;
 
   // store Hist collection as member variables
+  std::unique_ptr<Hists> h_ttbar;
 };
 
 /*
@@ -84,6 +85,10 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   else isherwig = false;
 
   isMC = (ctx.get("dataset_type") == "MC");
+
+  //HIST-classes
+  h_ttbar.reset(new TTbarGenHists(ctx, "TTbar"));
+
 
 
 
@@ -113,8 +118,12 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
-  else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2L2Nu" ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_SemiLep" ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_Hadronic") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
+  else                                                             genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+
 
   /******************************************************************/
 
@@ -229,6 +238,9 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
 
   event.set(h_recsel, passed_recsel);
   event.set(h_gensel, passed_gensel);
+
+  //FILL HISTS
+  h_ttbar->fill(event);
 
   return true;
 

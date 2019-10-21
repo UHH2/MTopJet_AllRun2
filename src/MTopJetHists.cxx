@@ -22,10 +22,17 @@ MTopJetHists::MTopJetHists(uhh2::Context & ctx, const std::string & dirname): Hi
   HTLep = book<TH1F>("HTLep", "H_{T} Lep", 100, 0, 1000);
   ST = book<TH1F>("ST", "S_{T}", 100, 0, 5000);
 
-  // b-tag
-  BTAG_L = book<TH1F>("BTAG_L", "N b-tags loose", 10, 0, 10);
-  BTAG_M = book<TH1F>("BTAG_M", "N b-tags medium", 10, 0, 10);
-  BTAG_T = book<TH1F>("BTAG_T", "N b-tags tight", 10, 0, 10);
+  // b-tag for CSVv2
+  BTAG_L_CSV = book<TH1F>("BTAG_L_CSV", "N b-tags loose", 10, 0, 10);
+  BTAG_M_CSV = book<TH1F>("BTAG_M_CSV", "N b-tags medium", 10, 0, 10);
+  BTAG_T_CSV = book<TH1F>("BTAG_T_CSV", "N b-tags tight", 10, 0, 10);
+
+  // b-tag for Deepjet
+  BTAG_L_DJ = book<TH1F>("BTAG_L_DJ", "N b-tags loose", 10, 0, 10);
+  BTAG_M_DJ = book<TH1F>("BTAG_M_DJ", "N b-tags medium", 10, 0, 10);
+  BTAG_T_DJ = book<TH1F>("BTAG_T_DJ", "N b-tags tight", 10, 0, 10);
+
+  BTAG_VALUE_DJ = book<TH1F>("BTAG_VALUE_DJ", "Probability", 20, 0, 1);
 
   deltaR_lep_Bjet = book<TH1F>("deltaR_lep_Bjet", "#Delta R(lep, b-tagged Jet)", 80, 0, 4.0);
 
@@ -102,9 +109,27 @@ void MTopJetHists::fill(const Event & event){
 
   }
 
-  hist("BTAG_L")->Fill(jetN__CSVL, weight);
-  hist("BTAG_M")->Fill(jetN__CSVM, weight);
-  hist("BTAG_T")->Fill(jetN__CSVT, weight);
+  hist("BTAG_L_CSV")->Fill(jetN__CSVL, weight);
+  hist("BTAG_M_CSV")->Fill(jetN__CSVM, weight);
+  hist("BTAG_T_CSV")->Fill(jetN__CSVT, weight);
+
+
+
+  int jetN__DJL(0), jetN__DJM(0), jetN__DJT(0);
+  for(const auto& j : *event.jets){
+    if(DeepJetBTag(DeepJetBTag::WP_LOOSE)(j, event)) ++jetN__DJL;
+    if(DeepJetBTag(DeepJetBTag::WP_MEDIUM)(j, event)) ++jetN__DJM;
+    if(DeepJetBTag(DeepJetBTag::WP_TIGHT)(j, event)) ++jetN__DJT;
+  }
+
+  hist("BTAG_L_DJ")->Fill(jetN__DJL, weight);
+  hist("BTAG_M_DJ")->Fill(jetN__DJM, weight);
+  hist("BTAG_T_DJ")->Fill(jetN__DJT, weight);
+
+
+  int prob;
+  for(const auto& j : *event.jets) hist("BTAG_VALUE_DJ")->Fill(j.btag_DeepJet(), weight);
+
 
   for(const auto & jet : *event.jets){
     if(jet.btag_combinedSecondaryVertex() > 0.935){

@@ -152,7 +152,20 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   //// CONFIGURATION
   if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3"  ||
   ctx.get("dataset_version") == "TTbar_Mtt0700to1000_2016v3"  ||
-  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3") isTTbar = true;
+  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3"  ||
+  ctx.get("dataset_version") == "TTbar_mtop1695_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_mtop1715_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_mtop1735_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_mtop1755_2016v3"       ||
+  ctx.get("dataset_version") == "TTbar_fsrup_2016v3"          ||
+  ctx.get("dataset_version") == "TTbar_fsrdown_2016v3"        ||
+  ctx.get("dataset_version") == "TTbar_isrup_2016v3"          ||
+  ctx.get("dataset_version") == "TTbar_isrdown_2016v3"        ||
+  ctx.get("dataset_version") == "TTbar_hdampup_2016v3"        ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2L2Nu"          ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_SemiLep"        ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_Hadronic"        ||
+  ctx.get("dataset_version") == "TTbar_hdampdown_2016v3"      ) isTTbar = true;
   else  isTTbar = false;
 
   if(ctx.get("dataset_version") == "SingleElecB" ||

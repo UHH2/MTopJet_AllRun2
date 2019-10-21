@@ -6,9 +6,12 @@ using namespace uhh2;
 PDFHists::PDFHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
 
 
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700"  ||
-     ctx.get("dataset_version") == "TTbar_Mtt0700to1000"  ||
-     ctx.get("dataset_version") == "TTbar_Mtt1000toInft") isTTbar = true;
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_2016v3"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3"  ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2L2Nu_2017" ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_SemiLep_2017" ||
+     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_Hadronic_2017") isTTbar = true;
   else isTTbar = false;
 
   for(int i=0; i<100; i++){
