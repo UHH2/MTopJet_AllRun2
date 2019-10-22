@@ -20,6 +20,7 @@
 #include <UHH2/common/include/AdditionalSelections.h>
 #include <UHH2/common/include/MCWeight.h>
 #include <UHH2/common/include/TopPtReweight.h>
+#include "UHH2/common/include/YearRunSwitchers.h"
 
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
@@ -143,11 +144,24 @@ protected:
 
   JetId btag_tight;
 
+  Year year;
+
 };
+
+/*
+███    ███  ██████  ██████  ██    ██ ██      ███████
+████  ████ ██    ██ ██   ██ ██    ██ ██      ██
+██ ████ ██ ██    ██ ██   ██ ██    ██ ██      █████
+██  ██  ██ ██    ██ ██   ██ ██    ██ ██      ██
+██      ██  ██████  ██████   ██████  ███████ ███████
+*/
+
+
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   recsel_only = false;
+  year = extract_year(ctx); // Ask for the year of Event
 
   //// CONFIGURATION
   if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3"  ||
@@ -162,30 +176,30 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   ctx.get("dataset_version") == "TTbar_isrup_2016v3"          ||
   ctx.get("dataset_version") == "TTbar_isrdown_2016v3"        ||
   ctx.get("dataset_version") == "TTbar_hdampup_2016v3"        ||
-  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2L2Nu"          ||
-  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_SemiLep"        ||
-  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_Hadronic"        ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2L2Nu_2017v2"          ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_SemiLep_2017v2"        ||
+  ctx.get("dataset_version") == "TTbar_Mtt0000to0700_Hadronic_2017v2"        ||
   ctx.get("dataset_version") == "TTbar_hdampdown_2016v3"      ) isTTbar = true;
   else  isTTbar = false;
 
   if(ctx.get("dataset_version") == "SingleElecB" ||
-     ctx.get("dataset_version") == "SingleElecC" ||
-     ctx.get("dataset_version") == "SingleElecD" ||
-     ctx.get("dataset_version") == "SingleElecE" ||
-     ctx.get("dataset_version") == "SingleElecF" ||
-     ctx.get("dataset_version") == "SingleElecG" ||
-     ctx.get("dataset_version") == "SingleElecHver2" ||
-     ctx.get("dataset_version") == "SingleElecHver3") isElectronStream = true;
+  ctx.get("dataset_version") == "SingleElecC" ||
+  ctx.get("dataset_version") == "SingleElecD" ||
+  ctx.get("dataset_version") == "SingleElecE" ||
+  ctx.get("dataset_version") == "SingleElecF" ||
+  ctx.get("dataset_version") == "SingleElecG" ||
+  ctx.get("dataset_version") == "SingleElecHver2" ||
+  ctx.get("dataset_version") == "SingleElecHver3") isElectronStream = true;
   else isElectronStream = false;
 
   if(ctx.get("dataset_version") == "SinglePhotonB" ||
-     ctx.get("dataset_version") == "SinglePhotonC" ||
-     ctx.get("dataset_version") == "SinglePhotonD" ||
-     ctx.get("dataset_version") == "SinglePhotonE" ||
-     ctx.get("dataset_version") == "SinglePhotonF" ||
-     ctx.get("dataset_version") == "SinglePhotonG" ||
-     ctx.get("dataset_version") == "SinglePhotonHver2" ||
-     ctx.get("dataset_version") == "SinglePhotonHver3") isPhotonStream = true;
+  ctx.get("dataset_version") == "SinglePhotonC" ||
+  ctx.get("dataset_version") == "SinglePhotonD" ||
+  ctx.get("dataset_version") == "SinglePhotonE" ||
+  ctx.get("dataset_version") == "SinglePhotonF" ||
+  ctx.get("dataset_version") == "SinglePhotonG" ||
+  ctx.get("dataset_version") == "SinglePhotonHver2" ||
+  ctx.get("dataset_version") == "SinglePhotonHver3") isPhotonStream = true;
   else isPhotonStream = false;
 
   // ttbar gen
@@ -243,7 +257,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
   JetCorrections->init(ctx, "xconeCHS");
-// smear jets after Correction
+  // smear jets after Correction
   JERSmearing.reset(new JER_Smearer_xcone());
   JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
   Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, false));
@@ -259,7 +273,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // this is used in combination with iso trigger
   ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
   // jet ids
-  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(30.0, 2.4));
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
   ////
 
   // define Trigger
@@ -299,7 +313,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // common->disable_jersmear();
   // common->disable_jec();
   common->init(ctx);
-
 
   muoSR_cleaner.reset(new     MuonCleaner(muid));
   eleSR_cleaner.reset(new ElectronCleaner(eleid_noiso55));
@@ -394,8 +407,6 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 ██      ██   ██  ██████   ██████ ███████ ███████ ███████
 */
 
-
-
 bool MTopJetSelectionModule::process(uhh2::Event& event){
 
   bool passed_gensel;
@@ -448,13 +459,34 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   /* *********** Trigger *********** */
   // for DATA until run 274954 -> use only Trigger A
   // for MC and DATA from 274954 -> use "A || B"
+  // HLT_TkMu50_v is not availible for 2017&18. Alternative still needs to be inlcuded !!!!!!!!!!!!!!!!
   bool elec_is_isolated = false;
   if(channel_ == muon){
     if(passed_recsel){
-      if( !isMC && event.run < 274954) {
+      if(!isMC) {
+        if(year == Year::is2016v3){
+          if(event.run < 274954){
+            if(!trigger_mu_A->passes(event)) passed_recsel = false;
+          }
+          else{
+            if( !(trigger_mu_A->passes(event) || trigger_mu_B->passes(event)) ) passed_recsel = false;
+          }
+        }
+        if(year == Year::is2017v2){
+          if(!trigger_mu_A->passes(event)) passed_recsel = false;
+        }
+        if(year == Year::is2018){
+          if(!trigger_mu_A->passes(event)) passed_recsel = false;
+        }
+      }
+    }
+  }
+
+  if(year == Year::is2017v2){
+    if(channel_ == muon){
+      if(passed_recsel){
+        if( !isMC)
         if(!trigger_mu_A->passes(event)) passed_recsel = false;
-      }else{
-        if( !(trigger_mu_A->passes(event) || trigger_mu_B->passes(event)) ) passed_recsel = false;
       }
     }
   }
@@ -607,7 +639,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     if(!passed_recsel) return false;
   }
   if(!passed_gensel && !passed_recsel) return false;
-
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   // store reco jets with and without JEC applied, and also copy uncorrected subjets
