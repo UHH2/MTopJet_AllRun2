@@ -47,6 +47,8 @@ GenHists_xcone::GenHists_xcone(uhh2::Context & ctx, const std::string & dirname)
   h_hadjets33=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
   h_lepjets33=ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined");
 
+  h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
+
   //h_softdrop=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets_softdrop");
 
 }
@@ -62,6 +64,7 @@ void GenHists_xcone::fill(const Event & event){
   std::vector<GenTopJet> lepjets33 = event.get(h_lepjets33);
   std::vector<GenTopJet> fatjets33 = event.get(h_fatjets33);
   //std::vector<GenTopJet> softdrop = event.get(h_softdrop);
+  const auto & ttbargen = event.get(h_ttbargen);
 
   if(hadjets33.size() == 0 || lepjets33.size() == 0) return;
 
@@ -82,21 +85,13 @@ void GenHists_xcone::fill(const Event & event){
   double weight = event.weight;
 
   LorentzVector lep33_v4;
+  GenParticle lepton;
+  if(ttbargen.IsSemiLeptonicDecay()){
+    lepton = ttbargen.ChargedLepton();
+    lep33_v4 = lep33.v4() + lepton.v4();
+  }
+  else lep33_v4 = lep33.v4();
 
-  std::vector<GenParticle> leptons;
-  bool is_semilep = false;
-  for (unsigned int i=0; i<event.genparticles->size(); i++){
-    if(abs(event.genparticles->at(i).pdgId()) == 11 || abs(event.genparticles->at(i).pdgId()) == 13 ){
-      leptons.push_back(event.genparticles->at(i));
-    }
-  }
-  if(leptons.size() == 1) is_semilep = true;
-  if(is_semilep){
-    lep33_v4 = lep33.v4() + leptons[0].v4();
-  }
-  else{
-    lep33_v4 = lep33.v4();
-  }
 
   Mass_HadJet33->Fill(had33.v4().M(), weight);
   Mass_HadJet33_rebin->Fill(had33.v4().M(), weight);

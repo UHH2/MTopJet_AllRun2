@@ -2,6 +2,7 @@
 #include "UHH2/core/include/Hists.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
+#include "UHH2/common/include/TTbarGen.h"
 
 #include <math.h>
 #include <vector>
@@ -49,4 +50,5 @@ protected:
     uhh2::Event::Handle<std::vector<GenTopJet>>h_lepjets33;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_fatjets33;
     uhh2::Event::Handle<std::vector<GenTopJet>>h_softdrop;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
 };

@@ -16,6 +16,7 @@
 #include <UHH2/common/include/MCWeight.h>
 #include <UHH2/common/include/MuonIds.h>
 #include <UHH2/common/include/ElectronIds.h>
+#include "UHH2/common/include/YearRunSwitchers.h"
 
 #include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
@@ -30,6 +31,7 @@
 
 #include <UHH2/MTopJet/include/GenHists_xcone.h>
 #include <UHH2/MTopJet/include/GenHists_particles.h>
+#include <UHH2/MTopJet/include/GenHists_process.h>
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
@@ -63,7 +65,7 @@ public:
 protected:
   enum lepton { muon, elec };
   lepton channel_;
-JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
+  JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
   // cleaners & Correctors
   // std::unique_ptr<uhh2::AnalysisModule> Correction;
 
@@ -101,6 +103,10 @@ JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
 
   // get weight (with all SF and weight applied in previous cycle)
   Event::Handle<double>h_weight;
+
+  // Get Events from MCWeights from UHH2 and creat an additional Handle
+  Event::Handle<float>h_weight_btag;
+  Event::Handle<float>h_btag_sf;
 
   // use top pt reweight module instead of derived sf?
   std::unique_ptr<TopPtReweight> ttbar_reweight;
@@ -177,7 +183,6 @@ JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
   std::unique_ptr<Hists> h_XCone_cor_PUlow, h_XCone_cor_PUmid,h_XCone_cor_PUhigh;
   std::unique_ptr<Hists> h_XCone_cor_PUlow_subjets, h_XCone_cor_PUmid_subjets, h_XCone_cor_PUhigh_subjets;
 
-
   std::unique_ptr<Hists> h_RecGenHists_lowPU, h_RecGenHists_medPU, h_RecGenHists_highPU, h_RecGenHists_lowPU_noJEC, h_RecGenHists_medPU_noJEC, h_RecGenHists_highPU_noJEC, h_RecGenHists_RecOnly_corr;
   std::unique_ptr<Hists> h_XCone_GEN_RecOnly, h_XCone_GEN_Both;
   std::unique_ptr<Hists> h_XCone_GEN_ST;
@@ -195,6 +200,7 @@ JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
   std::unique_ptr<Hists> h_RecGenHists_subjets_WJets, h_RecGenHists_subjets_noJEC_WJets;
   std::unique_ptr<Hists> h_GenParticles_RecOnly, h_GenParticles_GenOnly, h_GenParticles_Both;
   std::unique_ptr<Hists> h_GenParticles_SM, h_GenParticles_newWidth;
+  std::unique_ptr<Hists> h_GenProcess;
 
   std::unique_ptr<Hists> h_XCone_cor_migration_pt, h_XCone_cor_migration_pt350, h_XCone_cor_migration_mass, h_XCone_cor_migration_btag;
   std::unique_ptr<Hists> h_750_ak8, h_750_xcone;
@@ -223,6 +229,8 @@ JetId DeepjetMedium, DeepjetLoose, DeepjetTight;
   string ElTrigger_variation ="nominal";
   string PU_variation ="nominal";
 
+  Year year;
+
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
@@ -235,28 +243,27 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   .██████    ██    ██   ██
   */
 
+
+  bool year_16 = false;
+  bool year_17 = false;
+  bool year_18 = false;
+  year = extract_year(ctx);
+
+  if(year == Year::is2016v3) year_16 = true;
+  else if(year == Year::is2017v2) year_17 = true;
+  else if(year == Year::is2018) year_18 = true;
+  else throw runtime_error("In PostSelectionModule: This Event is not from 2016v3, 2017v2 or 2018!");
+
   /*************************** CONFIGURATION **********************************************************************************/
   isMC = (ctx.get("dataset_type") == "MC");
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3"  ||
-  ctx.get("dataset_version") == "TTbar_Mtt0700to1000_2016v3"  ||
-  ctx.get("dataset_version") == "TTbar_Mtt1000toInft_2016v3"||
-  ctx.get("dataset_version") == "TTbar_mtop1695_2016v3"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1715_2016v3"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1735_2016v3"       ||
-  ctx.get("dataset_version") == "TTbar_mtop1755_2016v3"       ||
-  ctx.get("dataset_version") == "TTbar_fsrup_2016v3"          ||
-  ctx.get("dataset_version") == "TTbar_fsrdown_2016v3"        ||
-  ctx.get("dataset_version") == "TTbar_isrup_2016v3"          ||
-  ctx.get("dataset_version") == "TTbar_isrdown_2016v3"        ||
-  ctx.get("dataset_version") == "TTbar_hdampup_2016v3"        ||
-  ctx.get("dataset_version") == "TTbar_hdampdown_2016v3"      ) isTTbar = true;
-  else  isTTbar = false;
 
+  TString dataset_version = (TString) ctx.get("dataset_version");
+  if(dataset_version.Contains("TTbar")) isTTbar = true;
+  else  isTTbar = false;
   // ttbar gen
   const std::string ttbar_gen_label("ttbargen");
   if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
   h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
-
 
   const std::string& channel = ctx.get("channel", ""); //define Channel
   if     (channel == "muon") channel_ = muon;
@@ -269,24 +276,30 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   counter = 0;
 
+
   // Top width reweigh
   width2_reweight.reset(new tt_width_reweight(ctx, 2.0));
   width4_reweight.reset(new tt_width_reweight(ctx, 4.0));
   width8_reweight.reset(new tt_width_reweight(ctx, 8.0));
 
+
   // Top PT reweight
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
 
+
   //scale variation
   scale_variation.reset(new MCScaleVariation(ctx));
+
 
   // PU reweighting
   PU_variation = ctx.get("PU_variation","central");
   PUreweight.reset(new MCPileupReweight(ctx, PU_variation));
 
 
+
   h_recjets_had = ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
-  if(isMC) h_genjets33_had = ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
+  if(isTTbar) h_genjets33_had = ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
+
 
   /*************************** Setup Subjet Corrector **********************************************************************************/
   // Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected"));
@@ -299,6 +312,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   njet_had.reset(new NJetXCone(ctx, jet_label_had, 1));
   njet_lep.reset(new NJetXCone(ctx, jet_label_lep, 1));
 
+
   subjet_quality.reset(new SubjetQuality(ctx, jet_label_had, 30, 2.5));
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
   pt450_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 450));
@@ -308,20 +322,23 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   pt350_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 350));
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
+
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(60., 2.4));
   ElectronId eleid = AndId<Electron>(PtEtaSCCut(60., 2.4), ElectronID_Summer16_tight);
+
 
   if(channel_ == muon) lepton_sel.reset(new NMuonSelection(1, -1, muid));
   else                 lepton_sel.reset(new NElectronSelection(1, -1, eleid));
 
+
   // GEN Selection
   if(channel_ == muon){
     lepton_sel_gen.reset(new GenMuonSel(ctx, 60.));
-    lepton_Nsel_gen.reset(new GenMuonCount(ctx, 1, 1));
+    lepton_Nsel_gen.reset(new GenMuonCount(ctx)); // Count is confusing here, since it only chooses the one lepton from the SemiLepDecay
   }
   else{
     lepton_sel_gen.reset(new GenElecSel(ctx, 60.));
-    lepton_Nsel_gen.reset(new GenElecCount(ctx, 1, 1));
+    lepton_Nsel_gen.reset(new GenElecCount(ctx));
   }
   subjet_quality_gen.reset(new SubjetQuality_gen(ctx, "GEN_XCone33_had_Combined", 30, 2.5));
   pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
@@ -332,11 +349,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   matched_fat_GEN.reset(new Matching_XCone33GEN(ctx, "GEN_XCone33_had_Combined", false));
 
 
-
   // Selection for matching reco jets to gen particles
   if(isTTbar) matched_sub.reset(new Matching_XCone33(ctx, true));
   if(isTTbar) matched_fat.reset(new Matching_XCone33(ctx, false));
-
   // AK8 Selection / 750 GeV
   njet_ak8.reset(new NRecoJets_topjet(ctx, 200, 2, 2));
   deltaR_ak8.reset(new DeltaRCutReco_topjet(ctx, 1.2));
@@ -363,9 +378,22 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ElTrigger_variation = ctx.get("ElTrigger_variation","nominal");
 
   //BTagReshape.reset(new MCCSVv2ShapeSystematic(ctx, "jets", BTag_variation, "iterativefit", "", "BTagCalibration"));
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx, btag_algo, wp_tight,"jets",BTag_variation));
-  muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", false, MuScale_variation));
-  muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", false, MuTrigger_variation));
+  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx, btag_algo, wp_tight,"jets",BTag_variation,"comb"));
+
+  // NOT HARDCODED!!!!!
+  if(year_16){
+    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root","NUM_TightID_DEN_genTracks_eta_pt",1, "tightID", false, MuScale_variation));
+    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", false, MuTrigger_variation));
+  }
+  else if(year_17){
+    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2017/MuonID_94X_RunBCDEF_SF_ID.root","NUM_TightID_DEN_genTracks_pt_abseta",1, "tightID", true, MuScale_variation));
+    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2017/MuonTrigger_EfficienciesAndSF_RunBtoF_Nov17Nov2017.root","Mu50_PtEtaBins/pt_abseta_ratio",1, "muonTrigger", true, MuTrigger_variation));
+  }
+  else if(year_18){
+    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/Muon_ID_SF_RunABCD.root","NUM_TightID_DEN_TrackerMuons_pt_abseta",1, "tightID", true, MuScale_variation));
+    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/Muon_Trigger_Eff_SF_AfterMuonHLTUpdate.root","Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",1, "muonTrigger", true, MuTrigger_variation));
+  }
+  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
 
   ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
   ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
@@ -502,6 +530,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     h_GenParticles_SM.reset(new GenHists_particles(ctx, "GenParticles_SM"));
     h_GenParticles_newWidth.reset(new GenHists_particles(ctx, "GenParticles_newWidth"));
 
+    h_GenProcess.reset(new GenHists_process(ctx, "GenProcess"));
+
     h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", "jec"));
     h_RecGenHists_subjets_matched.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_matched", "jec"));
     h_RecGenHists_subjets_lowPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_lowPU", "jec"));
@@ -557,6 +587,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
   h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
   h_musf_central = ctx.get_handle<double>("passed_recsel_2");
+  h_weight_btag = ctx.get_handle<float>("weight_btag");
 
   // undeclare event output (jet collections etc) to get small root files
   ctx.undeclare_all_event_output();
@@ -588,8 +619,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_factor_8width = ctx.declare_event_output<double>("factor_8width");
   h_pdf_weights = ctx.declare_event_output<vector<double>>("pdf_weights");
   h_bquark_pt = ctx.declare_event_output<vector<double>>("bquark_pt");
-
-
+  h_btag_sf = ctx.declare_event_output<float>("btag_sf");
 
   /*********************************************************************************************************************************/
 
@@ -606,25 +636,21 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   ██      ██   ██  ██████   ██████ ███████ ███████ ███████
   */
 
+  if(isMC) h_GenProcess->fill(event);
 
   // get bools for selections from root files
   bool passed_recsel;
   passed_recsel = event.get(h_recsel_2);
   bool passed_gensel33;
   passed_gensel33 = event.get(h_gensel_2);
-  ////
-
 
   // check if event has one had and one lep jet
   if( !(njet_had->passes(event)) ) return false;
   if( !(njet_lep->passes(event)) ) return false;
   ////
-
   // fill ttbargen class
   if(isTTbar) ttgenprod->process(event);
   ////
-
-
   /***************************  get jets to write mass *****************************************************************************************************/
 
   std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
@@ -632,9 +658,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
-
-
-  if(isMC){
+  if(isTTbar){
     std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
     double mass_gen33 = gen_hadjets33.at(0).v4().M();
     double pt_gen33 = gen_hadjets33.at(0).v4().Pt();
@@ -645,7 +669,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_mass_gen33, 0.); // set gen mass to 0 for data
     event.set(h_pt_gen33, 0.);   // set gen pt to 0 for data
   }
-
   // also set bquark pt
   vector<double> bquark_pt = {0.0, 0.0};
   if(isTTbar){
@@ -658,16 +681,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     }
   }
   event.set(h_bquark_pt, bquark_pt);
-
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
   // double SF_tt = 0.846817;  // estimated in combined channel FROM DENNIS
-  double SF_tt = 0.720007; // estimated in muon 2
-
+  double SF_tt = 0.720007; // estimated in muon 2016
   // get lumi weight = genweight (inkl scale variation)
   scale_variation->process(event); // here, it is only executed to be filled into the gen weight is has to be done again to appear in the event.weight
-  double gen_weight = event.weight;
+  double gen_weight = event.get(h_weight);
 
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
@@ -680,9 +701,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_Jets_PreSel01->fill(event);
     h_XCone_cor_PreSel01->fill(event);
   }
-
-
-
   if(isTTbar)h_GenParticles_SM->fill(event);
 
   // choose if tt bar sample width should be reweighted
@@ -697,9 +715,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     factor_4w = 1.0;
     factor_8w = 1.0;
   }
-
-
-
   scale_variation->process(event); // do this again because scale variation should change gen weight and event.weight, but not rec weight!!!
 
   // if(reweight_ttbar) ttbar_reweight->process(event);
@@ -715,8 +730,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       }
     }
   }
-
-
   /** PU Reweighting *********************/
   PUreweight->process(event);
   h_weights02->fill(event);
@@ -739,7 +752,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     ele_reco_SF->process(event);
     ele_trigger_SF->process(event);
   }
-
   h_weights03->fill(event);
 
   // FILL CONTROL PLOTS
@@ -755,8 +767,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /** b-tagging *********************/
   // first do cvs reshape (instead of SF)
   //BTagReshape->process(event);
-
-
   int jetbtagN(0);
   bool passed_btag;
   int jetbtagN_medium(0);
@@ -768,14 +778,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(DeepjetMedium(j, event)) ++jetbtagN_medium;
     if(DeepjetLoose(j, event)) ++jetbtagN_loose;
   }
-
   if(jetbtagN >= 1) passed_btag = true;
   else passed_btag = false;
   if(jetbtagN_medium >= 1) passed_btag_medium = true;
   else passed_btag_medium = false;
   if(jetbtagN_loose >= 1) passed_btag_loose = true;
   else passed_btag_loose = false;
-
   if(passed_recsel && passed_btag){
     h_MTopJet_PreSel03b->fill(event);
     h_Muon_PreSel03b->fill(event);
@@ -786,13 +794,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   BTagScaleFactors->process(event);
   h_weights04->fill(event);
-
+  // get BTag SF
+  float weight_btag;
+  weight_btag = event.get(h_weight_btag);
+  event.set(h_btag_sf, weight_btag);
 
   /** calculate recweight now *********************/
   double rec_weight;
   if(gen_weight==0)rec_weight = 0;
   else rec_weight = (event.weight)/gen_weight;
-
 
   /**********************************/
   bool passed_presel_rec = (passed_recsel && passed_btag);
@@ -805,7 +815,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_cor_PreSel04->fill(event);
   }
   /*************************** Events have to pass topjet pt > 400 & Mass_jet1 > Mass_jet2 *******************************************************/
-
   bool pass_measurement_rec;
   bool pass_pt350migration_rec;
   bool pass_ptmigration_rec;
@@ -814,7 +823,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool pass_WJets_sel;
   bool pass_subptmigration_rec;
   bool pass_leptonptmigration_rec;
-
 
   if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_measurement_rec = true;
   else pass_measurement_rec = false;
@@ -845,7 +853,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool pass_massmigration_gen;
   bool pass_subptmigration_gen;
   bool pass_leptonptmigration_gen;
-
   if(isTTbar){
     if(!lepton_Nsel_gen->passes(event)) passed_gensel33 = false;
 
@@ -871,17 +878,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     pass_subptmigration_gen = false;
     pass_leptonptmigration_gen = false;
   }
-
   /***************************  750GeV SELECTION ***********************************************************************************/
   bool passes_750_ak8 = false;
   bool passes_750_xcone = false;
-
   if(passed_presel_rec && njet_ak8->passes(event)){
     if(deltaR_ak8->passes(event) && pt_sel_ak8->passes(event) && mass_ak8->passes(event)) passes_750_ak8 = true;
   }
   if(pass_measurement_rec && pt750_sel->passes(event)) passes_750_xcone = true;
   /******************************************************************************************************************************/
-
 
   /*************************** Pile Up bools  ***************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
@@ -895,10 +899,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   // Hists for 750GeV phase space
   if(passes_750_ak8) h_750_ak8->fill(event);
-  if(passes_750_xcone) h_750_xcone->fill(event);
-
-
-
   // hists to see events that are generated in measurement phase-space, but reconstructed outside
   if(pass_measurement_gen){
     if(pass_pt350migration_rec) h_XCone_cor_migration_pt350->fill(event);
@@ -906,7 +906,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(pass_massmigration_rec)  h_XCone_cor_migration_mass->fill(event);
     if(pass_btagmigration_rec)  h_XCone_cor_migration_btag->fill(event);
   }
-
   // see all events reconstructed outside measurement phase-space
   if(pass_ptmigration_rec) h_XCone_cor_noptcut->fill(event);
   if(pass_pt350migration_rec) h_XCone_cor_pt350->fill(event);
@@ -917,19 +916,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_cor_Sel_ptsub->fill(event);
     h_XCone_cor_subjets_Sel_ptsub->fill(event);
   }
-
   if(pass_measurement_gen)    h_XCone_GEN_Sel_measurement->fill(event);
   if(pass_pt350migration_gen) h_XCone_GEN_Sel_pt350->fill(event);
   if(pass_massmigration_gen)  h_XCone_GEN_Sel_noMass->fill(event);
   if(pass_subptmigration_gen) h_XCone_GEN_Sel_ptsub->fill(event);
-
-
-  if(pass_WJets_sel && isMC){
+  if(pass_WJets_sel && isTTbar){
     h_CorrectionHists_WJets->fill(event);
     h_RecGenHists_subjets_WJets->fill(event);
     h_RecGenHists_subjets_noJEC_WJets->fill(event);
   }
-
   // fill resolution hists here without the subjet pt cut
   if(pass_measurement_gen || pass_subptmigration_gen){
     if(lowPU){
@@ -962,8 +957,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_ak4->fill(event);
     h_RecGenHists_ak4_noJEC->fill(event);
   }
-
-  if(isMC){
+  if(isTTbar){
     std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
     double pt = gen_hadjets33.at(0).v4().Pt();
     double mjet = gen_hadjets33.at(0).v4().M();
@@ -1067,7 +1061,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_Both->fill(event);
     h_RecGenHists_Both_corr->fill(event);
   }
-
 
   /*************************** also store factor from ttbar reweighting ****************************************************************************/
   double ttfactor = 1.0;

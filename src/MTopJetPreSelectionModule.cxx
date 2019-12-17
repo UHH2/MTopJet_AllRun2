@@ -15,6 +15,7 @@
 #include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
+#include "UHH2/common/include/YearRunSwitchers.h"
 
 // Hists
 #include <UHH2/common/include/ElectronHists.h>
@@ -60,13 +61,17 @@ protected:
   Event::Handle<bool>h_gensel;
   Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
   Event::Handle<std::vector<TopJet>>h_fatjets;
+  Event::Handle<TTbarGen> h_ttbargen;
 
+  // bools
   bool isMC;
   bool isPhotonStream;
   bool isElectronStream;
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_ttbar;
+
+  //Year year;
 };
 
 /*
@@ -89,8 +94,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   //HIST-classes
   h_ttbar.reset(new TTbarGenHists(ctx, "TTbar"));
 
-
-
+  //year = extract_year(ctx); // Ask for the year of Event
 
   // const std::string& channel = ctx.get("channel", ""); //define Channel
   // if     (channel == "muon") channel_ = muon;
@@ -107,6 +111,7 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   h_gensel = ctx.declare_event_output<bool>("passed_gensel");
   h_GENfatjets = ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
+  h_ttbargen = ctx.get_handle<TTbarGen>("ttbargen");
   ////
 
   //// COMMON MODULES
@@ -118,17 +123,16 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700" ||
-     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2L2Nu" ||
-     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_SemiLep" ||
-     ctx.get("dataset_version") == "TTbar_Mtt0000to0700_Hadronic") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
-  else                                                             genmttbar_sel.reset(new uhh2::AndSelection(ctx));
 
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
+  else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+
+  //else throw runtime_error("In PreSelectionModule: This Event is not from 2016v3, 2017v2 or 2018!");
 
   /******************************************************************/
 
   //// EVENT SELECTION REC
-  met_sel.reset(new METCut  (40, uhh2::infinity));
+  met_sel.reset(new METCut(40, uhh2::infinity));
   muon_sel.reset(new NMuonSelection(1, -1, MuonId(PtEtaCut(50, 2.4 ))));
   elec_sel.reset(new NElectronSelection(1, -1, ElectronId(PtEtaCut(50, 2.4))));
   ////
@@ -197,15 +201,11 @@ bool MTopJetPreSelectionModule::process(uhh2::Event& event){
   // cut on GEN Jet PT
   bool passed_genpt=false;
   if(isMC && pass_semilep && pass_genlepton){
+    const auto & ttbargen = event.get(h_ttbargen);
     std::vector<GenTopJet> jets = event.get(h_GENfatjets);
     if(jets.size() > 1){
-      GenParticle lepton;
-      std::vector<GenParticle>* genparts = event.genparticles;
-      for (unsigned int i=0; i<(genparts->size()); ++i){
-        GenParticle p = genparts->at(i);
-        if(abs(p.pdgId()) == 13) lepton = p;
-        else if(abs(p.pdgId()) == 11) lepton = p;
-      }
+      GenParticle lepton = ttbargen.ChargedLepton();
+
       float dR1 = deltaR(lepton, jets.at(0));
       float dR2 = deltaR(lepton, jets.at(1));
 

@@ -25,8 +25,8 @@ class CombineXCone{
   bool FindLepton(uhh2::Event &);
   bool FindLepton_gen(uhh2::Event &);
   Particle GetLepton(uhh2::Event &);
-  TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax);
   GenParticle GetLepton_gen(uhh2::Event &);
+  TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax);
   GenTopJet CreateTopJetFromSubjets_gen(vector<GenJet> subjets, double ptmin, double etamax);
 };
 
@@ -48,7 +48,7 @@ private:
 class CombineXCone33_gen: public uhh2::AnalysisModule{
 public:
 
-  explicit CombineXCone33_gen(uhh2::Context &);
+  explicit CombineXCone33_gen(uhh2::Context &, bool);
   virtual bool process(uhh2::Event & ) override;
 
 private:
@@ -56,21 +56,9 @@ private:
   uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone33hadjets;
   uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone33lepjets;
   uhh2::Event::Handle<std::vector<GenTopJet>>h_GENfatjets;
-
-};
-
-
-class CombineXCone23_gen: public uhh2::AnalysisModule{
-public:
-
-  explicit CombineXCone23_gen(uhh2::Context &);
-  virtual bool process(uhh2::Event & ) override;
-
-private:
-
-  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone23hadjets;
-  uhh2::Event::Handle<std::vector<GenTopJet>>h_GENxcone23lepjets;
-  uhh2::Event::Handle<std::vector<GenTopJet>>h_GEN23fatjets;
+  uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  bool isTTbar_;
+  // TTbarGen ttbargen;
 
 };
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python
-from datetime import datetime
 import sys, time, subprocess
 # from ROOT import *
+from datetime import datetime
 from multiprocessing import Pool, Value
 import random
 import shutil

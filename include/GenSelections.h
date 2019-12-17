@@ -36,21 +36,22 @@ namespace uhh2 {
   class GenMuonCount : public Selection {
 
   public:
-    explicit GenMuonCount(Context&, int, int);
+    explicit GenMuonCount(Context&);
     virtual bool passes(const Event&) override;
 
   protected:
-    int min, max;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
+
   };
 
   class GenElecCount : public Selection {
 
   public:
-    explicit GenElecCount(Context&, int, int);
+    explicit GenElecCount(Context&);
     virtual bool passes(const Event&) override;
 
   protected:
-    int min, max;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
   class GenMuonSel : public Selection {
@@ -61,6 +62,7 @@ namespace uhh2 {
 
   protected:
     double ptmin;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
   class GenElecSel : public Selection {
@@ -71,6 +73,7 @@ namespace uhh2 {
 
   protected:
     double ptmin;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
   class TTbarSemilep : public Selection {
@@ -251,6 +254,7 @@ namespace uhh2 {
   private:
     uhh2::Event::Handle<std::vector<GenTopJet>> h_hadjets;
     uhh2::Event::Handle<std::vector<GenTopJet>> h_lepjets;
+    uhh2::Event::Handle<TTbarGen> h_ttbargen;
   };
 
   class MassCut_top : public Selection {

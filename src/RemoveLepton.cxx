@@ -54,24 +54,26 @@ bool RemoveLepton::process(uhh2::Event & event){
 }
 
 /*
-██████  ███████ ███    ██
+.██████  ███████ ███    ██
 ██       ██      ████   ██
 ██   ███ █████   ██ ██  ██
 ██    ██ ██      ██  ██ ██
-██████  ███████ ██   ████
+.██████  ███████ ██   ████
 */
 
 
 RemoveLeptonGen::RemoveLeptonGen(uhh2::Context & ctx, const std::string & name_jet):
-h_topjets(ctx.get_handle<std::vector<GenTopJet>>(name_jet)){}
+h_topjets(ctx.get_handle<std::vector<GenTopJet>>(name_jet)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")){}
 
 bool RemoveLeptonGen::process(uhh2::Event & event){
   std::vector<GenTopJet> topjets = event.get(h_topjets);
+  GenParticle lepton;
   std::vector<GenParticle> leptons;
-  for (unsigned int i=0; i<event.genparticles->size(); i++){
-    if(abs(event.genparticles->at(i).pdgId()) == 11 || abs(event.genparticles->at(i).pdgId()) == 13 ){
-      leptons.push_back(event.genparticles->at(i));
-    }
+  const auto & ttbargen = event.get(h_ttbargen);
+  if(ttbargen.IsSemiLeptonicDecay()) {
+    lepton = ttbargen.ChargedLepton();
+    leptons.push_back(lepton);
   }
 
   if(topjets.size() == 0 || leptons.size() == 0) return true;
@@ -84,34 +86,32 @@ bool RemoveLeptonGen::process(uhh2::Event & event){
     std::vector<GenJet> new_subjets = topjets[i].subjets();
     GenTopJet new_topjet;
     new_topjet.set_v4(topjets[i].v4());
-    for(unsigned int j=0; j<leptons.size(); j++){
-      // loop over leptons and subtract v4 from topjet if dR < 1.2
-      if(deltaR(new_topjet, leptons[j]) < 1.2){
-        LorentzVector new_v4_top = new_topjet.v4() - leptons[j].v4();
-        if(new_v4_top.pt() > 5 && deltaR(new_v4_top, new_topjet.v4()) > M_PI/2){
-          cout << "Warning: subtracting lepton flipped jet direction" << endl;
-          new_topjet.set_v4(LorentzVector());
-        }
-        else new_topjet.set_v4(new_v4_top);
+    // loop over leptons and subtract v4 from topjet if dR < 1.2
+    if(deltaR(new_topjet, lepton) < 1.2){
+      LorentzVector new_v4_top = new_topjet.v4() - lepton.v4();
+      if(new_v4_top.pt() > 5 && deltaR(new_v4_top, new_topjet.v4()) > M_PI/2){
+        cout << "Warning: subtracting lepton flipped jet direction" << endl;
+        new_topjet.set_v4(LorentzVector());
+      }
+      else new_topjet.set_v4(new_v4_top);
 
-        // if there is also a subjet within 0.4, find subjet that is closed to
-        // the lepton and subtract the lepton from this one subjet only
-        double dRmin = 0.4;
-        int index = 100;
-        for(unsigned int k=0; k<new_subjets.size(); k++){
-          if(deltaR(new_subjets[k], leptons[j]) < dRmin){
-            dRmin = deltaR(new_subjets[k], leptons[j]);
-            index = k;
-          }
+      // if there is also a subjet within 0.4, find subjet that is closed to
+      // the lepton and subtract the lepton from this one subjet only
+      double dRmin = 0.4;
+      int index = 100;
+      for(unsigned int k=0; k<new_subjets.size(); k++){
+        if(deltaR(new_subjets[k], lepton) < dRmin){
+          dRmin = deltaR(new_subjets[k], lepton);
+          index = k;
         }
-        if(index != 100){
-          LorentzVector new_v4_sub = new_subjets[index].v4() - leptons[j].v4();
-          if(new_v4_sub.pt() > 5 && deltaR(new_v4_sub, new_subjets[index].v4()) > M_PI/2){
-            cout << "Warning: subtracting lepton flipped jet direction" << endl;
-            new_subjets[index].set_v4(LorentzVector());
-          }
-          else new_subjets[index].set_v4(new_v4_sub);
+      }
+      if(index != 100){
+        LorentzVector new_v4_sub = new_subjets[index].v4() - lepton.v4();
+        if(new_v4_sub.pt() > 5 && deltaR(new_v4_sub, new_subjets[index].v4()) > M_PI/2){
+          cout << "Warning: subtracting lepton flipped jet direction" << endl;
+          new_subjets[index].set_v4(LorentzVector());
         }
+        else new_subjets[index].set_v4(new_v4_sub);
       }
     }
     for(auto subjet: new_subjets) new_topjet.add_subjet(subjet);

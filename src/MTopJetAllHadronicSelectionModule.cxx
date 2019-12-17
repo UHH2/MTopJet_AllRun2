@@ -73,7 +73,6 @@ protected:
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_pupppi;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_noJEC;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
-  std::unique_ptr<uhh2::AnalysisModule> jetprod_gen23;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_gen33;
   std::unique_ptr<uhh2::AnalysisModule> copy_jet;
   std::unique_ptr<uhh2::Selection> triangc_sel;
@@ -84,7 +83,6 @@ protected:
 
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<std::vector<GenTopJet>>h_gen33fatjets;
-  Event::Handle<std::vector<GenTopJet>>h_gen23fatjets;
 
   // just for testing
   std::unique_ptr<TopPtReweight> ttbar_reweight;
@@ -114,7 +112,6 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
   if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
-  h_gen23fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone23TopJets");
   h_gen33fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
   // combine XCone
@@ -123,10 +120,7 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
   jetprod_reco_corrected.reset(new CombineXConeAllHad(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
   copy_jet.reset(new CopyJets(ctx, "xconeCHS", "xconeCHS_noJEC"));
 
-  if(isMC){
-    jetprod_gen23.reset(new CombineXCone23_gen(ctx));
-    jetprod_gen33.reset(new CombineXConeAllHad_gen(ctx));
-  }
+  if(isMC) jetprod_gen33.reset(new CombineXConeAllHad_gen(ctx));
   ////
 
 
@@ -195,16 +189,12 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   std::vector<TopJet> jets = event.get(h_fatjets);
   if(jets.size() < 2) return false;
   if(!event.isRealData){
-    std::vector<GenTopJet> gen23jets = event.get(h_gen23fatjets);
-    if(gen23jets.size() < 2) return false;
     std::vector<GenTopJet> gen33jets = event.get(h_gen33fatjets);
     if(gen33jets.size() < 2) return false;
   }
 
-  if(!event.isRealData){
-    jetprod_gen23->process(event);
-    jetprod_gen33->process(event);
-  }
+  if(!event.isRealData) jetprod_gen33->process(event);
+  
   // Here all the Correction is happening
   jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
   copy_jet->process(event);                // copy 'raw' Fatets (with subjets) and name one copy 'noJEC'

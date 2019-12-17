@@ -54,7 +54,6 @@ GenParticle CombineXCone::GetLepton_gen(uhh2::Event & event){
   return lepton;
 }
 
-
 // Combine Subjets to jet (do not use subjet if pt < ptmin)
 TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax){
   double px=0, py=0, pz=0, E=0;
@@ -122,9 +121,9 @@ GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<GenJet> subjets, doub
 
 // Get final Jets from 3+3 Method on Reco level
 CombineXCone33::CombineXCone33(uhh2::Context & ctx, const std::string & name_had, const std::string & name_lep, const std::string & name_fat):
-  h_xcone33hadjets(ctx.declare_event_output<std::vector<TopJet>>(name_had)),
-  h_xcone33lepjets(ctx.declare_event_output<std::vector<TopJet>>(name_lep)),
-  h_fatjets(ctx.get_handle<std::vector<TopJet>>(name_fat)){}
+h_xcone33hadjets(ctx.declare_event_output<std::vector<TopJet>>(name_had)),
+h_xcone33lepjets(ctx.declare_event_output<std::vector<TopJet>>(name_lep)),
+h_fatjets(ctx.get_handle<std::vector<TopJet>>(name_fat)){}
 
 bool CombineXCone33::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
@@ -181,31 +180,39 @@ bool CombineXCone33::process(uhh2::Event & event){
 }
 
 // Get final Jets from 3+3 Method on Gen level
-CombineXCone33_gen::CombineXCone33_gen(uhh2::Context & ctx):
-  h_GENxcone33hadjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_had_Combined")),
-  h_GENxcone33lepjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined")),
-  h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets")) {}
+CombineXCone33_gen::CombineXCone33_gen(uhh2::Context & ctx, bool isTTbar):
+h_GENxcone33hadjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_had_Combined")),
+h_GENxcone33lepjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined")),
+h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets")),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")),
+isTTbar_ (isTTbar) {}
 
 bool CombineXCone33_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
   //--------------------------------- get subjets and lepton ------------------------------
   //---------------------------------------------------------------------------------------
+  GenParticle lepton;
   std::vector<GenTopJet> jets = event.get(h_GENfatjets);
   if(jets.size() < 2) return false;
   CombineXCone* combine = new CombineXCone();
-  bool lepton_in_event = combine->FindLepton(event);
-
   //---------------------------------------------------------------------------------------
   //------------- define had and lep jet (deltaR) -----------------------------------------
   //---------------------------------------------------------------------------------------
   GenTopJet fathadjet, fatlepjet;
-  if(lepton_in_event){
-    GenParticle lepton = combine->GetLepton_gen(event);
-    float dR1 = deltaR(lepton, jets.at(0));
-    float dR2 = deltaR(lepton, jets.at(1));
-    if(dR1 < dR2){
-      fatlepjet = jets.at(0);
-      fathadjet = jets.at(1);
+  if(isTTbar_) {
+    TTbarGen ttbargen = event.get(h_ttbargen);
+    if(ttbargen.IsSemiLeptonicDecay()){
+      lepton = ttbargen.ChargedLepton();
+      float dR1 = deltaR(lepton, jets.at(0));
+      float dR2 = deltaR(lepton, jets.at(1));
+      if(dR1 < dR2){
+        fatlepjet = jets.at(0);
+        fathadjet = jets.at(1);
+      }
+      else{
+        fatlepjet = jets.at(1);
+        fathadjet = jets.at(0);
+      }
     }
     else{
       fatlepjet = jets.at(1);
@@ -238,67 +245,8 @@ bool CombineXCone33_gen::process(uhh2::Event & event){
   return true;
 }
 
-// Get final Jets from 2+3 Method on Gen level
-CombineXCone23_gen::CombineXCone23_gen(uhh2::Context & ctx):
-  h_GENxcone23hadjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone23_had_Combined")),
-  h_GENxcone23lepjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone23_lep_Combined")),
-  h_GEN23fatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone23TopJets")) {}
-
-
-bool CombineXCone23_gen::process(uhh2::Event & event){
-  //---------------------------------------------------------------------------------------
-  //--------------------------------- get subjets and lepton ------------------------------
-  //---------------------------------------------------------------------------------------
-  std::vector<GenTopJet> jets23 = event.get(h_GEN23fatjets);
-  if(jets23.size() < 2) return false;
-  CombineXCone* combine = new CombineXCone();
-  bool lepton_in_event = combine->FindLepton(event);
-
-  //---------------------------------------------------------------------------------------
-  //------------- define had and lep jet (deltaR) -----------------------------------------
-  //---------------------------------------------------------------------------------------
-  GenTopJet fathadjet, fatlepjet;
-  if(lepton_in_event){
-    GenParticle lepton = combine->GetLepton_gen(event);
-    float dR1 = deltaR(lepton, jets23.at(0));
-    float dR2 = deltaR(lepton, jets23.at(1));
-    if(dR1 < dR2){
-      fatlepjet = jets23.at(0);
-      fathadjet = jets23.at(1);
-    }
-    else{
-      fatlepjet = jets23.at(1);
-      fathadjet = jets23.at(0);
-    }
-  }
-  else{
-    fatlepjet = jets23.at(1);
-    fathadjet = jets23.at(0);
-  }
-
-  //---------------------------------------------------------------------------------------
-  //-------- set Lorentz Vectors of subjets and combine them ------------------------------
-  //---------------------------------------------------------------------------------------
-  std::vector<GenJet> subjets_lep = fatlepjet.subjets();
-  std::vector<GenJet> subjets_had = fathadjet.subjets();
-  GenTopJet lepjet = combine->CreateTopJetFromSubjets_gen(subjets_lep, 0, 2.5);
-  GenTopJet hadjet = combine->CreateTopJetFromSubjets_gen(subjets_had, 0, 2.5);
-  vector<GenTopJet> hadjets;
-  vector<GenTopJet> lepjets;
-  hadjets.push_back(hadjet);
-  lepjets.push_back(lepjet);
-
-  //---------------------------------------------------------------------------------------
-  //--------------------------------- Write Jets ------------------------------------------
-  //---------------------------------------------------------------------------------------
-  event.set(h_GENxcone23hadjets, hadjets);
-  event.set(h_GENxcone23lepjets, lepjets);
-
-  return true;
-}
-
 /*
- █████  ██      ██          ██   ██  █████  ██████
+.█████  ██      ██          ██   ██  █████  ██████
 ██   ██ ██      ██          ██   ██ ██   ██ ██   ██
 ███████ ██      ██          ███████ ███████ ██   ██
 ██   ██ ██      ██          ██   ██ ██   ██ ██   ██
@@ -308,9 +256,9 @@ bool CombineXCone23_gen::process(uhh2::Event & event){
 
 // Get final Jets from 3+3 Method on Reco level for ALL HAD Selection
 CombineXConeAllHad::CombineXConeAllHad(uhh2::Context & ctx, const std::string & name_had, const std::string & name_lep, const std::string & name_fat):
-  h_xcone33hadjets(ctx.declare_event_output<std::vector<TopJet>>(name_had)),
-  h_xcone33lepjets(ctx.declare_event_output<std::vector<TopJet>>(name_lep)),
-  h_fatjets(ctx.get_handle<std::vector<TopJet>>(name_fat)){}
+h_xcone33hadjets(ctx.declare_event_output<std::vector<TopJet>>(name_had)),
+h_xcone33lepjets(ctx.declare_event_output<std::vector<TopJet>>(name_lep)),
+h_fatjets(ctx.get_handle<std::vector<TopJet>>(name_fat)){}
 
 bool CombineXConeAllHad::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
@@ -349,9 +297,9 @@ bool CombineXConeAllHad::process(uhh2::Event & event){
 
 // Get final Jets from 3+3 Method on Gen level
 CombineXConeAllHad_gen::CombineXConeAllHad_gen(uhh2::Context & ctx):
-  h_GENxcone33hadjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_had_Combined")),
-  h_GENxcone33lepjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined")),
-  h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets")) {}
+h_GENxcone33hadjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_had_Combined")),
+h_GENxcone33lepjets(ctx.declare_event_output<std::vector<GenTopJet>>("GEN_XCone33_lep_Combined")),
+h_GENfatjets(ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets")) {}
 
 bool CombineXConeAllHad_gen::process(uhh2::Event & event){
   //---------------------------------------------------------------------------------------
@@ -393,13 +341,13 @@ bool CombineXConeAllHad_gen::process(uhh2::Event & event){
 
 
 CopyJets::CopyJets(uhh2::Context & ctx, const std::string & old_name, const std::string & new_name):
-  h_new(ctx.declare_event_output<std::vector<TopJet>>(new_name)),
-  h_old(ctx.get_handle<std::vector<TopJet>>(old_name)) {}
+h_new(ctx.declare_event_output<std::vector<TopJet>>(new_name)),
+h_old(ctx.get_handle<std::vector<TopJet>>(old_name)) {}
 
 
 bool CopyJets::process(uhh2::Event & event){
   std::vector<TopJet> jets = event.get(h_old);
   event.set(h_new, jets);
 
-return true;
+  return true;
 }

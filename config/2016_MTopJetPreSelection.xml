@@ -7,7 +7,7 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 
 <!-- PROOFdir ?????????????????? -->
-  <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PreSel/2016">
+  <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PreSel/2016/">
 
 
 <!-- ================================================================================================================================ -->
@@ -156,9 +156,9 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
  -->
 
 
-    <!-- <InputData Version="ST_t-channel_antitop_inclusiveDecays" Lumi="477080.5312" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <InputData Version="ST_t-channel_antitop_inclusiveDecays" Lumi="477080.5312" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &ST_t-channel_antitop_inclusiveDecays; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
+<!--
     <InputData Version="ST_t-channel_top_inclusiveDecays" Lumi="477843.6995" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &ST_t-channel_top_inclusiveDecays; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
@@ -193,7 +193,7 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
 
 
 
-    <InputData Version="WJetsToLNu_HT-0070to0100" Lumi="7597.068234" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    <!-- <InputData Version="WJetsToLNu_HT-0070to0100" Lumi="7597.068234" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &WJetsToLNu_HT-0070to0100; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_HT-0100to0200" Lumi="24239.87096" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -215,7 +215,7 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
     &WJetsToLNu_HT-1200to2500; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
     <InputData Version="WJetsToLNu_HT-2500toInft" Lumi="67786609.31" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &WJetsToLNu_HT-2500toInft; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    &WJetsToLNu_HT-2500toInft; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
   <!--
@@ -242,17 +242,17 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
   -->
 
   <!-- <InputData Version="TTbar_Mtt0000to0700" Lumi="92260.16399" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &TTbar_Mtt0000to0700; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+    &TTbar_Mtt0000to0700; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-  <InputData Version="TTbar_Mtt0700to1000" Lumi="501742.7061" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-    &TTbar_Mtt0700to1000; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <!-- <InputData Version="TTbar_Mtt0700to1000" Lumi="501742.7061" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+    &TTbar_Mtt0700to1000; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-  <InputData Version="TTbar_Mtt1000toInft" Lumi="1193967.198" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <!-- <InputData Version="TTbar_Mtt1000toInft" Lumi="1193967.198" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
     &TTbar_Mtt1000toInft; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 
-      <InputData Version="TTbar_mtop1665" Lumi="22797.90084" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <!-- <InputData Version="TTbar_mtop1665" Lumi="22797.90084" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
       &TTbar_mtop1665; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
       <InputData Version="TTbar_mtop1695" Lumi="35296.28739" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -289,7 +289,7 @@ Updated from CMSSW_8 (Data: 2016) to CMSSW_10 (Data: 2016v3)
       &TTbar_hdampdown; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
       <InputData Version="TTJets" Lumi="12262.01188" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-      &TTJets; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+      &TTJets; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
     <!--
 ██████  ██    ██

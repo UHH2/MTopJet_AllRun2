@@ -19,54 +19,45 @@ bool uhh2::SubjetQuality_gen::passes(const uhh2::Event& event){
   return pass;
 }
 ////////////////////////////////////////////////////////
-uhh2::GenMuonCount::GenMuonCount(uhh2::Context& ctx, int min_, int max_):
-min(min_),
-max(max_) {}
+uhh2::GenMuonCount::GenMuonCount(uhh2::Context& ctx):
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
 
 bool uhh2::GenMuonCount::passes(const uhh2::Event& event){
+  const auto & ttbargen = event.get(h_ttbargen);
   bool pass = false;
-  int count = 0;
-  std::vector<GenParticle>* genparts = event.genparticles;
-  for (unsigned int i=0; i<(genparts->size()); ++i){
-    GenParticle p = genparts->at(i);
-    if(abs(p.pdgId()) == 13){
-      count++;
-    }
+  GenParticle lepton;
+  if(ttbargen.IsSemiLeptonicDecay()){
+    lepton = ttbargen.ChargedLepton();
+    if(abs(lepton.pdgId()) == 13) pass = true;
   }
-  if(count >= min && count <= max) pass = true;
   return pass;
 }
 ////////////////////////////////////////////////////////
-uhh2::GenElecCount::GenElecCount(uhh2::Context& ctx, int min_, int max_):
-min(min_),
-max(max_) {}
+uhh2::GenElecCount::GenElecCount(uhh2::Context& ctx):
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
 
 bool uhh2::GenElecCount::passes(const uhh2::Event& event){
+  const auto & ttbargen = event.get(h_ttbargen);
   bool pass = false;
-  int count = 0;
-  std::vector<GenParticle>* genparts = event.genparticles;
-  for (unsigned int i=0; i<(genparts->size()); ++i){
-    GenParticle p = genparts->at(i);
-    if(abs(p.pdgId()) == 11){
-      count++;
-    }
+  GenParticle lepton;
+  if(ttbargen.IsSemiLeptonicDecay()){
+    lepton = ttbargen.ChargedLepton();
+    if(abs(lepton.pdgId()) == 11) pass = true;
   }
-  if(count >= min && count <= max) pass = true;
   return pass;
 }
 ////////////////////////////////////////////////////////
 
 uhh2::GenMuonSel::GenMuonSel(uhh2::Context& ctx, double ptmin_):
-ptmin(ptmin_) {}
+ptmin(ptmin_), h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
 
 bool uhh2::GenMuonSel::passes(const uhh2::Event& event){
+  const auto & ttbargen = event.get(h_ttbargen);
   bool pass = false;
-  std::vector<GenParticle>* genparts = event.genparticles;
-  for (unsigned int i=0; i<(genparts->size()); ++i){
-    GenParticle p = genparts->at(i);
-    if(abs(p.pdgId()) == 13){
-      if(p.pt() > ptmin) pass = true;
-    }
+  GenParticle lepton;
+  if(ttbargen.IsSemiLeptonicDecay()){
+    lepton = ttbargen.ChargedLepton();
+    if((abs(lepton.pdgId()) == 13) && (lepton.pt() > ptmin)) pass = true;
   }
   return pass;
 }
@@ -74,16 +65,15 @@ bool uhh2::GenMuonSel::passes(const uhh2::Event& event){
 
 
 uhh2::GenElecSel::GenElecSel(uhh2::Context& ctx, double ptmin_):
-ptmin(ptmin_) {}
+ptmin(ptmin_), h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
 
 bool uhh2::GenElecSel::passes(const uhh2::Event& event){
+  const auto & ttbargen = event.get(h_ttbargen);
   bool pass = false;
-  std::vector<GenParticle>* genparts = event.genparticles;
-  for (unsigned int i=0; i<(genparts->size()); ++i){
-    GenParticle p = genparts->at(i);
-    if(abs(p.pdgId()) == 11){
-      if(p.pt() > ptmin) pass = true;
-    }
+  GenParticle lepton;
+  if(ttbargen.IsSemiLeptonicDecay()){
+    lepton = ttbargen.ChargedLepton();
+    if((abs(lepton.pdgId()) == 11) && (lepton.pt() > ptmin)) pass = true;
   }
   return pass;
 }
@@ -98,9 +88,7 @@ bool uhh2::TTbarSemilep::passes(const uhh2::Event& event){
   const auto & ttbargen = event.get(h_ttbargen);
   bool semilep = false;
 
-  if(ttbargen.DecayChannel() == TTbarGen::e_muhad || ttbargen.DecayChannel() == TTbarGen::e_ehad){
-    semilep = true;
-  }
+  if(ttbargen.DecayChannel() == TTbarGen::e_muhad || ttbargen.DecayChannel() == TTbarGen::e_ehad) semilep = true;
   return semilep;
 }
 ////////////////////////////////////////////////////////
@@ -660,25 +648,22 @@ bool uhh2::MassCut::passes(const uhh2::Event& event){
 
 uhh2::MassCut_gen::MassCut_gen(uhh2::Context& ctx, const std::string & hadname, const std::string & lepname):
 h_hadjets(ctx.get_handle<std::vector<GenTopJet>>(hadname)),
-h_lepjets(ctx.get_handle<std::vector<GenTopJet>>(lepname)){}
+h_lepjets(ctx.get_handle<std::vector<GenTopJet>>(lepname)),
+h_ttbargen(ctx.get_handle<TTbarGen>("ttbargen")) {}
 
 bool uhh2::MassCut_gen::passes(const uhh2::Event& event){
   std::vector<GenTopJet> hadjets = event.get(h_hadjets);
   std::vector<GenTopJet> lepjets = event.get(h_lepjets);
-  vector<GenParticle> leptons;
-  bool is_semilep = false;
-  for (unsigned int i=0; i<event.genparticles->size(); i++){
-    if(abs(event.genparticles->at(i).pdgId()) == 11 || abs(event.genparticles->at(i).pdgId()) == 13 ){
-      leptons.push_back(event.genparticles->at(i));
-    }
-  }
-  if(leptons.size() == 1) is_semilep = true;
+  const auto & ttbargen = event.get(h_ttbargen);
+
+  GenParticle lepton = ttbargen.ChargedLepton();
+  bool is_semilep = ttbargen.IsSemiLeptonicDecay();
 
   LorentzVector jet1_v4, jet2_v4;
   bool pass_masscut = false;
   if(hadjets.size()>0 && lepjets.size()>0){
     jet1_v4 = hadjets.at(0).v4();
-    if(is_semilep) jet2_v4 = lepjets.at(0).v4() + leptons[0].v4();
+    if(is_semilep) jet2_v4 = lepjets.at(0).v4() + lepton.v4();
     else           jet2_v4 = lepjets.at(0).v4();
     if(jet1_v4.M() > jet2_v4.M()) pass_masscut = true;
   }

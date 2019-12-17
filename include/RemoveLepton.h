@@ -38,4 +38,5 @@ class RemoveLeptonGen: public uhh2::AnalysisModule{
 
  private:
    uhh2::Event::Handle<std::vector<GenTopJet>>h_topjets;
+   uhh2::Event::Handle<TTbarGen> h_ttbargen;
 };
