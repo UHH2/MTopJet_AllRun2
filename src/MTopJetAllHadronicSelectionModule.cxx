@@ -5,8 +5,8 @@
 #include <UHH2/core/include/Event.h>
 #include <UHH2/core/include/Selection.h>
 
-#include <UHH2/common/include/CleaningModules.h>
 #include <UHH2/common/include/CommonModules.h>
+#include <UHH2/common/include/CleaningModules.h>
 #include <UHH2/common/include/NSelections.h>
 #include <UHH2/common/include/TriggerSelection.h>
 #include <UHH2/common/include/JetCorrections.h>
@@ -20,6 +20,7 @@
 #include <UHH2/common/include/AdditionalSelections.h>
 #include <UHH2/common/include/MCWeight.h>
 #include <UHH2/common/include/TopPtReweight.h>
+#include "UHH2/common/include/YearRunSwitchers.h"
 
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/MuonHists.h>
@@ -30,7 +31,7 @@
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
-
+#include <UHH2/MTopJet/include/CountingEventHists.h>
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
@@ -56,14 +57,13 @@ protected:
   enum lepton { muon, elec };
   lepton channel_;
 
-  // cleaners & Correctors
   std::unique_ptr<CommonModules> common;
+  // cleaners & Correctors
   std::unique_ptr<JetCleaner> jet_cleaner1;
   std::unique_ptr<JetCleaner> jet_cleaner2;
   std::unique_ptr<JetCorrections_xcone> JetCorrections;
   std::unique_ptr<JER_Smearer_xcone> JERSmearing;
   std::unique_ptr<uhh2::AnalysisModule> Correction;
-  std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
 
   // Btag efficiency hists
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
@@ -80,6 +80,9 @@ protected:
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> jet_sel;
 
+  //HISTS
+  std::unique_ptr<Hists> h_events_start, h_events_end, h_events_common;
+
 
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<std::vector<GenTopJet>>h_gen33fatjets;
@@ -92,24 +95,32 @@ protected:
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
 
-  string corvar ="nominal";
+  string corvar = "nominal";
 
   JetId btag_tight;
+  Year year;
 
 };
 
 MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Context& ctx){
 
+  //======================= YearSwitcher =======================================
+  bool year_16 = false;
+  bool year_17 = false;
+  bool year_18 = false;
+  year = extract_year(ctx);
+
+  if(year == Year::is2016v3) year_16 = true;
+  else if(year == Year::is2017v2) year_17 = true;
+  else if(year == Year::is2018) year_18 = true;
+  else throw runtime_error("In AllHadronicSelectionModule: This Event is not from 2016v3, 2017v2 or 2018!");
+
+  /*************************** CONFIGURATION **********************************************************************************/
   isMC = (ctx.get("dataset_type") == "MC");
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_allHad"  ||
-     ctx.get("dataset_version") == "TTbar_Mtt0700to1000_allHad"  ||
-     ctx.get("dataset_version") == "TTbar_Mtt1000toInft_allHad" ) isTTbar = true;
-  else isTTbar = false;
+  TString dataset_version = (TString) ctx.get("dataset_version");
+  if(dataset_version.Contains("TTbar")) isTTbar = true;
+  else  isTTbar = false;
 
-
-  // ttbar gen
-  const std::string ttbar_gen_label("ttbargen");
-  if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
   h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
   h_gen33fatjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
@@ -130,15 +141,20 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
   // correct subjets (JEC + additional correction)
   JetCorrections.reset(new JetCorrections_xcone());
   JetCorrections->init(ctx, "xconeCHS");
-  Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true));
+
+  if(year_16) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2016"));
+  else if(year_17) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2017"));
+  else if(year_18) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2018"));
+  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
+
   JERSmearing.reset(new JER_Smearer_xcone());
   JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
   //// EVENT SELECTION
 
 
   // define IDs
-  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(30.0, 2.4));
-  JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_LOOSE_CHS), PtEtaCut(50.0, 2.4));
+  JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
+  JetId jetid_selection = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(50.0, 2.4));
   ////
 
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
@@ -146,27 +162,30 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
 
   //// Obj Cleaning
 
+  jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
+  jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
+
+  //
+  btag_tight = DeepJetBTag(DeepJetBTag::WP_TIGHT);
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",btag_tight));
+
+  //// set up Hists classes:
+  h_events_start.reset(new CountingEventHists(ctx, "Events_Start"));
+  h_events_end.reset(new CountingEventHists(ctx, "Events_End"));
+  h_events_common.reset(new CountingEventHists(ctx, "Events_Common"));
+
   common.reset(new CommonModules());
-  common->set_HTjetid(jetid_cleaner);
   common->switch_jetlepcleaner(true);
   common->switch_metcorrection();
   common->disable_mcpileupreweight(); // do this in PostSel
   common->init(ctx);
 
-  jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
-  jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
-
-  //
-  btag_tight = CSVBTag(CSVBTag::WP_TIGHT);
-  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",btag_tight));
-
-  //// set up Hists classes:
-  //
-
 }
 
 bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
-
+  h_events_start->fill(event);
+  if(!common->process(event)) return false;
+  h_events_common->fill(event);
   /* *********** at least 1 good primary vertex *********** */
   if(!pv_sel->passes(event)) return false;
 
@@ -176,13 +195,9 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   /* *********** b-tag counter *********** */
   bool passed_btag = false;
   int jetbtagN(0);
-  for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;
+  for(const auto& j : *event.jets) if(DeepJetBTag(DeepJetBTag::WP_TIGHT)(j, event)) ++jetbtagN;
   if(jetbtagN == 0) return false;
 
-
-  // fill ttbargen class
-  if(isTTbar) ttgenprod->process(event);
-  ////
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
   // store reco jets with and without JEC applied, and also copy uncorrected subjets
@@ -194,7 +209,7 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   }
 
   if(!event.isRealData) jetprod_gen33->process(event);
-  
+
   // Here all the Correction is happening
   jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
   copy_jet->process(event);                // copy 'raw' Fatets (with subjets) and name one copy 'noJEC'
@@ -204,6 +219,7 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
   ////
+  h_events_end->fill(event);
   return true;
 }
 

@@ -111,10 +111,8 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
 
 
 void SubjetHists_xcone::fill(const Event & event){
-
   // get weight
   double weight = event.weight;
-
   //---------------------------------------------------------------------------------------
   //--------------------------------- define needed objects-----------------------------------
   //---------------------------------------------------------------------------------------
@@ -125,7 +123,6 @@ void SubjetHists_xcone::fill(const Event & event){
   std::vector<float> cor_factor_lep = event.get(h_cor_factor_lep);
 
   // std::vector<Jet> ak4_jets = event.jets;
-
   std::vector<Jet> had_subjets, lep_subjets;
   Particle lepton;
   if(event.muons->size() > 0 && event.electrons->size() > 0){
@@ -137,7 +134,6 @@ void SubjetHists_xcone::fill(const Event & event){
   else if(event.electrons->size() > 0){
     lepton = event.electrons->at(0);
   }
-
   if(rec_fatjets.size() != 2) return;
   double dR1 = uhh2::deltaR(lepton, rec_fatjets.at(0));
   double dR2 = uhh2::deltaR(lepton, rec_fatjets.at(1));
@@ -151,7 +147,6 @@ void SubjetHists_xcone::fill(const Event & event){
   }
   if(had_subjets.size() != 3) return;
   if(lep_subjets.size() != 3) return;
-
   //---------------------------------------------------------------------------------------
   //------------------------ add subjets without and with  pt cut--------------------------
   //---------------------------------------------------------------------------------------
@@ -172,7 +167,6 @@ void SubjetHists_xcone::fill(const Event & event){
   }
   had_jet_v4.SetPxPyPzE(px, py, pz, E);
   had_jet_v4_cut.SetPxPyPzE(px_cut, py_cut, pz_cut, E_cut);
-
   px=0;
   py=0;
   pz=0;
@@ -185,7 +179,6 @@ void SubjetHists_xcone::fill(const Event & event){
     E += lep_subjets.at(i).v4().E();
   }
   lep_jet_v4.SetPxPyPzE(px, py, pz, E);
-
 
   //---------------------------------------------------------------------------------------
   //--------------------------------- add subjets to reconstruct W ------------------------
@@ -259,7 +252,6 @@ void SubjetHists_xcone::fill(const Event & event){
   all_mass_Wjet->Fill(M23, weight);
 
 
-
   //---------------------------------------------------------------------------------------
   //--------------------------------- Fill Hists here -------------------------------------
   //---------------------------------------------------------------------------------------
@@ -287,10 +279,8 @@ void SubjetHists_xcone::fill(const Event & event){
     }
   }
   ////
-
   for(auto fac: cor_factor_had) COR_factor_had->Fill(fac, weight);
   for(auto fac: cor_factor_lep) COR_factor_lep->Fill(fac, weight);
-
   double tot_area=0;
   pt_had_subjet1_fine->Fill(had_subjets.at(0).pt(), weight);
   pt_had_subjet2_fine->Fill(had_subjets.at(1).pt(), weight);
@@ -342,7 +332,6 @@ void SubjetHists_xcone::fill(const Event & event){
   }
   area_final->Fill(tot_area, weight);
   area_pt_final->Fill(tot_area, had_jet_v4.Pt(), weight);
-
   for(unsigned int i=0; i<lep_subjets.size(); i++){
     pt_lep_subjets->Fill(lep_subjets.at(i).pt(), weight);
     eta_lep_subjets->Fill(lep_subjets.at(i).eta(), weight);
@@ -375,7 +364,6 @@ void SubjetHists_xcone::fill(const Event & event){
   mass_had_combine->Fill(had_jet_v4.M(), weight);
   mass_had_combine_cut->Fill(had_jet_v4_cut.M(), weight);
   mass_lep_combine->Fill(lep_jet_v4.M(), weight);
-
   for(const auto& ak4 : *event.jets){
     if(CSVBTag(CSVBTag::WP_TIGHT)(ak4, event)){
       double dR_min = 100;

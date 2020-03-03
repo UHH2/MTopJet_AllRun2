@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
+  <!ENTITY NEVT "-1">
+
+ <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2018/muon/AllHad">
+ <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2018/muon/AllHad">
+
+<!-- =============================================== ttbar =========================================================================== -->
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_allHad_2018.root">
+
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_1  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_allHad_2018_1.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_2  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_allHad_2018_2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_3  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_allHad_2018_3.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_4  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_allHad_2018_4.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_5  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_allHad_2018_5.root">
+
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_1    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_allHad_2018_1.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_2    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_allHad_2018_2.root">
+]>
+
+<!--
+   <ConfigParse NEventsBreak="150000" LastBreak="0" FileSplit="0"/>
+   <ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelMu_AllHad_2018"/>
+-->
+
+<JobConfiguration JobName="MTopJetAllHadronicPostSelectionJob" OutputLevel="INFO">
+  <Library Name="libSUHH2MTopJet"/>
+  <Package Name="SUHH2MTopJet.par"/>
+
+
+  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="59740">
+  <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
+
+  <InputData Version="TTbar_Mtt0000to0700_2L2Nu_allHad_2018" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+  <InputData Version="TTbar_Mtt0000to0700_Hadronic_allHad_2018_1" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_Hadronic_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <InputData Version="TTbar_Mtt0000to0700_Hadronic_allHad_2018_2" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_Hadronic_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <InputData Version="TTbar_Mtt0000to0700_Hadronic_allHad_2018_3" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_Hadronic_3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <InputData Version="TTbar_Mtt0000to0700_Hadronic_allHad_2018_4" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_Hadronic_4;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <InputData Version="TTbar_Mtt0000to0700_Hadronic_allHad_2018_5" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_Hadronic_5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+  <InputData Version="TTbar_Mtt0000to0700_SemiLep_allHad_2018_1" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_SemiLep_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <InputData Version="TTbar_Mtt0000to0700_SemiLep_allHad_2018_2" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&TTbar_Mtt0000to0700_SemiLep_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!-- ================================================================================================================================== -->
+<!-- ====================================================== User Config =============================================================== -->
+<!-- ================================================================================================================================== -->
+
+    <UserConfig>
+        <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+        <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+        <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+
+        <Item Name="JetCollection"           Value="jetsAk4CHS"/>
+        <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
+
+      	<Item Name="additionalBranches" Value="xconePuppi xconeCHS xconeCHS_noJEC xconeCHS_Corrected genXCone33TopJets genXCone33TopJets_softdrop XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined cor_factor_had cor_factor_lep"/>
+
+      	<Item Name="METName" Value="slimmedMETs"/>
+
+        <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->
+        <!-- since the weight has already been scaled in the Selection, do not do it here -->
+      	<Item Name="use_sframe_weight" Value="false"/>
+
+      	<Item Name="dometfilters" Value="true" />
+      	<Item Name="dopvfilter" Value="true" />
+
+        <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2018_muon.root"/>
+        <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/DeepJet_102XSF_WP_V1.csv"/>
+
+        <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/MyDataPileupHistogram2018.root" />
+        <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/MyMCPileupHistogram.root" />
+        <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/MyDataPileupHistogram2018_72383.root" />
+        <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2018/MyDataPileupHistogram2018_66017.root" />
+
+      	<Item Name="ScaleVariationMuR" Value="none"/>
+      	<Item Name="ScaleVariationMuF" Value="none"/>
+      	<Item Name="PU_variation" Value="central" />
+      	<Item Name="BTag_variation" Value="central" />
+      	<Item Name="MuScale_variation" Value="nominal" />
+      	<Item Name="MuTrigger_variation" Value="nominal" />
+
+      	<Item Name="AnalysisModule" Value="MTopJetAllHadronicPostSelectionModule"/>
+  </UserConfig>
+
+  </Cycle>
+</JobConfiguration>

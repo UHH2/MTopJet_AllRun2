@@ -34,8 +34,7 @@
 #include <TVirtualFitter.h>
 #include <TFitResult.h>
 
-
-//TString dir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon/";
+TString dir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/";
 //TString dir_elec = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/elec/";
 //TString dir_combine = "/nfs/dust/cms/user/paaschal/MTopJet/PostSelection/combine/";
 

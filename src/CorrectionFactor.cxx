@@ -36,12 +36,6 @@ double CorrectionFactor::get_factor(double pt, double eta){
     // 2. add this to central factor
     if(CorUp)        factor = f_c + sqrt(df*df + dg*dg);
     else if(CorDown) factor = f_c - sqrt(df*df + dg*dg);
-    // cout << "------------------------------------------" << endl;
-    // cout << "central factor         = " << f_c << endl;
-    // cout << "diff from function     = " << df << endl;
-    // cout << "diff from additional   = " << dg << endl;
-    // cout << "diff to central factor = " << sqrt(df*df + dg*dg) << endl;
-    // cout << "new factor             = " << factor << endl;
 
   }
   else factor = CentralCorrectionFunctions[etabin]->Eval(pt);
@@ -50,11 +44,11 @@ double CorrectionFactor::get_factor(double pt, double eta){
 }
 
 
-void CorrectionFactor::get_function(){
+void CorrectionFactor::get_function(TString year){
 
-  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
+  TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
-  filename = dir + "Correction_allHad.root";
+  filename = dir + "Correction_allHad_"+year+".root";
   TFile *file = new TFile(filename);
 
   TString histname_updown;
@@ -80,9 +74,9 @@ void CorrectionFactor::get_function(){
 
 void CorrectionFactor::get_additionalSYS(){
 
-  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW_8_0_24_patch1/src/UHH2/MTopJet/CorrectionFile/";
+  TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
-  filename = dir + "Correction_SysFromResolution.root";
+  filename = dir + "Correction_SysFromResolution_"+year+".root";
   TFile *file = new TFile(filename);
 
   if(CorUp){
@@ -116,12 +110,13 @@ Particle GetLepton(uhh2::Event & event){
 }
 
 
-CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar, bool allHad_):
+CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar, bool allHad_, TString year_):
 h_oldjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS")),
 h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name)),
 h_cor_factor_had(ctx.declare_event_output<std::vector<float>>("cor_factor_had")),
 h_cor_factor_lep(ctx.declare_event_output<std::vector<float>>("cor_factor_lep")),
-allHad(allHad_)
+allHad(allHad_),
+year(year_)
 {
   CorUp = false;
   CorDown=false;
@@ -129,7 +124,7 @@ allHad(allHad_)
   if(corvar == "up")   CorUp = true;
   else if(corvar == "down") CorDown = true;
 
-  get_function(); // read file here, not in every event
+  get_function(year); // read file here, not in every event
   get_additionalSYS();
 }
 
@@ -137,20 +132,6 @@ bool CorrectionFactor::process(uhh2::Event & event){
   std::vector<TopJet> oldjets = event.get(h_oldjets);
   std::vector<TopJet> newjets;
   for(unsigned int i=0; i < oldjets.size(); i++) newjets.push_back(oldjets.at(i));
-
-  // get had jet, to only correct had subjets (in l+jets case)
-  // int had_nr = 0;
-  // int lep_nr = 1;
-  // if(!allHad){
-  //   Particle lepton = GetLepton(event);
-  //   if(deltaR(lepton, oldjets.at(0)) < deltaR(lepton, oldjets.at(1))){
-  //     had_nr = 1;
-  //     lep_nr = 0;
-  //   }
-  // }
-
-  // leave lep subjets unchanged (dont do this anymore!!)
-  // if(!allHad) newjets.at(lep_nr).set_subjets(oldjets.at(lep_nr).subjets());
 
   vector<float> factors_had;
   vector<float> factors_lep;

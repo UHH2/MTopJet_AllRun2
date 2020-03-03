@@ -60,7 +60,7 @@ protected:
   lepton channel_;
 
   // cleaners & Correctors
-  std::unique_ptr<CommonModules> common;
+  std::unique_ptr<CommonModules>   common;
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
 
@@ -162,30 +162,28 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   recsel_only = false;
   year = extract_year(ctx); // Ask for the year of Event
+
+  //======================= YearSwitcher =======================================
+  bool year_16 = false;
+  bool year_17 = false;
+  bool year_18 = false;
+  year = extract_year(ctx);
+
+  if(year == Year::is2016v3) year_16 = true;
+  else if(year == Year::is2017v2) year_17 = true;
+  else if(year == Year::is2018) year_18 = true;
+  else throw runtime_error("In AllHadronicSelectionModule: This Event is not from 2016v3, 2017v2 or 2018!");
+
   //// CONFIGURATION
 
   TString dataset_version = (TString) ctx.get("dataset_version");
   if(dataset_version.Contains("TTbar")) isTTbar = true;
   else  isTTbar = false;
 
-  if(ctx.get("dataset_version") == "SingleElecB" ||
-  ctx.get("dataset_version") == "SingleElecC" ||
-  ctx.get("dataset_version") == "SingleElecD" ||
-  ctx.get("dataset_version") == "SingleElecE" ||
-  ctx.get("dataset_version") == "SingleElecF" ||
-  ctx.get("dataset_version") == "SingleElecG" ||
-  ctx.get("dataset_version") == "SingleElecHver2" ||
-  ctx.get("dataset_version") == "SingleElecHver3") isElectronStream = true;
+  if(dataset_version.Contains("SingleElec")) isElectronStream = true;
   else isElectronStream = false;
 
-  if(ctx.get("dataset_version") == "SinglePhotonB" ||
-  ctx.get("dataset_version") == "SinglePhotonC" ||
-  ctx.get("dataset_version") == "SinglePhotonD" ||
-  ctx.get("dataset_version") == "SinglePhotonE" ||
-  ctx.get("dataset_version") == "SinglePhotonF" ||
-  ctx.get("dataset_version") == "SinglePhotonG" ||
-  ctx.get("dataset_version") == "SinglePhotonHver2" ||
-  ctx.get("dataset_version") == "SinglePhotonHver3") isPhotonStream = true;
+  if(dataset_version.Contains("SinglePhoton")) isPhotonStream = true;
   else isPhotonStream = false;
 
   // ttbar gen
@@ -237,7 +235,12 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // smear jets after Correction
   JERSmearing.reset(new JER_Smearer_xcone());
   JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
-  Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, false));
+
+  if(year_16) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2016"));
+  else if(year_17) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2017"));
+  else if(year_18) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2018"));
+  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
+
   NonClosureSYS.reset(new NonClosureUncertainty(ctx));
   //// EVENT SELECTION
   // define IDs

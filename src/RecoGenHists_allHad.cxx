@@ -67,7 +67,7 @@ RecoGenHists_allHad::RecoGenHists_allHad(uhh2::Context & ctx, const std::string 
   h_genjets=ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
   // handle for ttbargen
-  h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
+  //h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
 
   // set min ptgen and min ptrec
   ptreccut = ptreccut_;

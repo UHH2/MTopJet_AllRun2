@@ -26,6 +26,8 @@
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/TTbarGenHists.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
+#include <UHH2/common/include/MCWeight.h> // nachträglich eingebaut
+
 //
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
@@ -44,6 +46,7 @@ protected:
 
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
+  std::unique_ptr<AnalysisModule> lumiweight;
 
   // selections
   std::unique_ptr<uhh2::Selection> lumi_sel;
@@ -58,6 +61,8 @@ protected:
   std::unique_ptr<uhh2::Selection> SemiLepDecay;
 
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+  //HISTS
+  std::unique_ptr<Hists> h_ttbar;
 
   // handles
   Event::Handle<std::vector<TopJet>>h_fatjets;
@@ -70,21 +75,20 @@ MTopJetAllHadronicModule::MTopJetAllHadronicModule(uhh2::Context& ctx){
   isMC = (ctx.get("dataset_type") == "MC");
 
   h_fatjets = ctx.get_handle<std::vector<TopJet>>("xconeCHS");
-  ////
+
+  //HIST-classes
+  h_ttbar.reset(new TTbarGenHists(ctx, "TTbar"));
 
   //// COMMON MODULES
-
   if(!isMC) lumi_sel.reset(new LumiSelection(ctx));
-
-
 
   /* GEN M-ttbar selection [TTbar MC "0.<M^{gen}_{ttbar}(GeV)<700.] */
   const std::string ttbar_gen_label("ttbargen");
 
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
-  else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_allHad_2016v3") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
+  else                                                                  genmttbar_sel.reset(new uhh2::AndSelection(ctx));
 
   /******************************************************************/
 
@@ -104,6 +108,8 @@ MTopJetAllHadronicModule::MTopJetAllHadronicModule(uhh2::Context& ctx){
   muon_sel.reset(new NMuonSelection(0, 0, muid));
   elec_sel.reset(new NElectronSelection(0, 0, eleid));
   ////
+  lumiweight.reset(new MCLumiWeight(ctx));
+
 }
 
 bool MTopJetAllHadronicModule::process(uhh2::Event& event){
@@ -140,10 +146,11 @@ bool MTopJetAllHadronicModule::process(uhh2::Event& event){
   const bool pass_met = met_sel->passes(event);
   const bool pass_lepsel = (muon_sel->passes(event) && elec_sel->passes(event));
 
-
-
   if(pass_jet2 && pass_jet1 && pass_met && pass_fatjet && pass_lepsel) passed_recsel = true;
   else passed_recsel = false;
+
+  //FILL HISTS
+  h_ttbar->fill(event);
 
   if(!passed_recsel) return false;
   else               return true;

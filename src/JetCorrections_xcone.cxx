@@ -38,36 +38,58 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
 
   // setup JEC for XCone
   isMC = (ctx.get("dataset_type") == "MC");
-  jet_corrector_MC.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_07Aug2017_V20_L123_AK4PFchs_MC, jet_collection_rec));
 
-  // vector<vector<string>> JERfiles_flavor = {JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorUD,
-  //                                           JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorS,
-  //                                           JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorC,
-  //                                           JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorB,
-  //                                           JERFiles::Summer16_07Aug2017_V15_L123_AK4PFchs_MC_flavorG};
+  string jec_tag_2016 = "Summer16_07Aug2017";
+  string jec_ver_2016 = "20";
 
-  // jet_corrector_MC_flavor.reset(new GenericSubJetCorrector_flavor(ctx, JERfiles_flavor, jet_collection_rec));
+  string jec_tag_2017 = "Fall17_17Nov2017";
+  string jec_ver_2017 = "32";
 
-  jet_corrector_BCD.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_BCD_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
-  jet_corrector_EFearly.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_EF_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
-  jet_corrector_FlateG.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_G_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
-  jet_corrector_H.reset(new GenericSubJetCorrector(ctx, JERFiles::Summer16_23Sep2016_V4_H_L123_AK4PFchs_DATA_flavorG, jet_collection_rec));
+  string jec_tag_2018 = "Autumn18";
+  string jec_ver_2018 = "19";
+
+  string jec_jet_coll = "AK4PFchs";
+
+  if (isMC)
+  {
+    jet_corrector_MC.reset(new YearSwitcher(ctx));
+    jet_corrector_MC->setup2016v3(std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesMC(jec_tag_2016, jec_ver_2016, jec_jet_coll),jet_collection_rec));
+    jet_corrector_MC->setup2017v2(std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesMC(jec_tag_2017, jec_ver_2017, jec_jet_coll),jet_collection_rec));
+    jet_corrector_MC->setup2018(std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesMC(jec_tag_2018, jec_ver_2018, jec_jet_coll),jet_collection_rec));
+  }
+
+  else
+  {
+    jec_switcher_16.reset(new RunSwitcher(ctx, "2016"));
+    for (const auto & runItr : runPeriods2016) { // runPeriods defined in common/include/Utils.h
+      jec_switcher_16->setupRun(runItr, std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesDATA(jec_tag_2016, jec_ver_2016, jec_jet_coll, runItr),jet_collection_rec));
+    }
+
+    jec_switcher_17.reset(new RunSwitcher(ctx, "2017"));
+    for (const auto & runItr : runPeriods2017) {
+      jec_switcher_17->setupRun(runItr, std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesDATA(jec_tag_2017, jec_ver_2017, jec_jet_coll, runItr),jet_collection_rec));
+    }
+
+    jec_switcher_18.reset(new RunSwitcher(ctx, "2018"));
+    for (const auto & runItr : runPeriods2018) {
+      jec_switcher_18->setupRun(runItr, std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesDATA(jec_tag_2018, jec_ver_2018, jec_jet_coll, runItr),jet_collection_rec));
+    }
+
+    jet_corrector_data.reset(new YearSwitcher(ctx));
+    jet_corrector_data->setup2016v3(jec_switcher_16);
+    jet_corrector_data->setup2017v2(jec_switcher_17);
+    jet_corrector_data->setup2018(jec_switcher_18);
+  }
+
+  // The new SetUp chooses the right Modul by itself. The old one has to be done by telling the program which Module to choose.
+
 }
 
 bool JetCorrections_xcone::process(uhh2::Event & event){
   std::vector<TopJet> jets = event.get(h_topjets);
   event.set(h_topjets, set_JEC_factor(jets)); // first set JEC_factor_raw to a non-0 value
-  if(isMC){
-    jet_corrector_MC->process(event);
-    // jet_corrector_MC_flavor->process(event);
-  }
-  else{
-    if(event.run <= runnr_BCD)         jet_corrector_BCD->process(event);
-    else if(event.run < runnr_EFearly) jet_corrector_EFearly->process(event);
-    else if(event.run <= runnr_FlateG) jet_corrector_FlateG->process(event);
-    else if(event.run > runnr_FlateG)  jet_corrector_H->process(event);
-    else throw runtime_error("Jet Correction: run number not covered by if-statements in process-routine.");
-  }
+  if(isMC) jet_corrector_MC->process(event);
+  else jet_corrector_data->process(event);
 
   return true;
 }
@@ -80,8 +102,29 @@ void JER_Smearer_xcone::init(uhh2::Context & ctx, const std::string& jet_collect
   h_gentopjets_ = ctx.get_handle<std::vector<GenTopJet> >(jet_collection_gen);
   if(fat_sub == "sub") use_subjets = true;
   else                 use_subjets = false;
-  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, JERSmearing::SF_13TeV_2016_03Feb2017, "2017/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
+
+
+  JERSmearing::SFtype1 JER_sf;
+  std::string filenameAppend = "AK4PFPuppi.txt";
+
+  const Year & year = extract_year(ctx);
+  std::string resFilename = "";
+  if (year == Year::is2016v3) {
+    JER_sf = JERSmearing::SF_13TeV_Summer16_25nsV1;
+    resFilename = "2016/Summer16_25nsV1_MC_PtResolution_"+filenameAppend;
+  } else if (year == Year::is2017v2) {
+    JER_sf = JERSmearing::SF_13TeV_Fall17_V3;
+    resFilename = "2017/Fall17_V3_MC_PtResolution_"+filenameAppend;
+  } else if (year == Year::is2018) {
+    JER_sf = JERSmearing::SF_13TeV_Autumn18_RunABCD_V4;
+    resFilename = "2018/Autumn18_V4_MC_PtResolution_"+filenameAppend;
+  } else {
+    throw runtime_error("Cannot find suitable jet resolution file & scale factors for this year for JetResolutionSmearer");
+  }
+
+  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, JER_sf, resFilename));
 }
+
 
 bool JER_Smearer_xcone::process(uhh2::Event & event){
   if(use_subjets){
@@ -132,7 +175,7 @@ bool JER_Smearer_xcone::process(uhh2::Event & event){
   }
   else
 
-  JER_Smearer->process(event);
+  JER_Smearer->process(event); // Zu dem else ???????????????????????????????????????????
 
   return true;
 }

@@ -22,11 +22,11 @@ Particle GetLepton(uhh2::Event & event);
 class CorrectionFactor: public uhh2::AnalysisModule{
 public:
 
-  explicit CorrectionFactor(uhh2::Context &,  const std::string &, std::string, bool allHad_);
+  explicit CorrectionFactor(uhh2::Context &,  const std::string &, std::string, bool allHad_, TString year_);
   virtual bool process(uhh2::Event & ) override;
 
 private:
-  void get_function();
+  void get_function(TString);
   void get_additionalSYS();
   double get_factor(double, double);
   uhh2::Event::Handle<std::vector<TopJet>>h_oldjets;
@@ -41,5 +41,6 @@ private:
   TGraph *AdditionalSys;
   bool CorUp, CorDown;
   bool allHad;
+  string year;
 
 };

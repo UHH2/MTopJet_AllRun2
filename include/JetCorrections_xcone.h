@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TF1.h"
 #include "UHH2/common/include/JetCorrections.h"
+#include "UHH2/common/include/YearRunSwitchers.h"
 #include "UHH2/MTopJet/include/GenericSubJetCorrector_flavor.h"
 
 #include <iostream>
@@ -24,12 +25,9 @@ public:
   virtual bool process(uhh2::Event & event) override;
 
 private:
-  std::unique_ptr<GenericSubJetCorrector_flavor> jet_corrector_MC_flavor;
-  std::unique_ptr<GenericSubJetCorrector> jet_corrector_MC, jet_corrector_BCD, jet_corrector_EFearly, jet_corrector_FlateG, jet_corrector_H;
+  std::unique_ptr<YearSwitcher> jet_corrector_MC, jet_corrector_data;
+    std::shared_ptr<RunSwitcher> jec_switcher_16, jec_switcher_17, jec_switcher_18;
   std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
-  const int runnr_BCD = 276811;
-  const int runnr_EFearly = 278802;
-  const int runnr_FlateG = 280385;
   bool isMC;
   uhh2::Event::Handle<std::vector<TopJet>>h_topjets;
 

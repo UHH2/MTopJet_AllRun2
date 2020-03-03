@@ -217,7 +217,11 @@ obj/JetCorrections_xcone.o: src/JetCorrections_xcone.cxx \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw/CMSSW_10_2_10/external/slc6_amd64_gcc700/bin/../../../../../../../slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/include/Math/Types.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw/CMSSW_10_2_10/external/slc6_amd64_gcc700/bin/../../../../../../../slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/include/Math/ParamFunctor.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/include/JetCorrections.h \
+ /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/JetMETObjects/interface/JetResolution.h \
+ /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/JetMETObjects/interface/JetResolutionObject.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/include/JetCorrectionSets.h \
+ /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/include/YearRunSwitchers.h \
+ /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/core/include/Utils.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/MTopJet/include/GenericSubJetCorrector_flavor.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/include/TTbarGen.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/include/JetIds.h \
@@ -235,7 +239,6 @@ obj/JetCorrections_xcone.o: src/JetCorrections_xcone.cxx \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw/CMSSW_10_2_10/external/slc6_amd64_gcc700/bin/../../../../../../../slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/include/Fit/FitExecutionPolicy.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw/CMSSW_10_2_10/external/slc6_amd64_gcc700/bin/../../../../../../../slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/include/TFitResultPtr.h \
  /cvmfs/cms.cern.ch/slc6_amd64_gcc700/cms/cmssw/CMSSW_10_2_10/external/slc6_amd64_gcc700/bin/../../../../../../../slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/include/TGraph.h \
- /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/core/include/Utils.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/JetMETObjects/interface/FactorizedJetCorrector.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/JetMETObjects/interface/FactorizedJetCorrectorCalculator.h \
  /nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/JetMETObjects/interface/JetCorrectorParameters.h
