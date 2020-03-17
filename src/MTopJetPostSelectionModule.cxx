@@ -707,11 +707,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // double SF_tt = 0.846817;  // estimated in combined channel FROM DENNIS
   double SF_tt = 0.720007; // estimated in muon 2016
   // get lumi weight = genweight (inkl scale variation)
-  scale_variation->process(event); // here, it is only executed to be filled into the gen weight is has to be done again to appear in the event.weight
-  double gen_weight = event.get(h_weight);
-
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
+  scale_variation->process(event);
+  if(isTTbar) ps_weights->process(event);
+  double gen_weight = event.weight;
 
   // FILL CONTROL PLOTS
   if(passed_recsel){
@@ -735,7 +735,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     factor_4w = 1.0;
     factor_8w = 1.0;
   }
+
   scale_variation->process(event); // do this again because scale variation should change gen weight and event.weight, but not rec weight!!!
+  if(isTTbar) ps_weights->process(event);
 
   // if(reweight_ttbar) ttbar_reweight->process(event);
   h_weights01->fill(event);
@@ -823,9 +825,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   double rec_weight;
   if(gen_weight==0)rec_weight = 0;
   else rec_weight = (event.weight)/gen_weight;
-
-  // Now get PS Weight --- Right place ?
-  if(isTTbar) ps_weights->process(event);
 
   /**********************************/
   bool passed_presel_rec = (passed_recsel && passed_btag);
