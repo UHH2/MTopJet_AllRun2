@@ -9,8 +9,14 @@ sys.path.append('/nfs/dust/cms/user/tholenhe/installs/varial-stable/Varial')
 
 sys_uncerts = {
      #'name' : {'item name': 'item value', ...},
-     'FSR_up_2'              : {'PS_variation':'FSRup_2'},
-     'FSR_down_2'            : {'PS_variation':'FSRdown_2'},
+     'FSRup_2'              : {'PS_variation':'FSRup_2'},
+     'FSRdown_2'            : {'PS_variation':'FSRdown_2'},
+     'FSRup_4'              : {'PS_variation':'FSRup_4'},
+     'FSRdown_4'            : {'PS_variation':'FSRdown_4'},
+     'ISRup_2'              : {'PS_variation':'ISRup_2'},
+     'ISRdown_2'            : {'PS_variation':'ISRdown_2'},
+     'ISRup_4'              : {'PS_variation':'ISRup_4'},
+     'ISRdown_4'            : {'PS_variation':'ISRdown_4'},
 }
 start_all_parallel = True
 
@@ -57,7 +63,6 @@ if start_all_parallel:
     ToolChain = tools.ToolChainParallel
 else:
     ToolChain = tools.ToolChain
-print "here1"
 
 class MySFrameBatch(SFrame):
     def configure(self):
