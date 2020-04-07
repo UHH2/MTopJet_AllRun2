@@ -122,7 +122,7 @@ bool RecoJetLeptonCleaner_topjet::process(uhh2::Event& event){
       // std::cout<<"pt before: "<< jet.pt()<<std::endl;
 
      jet_v4.SetPxPyPzE(jet.v4().Px(), jet.v4().Py(), jet.v4().Pz(), jet.v4().E());
-     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E()); 
+     lepton_v4.SetPxPyPzE(lepton.v4().Px(), lepton.v4().Py(), lepton.v4().Pz(), lepton.v4().E());
      jetlep_v4 = jet_v4 - lepton_v4;
 
      jet.set_pt(jetlep_v4.Pt());
@@ -155,7 +155,7 @@ bool uhh2::deltaRCut_topjet::passes(const uhh2::Event& event){
     return false;
   }
 
-  float dR=100;  
+  float dR=100;
   if(event.muons->size()!=0){
     dR = deltaR(event.muons->at(0), event.topjets->at(1));
   }
@@ -172,7 +172,7 @@ uhh2::Jet2Cut_topjet::Jet2Cut_topjet(float min_pt):
 bool uhh2::Jet2Cut_topjet::passes(const uhh2::Event& event){
     const Particle* jet2 = &event.topjets->at(1);
     float jet_pt = jet2->pt();
-    
+
     return jet_pt > min_pt_;
 
 }

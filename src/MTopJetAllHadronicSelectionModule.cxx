@@ -31,7 +31,7 @@
 #include <UHH2/MTopJet/include/CombineXCone.h>
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
-#include <UHH2/MTopJet/include/CountingEventHists.h>
+#include <UHH2/MTopJet/include/ControlHists.h>
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
@@ -81,8 +81,6 @@ protected:
   std::unique_ptr<uhh2::Selection> jet_sel;
 
   //HISTS
-  std::unique_ptr<Hists> h_events_start, h_events_end, h_events_common;
-
 
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<std::vector<GenTopJet>>h_gen33fatjets;
@@ -170,9 +168,6 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
   BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",btag_tight));
 
   //// set up Hists classes:
-  h_events_start.reset(new CountingEventHists(ctx, "Events_Start"));
-  h_events_end.reset(new CountingEventHists(ctx, "Events_End"));
-  h_events_common.reset(new CountingEventHists(ctx, "Events_Common"));
 
   common.reset(new CommonModules());
   common->switch_jetlepcleaner(true);
@@ -183,9 +178,7 @@ MTopJetAllHadronicSelectionModule::MTopJetAllHadronicSelectionModule(uhh2::Conte
 }
 
 bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
-  h_events_start->fill(event);
   if(!common->process(event)) return false;
-  h_events_common->fill(event);
   /* *********** at least 1 good primary vertex *********** */
   if(!pv_sel->passes(event)) return false;
 
@@ -219,7 +212,6 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
   ////
-  h_events_end->fill(event);
   return true;
 }
 

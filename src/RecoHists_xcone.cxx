@@ -24,8 +24,6 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   number_largedR_all = book<TH1F>("number_largedR_all", "number", 1, 0.5, 1.5);
   number_largedR_pass = book<TH1F>("number_largedR_pass", "number", 1, 0.5, 1.5);
 
-
-
   csvmax = book<TH1F>("csvmax", "csv max", 50, 0, 1);
 
 
@@ -56,6 +54,12 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   Mass_Vertices = book<TH2F>("Mass_Vertices", "x=Pile-up y=m_{jet}", 50, 0, 50, 50, 0, 500);
 
   JER_factor = book<TH1F>("JER_factor", "JER factor", 100, 0, 2);
+
+  // HadJetMass_ptbin ={Bin1: 350<pt<400; Bin2: 400<pt<450; Bin3: 450<pt<530; Bin4: 530<pt}
+  HadJetMass_ptbin_1 = book<TH1F>("M_jet1_ptbin_1", "m_{jet} [GeV] for 350<pt<400", 50, 0, 500);
+  HadJetMass_ptbin_2 = book<TH1F>("M_jet1_ptbin_2", "m_{jet} [GeV] for 400<pt<450", 50, 0, 500);
+  HadJetMass_ptbin_3 = book<TH1F>("M_jet1_ptbin_3", "m_{jet} [GeV] for 450<pt<530", 50, 0, 500);
+  HadJetMass_ptbin_4 = book<TH1F>("M_jet1_ptbin_4", "m_{jet} [GeV] for 530<pt", 50, 0, 500);
 
   // DeltaRDiff = book<TH1F>("dR1_dR2", "dR(lepton, hadjet) - dR(lepton, lepjet)", 60, -6, -6);
 
@@ -142,6 +146,14 @@ void RecoHists_xcone::fill(const Event & event){
   HadJetMass_rebin->Fill(hadjet_v4.M(), weight);
   LepJetMass->Fill(lepjet_lepton_v4.M(), weight);
   HadMassLepMass->Fill(hadjet_v4.M() - lepjet_lepton_v4.M(), weight);
+
+  double pt_hadjet=hadjet_v4.Pt();
+
+  // Fill Hists for ptbin
+  if(350<=pt_hadjet && pt_hadjet<=400) HadJetMass_ptbin_1->Fill(hadjet_v4.M(), weight);
+  if(400<pt_hadjet && pt_hadjet<=450)  HadJetMass_ptbin_2->Fill(hadjet_v4.M(), weight);
+  if(450<pt_hadjet && pt_hadjet<=530)  HadJetMass_ptbin_3->Fill(hadjet_v4.M(), weight);
+  if(530<pt_hadjet)                    HadJetMass_ptbin_4->Fill(hadjet_v4.M(), weight);
 
   HadJetEta->Fill(hadjet_v4.Eta(), weight);
   HadJetPhi->Fill(hadjet_v4.Phi(), weight);

@@ -27,7 +27,6 @@
 #include <UHH2/MTopJet/include/RecoHists_topjet.h>
 #include <UHH2/MTopJet/include/PDFHists.h>
 
-#include <UHH2/MTopJet/include/CountingEventHists.h>
 #include <UHH2/MTopJet/include/GenHists_xcone.h>
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
@@ -39,6 +38,7 @@
 #include <UHH2/MTopJet/include/CorrectionFactor.h>
 #include <UHH2/MTopJet/include/tt_width_reweight.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
+#include <UHH2/MTopJet/include/ControlHists.h>
 
 #include <vector>
 
@@ -80,8 +80,6 @@ protected:
   std::unique_ptr<Hists> h_RecGenHists_allHad, h_RecGenHists_allHad_noJEC, h_RecGenHists_allHad_corrected;
   std::unique_ptr<Hists> h_RecGenHists_allHad_lowPU, h_RecGenHists_allHad_medPU, h_RecGenHists_allHad_highPU;
   std::unique_ptr<Hists> h_RecGenHists_allHad_noJEC_lowPU, h_RecGenHists_allHad_noJEC_medPU, h_RecGenHists_allHad_noJEC_highPU;
-
-  std::unique_ptr<Hists> h_events_start, h_events_end, h_events_common;
 
   bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
@@ -164,10 +162,6 @@ MTopJetAllHadronicPostSelectionModule::MTopJetAllHadronicPostSelectionModule(uhh
   h_RecGenHists_rec300_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec300_gen0", "jec", "all", 300, 0));
   h_RecGenHists_rec400_gen0.reset(new RecoGenHists_allHad(ctx, "RecGenHists_rec400_gen0", "jec", "all", 400, 0));
 
-  h_events_start.reset(new CountingEventHists(ctx, "Events_Start"));
-  h_events_end.reset(new CountingEventHists(ctx, "Events_End"));
-  h_events_common.reset(new CountingEventHists(ctx, "Events_Common"));
-
   common.reset(new CommonModules());
   common->disable_jersmear();
   common->init(ctx);
@@ -184,9 +178,7 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
   ██      ██   ██ ██    ██ ██      ██           ██      ██
   ██      ██   ██  ██████   ██████ ███████ ███████ ███████
   */
-  h_events_start->fill(event);
   lumiweight->process(event);
-  h_events_common->fill(event);
 
   if( !(njet_had->passes(event)) ) return false;
   if( !(njet_lep->passes(event)) ) return false;
@@ -259,7 +251,6 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
   h_RecGenHists_rec200_gen0->fill(event);
   h_RecGenHists_rec300_gen0->fill(event);
   h_RecGenHists_rec400_gen0->fill(event);
-  h_events_end->fill(event);
 
   return false;
 }

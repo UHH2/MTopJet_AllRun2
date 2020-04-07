@@ -5,7 +5,7 @@
 
   <!ENTITY channel "muon">
 
- <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2016/muon/">
+ <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2016/muon">
  <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon">
 
   <!-- =============================================== ttbar =========================================================================== -->

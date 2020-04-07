@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/afs/desy.de/user/p/paaschal/SFrameBatch/sframe_batch.py", line 16, in <module>
+    from Manager import *
+  File "/afs/desy.de/user/p/paaschal/SFrameBatch/Manager.py", line 4, in <module>
+    from io_func import *
+  File "/afs/desy.de/user/p/paaschal/SFrameBatch/io_func.py", line 15, in <module>
+    import ROOT
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/lib/ROOT.py", line 24, in <module>
+    import cppyy
+  File "/cvmfs/cms.cern.ch/slc6_amd64_gcc700/lcg/root/6.12.07-gnimlf5/lib/cppyy.py", line 61, in <module>
+    import libPyROOT as _backend
+KeyboardInterrupt

@@ -368,6 +368,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   h_ttbar_reweight_jets.reset(new JetHists(ctx, "ttbar_reweight_Jets"));
   h_ttbar_reweight_lumi.reset(new LuminosityHists(ctx, "ttbar_reweight_lumi"));
   //
+
 }
 
 /*
@@ -379,6 +380,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 */
 
 bool MTopJetSelectionModule::process(uhh2::Event& event){
+
   bool passed_gensel;
   if(isTTbar) passed_gensel = event.get(h_gensel);
   else passed_gensel = false;

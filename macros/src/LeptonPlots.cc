@@ -14,36 +14,71 @@ int main(){
   TFile *f_1735 = new TFile(dir+uhh+"TTbar_mtop1735_2016v3.root");
   TFile *f_1755 = new TFile(dir+uhh+"TTbar_mtop1755_2016v3.root");
   vector<TFile*> files = {f_tt, f_1695, f_1715, f_1735, f_1755};
+  TString hist_perp = "LeptonicTop/muon_momentum_perp_full";
+  TString hist_boost = "LeptonicTop/boosted_muon_pt_full";
+  TString hist_boost_perp = "LeptonicTop/boosted_muon_momentum_perp_full";
+  vector<TH1F*> pt_perp, pt_boost, pt_perp_norm, pt_boost_norm;
+  vector<TH1F*> pt_perp_rebin_10, pt_boost_rebin_10, pt_perp_rebin_10_norm, pt_boost_rebin_10_norm;
+  vector<TH1F*> momentum_perp_boosted, momentum_perp_boosted_norm;
+  vector<TH1F*> momentum_perp_boosted_rebin_10, momentum_perp_boosted_norm_rebin_10;
 
-  TString hist_perp = "LeptonicTop/MuonPtPerpFull";
-  TString hist_boost = "LeptonicTop/MuonPtBoostFull";
+  TH1F *hist, *hist_norm;
+  double integral;
 
-  vector<TH1F*> pt_perp, pt_boost, pt_perp_rebin_5, pt_boost_rebin_5;
-  vector<TH1F*> pt_perp_rebin_10, pt_boost_rebin_10;
-  TH1F *hist;
 
   for(unsigned int i=0; i<files.size(); i++){
     // --- Boost ----------------------------
     hist = (TH1F*)files[i]->Get(hist_boost);
     pt_boost.push_back(hist);
-    // --- Rebin 5 --------------------------
-    hist->Rebin(5);
-    pt_boost_rebin_5.push_back(hist);
+    // --- Boost Norm -----------------------
+    hist_norm = normalize(hist);
+    pt_boost_norm.push_back(hist_norm);
     // --- Rebin 10 -------------------------
-    hist->Rebin();
+    hist->Rebin(10);
     pt_boost_rebin_10.push_back(hist);
+    // --- R10 Norm -------------------------
+    hist_norm = normalize(hist);
+    pt_boost_rebin_10_norm.push_back(hist_norm);
 
+    // --------------------------------------
+    // --- Perp boost -----------------------
+    hist = (TH1F*)files[i]->Get(hist_boost_perp);
+    momentum_perp_boosted.push_back(hist);
+    // --- Perp Norm boost ------------------
+    hist_norm = normalize(hist);
+    momentum_perp_boosted_norm.push_back(hist_norm);
+    // --- Rebin 10 -------------------------
+    hist->Rebin(10);
+    momentum_perp_boosted_rebin_10.push_back(hist);
+    // --- R10 Norm -------------------------
+    hist_norm = normalize(hist);
+    momentum_perp_boosted_norm_rebin_10.push_back(hist_norm);
+
+    // --------------------------------------
     // --- Perp -----------------------------
     hist = (TH1F*)files[i]->Get(hist_perp);
     pt_perp.push_back(hist);
-    // --- Rebin ----------------------------
-    hist->Rebin(5);
-    pt_perp_rebin_5.push_back(hist);
+    // --- Perp Norm ------------------------
+    hist_norm = normalize(hist);
+    pt_perp_norm.push_back(hist_norm);
     // --- Rebin 10 -------------------------
-    hist->Rebin();
+    hist->Rebin(10);
     pt_perp_rebin_10.push_back(hist);
+    // --- R10 Norm -------------------------
+    hist_norm = normalize(hist);
+    pt_perp_rebin_10_norm.push_back(hist_norm);
   };
 
+
+  vector<vector<TH1F*>> all_vector, all_vector_boost_perp, all_vector_rebin10;
+  all_vector = {pt_perp, pt_boost, pt_perp_norm, pt_boost_norm,};
+  vector<TString> all_vector_name = {"perpendicular_momentum_to_top", "pt_boost", "perp_momentum_to_top_norm", "pt_boost_norm"};
+
+  all_vector_boost_perp = {momentum_perp_boosted, momentum_perp_boosted_norm, momentum_perp_boosted_rebin_10, momentum_perp_boosted_norm_rebin_10};
+  vector<TString> all_vector_boost_perp_name = {"boosted_perpendicular_momentum", "boosted_perpendicular_momentum_norm", "boosted_perpendicular_momentum_rebin_10", "boosted_perpendicular_momentum_norm_rebin_10"};
+
+  all_vector_rebin10 = {pt_perp_rebin_10, pt_boost_rebin_10, pt_perp_rebin_10_norm, pt_boost_rebin_10_norm};
+  vector<TString> all_vector_rebin10_name = {"perpendicular_momentum_to_top_rebin_10", "pt_boost_rebin_10", "perpendicular_momentum_to_top_rebin_10_norm", "pt_boost_rebin_10_norm"};
 
   /*
   ██████  ██       ██████  ████████
@@ -57,89 +92,100 @@ int main(){
   gStyle->SetPadTickX(1);
   gStyle->SetOptStat(kFALSE);
   gStyle->SetLegendBorderSize(0);
+  TLegend *leg;
 
-  pt_perp[0]->GetXaxis()->SetRangeUser(0, 100);
-  pt_perp[0]->GetYaxis()->SetRangeUser(0, (pt_perp[0]->GetMaximum())*1.2);
-  pt_perp[0]->GetXaxis()->SetNdivisions(505);
-  pt_perp[0]->GetYaxis()->SetNdivisions(505);
-  pt_perp[0]->GetXaxis()->SetTitleSize(0.05);
-  pt_perp[0]->GetYaxis()->SetTitleSize(0.04);
-  pt_perp[0]->GetXaxis()->SetTitleOffset(0.9);
-  pt_perp[0]->GetYaxis()->SetTitleOffset(1.5);
-  pt_perp[0]->GetXaxis()->SetTitle("p_{T,#perp}");
-  pt_perp[0]->GetYaxis()->SetTitle("");
-  for(unsigned int i=0; i<files.size();i++){
-    pt_perp[i]->SetLineWidth(2);
-    pt_perp[i]->SetLineColor(colors[i]);
+  for(unsigned int i=0; i<all_vector.size(); i++){
+    all_vector[i].at(0)->SetTitle("");
+    if(i == 1 || i == 3) all_vector[i].at(0)->GetXaxis()->SetRangeUser(0, 1000);
+    if(i == 0 || i == 2) all_vector[i].at(0)->GetXaxis()->SetRangeUser(0, 100);
+    all_vector[i].at(0)->GetYaxis()->SetRangeUser(0, get_highest_peak(all_vector[i])*1.2);
+    all_vector[i].at(0)->GetXaxis()->SetNdivisions(505);
+    all_vector[i].at(0)->GetYaxis()->SetNdivisions(505);
+    all_vector[i].at(0)->GetXaxis()->SetTitleSize(0.05);
+    all_vector[i].at(0)->GetYaxis()->SetTitleSize(0.04);
+    all_vector[i].at(0)->GetXaxis()->SetTitleOffset(0.9);
+    all_vector[i].at(0)->GetYaxis()->SetTitleOffset(1.5);
+    if(i == 1 || i == 3) all_vector[i].at(0)->GetXaxis()->SetTitle("p_{T}^{muon*}");
+    if(i == 0 || i == 2) all_vector[i].at(0)->GetXaxis()->SetTitle("#||{#vec{p}_{#perp}^{muon}}");
+    all_vector[i].at(0)->GetYaxis()->SetTitle("");
+
+    for(unsigned int j=0; j<files.size(); j++){
+      all_vector[i].at(j)->SetLineWidth(2);
+      all_vector[i].at(j)->SetLineColor(colors[j]);
+    }
+
+    TCanvas *A = new TCanvas("A", "A", 600, 600);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.12);
+    all_vector[i].at(0)->Draw("HIST");
+    all_vector[i].at(1)->Draw("HIST SAME");
+    all_vector[i].at(4)->Draw("HIST SAME");
+    leg = new TLegend(0.65,0.65,0.85,0.85);
+    leg->AddEntry(all_vector[i].at(0),"nominal 172.5","l");
+    leg->AddEntry(all_vector[i].at(1),"mTop 169.5","l");
+    leg->AddEntry(all_vector[i].at(4),"mTop 175.5","l");
+    leg->SetTextSize(0.03);
+    leg->Draw();
+    gPad->RedrawAxis();
+    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_name[i]+"_main_2016.pdf");
+    all_vector[i].at(2)->Draw("SAME HIST");
+    all_vector[i].at(3)->Draw("SAME HIST");
+    leg->AddEntry(all_vector[i].at(2),"mTop 171.5","l");
+    leg->AddEntry(all_vector[i].at(3),"mTop 173.5","l");
+    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_name[i]+"_full_2016.pdf");
+    delete A;
+    leg->Clear();
   }
 
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
+  /*
+  ███    ███  ██████  ███    ███ ███████ ███    ██ ████████ ██    ██ ███    ███
+  ████  ████ ██    ██ ████  ████ ██      ████   ██    ██    ██    ██ ████  ████
+  ██ ████ ██ ██    ██ ██ ████ ██ █████   ██ ██  ██    ██    ██    ██ ██ ████ ██
+  ██  ██  ██ ██    ██ ██  ██  ██ ██      ██  ██ ██    ██    ██    ██ ██  ██  ██
+  ██      ██  ██████  ██      ██ ███████ ██   ████    ██     ██████  ██      ██
+  */
 
-  TCanvas *c = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  pt_perp[0]->Draw("HIST");
-  pt_perp[1]->Draw("SAME HIST");
-  pt_perp[4]->Draw("SAME HIST");
-  TLegend *leg = new TLegend(0.65,0.65,0.85,0.85);
-  leg->AddEntry(pt_perp[0],"nominal","l");
-  leg->AddEntry(pt_perp[1],"1695","l");
-  leg->AddEntry(pt_perp[4],"1755","l");
-  leg->SetTextSize(0.05);
-  leg->Draw();
-  gPad->RedrawAxis();
-  c->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/PerpendicularPt_Comparison_main_2016.pdf");
+  for(unsigned int i=0; i<all_vector_boost_perp.size(); i++){
+    all_vector_boost_perp[i].at(0)->SetTitle("");
+    all_vector_boost_perp[i].at(0)->GetXaxis()->SetRangeUser(0, 100);
+    all_vector_boost_perp[i].at(0)->GetYaxis()->SetRangeUser(0, get_highest_peak(all_vector_boost_perp[i])*1.2);
+    all_vector_boost_perp[i].at(0)->GetXaxis()->SetNdivisions(505);
+    all_vector_boost_perp[i].at(0)->GetYaxis()->SetNdivisions(505);
+    all_vector_boost_perp[i].at(0)->GetXaxis()->SetTitleSize(0.05);
+    all_vector_boost_perp[i].at(0)->GetYaxis()->SetTitleSize(0.04);
+    all_vector_boost_perp[i].at(0)->GetXaxis()->SetTitleOffset(0.9);
+    all_vector_boost_perp[i].at(0)->GetYaxis()->SetTitleOffset(1.5);
+    if(i == 1 || i == 3) all_vector_boost_perp[i].at(0)->GetXaxis()->SetTitle("#||{#vec{p}_{#perp}^{muon*}}");
+    if(i == 0 || i == 2) all_vector_boost_perp[i].at(0)->GetXaxis()->SetTitle("#||{#vec{p}_{#perp}^{muon}}");
+    all_vector_boost_perp[i].at(0)->GetYaxis()->SetTitle("");
 
-  pt_perp[2]->Draw("SAME HIST");
-  pt_perp[3]->Draw("SAME HIST");
-  leg->AddEntry(pt_perp[2],"1715","l");
-  leg->AddEntry(pt_perp[3],"1735","l");
-  c->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/PerpendicularPt_Comparison_all_2016.pdf");
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
+    for(unsigned int j=0; j<files.size(); j++){
+      all_vector_boost_perp[i].at(j)->SetLineWidth(2);
+      all_vector_boost_perp[i].at(j)->SetLineColor(colors[j]);
+    }
 
-  pt_boost[0]->GetXaxis()->SetRangeUser(0, 1000);
-  pt_boost[0]->GetYaxis()->SetRangeUser(0, (pt_boost[4]->GetMaximum())*1.2);
-  pt_boost[0]->GetXaxis()->SetNdivisions(505);
-  pt_boost[0]->GetYaxis()->SetNdivisions(505);
-  pt_boost[0]->GetXaxis()->SetTitleSize(0.05);
-  pt_boost[0]->GetYaxis()->SetTitleSize(0.04);
-  pt_boost[0]->GetXaxis()->SetTitleOffset(0.9);
-  pt_boost[0]->GetYaxis()->SetTitleOffset(1.5);
-  pt_boost[0]->GetXaxis()->SetTitle("p_{T}");
-  pt_boost[0]->GetYaxis()->SetTitle("");
-  for(unsigned int i=0; i<files.size();i++){
-    pt_boost[i]->SetLineWidth(2);
-    pt_boost[i]->SetLineColor(colors[i]);
+    TCanvas *A = new TCanvas("A", "A", 600, 600);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.12);
+    all_vector_boost_perp[i].at(0)->Draw("HIST");
+    all_vector_boost_perp[i].at(1)->Draw("HIST SAME");
+    all_vector_boost_perp[i].at(4)->Draw("HIST SAME");
+    leg = new TLegend(0.65,0.65,0.85,0.85);
+    leg->AddEntry(all_vector_boost_perp[i].at(0),"nominal 172.5","l");
+    leg->AddEntry(all_vector_boost_perp[i].at(1),"mTop 169.5","l");
+    leg->AddEntry(all_vector_boost_perp[i].at(4),"mTop 175.5","l");
+    leg->SetTextSize(0.03);
+    leg->Draw();
+    gPad->RedrawAxis();
+    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_boost_perp_name[i]+"_main_2016.pdf");
+    all_vector_boost_perp[i].at(2)->Draw("SAME HIST");
+    all_vector_boost_perp[i].at(3)->Draw("SAME HIST");
+    leg->AddEntry(all_vector_boost_perp[i].at(2),"mTop 171.5","l");
+    leg->AddEntry(all_vector_boost_perp[i].at(3),"mTop 173.5","l");
+    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_boost_perp_name[i]+"_full_2016.pdf");
+    delete A;
+    leg->Clear();
   }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  TCanvas *d = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  pt_boost[0]->Draw("HIST");
-  pt_boost[1]->Draw("SAME HIST");
-  pt_boost[4]->Draw("SAME HIST");
-  TLegend *leg1 = new TLegend(0.65,0.65,0.85,0.85);
-  leg1->AddEntry(pt_boost[0],"nominal","l");
-  leg1->AddEntry(pt_boost[1],"1695","l");
-  leg1->AddEntry(pt_boost[4],"1755","l");
-  leg1->SetTextSize(0.05);
-  leg1->Draw();
-  gPad->RedrawAxis();
-  d->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/BoostPt_Comparison_main_2016.pdf");
-
-  pt_boost[2]->Draw("SAME HIST");
-  pt_boost[3]->Draw("SAME HIST");
-  leg1->AddEntry(pt_boost[2],"1715","l");
-  leg1->AddEntry(pt_boost[3],"1735","l");
-  d->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/BoostPt_Comparison_all_2016.pdf");
 
   /*
   ██████  ███████ ██████  ██ ███    ██
@@ -148,189 +194,48 @@ int main(){
   ██   ██ ██      ██   ██ ██ ██  ██ ██
   ██   ██ ███████ ██████  ██ ██   ████
   */
-  /*
-  ███████
-  ██
-  ███████
-  .....██
-  ███████
-  */
 
-  pt_perp_rebin_5[0]->GetXaxis()->SetRangeUser(0, 100);
-  pt_perp_rebin_5[0]->GetYaxis()->SetRangeUser(0, (pt_perp_rebin_5[0]->GetMaximum())*1.2);
-  pt_perp_rebin_5[0]->GetXaxis()->SetNdivisions(505);
-  pt_perp_rebin_5[0]->GetYaxis()->SetNdivisions(505);
-  pt_perp_rebin_5[0]->GetXaxis()->SetTitleSize(0.05);
-  pt_perp_rebin_5[0]->GetYaxis()->SetTitleSize(0.04);
-  pt_perp_rebin_5[0]->GetXaxis()->SetTitleOffset(0.9);
-  pt_perp_rebin_5[0]->GetYaxis()->SetTitleOffset(1.5);
-  pt_perp_rebin_5[0]->GetXaxis()->SetTitle("p_{T,#perp}");
-  pt_perp_rebin_5[0]->GetYaxis()->SetTitle("");
-  for(unsigned int i=0; i<files.size();i++){
-    pt_perp_rebin_5[i]->SetLineWidth(2);
-    pt_perp_rebin_5[i]->SetLineColor(colors[i]);
+  for(unsigned int i=0; i<all_vector_rebin10.size(); i++){
+    all_vector_rebin10[i].at(0)->SetTitle("");
+    if(i == 1 || i == 3) all_vector_rebin10[i].at(0)->GetXaxis()->SetRangeUser(0, 1000);
+    if(i == 0 || i == 2) all_vector_rebin10[i].at(0)->GetXaxis()->SetRangeUser(0, 100);
+    all_vector_rebin10[i].at(0)->GetYaxis()->SetRangeUser(0, get_highest_peak(all_vector_rebin10[i])*1.2);
+    all_vector_rebin10[i].at(0)->GetXaxis()->SetNdivisions(505);
+    all_vector_rebin10[i].at(0)->GetYaxis()->SetNdivisions(505);
+    all_vector_rebin10[i].at(0)->GetXaxis()->SetTitleSize(0.05);
+    all_vector_rebin10[i].at(0)->GetYaxis()->SetTitleSize(0.04);
+    all_vector_rebin10[i].at(0)->GetXaxis()->SetTitleOffset(0.9);
+    all_vector_rebin10[i].at(0)->GetYaxis()->SetTitleOffset(1.5);
+    if(i == 1 || i == 3) all_vector_rebin10[i].at(0)->GetXaxis()->SetTitle("p_{T}^{muon*}");
+    if(i == 0 || i == 2) all_vector_rebin10[i].at(0)->GetXaxis()->SetTitle("#||{#vec{p}_{#perp}^{muon}}");
+    all_vector_rebin10[i].at(0)->GetYaxis()->SetTitle("");
+
+    for(unsigned int j=0; j<files.size(); j++){
+      all_vector_rebin10[i].at(j)->SetLineWidth(2);
+      all_vector_rebin10[i].at(j)->SetLineColor(colors[j]);
+    }
+
+    TCanvas *A = new TCanvas("A", "A", 600, 600);
+    gPad->SetLeftMargin(0.15);
+    gPad->SetBottomMargin(0.12);
+    all_vector_rebin10[i].at(0)->Draw("HIST");
+    all_vector_rebin10[i].at(1)->Draw("HIST SAME");
+    all_vector_rebin10[i].at(4)->Draw("HIST SAME");
+    leg = new TLegend(0.65,0.65,0.85,0.85);
+    leg->AddEntry(all_vector_rebin10[i].at(0),"nominal 172.5","l");
+    leg->AddEntry(all_vector_rebin10[i].at(1),"mTop 169.5","l");
+    leg->AddEntry(all_vector_rebin10[i].at(4),"mTop 175.5","l");
+    leg->SetTextSize(0.03);
+    leg->Draw();
+    gPad->RedrawAxis();
+    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_rebin10_name[i]+"_main_2016.pdf");
+    all_vector_rebin10[i].at(2)->Draw("SAME HIST");
+    all_vector_rebin10[i].at(3)->Draw("SAME HIST");
+    leg->AddEntry(all_vector_rebin10[i].at(2),"mTop 171.5","l");
+    leg->AddEntry(all_vector_rebin10[i].at(3),"mTop 173.5","l");
+    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_rebin10_name[i]+"_full_2016.pdf");
+    delete A;
+    leg->Clear();
   }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  TCanvas *e = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  pt_perp_rebin_5[0]->Draw("HIST");
-  pt_perp_rebin_5[1]->Draw("SAME HIST");
-  pt_perp_rebin_5[4]->Draw("SAME HIST");
-  TLegend *leg2 = new TLegend(0.65,0.65,0.85,0.85);
-  leg2->AddEntry(pt_perp_rebin_5[0],"nominal","l");
-  leg2->AddEntry(pt_perp_rebin_5[1],"1695","l");
-  leg2->AddEntry(pt_perp_rebin_5[4],"1755","l");
-  leg2->SetTextSize(0.05);
-  leg2->Draw();
-  gPad->RedrawAxis();
-  e->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/PerpendicularPt_Comparison_main_rebin5_2016.pdf");
-
-  pt_perp_rebin_5[2]->Draw("SAME HIST");
-  pt_perp_rebin_5[3]->Draw("SAME HIST");
-  leg2->AddEntry(pt_perp_rebin_5[2],"1715","l");
-  leg2->AddEntry(pt_perp_rebin_5[3],"1735","l");
-  e->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/PerpendicularPt_Comparison_all_rebin5_2016.pdf");
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  pt_boost_rebin_5[0]->GetXaxis()->SetRangeUser(0, 1000);
-  pt_boost_rebin_5[0]->GetYaxis()->SetRangeUser(0, (pt_boost_rebin_5[4]->GetMaximum())*1.2);
-  pt_boost_rebin_5[0]->GetXaxis()->SetNdivisions(505);
-  pt_boost_rebin_5[0]->GetYaxis()->SetNdivisions(505);
-  pt_boost_rebin_5[0]->GetXaxis()->SetTitleSize(0.05);
-  pt_boost_rebin_5[0]->GetYaxis()->SetTitleSize(0.04);
-  pt_boost_rebin_5[0]->GetXaxis()->SetTitleOffset(0.9);
-  pt_boost_rebin_5[0]->GetYaxis()->SetTitleOffset(1.5);
-  pt_boost_rebin_5[0]->GetXaxis()->SetTitle("p_{T}");
-  pt_boost_rebin_5[0]->GetYaxis()->SetTitle("");
-  for(unsigned int i=0; i<files.size();i++){
-    pt_boost_rebin_5[i]->SetLineWidth(2);
-    pt_boost_rebin_5[i]->SetLineColor(colors[i]);
-  }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  TCanvas *f = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  pt_boost_rebin_5[0]->Draw("HIST");
-  pt_boost_rebin_5[1]->Draw("SAME HIST");
-  pt_boost_rebin_5[4]->Draw("SAME HIST");
-  TLegend *leg3 = new TLegend(0.65,0.65,0.85,0.85);
-  leg3->AddEntry(pt_boost_rebin_5[0],"nominal","l");
-  leg3->AddEntry(pt_boost_rebin_5[1],"1695","l");
-  leg3->AddEntry(pt_boost_rebin_5[4],"1755","l");
-  leg3->SetTextSize(0.05);
-  leg3->Draw();
-  gPad->RedrawAxis();
-  f->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/BoostPt_Comparison_main_rebin5_2016.pdf");
-
-  pt_boost_rebin_5[2]->Draw("SAME HIST");
-  pt_boost_rebin_5[3]->Draw("SAME HIST");
-  leg3->AddEntry(pt_boost_rebin_5[2],"1715","l");
-  leg3->AddEntry(pt_boost_rebin_5[3],"1735","l");
-  f->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/BoostPt_Comparison_all_rebin5_2016.pdf");
-
-  /*
-  .██  ██████
-  ███ ██  ████
-  .██ ██ ██ ██
-  .██ ████  ██
-  .██  ██████
-  */
-
-  pt_perp_rebin_10[0]->GetXaxis()->SetRangeUser(0, 100);
-  pt_perp_rebin_10[0]->GetYaxis()->SetRangeUser(0, (pt_perp_rebin_10[0]->GetMaximum())*1.2);
-  pt_perp_rebin_10[0]->GetXaxis()->SetNdivisions(505);
-  pt_perp_rebin_10[0]->GetYaxis()->SetNdivisions(505);
-  pt_perp_rebin_10[0]->GetXaxis()->SetTitleSize(0.05);
-  pt_perp_rebin_10[0]->GetYaxis()->SetTitleSize(0.04);
-  pt_perp_rebin_10[0]->GetXaxis()->SetTitleOffset(0.9);
-  pt_perp_rebin_10[0]->GetYaxis()->SetTitleOffset(1.5);
-  pt_perp_rebin_10[0]->GetXaxis()->SetTitle("p_{T,#perp}");
-  pt_perp_rebin_10[0]->GetYaxis()->SetTitle("");
-  for(unsigned int i=0; i<files.size();i++){
-    pt_perp_rebin_10[i]->SetLineWidth(2);
-    pt_perp_rebin_10[i]->SetLineColor(colors[i]);
-  }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  TCanvas *g = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  pt_perp_rebin_10[0]->Draw("HIST");
-  pt_perp_rebin_10[1]->Draw("SAME HIST");
-  pt_perp_rebin_10[4]->Draw("SAME HIST");
-  TLegend *leg4 = new TLegend(0.65,0.65,0.85,0.85);
-  leg4->AddEntry(pt_perp_rebin_10[0],"nominal","l");
-  leg4->AddEntry(pt_perp_rebin_10[1],"1695","l");
-  leg4->AddEntry(pt_perp_rebin_10[4],"1755","l");
-  leg4->SetTextSize(0.05);
-  leg4->Draw();
-  gPad->RedrawAxis();
-  g->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/PerpendicularPt_Comparison_main_rebin10_2016.pdf");
-
-  pt_perp_rebin_10[2]->Draw("SAME HIST");
-  pt_perp_rebin_10[3]->Draw("SAME HIST");
-  leg4->AddEntry(pt_perp_rebin_10[2],"1715","l");
-  leg4->AddEntry(pt_perp_rebin_10[3],"1735","l");
-  g->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/PerpendicularPt_Comparison_all_rebin10_2016.pdf");
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  pt_boost_rebin_10[0]->GetXaxis()->SetRangeUser(0, 1000);
-  pt_boost_rebin_10[0]->GetYaxis()->SetRangeUser(0, (pt_boost_rebin_10[4]->GetMaximum())*1.2);
-  pt_boost_rebin_10[0]->GetXaxis()->SetNdivisions(505);
-  pt_boost_rebin_10[0]->GetYaxis()->SetNdivisions(505);
-  pt_boost_rebin_10[0]->GetXaxis()->SetTitleSize(0.05);
-  pt_boost_rebin_10[0]->GetYaxis()->SetTitleSize(0.04);
-  pt_boost_rebin_10[0]->GetXaxis()->SetTitleOffset(0.9);
-  pt_boost_rebin_10[0]->GetYaxis()->SetTitleOffset(1.5);
-  pt_boost_rebin_10[0]->GetXaxis()->SetTitle("p_{T}");
-  pt_boost_rebin_10[0]->GetYaxis()->SetTitle("");
-  for(unsigned int i=0; i<files.size();i++){
-    pt_boost_rebin_10[i]->SetLineWidth(2);
-    pt_boost_rebin_10[i]->SetLineColor(colors[i]);
-  }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  TCanvas *h = new TCanvas();
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  pt_boost_rebin_10[0]->Draw("HIST");
-  pt_boost_rebin_10[1]->Draw("SAME HIST");
-  pt_boost_rebin_10[4]->Draw("SAME HIST");
-  TLegend *leg5 = new TLegend(0.65,0.65,0.85,0.85);
-  leg5->AddEntry(pt_boost_rebin_10[0],"nominal","l");
-  leg5->AddEntry(pt_boost_rebin_10[1],"1695","l");
-  leg5->AddEntry(pt_boost_rebin_10[4],"1755","l");
-  leg5->SetTextSize(0.05);
-  leg5->Draw();
-  gPad->RedrawAxis();
-  h->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/BoostPt_Comparison_main_rebin10_2016.pdf");
-
-  pt_boost_rebin_10[2]->Draw("SAME HIST");
-  pt_boost_rebin_10[3]->Draw("SAME HIST");
-  leg5->AddEntry(pt_boost_rebin_10[2],"1715","l");
-  leg5->AddEntry(pt_boost_rebin_10[3],"1735","l");
-  h->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/BoostPt_Comparison_all_rebin10_2016.pdf");
-
 
 }

@@ -34,10 +34,11 @@
 #include <TVirtualFitter.h>
 #include <TFitResult.h>
 
-TString dir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/";
-//TString dir_elec = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/elec/";
-//TString dir_combine = "/nfs/dust/cms/user/paaschal/MTopJet/PostSelection/combine/";
+using namespace std;
 
+TString dir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/";
+
+// -------------------------------------------------------------------------------------------
 void SetupGlobalStyle()
 {
   // general appearance and style
@@ -75,6 +76,7 @@ void SetupGlobalStyle()
 
 }
 
+// -------------------------------------------------------------------------------------------
 void CMSLabel(bool prelim, double x=0.25, double y=0.83){
   TString cmstext = "CMS";
   TLatex *text = new TLatex(3.5, 24, cmstext);
@@ -99,6 +101,7 @@ void CMSLabel(bool prelim, double x=0.25, double y=0.83){
   }
 }
 
+// -------------------------------------------------------------------------------------------
 void CMSSimLabel(bool prelim, double x=0.24, double y=0.9){
   TString cmstext = "CMS";
   TLatex *text2 = new TLatex(3.5, 24, cmstext);
@@ -133,7 +136,7 @@ void CMSSimLabel(bool prelim, double x=0.24, double y=0.9){
   }
 }
 
-
+// -------------------------------------------------------------------------------------------
 void LumiInfo(double lumi = 35.9, bool bratio = false, double x=0.9, double y=0.945){
   TString infotext = TString::Format("%3.1f fb^{-1} (13 TeV)", lumi);
   TLatex *text1 = new TLatex(3.5, 24, infotext);
@@ -143,5 +146,23 @@ void LumiInfo(double lumi = 35.9, bool bratio = false, double x=0.9, double y=0.
   text1->SetX(x);
   text1->SetY(y);
   text1->Draw();
-
 }
+
+// -------------------------------------------------------------------------------------------
+TH1F *normalize(TH1F *hist){
+  TH1F *hist_norm = (TH1F*) hist->Clone();
+  hist_norm->Scale(1/hist->Integral());
+  return hist_norm;
+}
+
+// -------------------------------------------------------------------------------------------
+double get_highest_peak(vector<TH1F*> hists){
+  vector<double> max;
+  double max_value;
+  for(unsigned int i = 0; i<hists.size(); i++) max.push_back(hists[i]->GetMaximum());
+  sort(max.begin(), max.end());
+  double top_index = max.size()-1;
+  return max[top_index];
+}
+
+// -------------------------------------------------------------------------------------------

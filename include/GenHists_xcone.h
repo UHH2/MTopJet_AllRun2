@@ -13,8 +13,6 @@
 
 using namespace uhh2;
 
-
-
 class GenHists_xcone: public uhh2::Hists {
 public:
     // use the same constructor arguments as Hists for forwarding:

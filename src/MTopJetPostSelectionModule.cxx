@@ -5,47 +5,48 @@
 #include <UHH2/core/include/Event.h>
 #include <UHH2/core/include/Selection.h>
 
-#include <UHH2/common/include/Utils.h>
 #include <UHH2/common/include/AdditionalSelections.h>
+#include <UHH2/common/include/CommonModules.h>
 #include <UHH2/common/include/ElectronHists.h>
-#include <UHH2/common/include/MuonHists.h>
+#include <UHH2/common/include/ElectronIds.h>
 #include <UHH2/common/include/JetHists.h>
-#include <UHH2/common/include/TTbarGen.h>
-#include <UHH2/common/include/TopPtReweight.h>
 #include <UHH2/common/include/MCWeight.h>
 #include <UHH2/common/include/MuonIds.h>
-#include <UHH2/common/include/ElectronIds.h>
+#include <UHH2/common/include/MuonHists.h>
+#include <UHH2/common/include/TopPtReweight.h>
+#include <UHH2/common/include/TTbarGen.h>
+#include <UHH2/common/include/Utils.h>
 #include "UHH2/common/include/YearRunSwitchers.h"
-#include <UHH2/common/include/CommonModules.h>
 
-#include <UHH2/MTopJet/include/MTopJetHists.h>
+#include <UHH2/MTopJet/include/CorrectionHists_subjets.h>
+#include <UHH2/MTopJet/include/ControlHists.h>
 #include <UHH2/MTopJet/include/CombineXCone.h>
-#include <UHH2/MTopJet/include/ModuleBASE.h>
-#include <UHH2/MTopJet/include/RecoSelections.h>
-#include <UHH2/MTopJet/include/RecoSelections_topjet.h>
-#include <UHH2/MTopJet/include/GenSelections.h>
-#include <UHH2/MTopJet/include/RecoHists_xcone.h>
-#include <UHH2/MTopJet/include/RecoHists_puppi.h>
-#include <UHH2/MTopJet/include/RecoHists_topjet.h>
-#include <UHH2/MTopJet/include/PDFHists.h>
-
-#include "UHH2/MTopJet/include/PartonShowerWeight.h"
 #include <UHH2/MTopJet/include/GenHists_xcone.h>
 #include <UHH2/MTopJet/include/GenHists_particles.h>
 #include <UHH2/MTopJet/include/GenHists_process.h>
+#include <UHH2/MTopJet/include/LeptonicTop_Hists.h>
+#include <UHH2/MTopJet/include/ModuleBASE.h>
+#include <UHH2/MTopJet/include/MTopJetHists.h>
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
-#include <UHH2/MTopJet/include/MTopJetUtils.h>
-#include <UHH2/MTopJet/include/AnalysisOutput.h>
-#include <UHH2/MTopJet/include/SubjetHists_xcone.h>
 #include <UHH2/MTopJet/include/RecoGenHists_subjets.h>
 #include <UHH2/MTopJet/include/RecoGenHists_ak4.h>
-#include <UHH2/MTopJet/include/CorrectionHists_subjets.h>
+#include <UHH2/MTopJet/include/RecoGenHists_xcone_topjet.h>
+#include <UHH2/MTopJet/include/RecoHists_xcone.h>
+#include <UHH2/MTopJet/include/RecoHists_puppi.h>
+#include <UHH2/MTopJet/include/RecoHists_topjet.h>
+#include <UHH2/MTopJet/include/SubjetHists_xcone.h>
+#include <UHH2/MTopJet/include/PDFHists.h>
+
+#include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/CorrectionFactor.h>
-#include <UHH2/MTopJet/include/tt_width_reweight.h>
-#include <UHH2/MTopJet/include/JetCorrections_xcone.h>
 #include <UHH2/MTopJet/include/ElecTriggerSF.h>
-#include <UHH2/MTopJet/include/WeightHists.h>
-#include <UHH2/MTopJet/include/LeptonicTop_Hists.h>
+#include <UHH2/MTopJet/include/GenSelections.h>
+#include <UHH2/MTopJet/include/JetCorrections_xcone.h>
+#include <UHH2/MTopJet/include/MTopJetUtils.h>
+#include "UHH2/MTopJet/include/PartonShowerWeight.h"
+#include <UHH2/MTopJet/include/RecoSelections.h>
+#include <UHH2/MTopJet/include/RecoSelections_topjet.h>
+#include <UHH2/MTopJet/include/tt_width_reweight.h>
 
 #include <vector>
 
@@ -216,13 +217,14 @@ protected:
   std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350, h_XCone_GEN_Sel_ptsub;
   std::unique_ptr<Hists> h_PDFHists;
 
+  std::unique_ptr<Hists> h_gen_weights, h_gen_weights_pass_gen, h_gen_weights_massbin_145, h_gen_weights_massbin_275;
+  std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_gensel_300;
   std::unique_ptr<Hists> h_leptonictop, h_leptonictop_SF;
 
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
 
   bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
-  int counter;
 
   std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors, BTagReshape;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
@@ -282,8 +284,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     log += "invalid argument for 'channel' key in xml file (must be 'muon' or 'elec'): \""+channel+"\"";
     throw std::runtime_error(log);
   }
-
-  counter = 0;
 
 
   // Top width reweigh
@@ -476,6 +476,16 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_weights03.reset(new WeightHists(ctx, "WeightHists03_Lepton"));
   h_weights04.reset(new WeightHists(ctx, "WeightHists04_BTag"));
 
+  // Control Hists for FSRx_4
+  if(isTTbar){
+    h_gen_weights.reset(new GenWeightRangeHists(ctx, "Gen_Weights"));
+    h_gen_weights_massbin_145.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_145"));
+    h_gen_weights_pass_gen.reset(new GenWeightRangeHists(ctx, "Gen_Weights_pass_gen"));
+    h_gen_weights_massbin_275.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_275"));
+
+    h_gen_weight_300.reset(new CountingEventHists(ctx, "Gen_Weight_300"));
+    h_gen_weight_gensel_300.reset(new CountingEventHists(ctx, "Gen_Weight_gensel_300"));
+  }
 
   h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
   h_Muon.reset(new MuonHists(ctx, "MuonHists"));
@@ -670,9 +680,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
+
+  double mass_gen33;
   if(isTTbar){
     std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
-    double mass_gen33 = gen_hadjets33.at(0).v4().M();
+    mass_gen33 = gen_hadjets33.at(0).v4().M();
     double pt_gen33 = gen_hadjets33.at(0).v4().Pt();
     event.set(h_mass_gen33, mass_gen33);
     event.set(h_pt_gen33, pt_gen33);
@@ -710,8 +722,18 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
   scale_variation->process(event);
-  if(isTTbar) ps_weights->process(event);
+  if(isTTbar){
+    ps_weights->process(event);
+    // h_gen_weights->fill(event);
+  }
   double gen_weight = event.weight;
+
+  // select events by gen weight - Control stage for FSRup_4
+  bool GenWeight300 = false;
+  if(isTTbar && gen_weight>300){
+    GenWeight300 = true;
+    h_gen_weight_300->fill(event);
+  }
 
   // FILL CONTROL PLOTS
   if(passed_recsel){
@@ -735,9 +757,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     factor_4w = 1.0;
     factor_8w = 1.0;
   }
-
-  scale_variation->process(event); // do this again because scale variation should change gen weight and event.weight, but not rec weight!!!
-  if(isTTbar) ps_weights->process(event);
 
   // if(reweight_ttbar) ttbar_reweight->process(event);
   h_weights01->fill(event);
@@ -869,7 +888,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && !lepton_sel->passes(event)) pass_leptonptmigration_rec = true;
   else pass_leptonptmigration_rec = false;
-  /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  ***/
+  /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  *****/
   bool pass_measurement_gen;
   bool pass_pt350migration_gen;
   bool pass_massmigration_gen;
@@ -900,21 +919,27 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     pass_subptmigration_gen = false;
     pass_leptonptmigration_gen = false;
   }
-  /***************************  750GeV SELECTION ***********************************************************************************/
+
+  /*************************************************************************************************************************************************/
+  /* In two steps because Event with gen_weight > 300 should be deleted completly but still be shown if it passes the GenSelection *****************/
+  if(GenWeight300 && pass_measurement_gen) h_gen_weight_gensel_300->fill(event);
+  if(GenWeight300) return false;
+
+  /***************************  750GeV SELECTION ***************************************************************************************************/
   bool passes_750_ak8 = false;
   bool passes_750_xcone = false;
   if(passed_presel_rec && njet_ak8->passes(event)){
     if(deltaR_ak8->passes(event) && pt_sel_ak8->passes(event) && mass_ak8->passes(event)) passes_750_ak8 = true;
   }
   if(pass_measurement_rec && pt750_sel->passes(event)) passes_750_xcone = true;
-  /******************************************************************************************************************************/
+  /*************************************************************************************************************************************************/
 
-  /*************************** Pile Up bools  ***************************************************************************************************/
+  /*************************** Pile Up bools  ******************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
   bool midPU = (event.pvs->size() > 10 && event.pvs->size() <= 20);
   bool highPU = (event.pvs->size() > 20);
 
-  /*************************** fill hists with reco sel applied ***********************************************************************************/
+  /*************************** fill hists with reco sel applied ************************************************************************************/
 
   bool is_matched_sub = false;
   bool is_matched_fat = false;
@@ -1049,12 +1074,23 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(isTTbar){
       h_XCone_GEN_RecOnly->fill(event);
       if(isTTbar) h_GenParticles_RecOnly->fill(event);
-
     }
   }
 
   /*************************** fill hists with gen sel applied *************************************************************************************/
+
   if(pass_measurement_gen){
+
+    // The next 3 Histograms are using the gen_weight of the event.
+    // To pass the weight properly through the event.weight, this method is used.
+    // I am open for a more elegant way !!
+    // double original_weight = event.weight;
+    // event.weight = gen_weight;
+    // h_gen_weights_pass_gen->fill(event);
+    // if(mass_gen33 < 150 && mass_gen33 > 140) h_gen_weights_massbin_145->fill(event); // 2017
+    // if(mass_gen33 < 280 && mass_gen33 > 270) h_gen_weights_massbin_275->fill(event); // 2018
+    // event.weight = original_weight;
+
     h_XCone_GEN_GenOnly->fill(event);
     if(matched_sub_GEN->passes(event)) h_XCone_GEN_GenOnly_matched->fill(event);
     else                               h_XCone_GEN_GenOnly_unmatched->fill(event);

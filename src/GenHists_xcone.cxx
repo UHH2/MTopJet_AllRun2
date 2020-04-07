@@ -3,7 +3,6 @@
 
 GenHists_xcone::GenHists_xcone(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
-
   Mass_HadJet33 = book<TH1F>("Mass_HadJet33", "m_{jet}", 50, 0, 500);
   Mass_HadJet33_B = book<TH1F>("Mass_HadJet33_B", "m_{jet}", 100, 0, 500);
   Mass_HadJet33_C = book<TH1F>("Mass_HadJet33_C", "m_{jet}", 500, 0, 500);
@@ -84,6 +83,16 @@ void GenHists_xcone::fill(const Event & event){
   // get weight
   double weight = event.weight;
 
+  // int mass_had33 = had33.v4().M();
+  // if((mass_had33 > 140) && (mass_had33 < 150)){
+  //   if(event.weight > 10){
+  //    std::cout << "------------------------------------------------------------" << std::endl;
+  //     std::cout << "Weight:     " << event.weight << std::endl;
+  //     std::cout << "Event:      " << event.event << std::endl;
+  //     std::cout << "Mass:       " << mass_had33 << std::endl;
+  //   }
+  // }
+
   LorentzVector lep33_v4;
   GenParticle lepton;
   if(ttbargen.IsSemiLeptonicDecay()){
@@ -91,7 +100,6 @@ void GenHists_xcone::fill(const Event & event){
     lep33_v4 = lep33.v4() + lepton.v4();
   }
   else lep33_v4 = lep33.v4();
-
 
   Mass_HadJet33->Fill(had33.v4().M(), weight);
   Mass_HadJet33_rebin->Fill(had33.v4().M(), weight);
