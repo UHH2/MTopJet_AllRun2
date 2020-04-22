@@ -375,13 +375,13 @@
       	<Item Name="dopvfilter" Value="true" />
       	<Item Name="channel" Value="&channel;"/>
 
-      	<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_muon.root"/>
-      	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/DeepJet_2016LegacySF_WP_V1.csv" />
+      	<Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_muon.root"/>
+      	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/DeepJet_2016LegacySF_WP_V1.csv" />
 
-      	<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
-      	<Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
-      	<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
-      	<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
+      	<Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
+      	<Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
+      	<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
+      	<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
 
       	<Item Name="ScaleVariationMuR" Value="none"/>
       	<Item Name="ScaleVariationMuF" Value="none"/>
