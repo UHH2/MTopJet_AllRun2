@@ -1,5 +1,5 @@
 #include "../include/CentralInclude.h"
-
+#include "../include/HistogramUtils.h"
 using namespace std;
 
 int main(){

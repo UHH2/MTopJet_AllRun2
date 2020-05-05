@@ -149,20 +149,3 @@ void LumiInfo(double lumi = 35.9, bool bratio = false, double x=0.9, double y=0.
 }
 
 // -------------------------------------------------------------------------------------------
-TH1F *normalize(TH1F *hist){
-  TH1F *hist_norm = (TH1F*) hist->Clone();
-  hist_norm->Scale(1/hist->Integral());
-  return hist_norm;
-}
-
-// -------------------------------------------------------------------------------------------
-double get_highest_peak(vector<TH1F*> hists){
-  vector<double> max;
-  double max_value;
-  for(unsigned int i = 0; i<hists.size(); i++) max.push_back(hists[i]->GetMaximum());
-  sort(max.begin(), max.end());
-  double top_index = max.size()-1;
-  return max[top_index];
-}
-
-// -------------------------------------------------------------------------------------------
