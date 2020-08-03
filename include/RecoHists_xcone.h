@@ -3,7 +3,7 @@
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
 #include <UHH2/common/include/MCWeight.h>
-
+#include <UHH2/MTopJet/include/Vector_utils.h>
 
 #include <math.h>
 #include <vector>
@@ -38,6 +38,7 @@ protected:
   TH1F *pt_probe1, *pt_probe2;
   TH1F *csvmax;
   TH1F *number_smalldR_all,*number_smalldR_pass,*number_largedR_all,*number_largedR_pass;
+  TH1F *mass_W, *mass_subjet, *pt_subjet, *number_btag_tight_subjet;
 
   uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;
   uhh2::Event::Handle<std::vector<TopJet>>h_lepjets;

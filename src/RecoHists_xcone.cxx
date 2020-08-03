@@ -26,7 +26,6 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
 
   csvmax = book<TH1F>("csvmax", "csv max", 50, 0, 1);
 
-
   SoftdropMass_had = book<TH1F>("SoftdropMass_had", "Soft Drop Mass [GeV]", 25, 0, 500);
   SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "Soft Drop Mass [GeV]", 25, 0, 500);
   SoftdropMass_lep = book<TH1F>("SoftdropMass_lep", "m_{fat lep jet}", 25, 0, 500);
@@ -105,40 +104,50 @@ void RecoHists_xcone::fill(const Event & event){
   }
 
   // get had jet from fat jets for softdrop mass
-  int nr_hadjet = 0;
-  int nr_lepjet = 1;
+  int index_had = 0;
+  int index_lep = 1;
   if(deltaR(lepjets.at(0), fatjets.at(0)) < deltaR(hadjets.at(0), fatjets.at(0))){
-    nr_hadjet = 1;
-    nr_lepjet = 0;
+    index_had = 1;
+    index_lep = 0;
   }
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of Combined Jets ---------- ------------------------------
   //---------------------------------------------------------------------------------------
-  TLorentzVector hadjet_v4, lepjet_v4;
-  double pxlep, pylep, pzlep, Elep;
-  pxlep = lepjets.at(0).v4().Px();
-  pylep = lepjets.at(0).v4().Py();
-  pzlep = lepjets.at(0).v4().Pz();
-  Elep = lepjets.at(0).v4().E();
-  lepjet_v4.SetPxPyPzE(pxlep, pylep, pzlep, Elep);
+  TLorentzVector lepjet_v4 = lorentz_to_tlorentz(lepjets.at(0).v4());
   LorentzVector lepjet_lepton_v4 = lepjets.at(0).v4();
   if(found_lep) lepjet_lepton_v4 += lepton.v4();
 
-  double pxhad, pyhad, pzhad, Ehad;
-  pxhad = hadjets.at(0).v4().Px();
-  pyhad = hadjets.at(0).v4().Py();
-  pzhad = hadjets.at(0).v4().Pz();
-  Ehad = hadjets.at(0).v4().E();
-  hadjet_v4.SetPxPyPzE(pxhad, pyhad, pzhad, Ehad);
+  TLorentzVector hadjet_v4 = lorentz_to_tlorentz(hadjets.at(0).v4());
+  // TLorentzVector hadjet_v4, lepjet_v4;
+  // double pxlep, pylep, pzlep, Elep;
+  // pxlep = lepjets.at(0).v4().Px();
+  // pylep = lepjets.at(0).v4().Py();
+  // pzlep = lepjets.at(0).v4().Pz();
+  // Elep = lepjets.at(0).v4().E();
+  // lepjet_v4.SetPxPyPzE(pxlep, pylep, pzlep, Elep);
+  // LorentzVector lepjet_lepton_v4 = lepjets.at(0).v4();
+  // if(found_lep) lepjet_lepton_v4 += lepton.v4();
+  //
+  // double pxhad, pyhad, pzhad, Ehad;
+  // pxhad = hadjets.at(0).v4().Px();
+  // pyhad = hadjets.at(0).v4().Py();
+  // pzhad = hadjets.at(0).v4().Pz();
+  // Ehad = hadjets.at(0).v4().E();
+  // hadjet_v4.SetPxPyPzE(pxhad, pyhad, pzhad, Ehad);
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
 
-  //---------------------------------------------------------------------------------------
-  //--------------------------------- Fill Hists here -------------------------------------
-  //---------------------------------------------------------------------------------------
+  /*
+  ███████ ██ ██      ██          ██   ██ ██ ███████ ████████ ███████
+  ██      ██ ██      ██          ██   ██ ██ ██         ██    ██
+  █████   ██ ██      ██          ███████ ██ ███████    ██    ███████
+  ██      ██ ██      ██          ██   ██ ██      ██    ██         ██
+  ██      ██ ███████ ███████     ██   ██ ██ ███████    ██    ███████
+  */
 
   // get weight
   double weight = event.weight;
+
   number_hadjet->Fill(hadjets.size(), weight); // just for checks
   number_lepjet->Fill(lepjets.size(), weight); // just for checks
   HadJetMass->Fill(hadjet_v4.M(), weight);
@@ -162,32 +171,32 @@ void RecoHists_xcone::fill(const Event & event){
 
   Mass_Vertices->Fill(event.pvs->size(), hadjet_v4.M(), weight);
 
-  SoftdropMass_had->Fill(fatjets.at(nr_hadjet).softdropmass(), weight);
-  SoftdropMass_lep->Fill(fatjets.at(nr_lepjet).softdropmass(), weight);
+  SoftdropMass_had->Fill(fatjets.at(index_had).softdropmass(), weight);
+  SoftdropMass_lep->Fill(fatjets.at(index_lep).softdropmass(), weight);
 
   HadJetPT->Fill(hadjet_v4.Pt(), weight);
   LepJetPT->Fill(lepjet_v4.Pt(), weight);
 
-  FatJetPT_had->Fill(fatjets.at(nr_hadjet).pt(), weight);
-  FatJetPTDiff_had->Fill((fatjets.at(nr_hadjet).pt() - hadjet_v4.Pt()), weight);
-  FatJetMassDiff_had->Fill((fatjets.at(nr_hadjet).softdropmass() - hadjet_v4.M()), weight);
+  FatJetPT_had->Fill(fatjets.at(index_had).pt(), weight);
+  FatJetPTDiff_had->Fill((fatjets.at(index_had).pt() - hadjet_v4.Pt()), weight);
+  FatJetMassDiff_had->Fill((fatjets.at(index_had).softdropmass() - hadjet_v4.M()), weight);
 
-  FatJetPT_lep->Fill(fatjets.at(nr_lepjet).pt(), weight);
-  FatJetPTDiff_lep->Fill((fatjets.at(nr_lepjet).pt() - lepjet_v4.Pt()), weight);
-  FatJetMassDiff_lep->Fill((fatjets.at(nr_lepjet).softdropmass() - lepjet_lepton_v4.M()), weight);
-  if(fatjets.at(nr_hadjet).pt() > 400 && fatjets.at(nr_lepjet).softdropmass() < fatjets.at(nr_hadjet).softdropmass())SoftdropMass_Sel->Fill(fatjets.at(nr_hadjet).softdropmass(), weight);
+  FatJetPT_lep->Fill(fatjets.at(index_lep).pt(), weight);
+  FatJetPTDiff_lep->Fill((fatjets.at(index_lep).pt() - lepjet_v4.Pt()), weight);
+  FatJetMassDiff_lep->Fill((fatjets.at(index_lep).softdropmass() - lepjet_lepton_v4.M()), weight);
+  if(fatjets.at(index_had).pt() > 400 && fatjets.at(index_lep).softdropmass() < fatjets.at(index_had).softdropmass())SoftdropMass_Sel->Fill(fatjets.at(index_had).softdropmass(), weight);
 
   double rhoa_fat = rho * M_PI * 1.2 * 1.2;
   double rhoa, area = 0;
-  for(unsigned int i = 0; i < fatjets.at(nr_hadjet).subjets().size(); i++){
-    area += fatjets.at(nr_hadjet).subjets().at(i).jetArea();
+  for(unsigned int i = 0; i < fatjets.at(index_had).subjets().size(); i++){
+    area += fatjets.at(index_had).subjets().at(i).jetArea();
   }
   rhoa = rho * area;
 
   RhoA_fat->Fill(rhoa_fat, weight);
   RhoA->Fill(rhoa, weight);
   RhoA_diff->Fill(rhoa_fat - rhoa, weight);
-  E_diff->Fill((fatjets.at(nr_hadjet).v4().E() - hadjet_v4.E()), weight);
+  E_diff->Fill((fatjets.at(index_had).v4().E() - hadjet_v4.E()), weight);
 
 
   double JER_f = 1./(hadjets.at(0).JEC_factor_raw());

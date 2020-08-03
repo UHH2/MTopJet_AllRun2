@@ -1,0 +1,159 @@
+---------------------------------------------------------------------------------------- 4
+Get Bin Content
+TGraphError - Single bin 4
+Define fit function
+Start: Fitting
+fit a linear function ------------
+FCN=6.9037 FROM MIGRAD    STATUS=CONVERGED      61 CALLS          62 TOTAL
+EDM=3.12583e-19    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           2.92184e-03   9.55231e-05   1.31091e-07  -7.57139e-06
+2  p1           3.91306e-05   1.54973e-04   2.12699e-07   1.29449e-06
+3  p2           3.57554e-06   1.49393e-04   2.05055e-07  -1.66760e-06
+ndfs: 2 | chi2: 6.903697 | prob: 0.031687
+Bin 4: linear fit is rejected (0.031687)
+fit a mixed (xy2) function ------------
+FCN=0.137721 FROM MIGRAD    STATUS=CONVERGED      63 CALLS          64 TOTAL
+EDM=1.00237e-07    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           2.71518e-03   1.24226e-04   4.97365e-08  -9.45502e-02
+2  p1           3.29134e-05   1.54991e-04   8.06989e-08   2.88486e+00
+3  p2           5.05381e-04   1.94282e-04   7.77987e-08   1.29894e-01
+ndfs: 2 | chi2: 0.137721 | prob: 0.933457
+fit a mixed (x2y) function ------------
+FCN=4.94718 FROM MIGRAD    STATUS=CONVERGED      63 CALLS          64 TOTAL
+EDM=3.38002e-21    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           3.02765e-03   1.21287e-04   1.13714e-07   1.95266e-08
+2  p1           5.97142e-06   1.49403e-04   1.77873e-07  -5.49266e-07
+3  p2          -2.79682e-04   1.96771e-04   1.84504e-07  -2.40694e-08
+ndfs: 2 | chi2: 4.947180 | prob: 0.084282
+Bin 4: A mixed (xy2) fit fullfills the criterion (0.933457)
+
+
+
+
+
+---------------------------------------------------------------------------------------- 5
+Get Bin Content
+TGraphError - Single bin 5
+Define fit function
+Start: Fitting
+fit a linear function ------------
+FCN=13.8165 FROM MIGRAD    STATUS=CONVERGED      61 CALLS          62 TOTAL
+EDM=4.06151e-13    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           7.03797e-03   1.51490e-04   2.84121e-07  -5.91567e-03
+2  p1          -1.84745e-04   2.37852e-04   4.46525e-07  -3.49951e-04
+3  p2          -1.34372e-04   2.38752e-04   4.48301e-07   2.74596e-04
+ndfs: 2 | chi2: 13.816469 | prob: 0.001000
+Bin 5: linear fit is rejected (0.001000)
+fit a mixed (xy2) function ------------
+FCN=0.589651 FROM MIGRAD    STATUS=CONVERGED      70 CALLS          71 TOTAL
+EDM=2.2271e-26    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           6.57700e-03   1.95807e-04   9.30639e-08  -5.96484e-10
+2  p1          -1.49917e-04   2.38036e-04   1.46260e-07   0.00000e+00
+3  p2           1.13569e-03   3.08598e-04   1.46841e-07   3.78035e-10
+ndfs: 2 | chi2: 0.589651 | prob: 0.744661
+fit a mixed (x2y) function ------------
+FCN=7.54631 FROM MIGRAD    STATUS=CONVERGED      63 CALLS          64 TOTAL
+EDM=3.10399e-08    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           7.36005e-03   1.96272e-04   2.15784e-07  -2.30579e-02
+2  p1          -1.56731e-04   2.38909e-04   3.40476e-07  -1.04115e+00
+3  p2          -8.07920e-04   3.08165e-04   3.39127e-07   8.09171e-02
+ndfs: 2 | chi2: 7.546311 | prob: 0.022979
+Bin 5: A mixed (xy2) fit fullfills the criterion (0.744661)
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------------- 16
+Get Bin Content
+TGraphError - Single bin 16
+Define fit function
+Start: Fitting
+fit a linear function ------------
+FCN=26.151 FROM MIGRAD    STATUS=CONVERGED      61 CALLS          62 TOTAL
+EDM=3.58269e-13    STRATEGY= 1      ERROR MATRIX ACCURATE
+EXT PARAMETER                                   STEP         FIRST
+NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+1  p0           9.21053e-02   3.56422e-04   9.04423e-07  -2.37460e-03
+2  p1          -5.22649e-03   5.76978e-04   1.46593e-06   2.02909e-05
+3  p2          -4.79386e-03   5.42202e-04   1.37777e-06  -1.31909e-04
+ndfs: 2 | chi2: 26.150967 | prob: 0.000002
+ Bin 16: linear fit is rejected (0.000002)
+ fit a mixed (xy2) function ------------
+ FCN=72.801 FROM MIGRAD    STATUS=CONVERGED      68 CALLS          69 TOTAL
+ EDM=4.90616e-23    STRATEGY= 1      ERROR MATRIX ACCURATE
+ EXT PARAMETER                                   STEP         FIRST
+ NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+ 1  p0           9.36904e-02   4.72376e-04   1.49111e-06  -4.76519e-09
+ 2  p1          -5.36220e-03   5.77588e-04   2.41686e-06   0.00000e+00
+ 3  p2          -4.03448e-03   7.18596e-04   2.27151e-06  -1.56403e-08
+ ndfs: 2 | chi2: 72.801038 | prob: 0.000000
+ fit a mixed (x2y) function ------------
+ FCN=99.6391 FROM MIGRAD    STATUS=CONVERGED      66 CALLS          67 TOTAL
+ EDM=1.69902e-22    STRATEGY= 1      ERROR MATRIX ACCURATE
+ EXT PARAMETER                                   STEP         FIRST
+ NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+ 1  p0           9.11163e-02   4.52608e-04   1.74125e-06  -4.08064e-08
+ 2  p1          -4.71826e-03   5.42621e-04   2.65256e-06  -2.67870e-09
+ 3  p2           2.14446e-03   7.32684e-04   2.82231e-06   0.00000e+00
+ ndfs: 2 | chi2: 99.639086 | prob: 0.000000
+ Bin 16: mixed (xy2) fit is rejected (0.000000)
+ fit a mixed (xyy2) function ------------
+ FCN=0.00788652 FROM MIGRAD    STATUS=CONVERGED      94 CALLS          95 TOTAL
+ EDM=7.0121e-08    STRATEGY= 1      ERROR MATRIX ACCURATE
+ EXT PARAMETER                                   STEP         FIRST
+ NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+ 1  p0           9.36904e-02   4.72376e-04   1.74255e-07   2.75567e-02
+ 2  p1          -5.36210e-03   5.77588e-04   2.82440e-07   6.33773e-01
+ 3  p2          -4.63374e-03   5.43106e-04   2.65453e-07  -1.49331e-01
+ 4  p3          -3.68033e-03   7.19794e-04   2.65453e-07  -4.32677e-02
+ ndfs: 1 | chi2: 0.007887 | prob: 0.929236
+ fit a mixed (xx2y) function ------------
+ FCN=13.5792 FROM MIGRAD    STATUS=CONVERGED      86 CALLS          87 TOTAL
+ EDM=8.93484e-08    STRATEGY= 1      ERROR MATRIX ACCURATE
+ EXT PARAMETER                                   STEP         FIRST
+ NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+ 1  p0           9.11163e-02   4.52608e-04   6.62745e-07   3.32112e-02
+ 2  p1          -5.36476e-03   5.78293e-04   1.07421e-06  -1.39902e-01
+ 3  p2          -4.71815e-03   5.42621e-04   1.00960e-06   7.65170e-01
+ 4  p3           2.60377e-03   7.34355e-04   1.07421e-06  -4.71178e-02
+ ndfs: 1 | chi2: 13.579235 | prob: 0.000229
+ Bin 16: mixed (xyy2) fit is rejected (0.000000)
+ fit a quadratic function ------------
+ FCN=158.853 FROM MIGRAD    STATUS=CONVERGED      59 CALLS          60 TOTAL
+ EDM=5.45111e-21    STRATEGY= 1      ERROR MATRIX ACCURATE
+ EXT PARAMETER                                   STEP         FIRST
+ NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+ 1  p0           9.36310e-02   8.18879e-04   2.19452e-06   1.29512e-08
+ 2  p1          -3.70293e-04   1.00127e-03   3.55698e-06  -1.99760e-08
+ 3  p2          -3.97507e-03   9.81735e-04   3.34305e-06   1.27526e-07
+ ndfs: 2 | chi2: 158.853002 | prob: 0.000000
+ Bin 16: quadratic fit is rejected (0.000000)
+ fit a polynomial of order 2 function ------------
+ FCN=5.44145e-24 FROM MIGRAD    STATUS=CONVERGED     134 CALLS         135 TOTAL
+ EDM=1.08485e-23    STRATEGY= 1      ERROR MATRIX ACCURATE
+ EXT PARAMETER                                   STEP         FIRST                                                                                                                                                                           
+ NO.   NAME      VALUE            ERROR          SIZE      DERIVATIVE
+ 1  p0           9.36310e-02   8.18879e-04   1.73572e-07  -4.47046e-10
+ 2  p1          -5.36474e-03   5.78293e-04   2.81333e-07   6.21592e-09
+ 3  p2          -4.63372e-03   5.43106e-04   2.64413e-07   4.45583e-09
+ 4  p3           8.90270e-05   1.00249e-03   2.81333e-07  -2.04066e-09
+ 5  p4          -3.62093e-03   9.82612e-04   2.64413e-07   4.81975e-10
+ ndfs: 0 | chi2: 0.000000 | prob: 0.000000
+ Bin 16: A polynomial of order 2 fit fullfills the criterion (0.000000)

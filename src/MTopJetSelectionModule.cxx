@@ -226,7 +226,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); // 8 TeV
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
   // double jecsysfactor = 1.0;
-  corvar = ctx.get("JetCorrection_direction","nominal");
+  corvar = ctx.get("JetCorrection_direction","nominal"); // "nominal" nur wenn nicht up oder down
   nonclosureSYS = ctx.get("NonClosureUncertainty","false");
   if(nonclosureSYS == "true") do_nonClosure = true;
   // correct subjets (JEC + additional correction)

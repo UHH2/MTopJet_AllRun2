@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
   // non-closure in root file
-  TString rootname = "files/Correction_SysFromResolution_"+year+".root";
+  TString rootname = "../CorrectionFile/Correction_SysFromResolution_"+year+".root";
   TFile * outfile = new TFile(rootname,"RECREATE");;
   upvar->Write("Up");
   downvar->Write("Down");
@@ -279,7 +279,6 @@ TH1F* GetResoPlot(vector<TH1F*> hists, bool use_median){
   Float_t bins[] = {0, 50, 80, 120, 170, 220, 270, 320, 370, 420, 600};
   TH1F * reso = new TH1F("reso"," ",n_bins, bins);
   vector<double> mean, error;
-
   for(unsigned int i=0; i<n_bins; i++){
     TF1* f1 = new TF1("f1","gaus",-0.2,0.2);
     hists[i]->Fit("f1", "QR");

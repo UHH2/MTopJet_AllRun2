@@ -209,8 +209,8 @@ protected:
   std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350, h_XCone_GEN_Sel_ptsub;
   std::unique_ptr<Hists> h_PDFHists;
 
-  std::unique_ptr<Hists> h_ak8_tau_pass_gen, h_ak8_tau_pass_rec, h_ak8_tau_pass_genrec, h_ak8_tau;
-  std::unique_ptr<Hists> h_ak8_tau_pass_rec_masscut_120, h_ak8_tau_pass_rec_masscut_130, h_ak8_tau_pass_rec_masscut_140, h_ak8_tau_pass_rec_masscut_150;
+  std::unique_ptr<Hists> h_comparison_topjet_xcone_pass_gen, h_comparison_topjet_xcone_pass_rec, h_comparison_topjet_xcone_pass_genrec, h_comparison_topjet_xcone;
+  std::unique_ptr<Hists> h_comparison_topjet_xcone_pass_rec_masscut_120, h_comparison_topjet_xcone_pass_rec_masscut_130, h_comparison_topjet_xcone_pass_rec_masscut_140, h_comparison_topjet_xcone_pass_rec_masscut_150;
 
   std::unique_ptr<Hists> h_gen_weights, h_gen_weights_pass_gen, h_gen_weights_massbin_145, h_gen_weights_massbin_275;
   std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_gensel_300;
@@ -462,15 +462,15 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_weights04.reset(new WeightHists(ctx, "WeightHists04_BTag"));
 
   // AK8 N-subjetiness
-  h_ak8_tau.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau", isTTbar, 0));
-  h_ak8_tau_pass_gen.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_gen", isTTbar, 0));
-  h_ak8_tau_pass_rec.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_rec", isTTbar, 0));
-  h_ak8_tau_pass_genrec.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_genrec", isTTbar, 0));
+  h_comparison_topjet_xcone.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_gen.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_gen", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_rec.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_genrec.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_genrec", isTTbar, 0));
 
-  h_ak8_tau_pass_rec_masscut_120.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_rec_masscut_120", isTTbar, 120));
-  h_ak8_tau_pass_rec_masscut_130.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_rec_masscut_130", isTTbar, 130));
-  h_ak8_tau_pass_rec_masscut_140.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_rec_masscut_140", isTTbar, 140));
-  h_ak8_tau_pass_rec_masscut_150.reset(new RecoGenHists_xcone_topjet(ctx, "AK8_tau_pass_rec_masscut_150", isTTbar, 150));
+  h_comparison_topjet_xcone_pass_rec_masscut_120.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_120", isTTbar, 120));
+  h_comparison_topjet_xcone_pass_rec_masscut_130.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_130", isTTbar, 130));
+  h_comparison_topjet_xcone_pass_rec_masscut_140.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_140", isTTbar, 140));
+  h_comparison_topjet_xcone_pass_rec_masscut_150.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_150", isTTbar, 150));
 
   // Control Hists for FSRx_4
   if(isTTbar){
@@ -931,7 +931,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool is_matched_sub = false;
   bool is_matched_fat = false;
 
-  if(isTTbar) h_ak8_tau->fill(event);
+  h_comparison_topjet_xcone->fill(event);
 
   // hists to see events that are generated in measurement phase-space, but reconstructed outside
   if(pass_measurement_gen){
@@ -1016,11 +1016,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_jec_subjets->fill(event);
     h_XCone_cor_subjets->fill(event);
 
-    h_ak8_tau_pass_rec->fill(event);
-    h_ak8_tau_pass_rec_masscut_120->fill(event);
-    h_ak8_tau_pass_rec_masscut_130->fill(event);
-    h_ak8_tau_pass_rec_masscut_140->fill(event);
-    h_ak8_tau_pass_rec_masscut_150->fill(event);
+    h_comparison_topjet_xcone_pass_rec->fill(event);
+    h_comparison_topjet_xcone_pass_rec_masscut_120->fill(event);
+    h_comparison_topjet_xcone_pass_rec_masscut_130->fill(event);
+    h_comparison_topjet_xcone_pass_rec_masscut_140->fill(event);
+    h_comparison_topjet_xcone_pass_rec_masscut_150->fill(event);
 
     if(isTTbar && scale_ttbar) event.weight *= SF_tt;
 
@@ -1085,7 +1085,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     // if(mass_gen33 < 280 && mass_gen33 > 270) h_gen_weights_massbin_275->fill(event); // 2018
     // event.weight = original_weight;
 
-    if(isTTbar) h_ak8_tau_pass_gen->fill(event);
+    if(isTTbar) h_comparison_topjet_xcone_pass_gen->fill(event);
     if(isTTbar) h_GenParticles_GenOnly->fill(event);
 
     h_XCone_GEN_GenOnly->fill(event);
@@ -1112,7 +1112,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /*************************** fill hists with reco+gen selection applied **************************************************************************/
   if(pass_measurement_rec && pass_measurement_gen){
-    if(isTTbar) h_ak8_tau_pass_genrec->fill(event);
+    if(isTTbar) h_comparison_topjet_xcone_pass_genrec->fill(event);
     if(isTTbar) h_GenParticles_Both->fill(event);
     h_XCone_GEN_Both->fill(event);
     h_RecGenHists_Both->fill(event);

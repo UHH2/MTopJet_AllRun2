@@ -9,19 +9,19 @@ sys.path.append('/nfs/dust/cms/user/froehlia/CMSSW_10_2_10/src/UHH2/Varial')
 
 sys_uncerts = {
     # 'name' : {'item name': 'item value', ...},
-     'FSRup_sqrt2'              : {'PS_variation':'FSRup_sqrt2'},
-     'FSRdown_sqrt2'            : {'PS_variation':'FSRdown_sqrt2'},
-     'FSRup_2'                  : {'PS_variation':'FSRup_2'},
-     'FSRdown_2'                : {'PS_variation':'FSRdown_2'},
-     'FSRup_4'                  : {'PS_variation':'FSRup_4'},
-     'FSRdown_4'                : {'PS_variation':'FSRdown_4'},
-     'ISRup_sqrt2'              : {'PS_variation':'ISRup_sqrt2'},
-     'ISRdown_sqrt2'            : {'PS_variation':'ISRdown_sqrt2'},
-     'ISRup_2'                  : {'PS_variation':'ISRup_2'},
-     'ISRdown_2'                : {'PS_variation':'ISRdown_2'},
-     'ISRup_4'                  : {'PS_variation':'ISRup_4'},
-     'ISRdown_4'                : {'PS_variation':'ISRdown_4'},
-     }
+    'FSRup_sqrt2'              : {'PS_variation':'FSRup_sqrt2'},
+    'FSRdown_sqrt2'            : {'PS_variation':'FSRdown_sqrt2'},
+    'FSRup_2'                  : {'PS_variation':'FSRup_2'},
+    'FSRdown_2'                : {'PS_variation':'FSRdown_2'},
+    'FSRup_4'                  : {'PS_variation':'FSRup_4'},
+    'FSRdown_4'                : {'PS_variation':'FSRdown_4'},
+    'ISRup_sqrt2'              : {'PS_variation':'ISRup_sqrt2'},
+    'ISRdown_sqrt2'            : {'PS_variation':'ISRdown_sqrt2'},
+    'ISRup_2'                  : {'PS_variation':'ISRup_2'},
+    'ISRdown_2'                : {'PS_variation':'ISRdown_2'},
+    'ISRup_4'                  : {'PS_variation':'ISRup_4'},
+    'ISRdown_4'                : {'PS_variation':'ISRdown_4'},
+}
 start_all_parallel = False
 
 ############################################################### script code ###
@@ -33,7 +33,7 @@ if len(sys.argv) != 2:
     print 'Plz. give me da name of da sframe-config! ... dude!'
     exit(-1)
 
-
+################################################################################
 def set_uncert_func(uncert_name):
     uncert = sys_uncerts[uncert_name]
     def do_set_uncert(element_tree):
@@ -50,6 +50,21 @@ def set_uncert_func(uncert_name):
 
     return do_set_uncert
 
+################################################################################
+def insert_str(string, str_to_insert, index):
+    return string[:index] + str_to_insert + string[index:]
+def DirName(prefix, xmlname):
+    newname = xmlname.replace('MTopJet', '')
+    newname = newname.replace('PostSelection', '')
+    newname = newname.replace('SYS', '')
+    newname = newname.replace('muon', '')
+    newname = newname.replace('.xml', '')
+    newname = newname.replace('_', '')
+    newname = newname.replace('/', '')
+    newname = insert_str(newname, "_" , 4)
+    return prefix+'_'+newname
+
+################################################################################
 from varial.extensions.sframe import SFrame
 from varial import tools
 if start_all_parallel:
@@ -57,7 +72,7 @@ if start_all_parallel:
 else:
     ToolChain = tools.ToolChain
 
-
+################################################################################
 class MySFrameBatch(SFrame):
 
     def configure(self):
@@ -75,7 +90,7 @@ class MySFrameBatch(SFrame):
         self.exe = 'sframe_batch.py' + opt
 
 sframe_tools = ToolChain(
-    'SFrameUncerts_2017',
+    DirName('SFrameUncerts',sys.argv[1]),
     list(
 	MySFrameBatch(
             cfg_filename=sys.argv[1],
@@ -87,6 +102,6 @@ sframe_tools = ToolChain(
     )
 )
 
-
+################################################################################
 if __name__ == '__main__':
     varial.tools.Runner(sframe_tools)

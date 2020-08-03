@@ -31,7 +31,6 @@
 
 <!-- =============================================== ttbar other samples ============================================================== -->
   <!ENTITY TTbar_mtop1665_2L2Nu              SYSTEM  "../../../common/datasets/RunII_102X_v2/2018/TTTo2L2Nu_mtop166p5_2018.xml">
-  <!-- <!ENTITY TTbar_mtop1665_2L2Nu              "/pnfs/desy.de/cms/tier2/store/user/apaasch/RunII_102X_v1/TTTo2L2Nu_mtop169p5_TuneCP5_13TeV-powheg-pythia8/crab_TTTo2L2Nu_mtop169p5/200305_143049/0000/Ntuple_1.root"> -->
   <!ENTITY TTbar_mtop1695_2L2Nu              SYSTEM  "../../../common/datasets/RunII_102X_v2/2018/TTTo2L2Nu_mtop169p5_2018.xml">
   <!ENTITY TTbar_mtop1715_2L2Nu              SYSTEM  "../../../common/datasets/RunII_102X_v2/2018/TTTo2L2Nu_mtop171p5_2018.xml">
   <!ENTITY TTbar_mtop1735_2L2Nu              SYSTEM  "../../../common/datasets/RunII_102X_v2/2018/TTTo2L2Nu_mtop173p5_2018.xml">
@@ -221,26 +220,23 @@
   &TTbar_Mtt0000to0700_Hadronic; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
-  <!-- <InputData Version="TTbar_mtop1665_2L2Nu_2018" Lumi="2436727.731" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-  <In FileName="&TTbar_mtop1665_2L2Nu;" Lumi="0.0"/>  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
   <InputData Version="TTbar_mtop1665_2L2Nu_2018" Lumi="2436727.731" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
   &TTbar_mtop1665_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!-- <InputData Version="TTbar_mtop1695_2L2Nu_2018" Lumi="10791998.49" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-  <!-- &TTbar_mtop1695_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+  <!-- <InputData Version="TTbar_mtop1695_2L2Nu_2018" Lumi="10791998.49" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  &TTbar_mtop1695_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!-- <InputData Version="TTbar_mtop1715_2L2Nu_2018" Lumi="5001544.591" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-  <!-- &TTbar_mtop1715_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+  <InputData Version="TTbar_mtop1715_2L2Nu_2018" Lumi="5001544.591" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  &TTbar_mtop1715_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!-- <InputData Version="TTbar_mtop1735_2L2Nu_2018" Lumi="4525075.189" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-  <!-- &TTbar_mtop1735_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+  <InputData Version="TTbar_mtop1735_2L2Nu_2018" Lumi="4525075.189" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  &TTbar_mtop1735_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!-- <InputData Version="TTbar_mtop1755_2L2Nu_2018" Lumi="11079134.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-  <!-- &TTbar_mtop1755_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+  <InputData Version="TTbar_mtop1755_2L2Nu_2018" Lumi="11079134.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  &TTbar_mtop1755_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!-- <InputData Version="TTbar_mtop1785_2L2Nu_2018" Lumi="406702.5747" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
-  <!-- &TTbar_mtop1785_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+  <InputData Version="TTbar_mtop1785_2L2Nu_2018" Lumi="406702.5747" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+  &TTbar_mtop1785_2L2Nu; <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
   <!-- <InputData Version="TTbar_mtop1665_SemiLeptonic_2018" Lumi="9523908.321" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
