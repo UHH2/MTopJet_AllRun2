@@ -4,7 +4,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-  bool debug = false;
+  bool debug = true;
   bool rel_error = false;
 
   if(argc != 2){
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]){
   .██████  ███████    ██        ██   ██ ██ ███████    ██    ███████
   */
 
-  TString tau32 = "AK8_tau_pass_rec_masscut_140/tau32_hadjet";
+  TString tau32 = "comparison_topjet_xcone_pass_rec_masscut_140/ak8_hadjet_tau32";
   TString save_path = "/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/";
 
 
@@ -62,12 +62,20 @@ int main(int argc, char* argv[]){
   // Get Background ##################################################################################
   if(debug) cout << "Background" << endl;
 
-  vector<TFile*> file_v;
-  vector<TH1F*> hist_v;
-  vector<TString> path_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.ST.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
-  for(unsigned int i=0; i<path_v.size(); i++) file_v.push_back(new TFile(dir+year+"/muon/"+path_v[i]));
-  for(unsigned int i=0; i<file_v.size(); i++) hist_v.push_back((TH1F*)file_v[i]->Get(tau32));
+  vector<TFile*>  file_v;
+  vector<TH1F*>   hist_v;
+  vector<TString> path_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.SingleTop.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
+  for(unsigned int i=0; i<path_v.size(); i++){
+    file_v.push_back(new TFile(dir+year+"/muon/"+path_v[i]));
+    cout << file_v.size() << endl;
+  }
+  for(unsigned int i=0; i<file_v.size(); i++){
+    hist_v.push_back((TH1F*)file_v[i]->Get(tau32));
+    cout << hist_v.size() << endl;
+  }
+  if(debug) cout << "Background6" << endl;
   TH1F *bkg = AddHists(hist_v, 1);
+  if(debug) cout << "Background" << endl;
   if(is1718) bkg = add_second_year("2018", bkg, dir, path_v, tau32);
 
   // #################################################################################################
@@ -93,6 +101,7 @@ int main(int argc, char* argv[]){
   // Get FSR #########################################################################################
   if(debug) cout << "FSR" << endl;
 
+  tau32 = "AK8_tau_pass_rec_masscut_140/tau32_hadjet";
   vector<TFile*> FSRup_file, FSRdown_file;
   vector<TH1F*> FSRup, FSRdown;
 
@@ -575,6 +584,11 @@ int main(int argc, char* argv[]){
   cout << "" << endl;
   cout << " \u03BC = " << minX << " +" << sigmaup << " -" << sigmadown << endl;
   print_seperater();
+
+  fstream fsr_txt;
+  fsr_txt.open(save_path+year+"/fsr_factor.txt", ios::out);
+  fsr_txt << "ymin     : " << minY << "\nxmin     : " << minX << "\nxmin_up  :  " << sigmaup << "\nxmin_down:  " << sigmadown  << endl;
+  fsr_txt.close();
 
   /*
   .██████  ██████  ██████  ██████  ███████ ████████ ███████ ██████      ██   ██ ██ ███████ ████████

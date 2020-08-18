@@ -75,14 +75,29 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   // Method: Match highest btag --------------------------------------------------------------------------------
 
   //Wjet
-  h_wjet_pt_match = book<TH1F>("wjet_pt_match", "p_{T}", 50, 0, 1000);
-  h_wmass_match = book<TH1F>("wmass_match", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wjet_bigger_pt_subjet  = book<TH1F>("wjet_bigger_pt_subjet", "", 2, 0, 2);
+  h_wjet_pt_match          = book<TH1F>("wjet_pt_match", "p_{T}", 50, 0, 1000);
+  h_wjet_pt_match_subjet1  = book<TH1F>("wjet_pt_match_subjet1", "p_{T}", 100, 0, 1000);
+  h_wjet_pt_match_subjet2  = book<TH1F>("wjet_pt_match_subjet2", "p_{T}", 100, 0, 1000);
+  h_wjet_pt_match_S1divS2  = book<TH1F>("wjet_pt_match_S1divS2", "p_{T}", 100, 0, 10);
+  h_wjet_pt_match_S1divW   = book<TH1F>("wjet_pt_match_S1divW", "p_{T}", 20, 0, 1);
+  h_wjet_pt_match_S1mS2    = book<TH1F>("wjet_pt_match_S1mS2", "p_{T}", 51, -10, 500);
+  h_wjet_pt_match_S1_S2    = book<TH2F>("wjet_pt_match_S1_S2", "W Subjet pt", 100, 0, 1000, 100, 0, 1000);
+  h_wjet_pt_match_S1divW_W = book<TH2F>("wjet_pt_match_S1divW_W", "W Subjet pt", 100, 0, 1000, 100, 0, 1);
+  h_wmass_match            = book<TH1F>("wmass_match", "m_{Wjet} [GeV]", 180, 0, 180);
 
   // pt bins
-  h_wmass_match_ptbin_low      = book<TH1F>("wmass_match_ptbin_low", "m_{Wjet} [GeV]", 180, 0, 180);
-  h_wmass_match_ptbin_midlow   = book<TH1F>("wmass_match_ptbin_midlow", "m_{Wjet} [GeV]", 180, 0, 180);
-  h_wmass_match_ptbin_midhigh  = book<TH1F>("wmass_match_ptbin_midhigh", "m_{Wjet} [GeV]", 180, 0, 180);
-  h_wmass_match_ptbin_high     = book<TH1F>("wmass_match_ptbin_high", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_match_ptbin_low    = book<TH1F>("wmass_match_ptbin_low", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_match_ptbin_high   = book<TH1F>("wmass_match_ptbin_high", "m_{Wjet} [GeV]", 180, 0, 180);
+
+  h_wmass_match_divbin_low   = book<TH1F>("wmass_match_divbin_low", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_match_divbin_high  = book<TH1F>("wmass_match_divbin_high", "m_{Wjet} [GeV]", 180, 0, 180);
+
+  h_wmass_match_ptdiv_hh     = book<TH1F>("wmass_match_ptdiv_hh", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_match_ptdiv_hl     = book<TH1F>("wmass_match_ptdiv_hl", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_match_ptdiv_lh     = book<TH1F>("wmass_match_ptdiv_lh", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_match_ptdiv_ll     = book<TH1F>("wmass_match_ptdiv_ll", "m_{Wjet} [GeV]", 180, 0, 180);
+
 
   //Btag
   h_ak4_btag_high = book<TH1F>("ak4_highest_btag", "btag", 50, 0, 1);
@@ -96,7 +111,7 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   h_number_one_close_subjets = book<TH1F>("number_one_close_subjets", "one jet with dR<0.4", 1, 0, 1);
   h_number_multiple_close_subjets = book<TH1F>("number_multiple_close_subjets", "two jets with dR<0.4", 1, 0, 1);
 
-  // BTagcut ----------------------------------------------------------------------------------------------------
+  // BtagCut ----------------------------------------------------------------------------------------------------
   h_ak4_btag_high_btagcut = book<TH1F>("number_ak4_btag_high_btagcut", "matched AK4 jet highest btag", 50, 0, 1);
 
   // WJet
@@ -485,6 +500,21 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   double E_wjet = xcone_had_subjets[index_Wjet1].v4().E() + xcone_had_subjets[index_Wjet2].v4().E();
   Wjet_v4_match.SetPxPyPzE(px_wjet, py_wjet, pz_wjet, E_wjet);
 
+  TLorentzVector Wjet_v4_match_subjetA = lorentz_to_tlorentz(xcone_had_subjets[index_Wjet1].v4()); // in Vector_utils.h
+  TLorentzVector Wjet_v4_match_subjetB = lorentz_to_tlorentz(xcone_had_subjets[index_Wjet2].v4());
+
+  // Sort subjets --------------------------------------------------------------
+  TLorentzVector Wjet_v4_match_subjet1;
+  TLorentzVector Wjet_v4_match_subjet2;
+  if(Wjet_v4_match_subjetA.Pt()<Wjet_v4_match_subjetB.Pt())
+  {
+    Wjet_v4_match_subjet1 = Wjet_v4_match_subjetB;
+    Wjet_v4_match_subjet2 = Wjet_v4_match_subjetA;
+  } else {
+    Wjet_v4_match_subjet1 = Wjet_v4_match_subjetA;
+    Wjet_v4_match_subjet2 = Wjet_v4_match_subjetB;
+  }
+
   /*
   -----------------------------------------------------------------------------------------------------------
   --------------------------------  Method: Min Mass --------------------------------------------------------
@@ -544,7 +574,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
 
   // Get WJet  -----------------------------------------------------------------
   TLorentzVector Wjet_v4_compare;
-  double M_compare = 1000;
+  // double M_compare = 1000;
   if(diff_W_M12<diff_W_M13 && diff_W_M12<diff_W_M23) Wjet_v4_compare = Wjet12;
   if(diff_W_M13<diff_W_M23 && diff_W_M13<diff_W_M12) Wjet_v4_compare = Wjet13;
   if(diff_W_M23<diff_W_M13 && diff_W_M23<diff_W_M12) Wjet_v4_compare = Wjet23;
@@ -673,14 +703,41 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
 
   // ---------------------------------------------------------------------------------------------------------
   // Method - btag matched: ----------------------------------------------------------------------------------
-  double wjet_matched_pt = Wjet_v4_match.Pt();
-  h_wjet_pt_match->Fill(Wjet_v4_match.Pt(), weight);
-  h_wmass_match->Fill(Wjet_v4_match.M(), weight);
+  double wjet_matched_pt  = Wjet_v4_match.Pt();
+  double wjet_match_s1_pt = Wjet_v4_match_subjet1.Pt();
+  double wjet_match_s2_pt = Wjet_v4_match_subjet2.Pt();
+  double S1divW           = wjet_match_s1_pt/wjet_matched_pt;
+  h_wjet_pt_match->Fill(wjet_matched_pt, weight);
+  h_wjet_pt_match_subjet1->Fill(wjet_match_s1_pt, weight);
+  h_wjet_pt_match_subjet2->Fill(wjet_match_s2_pt, weight);
+  h_wjet_pt_match_S1mS2->Fill(wjet_match_s1_pt-wjet_match_s2_pt, weight);
+  h_wjet_pt_match_S1divW->Fill(S1divW, weight);
 
-  if(wjet_matched_pt<200)                      h_wmass_match_ptbin_low->Fill(Wjet_v4_match.M(), weight);
-  if(200<wjet_matched_pt&&wjet_matched_pt<300) h_wmass_match_ptbin_midlow->Fill(Wjet_v4_match.M(), weight);
-  if(300<wjet_matched_pt&&wjet_matched_pt<400) h_wmass_match_ptbin_midhigh->Fill(Wjet_v4_match.M(), weight);
-  if(400<wjet_matched_pt)                      h_wmass_match_ptbin_high->Fill(Wjet_v4_match.M(), weight);
+  // 2D ------------------------------------------------------------------------
+  h_wjet_pt_match_S1_S2->Fill(wjet_match_s1_pt, wjet_match_s2_pt, weight);
+  h_wjet_pt_match_S1divW_W->Fill( wjet_matched_pt, S1divW, weight);
+
+  h_wmass_match->Fill(Wjet_v4_match.M(), weight);
+  if(wjet_match_s1_pt<wjet_match_s2_pt) h_wjet_bigger_pt_subjet->Fill(0.5, weight);
+  else                                  h_wjet_bigger_pt_subjet->Fill(1.5, weight);
+
+  // Bins ----------------------------------------------------------------------
+  bool pt_greater, div_greater;
+  if(wjet_matched_pt<300) pt_greater = false;
+  else                    pt_greater = true;
+  if(S1divW<0.7)         div_greater = false;
+  else                   div_greater = true;
+
+  if(!pt_greater)   h_wmass_match_ptbin_low->Fill(Wjet_v4_match.M(), weight);
+  if(pt_greater)    h_wmass_match_ptbin_high->Fill(Wjet_v4_match.M(), weight);
+
+  if(!div_greater)  h_wmass_match_divbin_low->Fill(Wjet_v4_match.M(), weight);
+  if(div_greater)   h_wmass_match_divbin_high->Fill(Wjet_v4_match.M(), weight);
+
+  if(pt_greater && div_greater)   h_wmass_match_ptdiv_hh->Fill(Wjet_v4_match.M(), weight);
+  if(pt_greater && !div_greater)  h_wmass_match_ptdiv_hl->Fill(Wjet_v4_match.M(), weight);
+  if(!pt_greater && div_greater)  h_wmass_match_ptdiv_lh->Fill(Wjet_v4_match.M(), weight);
+  if(!pt_greater && !div_greater) h_wmass_match_ptdiv_ll->Fill(Wjet_v4_match.M(), weight);
 
   // ---------------------------------------------------------------------------------------------------------
   // Method - match+cut --------------------------------------------------------------------------------------

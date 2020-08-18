@@ -16,6 +16,7 @@
 #include <UHH2/common/include/TopPtReweight.h>
 #include <UHH2/common/include/TTbarGen.h>
 #include <UHH2/common/include/Utils.h>
+#include <UHH2/common/include/JetCorrectionSets.h>
 #include "UHH2/common/include/YearRunSwitchers.h"
 
 #include <UHH2/MTopJet/include/CorrectionHists_subjets.h>
@@ -39,6 +40,7 @@
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/CorrectionFactor.h>
 #include <UHH2/MTopJet/include/ElecTriggerSF.h>
+#include <UHH2/MTopJet/include/CorrectionFactor_BestFit.h>
 #include <UHH2/MTopJet/include/GenSelections.h>
 #include <UHH2/MTopJet/include/JetCorrections_xcone.h>
 #include <UHH2/MTopJet/include/MTopJetUtils.h>
@@ -109,6 +111,7 @@ protected:
   // handles for output
   Event::Handle<double>h_musf_central;
   Event::Handle<TTbarGen>h_ttbargen;
+  Event::Handle<std::vector<TopJet>>h_hadjets_raw;
   Event::Handle<std::vector<TopJet>>h_hadjets;
   Event::Handle<std::vector<TopJet>>h_lepjets;
   Event::Handle<std::vector<TopJet>>h_fatjets;
@@ -157,6 +160,9 @@ protected:
   //scale variation
   std::unique_ptr<AnalysisModule> scale_variation;
   std::unique_ptr<AnalysisModule> PUreweight;
+
+  // Best fit
+  std::unique_ptr<CorrectionFactor_BestFit> BestFit;
 
   // store Hist collection as member variables
   std::unique_ptr<Hists> h_Muon_PreSel01, h_Elec_PreSel01, h_MTopJet_PreSel01, h_Jets_PreSel01, h_XCone_cor_PreSel01;
@@ -597,12 +603,17 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   // PDF hists
   h_PDFHists.reset(new PDFHists(ctx, "PDFHists"));
 
+  // Best Fit
+  BestFit.reset(new CorrectionFactor_BestFit(ctx, "XCone33_had_Combined_Corrected", year));
+
   // get handles
   h_weight = ctx.get_handle<double>("weight");
   h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
   h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
   h_musf_central = ctx.get_handle<double>("passed_recsel_2");
   h_weight_btag = ctx.get_handle<float>("weight_btag");
+
+  h_hadjets_raw=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
 
   h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
   h_lepjets=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
@@ -702,13 +713,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
   event.set(h_bquark_pt, bquark_pt);
   // SoftDropMass for HadJet
-  std::vector<TopJet> hadjets = event.get(h_hadjets);
-  std::vector<TopJet> lepjets = event.get(h_lepjets);
-  std::vector<TopJet> fatjets = event.get(h_fatjets);
+  std::vector<TopJet> hadjets_raw = event.get(h_hadjets_raw);
+  std::vector<TopJet> hadjets     = event.get(h_hadjets);
+  std::vector<TopJet> lepjets     = event.get(h_lepjets);
+  std::vector<TopJet> fatjets     = event.get(h_fatjets);
   TopJet hadjet;
   if(deltaR(lepjets.at(0), fatjets.at(0)) < deltaR(hadjets.at(0), fatjets.at(0))) hadjet = fatjets.at(1);
   else hadjet = fatjets.at(0);
 
+  double test = BestFit->get_mass_BestFit(event, hadjets_raw, {0.2, 0.2});
+  cout << "---------------------------------------- " << test << endl;
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?

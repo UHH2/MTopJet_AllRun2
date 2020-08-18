@@ -39,6 +39,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <tuple>
 #include <vector>
 
@@ -163,4 +165,52 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
         s << c.str_;
     }
     return s;
+}
+
+/*
+███████  ██████  ██      ██████  ███████ ██████
+██      ██    ██ ██      ██   ██ ██      ██   ██
+█████   ██    ██ ██      ██   ██ █████   ██████
+██      ██    ██ ██      ██   ██ ██      ██   ██
+██       ██████  ███████ ██████  ███████ ██   ██
+*/
+
+void creat_folder(TString path, TString name){mkdir(path+"/"+name,0777);}
+
+TString creat_folder_and_path(TString path, TString name){
+  mkdir(path+"/"+name,0777);
+  return path += "/"+name;
+}
+
+/*
+.██████  ██████  ███    ███ ██████   █████  ██████  ███████
+██      ██    ██ ████  ████ ██   ██ ██   ██ ██   ██ ██
+██      ██    ██ ██ ████ ██ ██████  ███████ ██████  █████
+██      ██    ██ ██  ██  ██ ██      ██   ██ ██   ██ ██
+.██████  ██████  ██      ██ ██      ██   ██ ██   ██ ███████
+*/
+
+double choose_greater_number(double x1, double x2){
+  double x;
+  if(x1<x2) x=x2;
+  else      x=x1;
+  return x;
+}
+
+/*
+██████   ██████  ██    ██ ███    ██ ██████
+██   ██ ██    ██ ██    ██ ████   ██ ██   ██
+██████  ██    ██ ██    ██ ██ ██  ██ ██   ██
+██   ██ ██    ██ ██    ██ ██  ██ ██ ██   ██
+██   ██  ██████   ██████  ██   ████ ██████
+*/
+
+int Round(double wert)
+{
+	return (int) (wert + ((wert < 0)? - 0.5 : 0.5));
+}
+
+double Round(double wert, int nachkommastellen)
+{
+	return ((int) ((wert * pow(10.0, nachkommastellen)) + ((wert < 0)? - 0.5 : 0.5))) / pow(10.0, nachkommastellen);
 }

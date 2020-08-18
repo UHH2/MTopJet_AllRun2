@@ -26,7 +26,7 @@ public:
 
 private:
   std::unique_ptr<YearSwitcher> jet_corrector_MC, jet_corrector_data;
-    std::shared_ptr<RunSwitcher> jec_switcher_16, jec_switcher_17, jec_switcher_18;
+  std::shared_ptr<RunSwitcher> jec_switcher_16, jec_switcher_17, jec_switcher_18;
   std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
   bool isMC;
   uhh2::Event::Handle<std::vector<TopJet>>h_topjets;

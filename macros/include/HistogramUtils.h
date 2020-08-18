@@ -270,6 +270,15 @@ double get_highest_peak(vector<TH1F*> hists){
 
 TH1F* AddHists(vector<TH1F*> hists_, int factor){
   TH1F* hist_added = (TH1F*) hists_[0]->Clone();
+  for(unsigned int i=1; i<hists_.size();i++){
+    hist_added->Add(hists_[i], factor);
+  }
+  return hist_added;
+}
+
+// -------------------------------------------------------------------------------------------------------
+TH2F* AddHists(vector<TH2F*> hists_, int factor){
+  TH2F* hist_added = (TH2F*) hists_[0]->Clone();
   for(unsigned int i=1; i<hists_.size();i++) hist_added->Add(hists_[i], factor);
   return hist_added;
 }

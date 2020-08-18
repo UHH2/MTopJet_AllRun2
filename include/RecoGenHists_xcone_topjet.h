@@ -2,6 +2,7 @@
 #include "UHH2/core/include/Hists.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/common/include/Utils.h"
+#include "UHH2/MTopJet/include/Vector_utils.h"
 #include "UHH2/common/include/TTbarGen.h"
 #include "UHH2/common/include/JetIds.h"
 
@@ -46,7 +47,11 @@ protected:
   TH1F *h_number_ak4_jets, *h_number_ak4_matched_xcone_had, *h_number_equal_distance;
   TH1F *h_ak4_btag, *h_ak4_btag_high, *h_ak4_btag_high_btagcut;
   TH1F *h_wjet_pt_match, *h_wmass_match;
-  TH1F *h_wmass_match_ptbin_low, *h_wmass_match_ptbin_midlow, *h_wmass_match_ptbin_midhigh, *h_wmass_match_ptbin_high;
+  TH2F *h_wjet_pt_match_S1_S2, *h_wjet_pt_match_S1divW_W;
+  TH1F *h_wjet_pt_match_subjet1, *h_wjet_pt_match_subjet2, *h_wjet_pt_match_S1divS2, *h_wjet_pt_match_S1divW, *h_wjet_pt_match_S1mS2;
+  TH1F *h_wjet_bigger_pt_subjet;
+  TH1F *h_wmass_match_ptdiv_hh, *h_wmass_match_ptdiv_hl, *h_wmass_match_ptdiv_lh, *h_wmass_match_ptdiv_ll;
+  TH1F *h_wmass_match_ptbin_low, *h_wmass_match_ptbin_high, *h_wmass_match_divbin_high, *h_wmass_match_divbin_low;
   TH1F *h_distance_ak4_xcone_subjet_btag, *h_difference_distance_small_mid, *h_difference_distance_small_high, *h_difference_distance_mid_high;
   TH1F *h_btag_difference_high_mid, *h_btag_percentage_high_mid, *h_btag_difference_high_mid_sel_btag_min, *h_btag_percentage_high_mid_sel_btag_min;
 

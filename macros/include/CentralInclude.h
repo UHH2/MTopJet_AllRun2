@@ -15,6 +15,7 @@
 #include <TGraph2DErrors.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TLine.h>
 #include <TMath.h>
 #include <TMultiGraph.h>
 #include <TGraphAsymmErrors.h>

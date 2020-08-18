@@ -158,3 +158,53 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
 
   return all_points;
 }
+
+
+/*
+██████   ██████  ██ ███    ██ ████████
+██   ██ ██    ██ ██ ████   ██    ██
+██████  ██    ██ ██ ██ ██  ██    ██
+██      ██    ██ ██ ██  ██ ██    ██
+██       ██████  ██ ██   ████    ██
+*/
+
+double ReturnIndex_High(vector<double> vec){
+  unsigned int d = vec.size();
+  bool isMax=false;
+  double index;
+  for(unsigned int point=0; point<d; point++){
+    for(unsigned int point1=0; point1<d; point1++){
+      if(point!=point1){
+        bool bigger = vec[point]>vec[point1];
+        if(!bigger){
+          isMax=false;
+          break; // to avoid point that are bigger then the last point
+        }
+        else isMax=true;
+      }
+    }
+    if(isMax) index=point;
+  }
+  return index;
+}
+
+
+double ReturnIndex_Low(vector<double> vec){
+  unsigned int d = vec.size();
+  bool isMin=false;
+  double index;
+  for(unsigned int point=0; point<d; point++){
+    for(unsigned int point1=0; point1<d; point1++){
+      if(point!=point1){
+        bool smaller = vec[point]<vec[point1];
+        if(!smaller){
+          isMin=false;
+          break; // to avoid point that are bigger then the last point
+        }
+        else isMin=true;
+      }
+    }
+    if(isMin) index=point;
+  }
+  return index;
+}

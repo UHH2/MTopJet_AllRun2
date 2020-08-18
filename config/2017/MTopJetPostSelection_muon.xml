@@ -1,7 +1,7 @@
 <!-- <?xml version="1.0" encoding="UTF-8"?> -->
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
-<!ENTITY NEVT "50000">
+<!ENTITY NEVT "-1">
 
 <!ENTITY channel "muon">
 
@@ -23,25 +23,25 @@
 <!ENTITY ST_tW_top               "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_tW_top_2017v2.root">
 
 <!-- =============================================== ttbar =========================================================================== -->
-<!ENTITY TTbar_Mtt0000to0700_2L2Nu      "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_SemiLep    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu          "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep        "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic       "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
 
-<!ENTITY TTbar_Mtt0000to0700_2L2Nu_up      "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_SemiLep_up    "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_Hadronic_up   "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_up       "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_up     "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_up    "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
 
-<!ENTITY TTbar_Mtt0000to0700_2L2Nu_down      "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_SemiLep_down    "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_Hadronic_down   "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_down     "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_down   "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_down  "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
 
 <!ENTITY TTbar_Mtt0000to0700_2L2Nu_Xup      "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
 <!ENTITY TTbar_Mtt0000to0700_SemiLep_Xup    "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
 <!ENTITY TTbar_Mtt0000to0700_Hadronic_Xup   "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
 
-<!ENTITY TTbar_Mtt0000to0700_2L2Nu_Xdown      "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_SemiLep_Xdown    "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
-<!ENTITY TTbar_Mtt0000to0700_Hadronic_Xdown   "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_Xdown    "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_Xdown  "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_Xdown "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
 
 <!-- =============================================== ttbar other samples ============================================================= -->
 <!ENTITY TTbar_mtop1665_2L2Nu               "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_2L2Nu_2017v2.root">
@@ -187,21 +187,21 @@
 <InputData Version="TTbar_Mtt0000to0700_SemiLep_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_SemiLep;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_Hadronic_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Mtt0000to0700_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_Mtt0000to0700_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<!-- <InputData Version="TTbar_Mtt0000to0700_2L2Nu_JECup_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_Mtt0000to0700_2L2Nu_JECup_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_2L2Nu_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_SemiLep_JECup_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_SemiLep_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_Hadronic_JECup_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Mtt0000to0700_Hadronic_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<!-- <InputData Version="TTbar_Mtt0000to0700_2L2Nu_JECdown_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_Mtt0000to0700_2L2Nu_JECdown_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_2L2Nu_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_SemiLep_JECdown_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_SemiLep_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_Hadronic_JECdown_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Mtt0000to0700_Hadronic_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <InputData Version="TTbar_Mtt0000to0700_2L2Nu_XConeup_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_2L2Nu_Xup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -215,7 +215,7 @@
 <InputData Version="TTbar_Mtt0000to0700_SemiLep_XConedown_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_SemiLep_Xdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_Hadronic_XConedown_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Mtt0000to0700_Hadronic_Xdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_Xdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <!--
 ███    ███ ████████  ██████  ██████
@@ -225,7 +225,7 @@
 ██      ██    ██     ██████  ██
 -->
 
-<!-- <InputData Version="TTbar_mtop1665_2L2Nu_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_mtop1665_2L2Nu_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -236,35 +236,35 @@
 <InputData Version="TTbar_mtop1755_2L2Nu_2017v2" Lumi="3764005.9" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_2L2Nu_2017v2" Lumi="416778.9988" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_mtop1785_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
-<!-- <InputData Version="TTbar_mtop1665_SemiLeptonic_2017v2" Lumi="9315144.424" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1665_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-<!-- <InputData Version="TTbar_mtop1695_SemiLeptonic_2017v2" Lumi="17846378.04" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1695_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-<!-- <InputData Version="TTbar_mtop1715_SemiLeptonic_2017v2" Lumi="20689901.15" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_mtop1665_SemiLeptonic_2017v2" Lumi="9315144.424" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1665_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_SemiLeptonic_2017v2" Lumi="17846378.04" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1715_SemiLeptonic_2017v2" Lumi="20689901.15" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1715_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1735_SemiLeptonic_2017v2" Lumi="19390096.84" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1735_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-<!-- <InputData Version="TTbar_mtop1755_SemiLeptonic_2017v2" Lumi="15029229.34" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1755_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-<!-- <InputData Version="TTbar_mtop1785_SemiLeptonic_2017v2" Lumi="6743145.288" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_mtop1735_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_SemiLeptonic_2017v2" Lumi="15029229.34" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1785_SemiLeptonic_2017v2" Lumi="6743145.288" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1785_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
-<!-- <InputData Version="TTbar_mtop1665_Hadronic_2017v2" Lumi="9135621.953" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_mtop1665_Hadronic_2017v2" Lumi="9135621.953" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_Hadronic_2017v2" Lumi="16800249.08" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1695_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-<!-- <InputData Version="TTbar_mtop1715_Hadronic_2017v2" Lumi="21033053.77" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1715_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-<!-- <InputData Version="TTbar_mtop1735_Hadronic_2017v2" Lumi="19580500.83" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1715_Hadronic_2017v2" Lumi="21033053.77" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1715_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1735_Hadronic_2017v2" Lumi="19580500.83" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1735_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1755_Hadronic_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_Hadronic_2017v2" Lumi="6995843.265" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_mtop1785_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
 
