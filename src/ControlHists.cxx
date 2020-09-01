@@ -2,7 +2,8 @@
 
 using namespace uhh2;
 
-// ---------------------------------------------------------------------------------------------------------------------------
+// ###########################################################################################################################
+// ###########################################################################################################################
 WeightHists::WeightHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
   h_weight_w = book<TH1F>("weight_w", "weight (filled with weights)", 200, -1, 1);
@@ -16,7 +17,8 @@ void WeightHists::fill(const Event & event){
 }
 
 
-// ---------------------------------------------------------------------------------------------------------------------------
+// ###########################################################################################################################
+// ###########################################################################################################################
 CountingEventHists::CountingEventHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
   events_w = book<TH1F>("Events_weight", "events with weight", 2, 0, 2);
@@ -30,7 +32,8 @@ void CountingEventHists::fill(const Event & event){
 }
 
 
-// ---------------------------------------------------------------------------------------------------------------------------
+// ###########################################################################################################################
+// ###########################################################################################################################
 WeightRangeHists::WeightRangeHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
   h_weight_big_w = book<TH1F>("weight_big_w", "weight (filled with weights)", 1000, 0, 10000);
@@ -79,7 +82,8 @@ void WeightRangeHists::fill(const Event & event){
   events_weight->Fill(1, 1);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------------
+// ###########################################################################################################################
+// ###########################################################################################################################
 GenWeightRangeHists::GenWeightRangeHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
   h_weight_big_w = book<TH1F>("gen_weight_big_w", "gen weight (filled with weights)", 1000, 0, 10000);
@@ -126,5 +130,27 @@ void GenWeightRangeHists::fill(const Event & event){
   h_weight_negativ_small_1->Fill(gen_weight, 1);
 
   events->Fill(1, gen_weight);
+  events_weight->Fill(1, 1);
+}
+
+// ###########################################################################################################################
+// ###########################################################################################################################
+JetMassScaleHists::JetMassScaleHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+  // book all histograms here
+  h_mass = book<TH1F>("hadjet_jms_mass", "m_{jet} [GeV]", 50, 0, 500);
+
+  events = book<TH1F>("events", "events", 1, 0, 1);
+  events_weight = book<TH1F>("events_weights", "events with gen weights", 1, 0, 1);
+}
+
+void JetMassScaleHists::fill(const Event & event){// dummy
+  double weight = event.weight; // avoid warning
+  weight +=0;                   // avoid warning
+}
+
+void JetMassScaleHists::fill_mass(const Event & event, const double mass){
+  double weight = event.weight;
+  h_mass->Fill(mass, weight);
+  events->Fill(1, weight);
   events_weight->Fill(1, 1);
 }

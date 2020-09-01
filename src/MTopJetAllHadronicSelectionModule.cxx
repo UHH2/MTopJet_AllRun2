@@ -186,7 +186,7 @@ bool MTopJetAllHadronicSelectionModule::process(uhh2::Event& event){
   if(!event.isRealData) BTagEffHists->fill(event);
 
   /* *********** b-tag counter *********** */
-  bool passed_btag = false;
+  // bool passed_btag = false;
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(DeepJetBTag(DeepJetBTag::WP_TIGHT)(j, event)) ++jetbtagN;
   if(jetbtagN == 0) return false;

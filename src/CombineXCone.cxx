@@ -83,7 +83,6 @@ TopJet CombineXCone::CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, 
   jet.set_phi(jet_v4.Phi());
   jet.set_energy(jet_v4.E());
 
-
   return jet;
 }
 

@@ -1,8 +1,10 @@
 #pragma once
+
 #include "UHH2/core/include/AnalysisModule.h"
 #include "UHH2/core/include/Event.h"
 #include "UHH2/core/include/Jet.h"
 #include "UHH2/core/include/TopJet.h"
+
 #include "UHH2/common/include/Utils.h"
 #include "UHH2/common/include/JetCorrections.h"
 #include "UHH2/common/include/JetCorrectionSets.h"
@@ -10,6 +12,10 @@
 
 #include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "UHH2/JetMETObjects/interface/JetCorrectorParameters.h"
+
+#include "UHH2/MTopJet/include/GenericSubJetCorrector_flavor.h"
+#include "UHH2/MTopJet/include/Vector_utils.h"
+
 
 #include <vector>
 #include <iostream>
@@ -25,22 +31,24 @@ using namespace uhh2;
 
 
 
-class CorrectionFactor_BestFit: public uhh2::AnalysisModule{
+class CorrectionFactor_JMS: public uhh2::AnalysisModule{
 public:
 
-  explicit CorrectionFactor_BestFit(uhh2::Context &,  const std::string & , Year year_);
+  explicit CorrectionFactor_JMS(uhh2::Context &,  const std::string &, const std::string &, Year year_);
   virtual bool process(uhh2::Event & event) override;
-  double get_mass_BestFit(uhh2::Event &, vector<TopJet>, vector<double>);
+  double get_mass_BestFit(uhh2::Event &, vector<double>);
 
 private:
 
-  uhh2::Event::Handle<std::vector<TopJet>>h_oldjets;
-  Year year;
+  uhh2::Event::Handle<std::vector<TopJet>>    h_oldjets;
+  uhh2::Event::Handle<std::vector<GenTopJet>> h_genjets;
   TString str_year;
+  Year year;
   vector<double> points;
   bool isMC;
   std::unique_ptr<YearSwitcher> jet_corrector_MC, jet_corrector_data;
   std::shared_ptr<RunSwitcher> jec_switcher_16, jec_switcher_17, jec_switcher_18;
+  std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
 
   // XCone ---------------------------------------------------------------------
   void get_function(TString);

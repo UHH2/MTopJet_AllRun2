@@ -6,7 +6,8 @@
 <!ENTITY channel "muon">
 
 <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2016/muon">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon/JMS_downdown">
+
 
 <!-- =============================================== ttbar =========================================================================== -->
 <!ENTITY TTbar_Mtt0000to0700    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2016v3.root">
@@ -18,7 +19,7 @@
 
 <!--
 <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
-<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSel_SYS_2016"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelMu_JMS_downdown_2016"/>
 -->
 
 <JobConfiguration JobName="MTopJetPostSelectionJob" OutputLevel="INFO">
@@ -28,6 +29,7 @@
 
   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="35867">
     <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
+
 
 
 <!--
@@ -93,7 +95,7 @@
   <Item Name="ElTrigger_variation" Value="nominal" />
 
   <!-- 1: JEC - 2: XCone - nominal, upup, downdown, downup, updown -->
-  <Item Name="JetMassScale_direction" Value="nominal" />
+  <Item Name="JetMassScale_direction" Value="downdown" />
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>

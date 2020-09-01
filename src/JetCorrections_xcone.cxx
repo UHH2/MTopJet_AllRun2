@@ -122,7 +122,7 @@ void JER_Smearer_xcone::init(uhh2::Context & ctx, const std::string& jet_collect
     throw runtime_error("Cannot find suitable jet resolution file & scale factors for this year for JetResolutionSmearer");
   }
 
-  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, jet_collection_rec, jet_collection_gen, JER_sf, resFilename));
+  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, "xconeCHS", jet_collection_gen, JER_sf, resFilename));
 }
 
 

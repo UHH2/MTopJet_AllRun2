@@ -13,6 +13,13 @@
 #include "TH2F.h"
 using namespace std;
 
+/*
+This collection contains HistClasses which are to small for seperated files.
+They are used for ControlHists like event counting or HistClasses which are only
+creating one hists for one variable. If the Classes are getting to big, they
+will be shifted into an individual file.
+*/
+
 // -----------------------------------------------------------------------------
 class WeightHists: public uhh2::Hists {
 public:
@@ -55,7 +62,6 @@ protected:
   TH1F *h_weight_negativ_small_w, *h_weight_negativ_small_1;
 
   TH1F *events, *events_weight;
-
 };
 
 // -----------------------------------------------------------------------------
@@ -77,5 +83,20 @@ protected:
   TH1F *h_weight_negativ_small_w, *h_weight_negativ_small_1;
 
   TH1F *events, *events_weight;
+};
 
+// -----------------------------------------------------------------------------
+class JetMassScaleHists: public uhh2::Hists {
+public:
+  // use the same constructor arguments as Hists for forwarding:
+  JetMassScaleHists(uhh2::Context & ctx, const std::string & dirname);
+
+  virtual void fill(const uhh2::Event & ev) override;
+  virtual void fill_mass(const uhh2::Event & ev, const double mass);
+
+private:
+  double mass;
+
+  TH1F *h_mass;
+  TH1F *events, *events_weight;
 };

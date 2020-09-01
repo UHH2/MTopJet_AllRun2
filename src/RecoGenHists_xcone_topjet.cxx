@@ -214,7 +214,11 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   std::vector<TopJet> xcone_had_jet = event.get(h_hadjet);
   std::vector<TopJet> xcone_lep_jet = event.get(h_lepjet);
   std::vector<TopJet> xcone_fatjets = event.get(h_fatjets);
-
+  if(debug){
+    std::cout << "Number HadJets: "<< xcone_had_jet.size() << '\n';
+    std::cout << "Number LepJets: "<< xcone_lep_jet.size() << '\n';
+    std::cout << "Number FatJets: "<< xcone_fatjets.size() << '\n';
+  }
   // Select AK8 Jet in range of XCone size.
   // Looking at each jet seperatly by going through with a for-Loop
   TLorentzVector ak8_v4, xcone_had_v4;
@@ -407,6 +411,14 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   std::vector<Jet> ak4_jets = *event.jets;
   h_number_ak4_jets->Fill(ak4_jets.size(), weight);
 
+  if(debug){
+    std::cout << "Number HadSubjets: "<< xcone_had_jet[0].subjets().size() << '\n';
+    std::cout << "Number LepSubjets: "<< xcone_lep_jet[0].subjets().size() << '\n';
+    for(unsigned int jet=0;jet<xcone_fatjets.size(); jet ++){
+      std::cout << "Number FatSubjets - FatJet"<<jet<<": "<< xcone_fatjets[jet].subjets().size() << '\n';
+    }
+  }
+
   /*
   ███    ███ ███████ ████████ ██   ██  ██████  ██████  ███████
   ████  ████ ██         ██    ██   ██ ██    ██ ██   ██ ██
@@ -435,7 +447,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   Choosing the AK4 jet with the highest btag to later identify the one of
   the three XCone subjets as the b quark
   */
-
+  if(debug) std::cout << " - search for AK4 jet with higest btag" << '\n';
   std::vector<double> btag_v; // Using a vector to identifie events with ambigous btag results (two high btags i.e. through a c-quark)
   double btag_high = 0;
   Jet ak4_highest_btag;
@@ -459,7 +471,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   }
   h_ak4_btag_high->Fill(ak4_highest_btag.btag_DeepJet(), weight);
 
-
+  if(debug) std::cout << " - Identify Wjet: Distance AK4 to subjets" << '\n';
   // Matching AK4 jet with highest btag to the three XCone subjets
   double dR_subjet1_ak4 = deltaR(xcone_had_subjets[0], ak4_highest_btag);
   double dR_subjet2_ak4 = deltaR(xcone_had_subjets[1], ak4_highest_btag);
@@ -467,6 +479,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   std::vector<double> dR_subjets = {dR_subjet1_ak4, dR_subjet2_ak4, dR_subjet3_ak4};
   sort(dR_subjets.begin(), dR_subjets.end()); // vector orderd from small to big
 
+  if(debug) std::cout << " - Identify Wjet: Compare Distance" << '\n';
   int index_bjet = -1; int index_Wjet1 = -1; int index_Wjet2 = -1;
   if(dR_subjet1_ak4<dR_subjet2_ak4 && dR_subjet1_ak4<dR_subjet3_ak4){
     index_bjet = 0;
@@ -489,10 +502,12 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   }
 
   // Selection for minimum btag ------------------------------------------------
+  if(debug) std::cout << " - Btag Selection" << '\n';
   bool sel_btag_min = false;
   if(btag_high > 0.7) sel_btag_min = true;
 
   // Get WJet  -----------------------------------------------------------------
+  if(debug) std::cout << " - build Wjet" << '\n';
   TLorentzVector Wjet_v4_match;
   double px_wjet = xcone_had_subjets[index_Wjet1].v4().Px() + xcone_had_subjets[index_Wjet2].v4().Px();
   double py_wjet = xcone_had_subjets[index_Wjet1].v4().Py() + xcone_had_subjets[index_Wjet2].v4().Py();
@@ -504,6 +519,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   TLorentzVector Wjet_v4_match_subjetB = lorentz_to_tlorentz(xcone_had_subjets[index_Wjet2].v4());
 
   // Sort subjets --------------------------------------------------------------
+  if(debug) std::cout << " - sort Wsubjets" << '\n';
   TLorentzVector Wjet_v4_match_subjet1;
   TLorentzVector Wjet_v4_match_subjet2;
   if(Wjet_v4_match_subjetA.Pt()<Wjet_v4_match_subjetB.Pt())

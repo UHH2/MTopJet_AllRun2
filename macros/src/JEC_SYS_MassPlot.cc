@@ -17,7 +17,13 @@ int main(int argc, char* argv[]){
   Mostly, the loops start at bin=0. Therefor, using the function GetBinContent the bin needs to be bin+1
   */
 
-  // Changes of how many pt bins to use - Search for CHANGE_PT
+  // #################################################################################################
+  // Modification ####################################################################################
+  TString mTop_ = "mtop1695";           // CHANGE_MTOP
+  // Changes of how many pt bins to use // CHANGE_PT
+  // Modification ####################################################################################
+  // #################################################################################################
+
   // #################################################################################################
   // Declare different variables used in the code ####################################################
   for(int ptbin=0; ptbin<4; ptbin++){ // CHANGE_PT
@@ -65,16 +71,12 @@ int main(int argc, char* argv[]){
 
     TString year = argv[1];
     bool is16=false; bool is17=false; bool is18=false; bool isAll=false; bool is1718=false;
-    if     (strcmp(year, "2016")==0) is16   = true;
-    else if(strcmp(year, "2017")==0) is17   = true;
-    else if(strcmp(year, "2018")==0) is18   = true;
-    else if(strcmp(year,  "all")==0) isAll  = true;
-    else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or all)");
+    if     (strcmp(year, "2016")==0) is16       = true;
+    else if(strcmp(year, "2017")==0) is17       = true;
+    else if(strcmp(year, "2018")==0) is18       = true;
+    else if(strcmp(year, "combined")==0) isAll  = true;
+    else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combined)");
 
-    vector<TString> all_years;
-    if(is16 || is17 || is18) all_years = {year};
-    else if(isAll) all_years = {"2016", "2017", "2018"};
-    else throw runtime_error("Give me the correct year please (2016, 2017, 2018, all or 1718)");
 
     /*
     ██████  ██ ██████  ███████  ██████ ████████  ██████  ██████  ██ ███████ ███████
@@ -97,8 +99,9 @@ int main(int argc, char* argv[]){
     positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
     */
 
-    TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS"; // CHANGE_PT
-    save_path_general = creat_folder_and_path(save_path_general, "pt_bins");
+    TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS";
+    // save_path_general = creat_folder_and_path(save_path_general, mTop_);      // CHANGE_MTOP
+    save_path_general = creat_folder_and_path(save_path_general, "pt_bins");  // CHANGE_PT
 
     // #################################################################################################
     // creat subdirectories ############################################################################
@@ -134,30 +137,20 @@ int main(int argc, char* argv[]){
     // Get Background ##################################################################################
     if(debug) cout << "Background" << endl;
 
-    for(unsigned int iyear=0; iyear<all_years.size(); iyear++){
-      vector<TFile*> file_bkg_v;
-      vector<TH1F*> hists_bkg_v;
-      vector<TString> path_bkg_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.SingleTop.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
-      for(unsigned int i=0; i<path_bkg_v.size(); i++) file_bkg_v.push_back(new TFile(dir+all_years[iyear]+"/muon/"+path_bkg_v[i]));
-      for(unsigned int i=0; i<file_bkg_v.size(); i++) hists_bkg_v.push_back((TH1F*)file_bkg_v[i]->Get(w_mass));
-      TH1F *bkg = AddHists(hists_bkg_v, 1);
-      allyears_bkg.push_back(bkg);
-    }
-
-    TH1F *bkg = AddHists(allyears_bkg, 1);
+    vector<TFile*> file_bkg_v;
+    vector<TH1F*> hists_bkg_v;
+    vector<TString> path_bkg_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.SingleTop.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
+    for(unsigned int i=0; i<path_bkg_v.size(); i++) file_bkg_v.push_back(new TFile(dir+year+"/muon/"+path_bkg_v[i]));
+    for(unsigned int i=0; i<file_bkg_v.size(); i++) hists_bkg_v.push_back((TH1F*)file_bkg_v[i]->Get(w_mass));
+    TH1F *bkg = AddHists(hists_bkg_v, 1);
 
     // #################################################################################################
     // Get Data ########################################################################################
     if(debug) cout << "Data" << endl;
 
     TString data_path     = "uhh2.AnalysisModuleRunner.DATA.DATA.root";
-    for(unsigned int iyear=0; iyear<all_years.size(); iyear++){
-      TFile *data_file      = new TFile(dir+all_years[iyear]+"/muon/"+data_path);
-      TH1F  *data           = (TH1F*)data_file->Get(w_mass);
-      allyears_data.push_back(data);
-    }
-
-    TH1F *data            = AddHists(allyears_data, 1);
+    TFile *data_file      = new TFile(dir+year+"/muon/"+data_path);
+    TH1F *data            = (TH1F*)data_file->Get(w_mass);
     TH1F *data_rebin      = rebin(data, bin_width);
     TH1F *data_norm       = normalize(data);
     TH1F *data_rebin_norm = normalize(data_rebin);
@@ -171,13 +164,9 @@ int main(int argc, char* argv[]){
     if(debug) cout << "TTbar" << endl;
 
     TString ttbar_path = "uhh2.AnalysisModuleRunner.MC.TTbar.root";
-    for(unsigned int iyear=0; iyear<all_years.size(); iyear++){
-      TFile *ttbar_file  = new TFile(dir+all_years[iyear]+"/muon/"+ttbar_path);
-      TH1F  *ttbar       = (TH1F*)ttbar_file->Get(w_mass);
-      allyears_ttbar.push_back(ttbar);
-    }
-
-    TH1F  *ttbar           = AddHists(allyears_ttbar, 1);
+    // TString ttbar_path = "uhh2.AnalysisModuleRunner.MC.TTbar_"+mTop_+".root"; // CHANGE_MTOP
+    TFile *ttbar_file  = new TFile(dir+year+"/muon/"+ttbar_path);
+    TH1F  *ttbar       = (TH1F*)ttbar_file->Get(w_mass);
     ttbar->Add(bkg, 1);
     TH1F* ttbar_rebin      = rebin(ttbar, bin_width);
     TH1F* ttbar_norm       = normalize(ttbar);
@@ -189,17 +178,12 @@ int main(int argc, char* argv[]){
     // Get SYS #########################################################################################
     if(debug) cout << "JEC" << endl;
 
-    for(unsigned int iyear=0; iyear<all_years.size(); iyear++){
-      TFile *JECup_file   = new TFile(dir+all_years[iyear]+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_JECup.root");
-      TFile *JECdown_file = new TFile(dir+all_years[iyear]+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_JECdown.root");
-      TH1F  *JECup        = (TH1F*)JECup_file->Get(w_mass);
-      TH1F  *JECdown      = (TH1F*)JECdown_file->Get(w_mass);
-      allyears_JECup.push_back(JECup);
-      allyears_JECdown.push_back(JECdown);
-    }
-
-    TH1F *JECup   = AddHists(allyears_JECup, 1);
-    TH1F *JECdown = AddHists(allyears_JECdown, 1);
+    TFile *JECup_file   = new TFile(dir+year+"/muon/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar.root");
+    TFile *JECdown_file = new TFile(dir+year+"/muon/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar.root");
+    // TFile *JECup_file   = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_"+mTop_+"_JECup.root"); // CHANGE_MTOP
+    // TFile *JECdown_file = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_"+mTop_+"_JECdown.root"); // CHANGE_MTOP
+    TH1F  *JECup        = (TH1F*)JECup_file->Get(w_mass);
+    TH1F  *JECdown      = (TH1F*)JECdown_file->Get(w_mass);
 
     // Add hists from JEC and background ---------------------------------------------------------------
     if(debug) cout << "JEC+Background" << endl;
@@ -219,18 +203,12 @@ int main(int argc, char* argv[]){
 
     // ------------------------------------------------------------------------------------------------
     if(debug) cout << "XCone" << endl;
-
-    for(unsigned int iyear=0; iyear<all_years.size(); iyear++){
-      TFile *XCup_file   = new TFile(dir+all_years[iyear]+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_XConeup.root");
-      TFile *XCdown_file = new TFile(dir+all_years[iyear]+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_XConedown.root");
-      TH1F  *XCup        = (TH1F*)XCup_file->Get(w_mass);
-      TH1F  *XCdown      = (TH1F*)XCdown_file->Get(w_mass);
-      allyears_XCup.push_back(XCup);
-      allyears_XCdown.push_back(XCdown);
-    }
-
-    TH1F *XConeup   = AddHists(allyears_XCup, 1);
-    TH1F *XConedown = AddHists(allyears_XCdown, 1);
+    TFile *XCup_file   = new TFile(dir+year+"/muon/COR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root");
+    TFile *XCdown_file = new TFile(dir+year+"/muon/COR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root");
+    // TFile *XCup_file   = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_"+mTop_+"_XConeup.root"); // CHANGE_MTOP
+    // TFile *XCdown_file = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_"+mTop_+"_XConedown.root"); // CHANGE_MTOP
+    TH1F  *XConeup        = (TH1F*)XCup_file->Get(w_mass);
+    TH1F  *XConedown      = (TH1F*)XCdown_file->Get(w_mass);
 
     // Add hists from FSR and background ---------------------------------------------------------------
     if(debug) cout << "XCone+Background" << endl;

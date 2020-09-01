@@ -6,19 +6,19 @@
 <!ENTITY channel "muon">
 
 <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2016/muon">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon/JMS_updown">
+
 
 <!-- =============================================== ttbar =========================================================================== -->
 <!ENTITY TTbar_Mtt0000to0700    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2016v3.root">
 <!ENTITY TTbar_Mtt0700to1000    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0700to1000_2016v3.root">
 <!ENTITY TTbar_Mtt1000toInft    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt1000toInft_2016v3.root">
 
-
 ]>
 
 <!--
 <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
-<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSel_SYS_2016"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelMu_JMS_updown_2016"/>
 -->
 
 <JobConfiguration JobName="MTopJetPostSelectionJob" OutputLevel="INFO">
@@ -28,6 +28,7 @@
 
   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="35867">
     <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
+
 
 
 <!--
@@ -44,7 +45,6 @@
 <In FileName="&TTbar_Mtt0700to1000;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt1000toInft_2016v3" Lumi="1193967.198" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 
 
 <!-- ================================================================================================================================== -->
@@ -93,7 +93,7 @@
   <Item Name="ElTrigger_variation" Value="nominal" />
 
   <!-- 1: JEC - 2: XCone - nominal, upup, downdown, downup, updown -->
-  <Item Name="JetMassScale_direction" Value="nominal" />
+  <Item Name="JetMassScale_direction" Value="updown" />
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>
