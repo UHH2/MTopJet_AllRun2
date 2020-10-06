@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import subprocess, os, sys, math
 
 ################################################################################
@@ -6,12 +8,13 @@ def write_latex(PathPlots,list_files,variation,number_pages,addition):
     print ""
     print "Write Latex"
     print PathPlots+"\n"
-    outfile = open(PathPlots+"projections_"+variation+addition+".tex","w")
+    outfile = open(PathPlots+"/projections_"+variation+addition+".tex","w")
     outfile.write("\\documentclass{article}\n")
     outfile.write("\usepackage[margin=0pt]{geometry}")
     outfile.write("\\usepackage{graphicx} \n")
     outfile.write("\pagestyle{empty}\n")
     outfile.write("\n\\begin{document}\n")
+
     file=0
     page=0
     vertical_count = 0
@@ -41,7 +44,6 @@ def write_latex(PathPlots,list_files,variation,number_pages,addition):
         vertical_count = 0
         page = page+1
     #end document
-    print 222
     outfile.write("\\end{document}")
     outfile.close()
 
@@ -79,19 +81,9 @@ def switch_element(list, isXC):
     return list
 
 ##################################################################################################################### MAIN
-path = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS/pt_bins/"
-# path = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS/pt_bins/"
-
-# year = input("Which year? ")
-year=sys.argv[1]
-binning=sys.argv[2]
-reconst = "/btag/"
-if len(sys.argv)==3:
-    addition="";
-else:
-    addition=sys.argv[3]
-# binning = input("Which binning (180, 90, 60, 45, 36,...)? ")
-path_full = path+year+reconst+"rebin"+binning+"/"
+path_full = sys.argv[1]
+addition  = sys.argv[2]
+folder    = sys.argv[2]
 print path_full
 os.chdir(path_full)
 
@@ -105,7 +97,7 @@ list_XC = []
 print len(list_files)
 
 list_corrections_str = ["JEC", "XC"]
-list_fits_str = ["", "_lin"]
+list_fits_str = ["xy", "xy2", "xyy2", "x2y2", "xx2yy2"]
 
 for file in list_files:
    if "_XC"+addition+".pdf" in file:
@@ -117,15 +109,14 @@ print len(list_XC)
 print len(list_JEC)
 
 print("switch element")
-list_XC = switch_element(list_XC, True)
+list_XC  = switch_element(list_XC, True)
 list_JEC = switch_element(list_JEC, False)
 
 number_pages = math.ceil(len(list_XC)/35)+1 #JEC same size
+
 write_latex(path_full, list_XC, "XC", number_pages, addition)
 write_latex(path_full, list_JEC, "JEC", number_pages, addition)
 
 os.system("pdflatex projections_XC"+addition+".tex")
 os.system("pdflatex projections_JEC"+addition+".tex")
 os.system("rm *.aux *.log *.nav *.gz *.out *.snm *.tex *.toc")
-
-print("LATEX DONE")

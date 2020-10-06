@@ -1,0 +1,48 @@
+/*
+ ██████  ███████ ████████     ██   ██ ██ ███████ ████████ ███████
+██       ██         ██        ██   ██ ██ ██         ██    ██
+██   ███ █████      ██        ███████ ██ ███████    ██    ███████
+██    ██ ██         ██        ██   ██ ██      ██    ██         ██
+ ██████  ███████    ██        ██   ██ ██ ███████    ██    ███████
+*/
+
+// if(reconst=="min_mass" ) w_mass = hist_class+"wmass_min";                      // minimal mass from subjet combination
+// if(reconst=="btag")      w_mass = hist_class+"wmass_match";                    // mass from subjet matched with ak4 with highest_btag close to the xcone fathadjet
+// if(reconst=="btag_cut")  w_mass = hist_class+"wmass_btagcut";                  // same mass as above mit with btag_high > 0.7
+// if(reconst=="btag_sel")  w_mass = hist_class+"wmass_btagcut_one_btag_subjet";  // mass from subjet matched with ak4 with highest_btag close to the xcone fathadjet
+// //                                                                                Selection: btag_high>0.7; ONE subjet with dr(ak4, subjet)<0.4; ONE high btag
+// if(reconst=="compare")   w_mass = hist_class+"wmass_compare";                  // mass closest to Wmass from subjet combination
+// if(reconst=="btag"&&ptbin==0) w_mass = hist_class+"wmass_match_ptbin_low";
+// if(reconst=="btag"&&ptbin==1) w_mass = hist_class+"wmass_match_ptbin_high";
+
+
+// #################################################################################################
+// Empty Data Bins #################################################################################
+if(debug) cout << "Empty Bins Data" << endl;
+
+vector<int> empty_bins_v;
+for(int bin=0; bin < number_bins; bin++){
+  if(!(abs(data_rebin_norm->GetBinContent(bin+1))>0)) empty_bins_v.push_back(bin+1);
+}
+int number_empty_bins = empty_bins_v.size();
+
+
+
+// #################################################################################################
+// Masspeack #######################################################################################
+if(debug) cout << "Masspeak Bins" << endl;
+
+bool usePeak =false;
+vector<double> PeakLimit;
+if(usePeak_in) usePeak = true;
+
+double Limit = 75;
+vector<int> peak_bins_v; // Search_peackmethod
+if(usePeak){
+  for(int bin=0; bin < number_bins; bin++){
+    if((data_rebin->GetBinContent(bin+1)>Limit)){
+      peak_bins_v.push_back(bin+1);
+      if(debug) cout << "Peak Bins: " << peak_bins_v[bin] << "\n";
+    }
+  }
+}

@@ -85,6 +85,10 @@ double GetMaxValue(vector<double> v){
 double GetMinValue(vector<double> v){
   return *min_element(v.begin(), v.end());
 }
+
+// -------------------------------------------------------------------------------------------------------
+
+
 /*
 .██████  ██████  ██    ██ ████████
 ██      ██    ██ ██    ██    ██
@@ -176,10 +180,16 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
 */
 
 void creat_folder(TString path, TString name){mkdir(path+"/"+name,0777);}
+void creat_folder(TString path){mkdir(path,0777);}
 
 TString creat_folder_and_path(TString path, TString name){
   mkdir(path+"/"+name,0777);
   return path += "/"+name;
+}
+
+TString creat_folder_and_path(TString path){
+  mkdir(path,0777);
+  return path;
 }
 
 /*

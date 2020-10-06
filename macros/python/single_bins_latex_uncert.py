@@ -2,13 +2,14 @@ import subprocess, os, sys, math
 
 ################################################################################
 ################################################################################
-def write_latex(PathPlots,list_files,variation,number_pages):
+def write_latex(PathPlots,list_files,number_pages,addition):
     print ""
     print "Write Latex"
     print PathPlots+"\n"
-    outfile = open(PathPlots+"/projections_"+variation+".tex","w")
+    outfile = open(PathPlots+"/single_bin"+addition+".tex","w")
     outfile.write("\\documentclass{article}\n")
-    outfile.write("\usepackage[margin=0pt]{geometry}")
+    outfile.write("\\usepackage[english,german]{babel}\n")
+    outfile.write("\\usepackage[margin=0pt]{geometry}\n")
     outfile.write("\\usepackage{graphicx} \n")
     outfile.write("\pagestyle{empty}\n")
     outfile.write("\n\\begin{document}\n")
@@ -23,7 +24,7 @@ def write_latex(PathPlots,list_files,variation,number_pages):
         while vertical_count<7:
             while horizontal_count<5:
                 outfile.write("\\begin{minipage}{"+str(plotwidth)+"\\textwidth}\n")
-                outfile.write("\\includegraphics[width=\\textwidth]{projection/")
+                outfile.write("\\includegraphics[width=\\textwidth]{"+addition+"/")
                 outfile.write(list_files[file])
                 outfile.write("}\n\\end{minipage}\n")
                 file = file+1
@@ -64,7 +65,7 @@ def insert_zero(list):
 
 ################################################################################
 ################################################################################
-def switch_element(list, isXC):
+def switch_element(list):
     i=0
     len_switch = 12
     if isXC:
@@ -79,47 +80,25 @@ def switch_element(list, isXC):
     return list
 
 ##################################################################################################################### MAIN
-path = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS/"
-# year = input("Which year? ")
-year=sys.argv[1]
-binning=sys.argv[2]
-width=sys.argv[3]
-reconst = "/btag/"
-# binning = input("Which binning (180, 90, 60, 45, 36,...)? ")
-path_full = path+year+reconst+"rebin"+binning+"/masspeak/width"+width
-
+path_full = sys.argv[1]
+addition  = sys.argv[2]
+folder    = sys.argv[2]
+print path_full
 os.chdir(path_full)
 
 ###################################################################################################
 ## Getting List ###################################################################################
 bin=1
 bin_exists = False
-list_files = sorted(os.listdir("./projection"))
-list_JEC = []
-list_XC = []
+list_files = sorted(os.listdir("./"+folder))
 print len(list_files)
 
-list_corrections_str = ["JEC", "XC"]
-list_fits_str = ["xy", "xy2", "xyy2", "x2y2", "xx2yy2"]
-
-for file in list_files:
-   if "_XC.pdf" in file:
-       list_XC.append(file)
-   if "_JEC.pdf" in file:
-       list_JEC.append(file)
-
-print len(list_XC)
-print len(list_JEC)
-
 print("switch element")
-list_XC = switch_element(list_XC, True)
-list_JEC = switch_element(list_JEC, False)
+# list_XC = switch_element(list_XC, True)
 
-number_pages = math.ceil(len(list_XC)/35)+1 #JEC same size
+number_pages = math.ceil(len(list_files)/35)+1 #JEC same size
 
-write_latex(path_full, list_XC, "XC", number_pages)
-write_latex(path_full, list_JEC, "JEC", number_pages)
+write_latex(path_full, list_files, number_pages, addition)
 
-os.system("pdflatex projections_XC.tex")
-os.system("pdflatex projections_JEC.tex")
+os.system("pdflatex single_bin"+addition+".tex")
 os.system("rm *.aux *.log *.nav *.gz *.out *.snm *.tex *.toc")

@@ -19,21 +19,37 @@ int main(int argc, char* argv[]){
   print_seperater();
 
 
-  if(argc != 2){
-    cout << "\n" << "Usage: ./JEC_SYS <year>\n";
+  if(argc != 3){
+    cout << "\n" << "Usage: ./JEC_SYS <year> <rebin>\n";
     return 0;
   }
+
+  // #################################################################################################
+  // Only one fit for all bins #######################################################################
+  if(debug) cout << "String into bool" << endl;
+
+  // Default -------------------------------------------------------------------
+  Int_t   oldLevel     = gErrorIgnoreLevel; // Set by: gErrorIgnoreLevel = ... - functions_explain
+  gErrorIgnoreLevel    = kWarning;          // suppress TCanvas output
+
+  // Input ---------------------------------------------------------------------
+  int     bin_width   = stoi(argv[2]);
+  TString year        = argv[1];
 
   // Year --------------------------------------------------------------------------------------------
   if(debug) cout << "Getting Input Year" << endl;
 
-  TString year = argv[1];
   bool is16=false; bool is17=false; bool is18=false; bool isAll=false; bool is1718=false;
   if     (strcmp(year, "2016")==0) is16   = true;
   else if(strcmp(year, "2017")==0) is17   = true;
   else if(strcmp(year, "2018")==0) is18   = true;
   else if(strcmp(year,  "combined")==0) isAll  = true;
   else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combined)");
+
+  // Rebin -------------------------------------------------------------------------------------------
+  if(debug) cout << "Set Number Bins" << endl;
+  int     number_bins     = 180/bin_width;
+  TString str_number_bins = to_string(number_bins); // For creating folders
 
 
   /*
@@ -101,6 +117,9 @@ int main(int argc, char* argv[]){
   TH1F  *data_old       = (TH1F*)data_file->Get(hist_old);
 
   TH1F  *data_norm       = normalize(data);
+  TH1F  *data_rebin      = rebin(data, bin_width);
+  TH1F  *data_rebin_norm = normalize(data_rebin);
+
 
   // #################################################################################################
   // Get TTbar #######################################################################################
@@ -114,8 +133,12 @@ int main(int argc, char* argv[]){
   ttbar->Add(bkg, 1);
   ttbar_old->Add(bkg_old, 1);
 
-  TH1F* ttbar_norm       = normalize(ttbar);
-  TH1F* ttbar_norm_old   = normalize(ttbar_old);
+  TH1F* ttbar_norm              = normalize(ttbar);
+  TH1F* ttbar_norm_old          = normalize(ttbar_old);
+  TH1F* ttbar_rebin             = rebin(ttbar, bin_width);
+  TH1F* ttbar_rebin_old         = rebin(ttbar_old, bin_width);
+  TH1F* ttbar_rebin_norm       = normalize(ttbar_rebin);
+  TH1F* ttbar_rebin_norm_old   = normalize(ttbar_rebin_old);
 
 
   // #################################################################################################
@@ -171,7 +194,7 @@ int main(int argc, char* argv[]){
   ttbar->GetXaxis()->SetTitleSize(0.05);
   ttbar->GetYaxis()->SetTitleSize(0.04);
   ttbar->GetXaxis()->SetTitleOffset(0.9);
-  ttbar->GetYaxis()->SetTitleOffset(1.5);
+  ttbar->GetYaxis()->SetTitleOffset(0.9);
   ttbar->GetXaxis()->SetTitle("m_{jet}");
   ttbar->GetYaxis()->SetTitle("");
   ttbar->SetLineWidth(2);  // ttbar hist style
@@ -180,6 +203,7 @@ int main(int argc, char* argv[]){
   // Data --------------------------------------------------------------------------------------------
   data->SetMarkerStyle(8);  // data hist style
   data->SetMarkerColor(kBlack);
+  data->SetLineColor(kBlack);
 
   // upup --------------------------------------------------------------------------------------------
   JMSuu->SetLineWidth(2);
@@ -257,10 +281,10 @@ int main(int argc, char* argv[]){
   leg->SetTextSize(0.02);
   leg->Draw();
   gPad->RedrawAxis();
-  A->SaveAs(save_path_general+"/method_comparison_jms_"+year+".pdf");
+  A->SaveAs(save_path_general+"/method_comparison_jms_old_"+year+".pdf");
   data->Draw("SAME P");
   leg->AddEntry(data,"Data","pl");
-  A->SaveAs(save_path_general+"/method_comparison_jms_data_"+year+".pdf");
+  A->SaveAs(save_path_general+"/method_comparison_jms_old_data_"+year+".pdf");
   delete A;
   leg->Clear();
 

@@ -18,7 +18,7 @@ using namespace uhh2;
 class RecoGenHists_xcone_topjet: public uhh2::Hists {
 public:
   // use the same constructor arguments as Hists for forwarding:
-  RecoGenHists_xcone_topjet(uhh2::Context & ctx, const std::string & dirname, bool isTTbar, double masscut);
+  RecoGenHists_xcone_topjet(uhh2::Context & ctx, const std::string & dirname, bool & isTTbar, const double &masscut);
 
   virtual void fill(const uhh2::Event & ev) override;
 

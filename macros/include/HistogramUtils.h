@@ -74,6 +74,24 @@ tuple<vector<double>, vector<double>> get_bin_content_and_error(TH1F* hist){
   return {bin_content_v, bin_error_v};
 }
 
+// -------------------------------------------------------------------------------------------
+vector<int> bins_upper_limit(TH1F* hist, double limit){
+  vector<int> bin_pass_v;
+  for(int bin=0; bin < hist->GetNbinsX(); bin++){
+    if((hist->GetBinContent(bin+1)>limit)) bin_pass_v.push_back(bin+1);
+  }
+  return bin_pass_v;
+}
+
+// -------------------------------------------------------------------------------------------
+vector<int> bins_empty(TH1F* hist){
+  vector<int> bin_empty_v;
+  for(int bin=0; bin < hist->GetNbinsX(); bin++){
+    if(!(abs(hist->GetBinContent(bin+1))>0)) bin_empty_v.push_back(bin+1);
+  }
+  return bin_empty_v;
+}
+
 /*
 ██████  ███████ ██████  ██ ███    ██
 ██   ██ ██      ██   ██ ██ ████   ██
@@ -220,6 +238,36 @@ vector<double> normalize_error(TH1F* hist){
   }
 
   return bin_error_norm;
+}
+
+
+vector<vector<double>> normalize_error(vector<TH1F*> hist_v){
+  // error of each bin normalized and into vector
+  vector<vector<double>> all_errors;
+  for(unsigned int i=0; i<hist_v.size(); i++){
+    TH1F* hist_ = (TH1F*) hist_v[i]->Clone();
+    double integral = hist_->Integral();
+    double integral2 = integral*integral;
+    int number_bins = hist_->GetNbinsX();
+
+    vector<double> bin_error_norm, bin_content, bin_error;
+    for(unsigned int bin=1; bin<number_bins+1; bin++){
+      bin_content.push_back(hist_->GetBinContent(bin));
+      bin_error.push_back(hist_->GetBinError(bin));
+    }
+
+    double error_term = 0;
+    for(unsigned int bin=0; bin<number_bins; bin++){ // Calculate the error for each bin
+      for(unsigned int i=0; i<number_bins; i++){ // Include contribution of each bin for PoU
+        if(bin == i) error_term += pow(((integral-bin_content[bin])/integral2)*bin_error[i], 2.0);
+        else         error_term += pow(((-1)*(bin_content[bin])/integral2)*bin_error[i], 2.0);
+      }
+      bin_error_norm.push_back(sqrt(error_term));
+      error_term=0;
+    }
+    all_errors.push_back(bin_error_norm);
+  }
+  return all_errors;
 }
 
 /*

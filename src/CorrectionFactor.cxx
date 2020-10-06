@@ -44,7 +44,7 @@ double CorrectionFactor::get_factor(double pt, double eta){
 }
 
 
-void CorrectionFactor::get_function(TString year){
+void CorrectionFactor::get_function(const TString & year){
 
   TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
@@ -110,7 +110,7 @@ Particle GetLepton(uhh2::Event & event){
 }
 
 
-CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, std::string corvar, bool allHad_, TString year_):
+CorrectionFactor::CorrectionFactor(uhh2::Context & ctx, const std::string & name, const std::string & corvar, bool allHad_, const TString & year_):
 h_oldjets(ctx.get_handle<std::vector<TopJet>>("xconeCHS")),
 h_newjets(ctx.declare_event_output<std::vector<TopJet>>(name)),
 h_cor_factor_had(ctx.declare_event_output<std::vector<float>>("cor_factor_had")),

@@ -59,7 +59,7 @@ using namespace std::chrono;
 // #################################################################################################
 // Numeric solution for Z values of 2D plot ########################################################
 
-vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xmax, double ymin, double ymax, int steps = 1000, double accuracy = 0){
+vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xmax, double ymin, double ymax, int steps = 1000, double accuracy = 0, bool count=false){
   vector<double> points;
   vector<vector<double>> all_points;
   double dx = (xmax-xmin)/steps;
@@ -138,7 +138,19 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
   //  994403ms  20
   //  897007ms  50
   //  827621ms 100
+
+  if(count){
+    cout << "\nxup: " << step_limit_x_up << " | xdown: " << step_limit_x_down << endl;
+    cout << "yup: " << step_limit_y_up << " | ydown: " << step_limit_y_down << endl;
+  }
+
+  auto start = high_resolution_clock::now(); // Calculation time - start
   for(int xpar=step_limit_x_down; xpar<step_limit_x_up; xpar++){
+    if(count&&(xpar%1000==0)){
+      auto stop = high_resolution_clock::now();  // Calculation time - stop
+      auto duration = duration_cast<milliseconds>(stop - start);
+      cout << "Passed x = " << xpar << " (" << duration.count()/1000 << "s)" << endl;
+    }
     int count_zfix_reached=0;
     x=xmin+xpar*dx;
     for(int ypar=step_limit_y_down; ypar<step_limit_y_up; ypar++){

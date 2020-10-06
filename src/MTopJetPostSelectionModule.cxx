@@ -28,6 +28,7 @@
 #include <UHH2/MTopJet/include/LeptonicTop_Hists.h>
 #include <UHH2/MTopJet/include/ModuleBASE.h>
 #include <UHH2/MTopJet/include/MTopJetHists.h>
+#include <UHH2/MTopJet/include/PDFHists.h>
 #include <UHH2/MTopJet/include/RecoGenHists_xcone.h>
 #include <UHH2/MTopJet/include/RecoGenHists_subjets.h>
 #include <UHH2/MTopJet/include/RecoGenHists_ak4.h>
@@ -35,7 +36,6 @@
 #include <UHH2/MTopJet/include/RecoHists_xcone.h>
 #include <UHH2/MTopJet/include/RecoHists_puppi.h>
 #include <UHH2/MTopJet/include/SubjetHists_xcone.h>
-#include <UHH2/MTopJet/include/PDFHists.h>
 
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/CorrectionFactor.h>
@@ -224,10 +224,9 @@ protected:
   std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_gensel_300;
   std::unique_ptr<Hists> h_leptonictop, h_leptonictop_SF;
 
-  std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
+  std::unique_ptr<Hists> h_wrong_events_mtop_17;
 
-  bool isMC;    //define here to use it in "process" part
-  bool isTTbar; //define here to use it in "process" part
+  std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
 
   std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors, BTagReshape;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
@@ -245,13 +244,16 @@ protected:
   string PU_variation ="nominal";
   TString jms_direction ="nominal";
   Year year;
-  bool debug;
 
+  bool isMC;    //define here to use it in "process" part
+  bool isTTbar; //define here to use it in "process" part
+  bool debug;
+  bool isMTop;
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
-  debug = true;
+  debug = false;
   /*
   .██████ ████████ ██   ██
   ██         ██     ██ ██
@@ -277,6 +279,13 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   TString dataset_version = (TString) ctx.get("dataset_version");
   if(dataset_version.Contains("TTbar")) isTTbar = true;
   else  isTTbar = false;
+
+  // Avoid empty fatjets for JMS
+  if(dataset_version.Contains("_mtop")&&year_17) isMTop = true;
+  else                                           isMTop = false;
+
+  if(isMTop) h_wrong_events_mtop_17.reset(new CountingEventHists(ctx, "Wrong_17_mTop_events"));
+
   // ttbar gen
   const std::string ttbar_gen_label("ttbargen");
   if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
@@ -678,16 +687,18 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 }
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
+
   if(debug) cout << "\nStart process --------------------------------------------------------------\n";
-  // std::vector<TopJet> test_fatjets = event.get(h_fatjets);
-  // for(auto & jet: test_fatjets){
-  //   if (jet.subjets().size() ==0){
-  //     cout << "############################################################################\n";
-  //     cout << "KICK EVENT \n";
-  //     cout << "############################################################################\n";
-  //     return false;
-  //   }
-  // }
+  if(isMTop){
+    std::vector<TopJet> test_fatjets = event.get(h_fatjets);
+    for(auto & jet: test_fatjets){
+      if (jet.subjets().size() ==0){
+        h_wrong_events_mtop_17->fill(event);
+        return false;
+      }
+    }
+  }
+
   /*
   ██████  ██████   ██████   ██████ ███████ ███████ ███████
   ██   ██ ██   ██ ██    ██ ██      ██      ██      ██
@@ -700,8 +711,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   // get bools for selections from root files
   bool passed_recsel;
-  passed_recsel = event.get(h_recsel_2);
   bool passed_gensel33;
+  passed_recsel = event.get(h_recsel_2);
   passed_gensel33 = event.get(h_gensel_2);
 
   // check if event has one had and one lep jet
@@ -723,11 +734,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   vector<double> points;
   double mass_jms =0;
   if(isMC){
-    if     (jms_direction == "nominal")  points = {0.493,  0.208}; // BestFit point
-    else if(jms_direction == "upup")     points = {0.669,  0.272}; // clostest point, right
-    else if(jms_direction == "updown")   points = {0.739, -0.463}; // furthest point, down
-    else if(jms_direction == "downup")   points = {0.243,  0.881}; // furthest point, up
-    else if(jms_direction == "downdown") points = {0.317,  0.142}; // clostest point, left
+    // Data+MC
+    if     (jms_direction == "nominal")  points = {0.4904,  0.2047}; // BestFit point
+    else if(jms_direction == "upup")     points = {0.6848,  0.2707}; // clostest point, right
+    else if(jms_direction == "updown")   points = {0.7601, -0.5318}; // furthest point, down
+    else if(jms_direction == "downup")   points = {0.2153,  0.9424}; // furthest point, up
+    else if(jms_direction == "downdown") points = {0.3011,  0.1198}; // clostest point, left
     else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown)");
     if(debug) cout << "JMS - get_mass_BestFit\n";
     mass_jms = BestFit->get_mass_BestFit(event, points);
@@ -775,7 +787,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
-  // double SF_tt = 0.846817;  // estimated in combined channel FROM DENNIS
   double SF_tt = 0.720007; // estimated in muon 2016
   // get lumi weight = genweight (inkl scale variation)
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
@@ -867,12 +878,12 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /** b-tagging *********************/
   // first do cvs reshape (instead of SF)
   //BTagReshape->process(event);
-  int jetbtagN(0);
   bool passed_btag;
-  int jetbtagN_medium(0);
   bool passed_btag_medium;
-  int jetbtagN_loose(0);
   bool passed_btag_loose;
+  int jetbtagN(0);
+  int jetbtagN_medium(0);
+  int jetbtagN_loose(0);
   for(const auto& j : *event.jets){
     if(DeepjetTight(j, event)) ++jetbtagN;
     if(DeepjetMedium(j, event)) ++jetbtagN_medium;
@@ -989,13 +1000,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool lowPU = (event.pvs->size() <= 10);
   bool midPU = (event.pvs->size() > 10 && event.pvs->size() <= 20);
   bool highPU = (event.pvs->size() > 20);
-
-  /*************************** fill hists with reco sel applied ************************************************************************************/
-  if(debug) cout << "\nFill Main Hists\n";
-
   bool is_matched_sub = false;
   bool is_matched_fat = false;
 
+  /*************************** fill hists with reco sel applied ************************************************************************************/
+  if(debug) cout << "\nFill Main Hists\n";
   h_comparison_topjet_xcone->fill(event);
 
   // hists to see events that are generated in measurement phase-space, but reconstructed outside

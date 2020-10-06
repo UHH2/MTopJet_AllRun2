@@ -1,10 +1,15 @@
 #include "../include/CentralInclude.h"
 #include "../include/HistogramUtils.h"
 #include "../include/Utils.h"
+
+#include "TFitResultPtr.h"
+#include "TVirtualFitter.h"
+#include "TFitter.h"
+
 using namespace std;
 
 int main(int argc, char* argv[]){
-  bool debug = true;
+  bool debug     = true;
   bool rel_error = false;
 
   if(argc != 2){
@@ -16,9 +21,9 @@ int main(int argc, char* argv[]){
   TString year = argv[1];
 
   bool is16=false; bool is17=false; bool is18=false; bool is1718=false;
-  if(strcmp(year, "2016")==0) is16 = true;
-  else if(strcmp(year, "2017")==0) is17 = true;
-  else if(strcmp(year, "2018")==0) is18 = true;
+  if(strcmp(year, "2016")==0)          is16   = true;
+  else if(strcmp(year, "2017")==0)     is17   = true;
+  else if(strcmp(year, "2018")==0)     is18   = true;
   else if(strcmp(year, "combined")==0) is1718 = true;
   else{
     cout << "" << endl;
@@ -28,7 +33,6 @@ int main(int argc, char* argv[]){
     throw runtime_error("By the way ... it is line 17");
   }
 
-  if(is1718) year = "2017"; // this will be changed to "combined" again
 
   /*
   .██████  ███████ ████████     ██   ██ ██ ███████ ████████ ███████
@@ -39,8 +43,9 @@ int main(int argc, char* argv[]){
   */
 
   TString tau32 = "comparison_topjet_xcone_pass_rec_masscut_140/ak8_hadjet_tau32";
-  TString save_path = "/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/";
-
+  TString save_path = creat_folder_and_path("/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/"+year);  // CHANGE
+  creat_folder(save_path, "single_bins");
+  if(is1718) year = "2017"; // this will be changed to "combined" again
 
   // Difference between 2016 and 17&18
   std::vector<int> color;
@@ -73,9 +78,7 @@ int main(int argc, char* argv[]){
     hist_v.push_back((TH1F*)file_v[i]->Get(tau32));
     cout << hist_v.size() << endl;
   }
-  if(debug) cout << "Background6" << endl;
-  TH1F *bkg = AddHists(hist_v, 1);
-  if(debug) cout << "Background" << endl;
+  TH1F *bkg      = AddHists(hist_v, 1);
   if(is1718) bkg = add_second_year("2018", bkg, dir, path_v, tau32);
 
   // #################################################################################################
@@ -101,7 +104,7 @@ int main(int argc, char* argv[]){
   // Get FSR #########################################################################################
   if(debug) cout << "FSR" << endl;
 
-  tau32 = "AK8_tau_pass_rec_masscut_140/tau32_hadjet";
+  tau32 = "comparison_topjet_xcone_pass_rec_masscut_140/ak8_hadjet_tau32";
   vector<TFile*> FSRup_file, FSRdown_file;
   vector<TH1F*> FSRup, FSRdown;
 
@@ -124,14 +127,17 @@ int main(int argc, char* argv[]){
     TFile *FSRup_2016 = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_fsrup_2016v3.root");
     TFile *FSRdown_2016 = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_fsrdown_2016v3.root");
 
-    FSRup.push_back((TH1F*)FSRup_2016->Get(tau32));
+    FSRup.push_back((TH1F*)  FSRup_2016->Get(tau32));
     FSRdown.push_back((TH1F*)FSRdown_2016->Get(tau32));
   }
-
+  cout << FSRup.size() << endl;
   // Add hists from FSR and background ---------------------------------------------------------------
   if(debug) cout << "FSR+Background" << endl;
   for(unsigned int i=0; i<FSRup.size();i++){
+    cout << bkg->GetNbinsX() << endl;
+    cout << FSRup[i]->GetNbinsX() << endl;
     FSRup[i]->Add(bkg, 1);
+    cout << FSRup.size() << "terst" << endl;
     FSRdown[i]->Add(bkg, 1);
   }
 
@@ -143,11 +149,11 @@ int main(int argc, char* argv[]){
   TH1F *ttbar_rebin10 = rebin(ttbar, 5);
   TH1F *data_rebin10 = rebin(data, 5);
 
-  vector<TH1F*> FSRup_rebin10 = rebin(FSRup, 5);
+  vector<TH1F*> FSRup_rebin10   = rebin(FSRup, 5);
   vector<TH1F*> FSRdown_rebin10 = rebin(FSRdown, 5);
 
   // For tau bin dependency
-  vector<TH1F*> FSRup_rebin10_norm = normalize(FSRup_rebin10);
+  vector<TH1F*> FSRup_rebin10_norm   = normalize(FSRup_rebin10);
   vector<TH1F*> FSRdown_rebin10_norm = normalize(FSRdown_rebin10);
 
   // #################################################################################################
@@ -166,10 +172,20 @@ int main(int argc, char* argv[]){
 
   // Vectors have the same order like the ones above
   vector<TH1F*> ttbar_all_norm = normalize(ttbar_all);
-  vector<TH1F*> data_all_norm = normalize(data_all);
+  vector<TH1F*> data_all_norm  = normalize(data_all);
 
-  vector<vector<TH1F*>> FSRup_all_norm = normalize(FSRup_all);
+  vector<vector<TH1F*>> FSRup_all_norm   = normalize(FSRup_all);
   vector<vector<TH1F*>> FSRdown_all_norm = normalize(FSRdown_all);
+
+  // #################################################################################################
+  // Normalize Error ###############################################################################
+  if(debug) cout << "Normalized Error" << endl;
+
+  vector<double> ttbar_rebin_norm_err = normalize_error(ttbar_all_norm[1]);
+  vector<double> data_rebin_norm_err  = normalize_error(data_all_norm[1]);
+
+  vector<vector<double>> FSRup_rebin_norm_err   = normalize_error(FSRup_rebin10_norm);
+  vector<vector<double>> FSRdown_rebin_norm_err = normalize_error(FSRdown_rebin10_norm);
 
   // #################################################################################################
   // Combine Non normalized and normalized ###########################################################
@@ -206,6 +222,7 @@ int main(int argc, char* argv[]){
       // data hist style
       data_general[a].at(b)->SetMarkerStyle(8);
       data_general[a].at(b)->SetMarkerColor(kBlack);
+      data_general[a].at(b)->SetLineColor(kBlack);
     }
   }
 
@@ -216,7 +233,8 @@ int main(int argc, char* argv[]){
   for(unsigned int a=0; a<FSRup_general.size();a++){ // not norm and norm (ttbar, data and variations)
     for(unsigned int b=0; b<FSRup_general.at(a).size();b++){ // not rebin and rebin (ttbar, data and variations)
       for(unsigned int c=0; c<FSRup_general.at(a).at(b).size();c++){ // variation factors (sqrt_2, 2, 4)
-        FSRup_general[a].at(b).at(c)->SetTitle(FSR_strings[c]);
+        // FSRup_general[a].at(b).at(c)->SetTitle(FSR_strings[c]);
+        FSRup_general[a].at(b).at(c)->SetTitle("");
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetRangeUser(0, 400);
         FSRup_general[a].at(b).at(c)->GetYaxis()->SetRangeUser(0, FSRup_general[a].at(b).at(c)->GetMaximum()*1.2);
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetNdivisions(505);
@@ -224,9 +242,10 @@ int main(int argc, char* argv[]){
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetTitleSize(0.05);
         FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleSize(0.04);
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetTitleOffset(0.9);
-        FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleOffset(1.5);
+        FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleOffset(0.9);
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetTitle("#tau_{32}");
-        FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitle("");
+        if(a==0) FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitle("Events");
+        else     FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitle("#DeltaN/N");
         FSRup_general[a].at(b).at(c)->SetLineWidth(2);
         FSRup_general[a].at(b).at(c)->SetLineColor(color[c]);
 
@@ -241,13 +260,21 @@ int main(int argc, char* argv[]){
         FSRdown_general[a].at(b).at(c)->Draw("SAME HIST");
         ttbar_general[a].at(b)->Draw("SAME HIST");
         data_general[a].at(b)->Draw("SAME P");
+        leg = new TLegend(0.2,0.6,0.4,0.8);
+        leg->AddEntry(ttbar_general[a].at(b),"nominal","l");
+        leg->AddEntry(FSRup_general[a].at(b).at(c) ,"FSR up","l");
+        leg->AddEntry(FSRdown_general[a].at(b).at(c) ,"FSR down","l");
+        leg->AddEntry(data_general[a].at(b) ,"data","pl");
+        leg->SetTextSize(0.03);
+        leg->Draw();
+        gPad->RedrawAxis();
         if(a==0){ // not norm
-          if(b==0) A->SaveAs(save_path+year+"/tau32_SYS_"+FSR_strings[c]+".pdf");
-          if(b==1) A->SaveAs(save_path+year+"/tau32_SYS_"+FSR_strings[c]+"_Rebin10.pdf");
+          if(b==0) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+".pdf");
+          if(b==1) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+"_Rebin10.pdf");
         }
         if(a==1){ // norm
-          if(b==0) A->SaveAs(save_path+year+"/tau32_SYS_"+FSR_strings[c]+"_norm.pdf");
-          if(b==1) A->SaveAs(save_path+year+"/tau32_SYS_"+FSR_strings[c]+"_Rebin10_norm.pdf");
+          if(b==0) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+"_norm.pdf");
+          if(b==1) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+"_Rebin10_norm.pdf");
         }
         delete A;
       }
@@ -300,12 +327,12 @@ int main(int argc, char* argv[]){
         leg->Draw();
         gPad->RedrawAxis();
         if(a==0){
-          if(b==0) A->SaveAs(save_path+year+"/tau32_SYS_all.pdf");
-          if(b==1) A->SaveAs(save_path+year+"/tau32_SYS_all_Rebin10.pdf");
+          if(b==0) A->SaveAs(save_path+"/tau32_SYS_all.pdf");
+          if(b==1) A->SaveAs(save_path+"/tau32_SYS_all_Rebin10.pdf");
         }
         if(a==1){
-          if(b==0) A->SaveAs(save_path+year+"/tau32_SYS_all_norm.pdf");
-          if(b==1) A->SaveAs(save_path+year+"/tau32_SYS_all_Rebin10_norm.pdf");
+          if(b==0) A->SaveAs(save_path+"/tau32_SYS_all_norm.pdf");
+          if(b==1) A->SaveAs(save_path+"/tau32_SYS_all_Rebin10_norm.pdf");
         }
         leg->Clear();
         delete A;
@@ -331,6 +358,8 @@ int main(int argc, char* argv[]){
 
   // set first fit function
   TF1 *fit = new TF1("fit", "[0] + [1]*log(x)");
+  TF1 *fit_alt = new TF1("fit_alt", "[0] + [1]*log(x)");
+
 
   /*
   OVERVIEW ---------------------------------------------------------------------
@@ -350,8 +379,8 @@ int main(int argc, char* argv[]){
 
   vector<vector<double>> ordered_fsr_norm_err;
   vector<vector<double>> fit_bin_values, fit_bin_values_norm; // chi2, parameters and errors --- {a, a_err, b, b_err, chi2}
-  vector<TF1*> fit_functions, fit_functions_norm;
-  vector<double> a, a_err, b, b_err, chi2;
+  vector<double>         a, a_err, b, b_err, chi2, fit_error_estimate;
+  vector<TF1*>           fit_functions, fit_functions_norm;
   int fit_value_size = 5;
 
   // first index: factor (order: 1/4, 1/2, 1/sqrt2, 1, sqrt2, 2, 4) --- second index: bin
@@ -382,13 +411,14 @@ int main(int argc, char* argv[]){
   for(unsigned int factor=0; factor<n_factors; factor++) ordered_fsr_norm_err.push_back(normalize_error(ordered_fsr[factor]));
 
   for(unsigned int isnorm=0; isnorm<2; isnorm++){ // isnorm=0: normal --- isnorm=1: norm
+    if(isnorm==0) continue;
     if(debug) cout << "Star: filling axis" << endl;
 
     cout << "" << endl;
-    cout << "******************************************************************************************************************************" << endl;
-    if(isnorm==0) cout << "*********** yAxis: normal --- xAxis: log *************************************************************************************" << endl;
-    if(isnorm==1) cout << "*********** yAxis: norm   --- xAxis: log *************************************************************************************" << endl;
-    cout << "******************************************************************************************************************************" << endl;
+    cout << "**********************************************************************************************************" << endl;
+    if(isnorm==0) cout << "*********** yAxis: normal --- xAxis: log *****************************************************************" << endl;
+    if(isnorm==1) cout << "*********** yAxis: norm   --- xAxis: log *****************************************************************" << endl;
+    cout << "**********************************************************************************************************" << endl;
     cout << "" << endl;
 
     TCanvas *E = new TCanvas(); // All Graphs in one
@@ -401,7 +431,7 @@ int main(int argc, char* argv[]){
       cout << "------------------------------------------------------------------------------------------------" << endl;
       if(isnorm == 1){ // data_norm_rebin10 - for the chi2 Method
         data_norm_bin_content.push_back(data_all_norm[1]->GetBinContent(bin));
-        data_norm_bin_error.push_back(data_all_norm[1]->GetBinError(bin));
+        data_norm_bin_error.push_back(data_rebin_norm_err[bin-1]); // vector!!!
         ttbar_norm_bin_content.push_back(ttbar_all_norm[1]->GetBinContent(bin));
       }
       for(int factor=0; factor<n_factors; factor++){
@@ -416,19 +446,89 @@ int main(int argc, char* argv[]){
       TGraphErrors *single_bin;
 
       TCanvas *A = new TCanvas("A","A", 600, 600); // each Graph seperatly
+
       if(isnorm==0) single_bin = new TGraphErrors(n_factors, &mu2[0], &events[0], &mu_err[0], &events_err[0]);
       if(isnorm==1) single_bin = new TGraphErrors(n_factors, &mu2[0], &events_norm[0], &mu_err[0], &events_norm_err[0]);
 
       single_bin->SetTitle(tau_bin[bin-1]);
       single_bin ->GetXaxis()->SetTitleOffset(0.9);
       gPad->SetLogx();
-      single_bin->GetXaxis()->SetTitle("log(#mu)");
-
+      single_bin->GetXaxis()->SetTitle("log(#mu_{FSR})");
       single_bin->SetMarkerStyle(2);
-      single_bin->Fit("fit");
+
+      single_bin->Fit("fit", "Q");
+
+      TGraphErrors* fit_err_68;
+      if(isnorm==0) fit_err_68 = new TGraphErrors(n_factors, &mu2[0], &events[0], &mu_err[0], &events_err[0]);
+      if(isnorm==1) fit_err_68 = new TGraphErrors(n_factors, &mu2[0], &events_norm[0], &mu_err[0], &events_norm_err[0]);
+      TFitter* fitter = (TFitter*) TVirtualFitter::GetFitter();
+      fitter->GetConfidenceIntervals(fit_err_68, 0.68);
+      fit_err_68->SetFillColorAlpha(kOrange-4,0.5); // FillColor transparency
+
+      vector<double> error_const, fit_values;
+      double errm4, errm2, errms2, err0, errps2, errp2, errp4, average;
+      double fxm4, fym4, fxm2, fym2, fxms2, fyms2;
+      double fx0, fy0;
+      double fxps2, fyps2, fxp2, fyp2, fxp4, fyp4;
+      if(is16){
+        fit_err_68->GetPoint(0, fxm2, fym2);
+        fit_err_68->GetPoint(1, fx0, fy0);
+        fit_err_68->GetPoint(2, fxp2, fyp2);
+
+        errm2   = fit_err_68->GetErrorY(0);
+        err0    = fit_err_68->GetErrorY(1);
+        errp2   = fit_err_68->GetErrorY(2);
+
+        fit_values = {fym2, fy0, fyp2};
+        // fit_values.push_back(fym2);
+        // fit_values.push_back(fy0);
+        // fit_values.push_back(fyp2);
+
+        average = (errm2+err0+errp2)/3.;
+        cout << "Estimated Error: " << average << endl;
+        error_const = {average, average, average};
+        fit_error_estimate.push_back(average);
+      } else{
+        fit_err_68->GetPoint(0, fxm4, fym4);
+        fit_err_68->GetPoint(1, fxm2, fym2);
+        fit_err_68->GetPoint(2, fxms2, fyms2);
+        fit_err_68->GetPoint(3, fx0, fy0);
+        fit_err_68->GetPoint(4, fxps2, fyps2);
+        fit_err_68->GetPoint(5, fxp2, fyp2);
+        fit_err_68->GetPoint(6, fxp4, fyp4);
+
+        errm4   = fit_err_68->GetErrorY(0);
+        errm2   = fit_err_68->GetErrorY(1);
+        errms2  = fit_err_68->GetErrorY(2);
+        err0    = fit_err_68->GetErrorY(3);
+        errps2  = fit_err_68->GetErrorY(4);
+        errp2   = fit_err_68->GetErrorY(5);
+        errp4   = fit_err_68->GetErrorY(6);
+        cout << "m4 " << errm4 << endl;
+        cout << "m2 " << errm2 << endl;
+        cout << "ms2 " << errms2 << endl;
+        cout << "0 " << err0 << endl;
+        cout << "ps2 " << errps2 << endl;
+        cout << "p2 " << errp2 << endl;
+        cout << "p4 " << errp4 << endl;
+
+        fit_values  = {fym4, fym2, fyms2, fy0, fyps2, fyp2, fyp4};
+        average = (errm4+errm2+errms2+err0+errps2+errp2+errp4)/7.;
+        cout << "Estimated Error: " << average << endl;
+        error_const = {average, average, average, average, average, average, average};
+        fit_error_estimate.push_back(average);
+      }
+      for(unsigned int i =0; i<fit_values.size(); i++) cout << i << "  " << fit_values[i] << endl;
+      TGraphErrors* fit_estimate;
+      fit_estimate = new TGraphErrors(n_factors, &mu2[0], &fit_values[0], &mu_err[0], &error_const[0]);
+      fit_estimate->SetFillColorAlpha(kGreen-7,0.5); // FillColor transparency
+
+      // Draw ------------------------------------------------------------------
       single_bin->Draw("APE");
-      if(isnorm==0) A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/"+year+"/single_bins/tau32_bin_"+number_bin[bin-1]+".pdf");
-      if(isnorm==1) A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/"+year+"/single_bins/tau32_bin_"+number_bin[bin-1]+"_norm.pdf");
+      fit_estimate->Draw("L3 same");
+      fit_err_68->Draw("L3 same");
+      if(isnorm==0) A->SaveAs(save_path+"/single_bins/tau32_bin_"+number_bin[bin-1]+".pdf");
+      if(isnorm==1) A->SaveAs(save_path+"/single_bins/tau32_bin_"+number_bin[bin-1]+"_norm.pdf");
       delete A;
 
       // Now plot all graphs into one file
@@ -438,8 +538,10 @@ int main(int argc, char* argv[]){
       single_bin->SetTitle(tau_bin[bin-1]);
       single_bin->SetMarkerStyle(2);
       gPad->SetLogx();
-      single_bin->GetXaxis()->SetTitle("log(#mu)");
+      single_bin->GetXaxis()->SetTitle("log(#mu_{FSR})");
       single_bin->Draw("AP");
+      fit_estimate->Draw("L3 same");
+      fit_err_68->Draw("L3 same");
 
       events = {}; events_err = {}; events_norm = {}; events_norm_err = {}; // clear vectors
 
@@ -449,73 +551,50 @@ int main(int argc, char* argv[]){
         Values du not depend on scale of ((not-)log) xAxis, but only on the scale of the yAxis ((not-)norm)
         Therefore the vectors for the Value are filled once
         */
-        TF1 *fit = single_bin->GetFunction("fit");
-        a.push_back(fit->GetParameter(0));
-        a_err.push_back(fit->GetParError(0));
-        b.push_back(fit->GetParameter(1));
-        b_err.push_back(fit->GetParError(1));
-        chi2.push_back(fit->GetChisquare());
-        fit_functions_norm.push_back(fit);
+        TF1 *fit_copy = single_bin->GetFunction("fit");
+        a.push_back(fit_copy->GetParameter(0));
+        a_err.push_back(fit_copy->GetParError(0));
+        b.push_back(fit_copy->GetParameter(1));
+        b_err.push_back(fit_copy->GetParError(1));
+        chi2.push_back(fit_copy->GetChisquare());
+
       }
 
       cout << "" << endl;
     }
 
-    if(isnorm==0) E->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/"+year+"/tau_bin_all.pdf");
-    if(isnorm==1) E->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/"+year+"/tau_bin_all_norm.pdf");
+    if(isnorm==0) E->SaveAs(save_path+"/tau_bin_all.pdf");
+    if(isnorm==1) E->SaveAs(save_path+"/tau_bin_all_norm.pdf");
 
   }
+  cout << "Size: " << fit_error_estimate.size() << endl;
+  for(auto number: fit_error_estimate) cout << number << endl;
 
   cout.precision(6);
   cout << "" << '\n' << fixed;
-  cout << "|================================================================|" << endl;
-  cout << "| ------------------------- Fit Values --------------------------|" << endl;
-  cout << "| ---------------------------------------------------------------|" << endl;
-  cout << "|   Bin  |    a     |  a_err   |     b     |   b_err  |   chi2   |" << endl;
-  cout << "| -------|----------|----------|-----------|----------|----------|" << endl;
+  cout << "|====================================================================|" << endl;
+  cout << "|---------------------------- Fit Values ----------------------------|" << endl;
+  cout << "|--------------------------------------------------------------------|" << endl;
+  cout << "|   Bin  |     a     |   a_err   |     b     |    b_err  |    chi2   |" << endl;
+  cout << "|--------|-----------|-----------|-----------|-----------|-----------|" << endl;
+
+  int bin;
+  double a_n, a_n_err, b_n, b_n_err, chi2_n;
+
   for(unsigned int i=0; i<8; i++){
-    if(is17){
-      if(i==0) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==1) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==2) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==3) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==4) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==5) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==6) cout<<"|     "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==7) cout<<"|    "<<i+3<<"  | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<< " | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-    }
-    if(is18){
-      if(i==0) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" |"<<chi2.at(i)<<" |"<< endl;
-      if(i==1) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" |"<<chi2.at(i)<<" |"<< endl;
-      if(i==2) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==3) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==4) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==5) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==6) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==7) cout<<"|   "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<< " | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-    }
-    if(is16){
-      if(i==0) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==1) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==2) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==3) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==4) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==5) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==6) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==7) cout<<"|   "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<< " | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-    }
-    if(is1718){
-      if(i==0) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" |"<<chi2.at(i)<<" |"<< endl;
-      if(i==1) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" |" <<chi2.at(i)<<" |"<< endl;
-      if(i==2) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" | "<<b.at(i)<<" | "<<b_err.at(i)<<" |" <<chi2.at(i)<<" |"<< endl;
-      if(i==3) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" |" <<chi2.at(i)<<" |"<< endl;
-      if(i==4) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==5) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==6) cout<<"|    "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<<" | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-      if(i==7) cout<<"|   "<<i+3<<"   | "<<a.at(i)<<" | "<<a_err.at(i)<<" |  "<<b.at(i)<< " | "<<b_err.at(i)<<" | "<<chi2.at(i)<<" |"<< endl;
-    }
+    bin     = i+3;
+    a_n     = a.at(i);
+    a_n_err = a_err.at(i);
+    b_n     = b.at(i);
+    b_n_err = b_err.at(i);
+    chi2_n  = chi2.at(i);
+    if( i % 2 == 0) cout << DGRAY;
+    else            cout << RESET;
+    cout<<"|"<<setw(8) <<centered(to_string(bin))    <<"|"<<setw(11)<<(to_string(a_n));
+    cout<<"|"<<setw(11)<<(to_string(a_n_err))<<"|"<<setw(11)<<(to_string(b_n));
+    cout<<"|"<<setw(11)<<(to_string(b_n_err))<<"|"<<setw(11)<<(to_string(chi2_n))<<"|"<<endl;
   }
-  cout << "| ---------------------------------------------------------------|" << endl;
+  cout << "|--------------------------------------------------------------------|" << endl;
   cout << "" << endl;
 
   /*
@@ -535,50 +614,64 @@ int main(int argc, char* argv[]){
 
   // for 2017, 2018
   // Chi2 term for all bins
-  TF1 *b3 = new TF1("b3", "(([0]-[1]-[2]*log(x))/[3])^2");
-  TF1 *b4 = new TF1("b4", "(([4]-[5]-[6]*log(x))/[7])^2");
-  TF1 *b5 = new TF1("b5", "(([8]-[9]-[10]*log(x))/[11])^2");
-  TF1 *b6 = new TF1("b6", "(([12]-[13]-[14]*log(x))/[15])^2");
-  TF1 *b7 = new TF1("b7", "(([16]-[17]-[18]*log(x))/[19])^2");
-  TF1 *b8 = new TF1("b8", "(([20]-[21]-[22]*log(x))/[23])^2");
-  TF1 *b9 = new TF1("b9", "(([24]-[25]-[26]*log(x))/[27])^2");
-  TF1 *b10 = new TF1("b10", "(([28]-[29]-[30]*log(x))/[31])^2");
+  TF1 *b3  = new TF1("b3", "(([0]-[1]-[2]*log(x))^2/[3])");
+  TF1 *b4  = new TF1("b4", "(([4]-[5]-[6]*log(x))^2/[7])");
+  TF1 *b5  = new TF1("b5", "(([8]-[9]-[10]*log(x))^2/[11])");
+  TF1 *b6  = new TF1("b6", "(([12]-[13]-[14]*log(x))^2/[15])");
+  TF1 *b7  = new TF1("b7", "(([16]-[17]-[18]*log(x))^2/[19])");
+  TF1 *b8  = new TF1("b8", "(([20]-[21]-[22]*log(x))^2/[23])");
+  TF1 *b9  = new TF1("b9", "(([24]-[25]-[26]*log(x))^2/[27])");
+  TF1 *b10 = new TF1("b10", "(([28]-[29]-[30]*log(x))^2/[31])");
 
   TF1 *chi2_function;
-  if(is16) chi2_function = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 0.1, 10);
-  if(is17) chi2_function = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 10, 200);
-  if(is18) chi2_function = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 1, 50);
+  if(is16) chi2_function   = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 0.1, 10);
+  if(is17) chi2_function   = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 10, 200);
+  if(is18) chi2_function   = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 1, 50);
   if(is1718) chi2_function = new TF1("chi2_function", "b3+b4+b5+b6+b7+b8+b9+b10", 1, 50);
 
   // get parameters for terms
   vector<double> parameters;
   for(int bin=0; bin<8; bin++){
+    // double sigma_total_square = pow(data_rebin_norm_err[bin+2], 2)+pow(ttbar_rebin_norm_err[bin+2], 2);
+    cout << "Fit estimated error: " << fit_error_estimate[bin] << endl;
+    double sigma_total_square = pow(data_rebin_norm_err[bin+2], 2)+pow(fit_error_estimate[bin], 2);
     parameters.push_back(data_norm_bin_content[bin]);
     parameters.push_back(a[bin]);
     parameters.push_back(b[bin]);
-    parameters.push_back(data_norm_bin_error[bin]);
+    parameters.push_back(sigma_total_square);
   }
 
-  // Set all parameters
-  for(int ipar=0; ipar<36; ipar++) chi2_function->SetParameter(ipar, parameters[ipar]);
-  chi2_function->SetTitle("#chi^{2} of "+year);
+  // Set all parameters - befor 36 ... but why ?
+  for(int ipar=0; ipar<32; ipar++){
+    // cout << parameters[ipar] << endl;
+    chi2_function->SetParameter(ipar, parameters[ipar]);
+  }
+  // chi2_function->SetTitle("#chi^{2} of "+year);
+  chi2_function->SetTitle("");
+  chi2_function->GetHistogram()->GetXaxis()->SetTitle("log(#mu_{FSR})");
+  chi2_function->GetHistogram()->GetXaxis()->SetTitleOffset(1.2);
+  chi2_function->GetHistogram()->GetYaxis()->SetTitle("#chi^{2}");
+  chi2_function->GetHistogram()->GetYaxis()->SetTitleOffset(0.9);
 
   if(debug) cout << "Chi2 - Function" << endl;
   TCanvas *B = new TCanvas("B","B", 600, 600);
   chi2_function->Draw();
   gPad->SetLogx();
-  B->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS/"+year+"/chi2.pdf");
+  B->SaveAs(save_path+"/chi2.pdf");
 
   // Get Minimum of chi2
   if(debug) cout << "Chi2 - Minimum" << endl;
-  double minY = chi2_function->GetMinimum();
-  double minX2 = chi2_function->GetX(minY, 0, 100);
-  double minX = sqrt(minX2);
-  double X2_sigmaup = chi2_function->GetX(minY+1, minX2, 200);
+  double minY         = chi2_function->GetMinimum();
+  double minX2        = chi2_function->GetX(minY, 0, 100);
+  double minX         = sqrt(minX2);
+  double X2_sigmaup   = chi2_function->GetX(minY+1, minX2, 200);
   double X2_sigmadown = chi2_function->GetX(minY+1, 0.01, minX2);
 
-  double X_sigmaup = sqrt(X2_sigmaup); double X_sigmadown = sqrt(X2_sigmadown);
-  double sigmaup = X_sigmaup - minX;   double sigmadown = minX - X_sigmadown;
+  double X_sigmaup    = sqrt(X2_sigmaup);
+  double sigmaup      = X_sigmaup - minX;
+
+  double X_sigmadown  = sqrt(X2_sigmadown);
+  double sigmadown    = minX - X_sigmadown;
 
   // \u03BC = Mu
   cout << "" << endl;
@@ -586,9 +679,32 @@ int main(int argc, char* argv[]){
   print_seperater();
 
   fstream fsr_txt;
-  fsr_txt.open(save_path+year+"/fsr_factor.txt", ios::out);
+  fsr_txt.open(save_path+"/fsr_factor.txt", ios::out);
   fsr_txt << "ymin     : " << minY << "\nxmin     : " << minX << "\nxmin_up  :  " << sigmaup << "\nxmin_down:  " << sigmadown  << endl;
   fsr_txt.close();
+
+  TGraph *extreme_points = new TGraph();
+
+  // // #################################################################################################
+  // // unified x axis interval  ########################################################################
+  // if(debug) cout << "Chi2 - shifted Function" << endl;
+  // TF1 *chi2_function_shifted = new TF1("chi2_function_shifted", "b3+b4+b5+b6+b7+b8+b9+b10", minX-3, minX+3);
+  //
+  // // Set all parameters ------------------------------------------------------------------------------
+  // for(int ipar=0; ipar<32; ipar++) chi2_function_shifted->SetParameter(ipar, parameters[ipar]);
+  // chi2_function_shifted->SetTitle("#chi^{2} of "+year);
+
+  double shifted_limit_up   = minX+3;
+  double shifted_limit_down = minX-3;
+  if(is16){
+    shifted_limit_down = 0.1;
+    shifted_limit_up   = 2*minX-0.1;
+  }
+
+  TCanvas *T = new TCanvas("T","T", 600, 600);
+  chi2_function->GetXaxis()->SetLimits(shifted_limit_down, shifted_limit_up);
+  T->SaveAs(save_path+"/chi2_shifted.pdf");
+  T->Clear();
 
   /*
   .██████  ██████  ██████  ██████  ███████ ████████ ███████ ██████      ██   ██ ██ ███████ ████████
@@ -608,9 +724,9 @@ int main(int argc, char* argv[]){
   for(unsigned int bin=0; bin<8;bin++){ // Starting at Bin 3. For Completeness the first two bins are set to 0.
     double a_par = a[bin];
     double b_par = b[bin];
-    double sigmaup_value = a_par + b_par * log(X2_sigmaup); // pow(minX*sqrt(2),2)
+    double sigmaup_value   = a_par + b_par * log(X2_sigmaup); // pow(minX*sqrt(2),2)
     double sigmadown_value = a_par + b_par * log(X2_sigmadown); // pow(minX*(1/sqrt(2)),2)
-    double nominal_value = a_par + b_par * log(minX2);
+    double nominal_value   = a_par + b_par * log(minX2);
     FSRup_min.push_back(nominal_value);
     if(sigmaup_value<nominal_value && nominal_value<sigmadown_value){
       if(debug) cout << "Bin " << bin << ": up(down) is down(up)" << endl;
@@ -631,7 +747,7 @@ int main(int argc, char* argv[]){
 
   // Integral-----------------------------------------------------------------------------------------------
   double fsr_min_integral = h_FSRup_min->Integral();
-  cout << "Integral of calculated \u03C4_32 distribution: " << fsr_min_integral << endl;
+  cout << "Integral of calculated \u03C4_{32} distribution: " << fsr_min_integral << endl;
 
   h_FSRup_min->SetTitle(year);
   h_FSRup_min->GetXaxis()->SetRangeUser(0, 400);
@@ -670,11 +786,11 @@ int main(int argc, char* argv[]){
   leg = new TLegend(0.20,0.65,0.40,0.85);
   leg->AddEntry(ttbar_all_norm[1],"nominal","l");
   leg->AddEntry(h_FSRup_min, "FSR best fit value","l");
-  leg->AddEntry(data_all_norm[1], "data","l");
+  leg->AddEntry(data_all_norm[1], "data","pl");
   leg->SetTextSize(0.02);
   leg->Draw();
   gPad->RedrawAxis();
-  C->SaveAs(save_path+year+"/tau32_minimum_factor.pdf");
+  C->SaveAs(save_path+"/tau32_minimum_factor.pdf");
   // C->SaveAs(save_path+year+"/Addition_err/tau32_minimum_factor_err_factorsqrt2.pdf");
   if(is17 || is18 || is1718) {
     FSRup_general[1].at(1).at(2)->Draw("SAME HIST");
@@ -688,7 +804,7 @@ int main(int argc, char* argv[]){
     leg->AddEntry(FSRup_general[1].at(1).at(0), "FSRup 2","l");
     leg->AddEntry(FSRdown_general[1].at(1).at(0), "FSRdown 2","l");
   }
-  C->SaveAs(save_path+year+"/tau32_minimum_factor_compare.pdf");
+  C->SaveAs(save_path+"/tau32_minimum_factor_compare.pdf");
   // C->SaveAs(save_path+year+"/Addition_err/tau32_minimum_factor_compare_err_factorsqrt2.pdf");
   leg->Clear();
   delete C;

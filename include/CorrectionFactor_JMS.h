@@ -36,7 +36,7 @@ public:
 
   explicit CorrectionFactor_JMS(uhh2::Context &,  const std::string &, const std::string &, Year year_);
   virtual bool process(uhh2::Event & event) override;
-  double get_mass_BestFit(uhh2::Event &, vector<double>);
+  double get_mass_BestFit(uhh2::Event &, const vector<double>&);
 
 private:
 
@@ -51,7 +51,7 @@ private:
   std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
 
   // XCone ---------------------------------------------------------------------
-  void get_function(TString);
+  void get_function(TString &);
   void get_additionalSYS();
   double get_factor_XCone(double, double, double);
 
