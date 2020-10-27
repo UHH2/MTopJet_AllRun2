@@ -124,8 +124,12 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
 
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700") genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
-  else                                                    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3" || ctx.get("dataset_version") == "TTbar_Mtt0000to0700"){
+    genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
+  }
+  else{
+    genmttbar_sel.reset(new uhh2::AndSelection(ctx));
+  }
 
   //else throw runtime_error("In PreSelectionModule: This Event is not from 2016v3, 2017v2 or 2018!");
 

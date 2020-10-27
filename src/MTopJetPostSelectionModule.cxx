@@ -48,6 +48,9 @@
 #include <UHH2/MTopJet/include/RecoSelections.h>
 #include <UHH2/MTopJet/include/tt_width_reweight.h>
 
+#include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h"
+
+
 #include <vector>
 
 /*
