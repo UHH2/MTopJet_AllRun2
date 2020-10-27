@@ -1,5 +1,13 @@
 #include <UHH2/MTopJet/include/CorrectionFactor_JMS.h>
+#include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "UHH2/JetMETObjects/interface/JetCorrectorParameters.h"
 
+using namespace uhh2;
+using namespace std;
+
+
+std::unique_ptr<FactorizedJetCorrector> build_corrector(const std::vector<std::string> & filenames);
+JetCorrectionUncertainty* corrector_uncertainty(const std::vector<std::string> & filenames);
 /*
 Here only the Up Variation is used for both coreections. The points/factors for the BestFit method
 is calculated seperatly and have to be inserted by hand. The up an down factors are symmetric around the nominal value.
@@ -148,35 +156,23 @@ year(year_)
 
   string jec_jet_coll = "AK4PFchs";
 
-  if (isMC)
-  {
+  if (isMC){
     jet_corrector_MC.reset(new YearSwitcher(ctx));
     jet_corrector_MC->setup2016v3(std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesMC(jec_tag_2016, jec_ver_2016, jec_jet_coll),jet_collection_rec));
     jet_corrector_MC->setup2017v2(std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesMC(jec_tag_2017, jec_ver_2017, jec_jet_coll),jet_collection_rec));
     jet_corrector_MC->setup2018(std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesMC(jec_tag_2018, jec_ver_2018, jec_jet_coll),jet_collection_rec));
-  }
 
-  else
-  {
-    jec_switcher_16.reset(new RunSwitcher(ctx, "2016"));
-    for (const auto & runItr : runPeriods2016) { // runPeriods defined in common/include/Utils.h
-      jec_switcher_16->setupRun(runItr, std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesDATA(jec_tag_2016, jec_ver_2016, jec_jet_coll, runItr),jet_collection_rec));
-    }
+    corrector_MC_2016 = build_corrector(JERFiles::JECFilesMC(jec_tag_2016, jec_ver_2016, jec_jet_coll));
+    uncertainty_MC_2016 = corrector_uncertainty(JERFiles::JECFilesMC(jec_tag_2016, jec_ver_2016, jec_jet_coll));
 
-    jec_switcher_17.reset(new RunSwitcher(ctx, "2017"));
-    for (const auto & runItr : runPeriods2017) {
-      jec_switcher_17->setupRun(runItr, std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesDATA(jec_tag_2017, jec_ver_2017, jec_jet_coll, runItr),jet_collection_rec));
-    }
+    corrector_MC_2017 = build_corrector(JERFiles::JECFilesMC(jec_tag_2017, jec_ver_2017, jec_jet_coll));
+    uncertainty_MC_2017 = corrector_uncertainty(JERFiles::JECFilesMC(jec_tag_2017, jec_ver_2017, jec_jet_coll));
 
-    jec_switcher_18.reset(new RunSwitcher(ctx, "2018"));
-    for (const auto & runItr : runPeriods2018) {
-      jec_switcher_18->setupRun(runItr, std::make_shared<GenericSubJetCorrector>(ctx, JERFiles::JECFilesDATA(jec_tag_2018, jec_ver_2018, jec_jet_coll, runItr),jet_collection_rec));
-    }
+    corrector_MC_2018 = build_corrector(JERFiles::JECFilesMC(jec_tag_2018, jec_ver_2018, jec_jet_coll));
+    uncertainty_MC_2018 = corrector_uncertainty(JERFiles::JECFilesMC(jec_tag_2018, jec_ver_2018, jec_jet_coll));
 
-    jet_corrector_data.reset(new YearSwitcher(ctx));
-    jet_corrector_data->setup2016v3(jec_switcher_16);
-    jet_corrector_data->setup2017v2(jec_switcher_17);
-    jet_corrector_data->setup2018(jec_switcher_18);
+  } else{
+    throw runtime_error("JMS should not be applied to data!");
   }
 
   // ---------------------------------------------------------------------------------------------------------------
@@ -236,14 +232,20 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
   if(debug) std::cout << "\nBestFit: Get oldsubjets";
   std::vector<Jet> oldsubjets = oldjets.at(0).subjets();
   if(debug) std::cout << "\nBestFit: number oldsubjets " << oldsubjets.size() << endl;
-  vector<double> factor_X, factor_J;
-  if(debug) std::cout << "\nBestFit: Get X_factor";
-  for (auto & jet : oldsubjets)
-  {
-    factor_X.push_back(get_factor_XCone(jet.pt(), jet.eta(), point_X));
-  }
+  // first get JEC factors
+  vector<double> factor_J;
   if(debug) std::cout << "\nBestFit: Get J_factor";
-  factor_J = jet_corrector_MC->get_factor_JEC_year(event, point_J);
+  if(year == Year::is2016v3) factor_J = get_factor_JEC(*corrector_MC_2016, oldsubjets, event, uncertainty_MC_2016, point_J);
+  else if(year == Year::is2017v2) factor_J = get_factor_JEC(*corrector_MC_2017, oldsubjets, event, uncertainty_MC_2017, point_J);
+  else if(year == Year::is2018) factor_J = get_factor_JEC(*corrector_MC_2018, oldsubjets, event, uncertainty_MC_2018, point_J);
+  // Now get XCone factor using corrected jet
+  vector<double> factor_X;
+  if(debug) std::cout << "\nBestFit: Get X_factor";
+  for (unsigned int i=0; i<oldsubjets.size(); i++){
+    double pt = oldsubjets[i].pt()*factor_J[i];
+    double eta = oldsubjets[i].eta();
+    factor_X.push_back(get_factor_XCone(pt, eta, point_X));
+  }
 
   // Apply new correction factors for each subjet ------------------------------------------------------------------
   if(debug) std::cout << "\nBestFit: Set newsubjets";
@@ -253,6 +255,9 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
 
   for(unsigned int subjet=0; subjet<factor_J.size(); subjet++)
   {
+    if(debug) cout << "Factor JEC   = " << factor_J[subjet] << endl;
+    if(debug) cout << "Factor XCone = " << factor_X[subjet] << endl;
+
     newsubjets_v4.push_back(jet_to_tlorentz(oldsubjets[subjet]));
     newsubjets_v4[subjet] *= factor_J[subjet]*factor_X[subjet];
 
@@ -284,4 +289,65 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
   // return mass _--------------------------------------------------------------------------------------------------
   return xcone_had_jms_JER_v4.M();
   if(debug) std::cout << "\n\n";
+}
+
+
+
+
+
+std::unique_ptr<FactorizedJetCorrector> build_corrector(const std::vector<std::string> & filenames){
+  std::vector<JetCorrectorParameters> pars;
+  for(const auto & filename : filenames){
+    pars.emplace_back(locate_file(filename));
+  }
+  return uhh2::make_unique<FactorizedJetCorrector>(pars);
+}
+
+vector<double> CorrectionFactor_JMS::get_factor_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc, double point_J){
+  vector<double> JEC_factors;
+  for(unsigned int i=0; i<subjets.size(); i++){
+    auto factor_raw = subjets[i].JEC_factor_raw();
+    corrector.setJetPt(subjets[i].pt() * factor_raw);
+    corrector.setJetEta(subjets[i].eta());
+    corrector.setJetE(subjets[i].energy() * factor_raw);
+    corrector.setJetA(subjets[i].jetArea());
+    corrector.setJetPhi(subjets[i].phi());
+    corrector.setRho(event.rho);
+    auto correctionfactors = corrector.getSubCorrections();
+    auto correctionfactor = correctionfactors.back();
+
+    LorentzVector jet_v4_corrected = subjets[i].v4() * (factor_raw *correctionfactor);
+
+    // get factor for up variation
+    // ignore jets with very low pt or high eta, avoiding a crash from the JESUncertainty tool
+    double pt = jet_v4_corrected.Pt();
+    double eta = jet_v4_corrected.Eta();
+    jec_unc->setJetEta(eta);
+    jec_unc->setJetPt(pt);
+
+    double unc = 0.;
+    unc = jec_unc->getUncertainty(true);
+    double correctionfactor_up = correctionfactor * (1 + fabs(unc));
+
+    // now calculate old factor
+    double correctionfactor_jms = correctionfactor + point_J * fabs(correctionfactor_up-correctionfactor);
+    JEC_factors.push_back(correctionfactor_jms);
+  }
+  return JEC_factors;
+}
+
+JetCorrectionUncertainty* corrector_uncertainty(const std::vector<std::string> & filenames){
+  //take name from the L1FastJet correction (0th element of filenames) and replace "L1FastJet" by "UncertaintySources" to get the proper name of the uncertainty file
+  TString unc_file = locate_file(filenames[0]);
+  if (unc_file.Contains("L1FastJet")) {
+    unc_file.ReplaceAll("L1FastJet","UncertaintySources");
+  }
+  else if (unc_file.Contains("L2Relative")) {
+    unc_file.ReplaceAll("L2Relative","UncertaintySources");
+  }
+  else {
+    throw runtime_error("WARNING No JEC Uncertainty File found!");
+  }
+  JetCorrectionUncertainty* jec_uncertainty = new JetCorrectionUncertainty(*(new JetCorrectorParameters(unc_file.Data(), "Total")));
+  return jec_uncertainty;
 }

@@ -10,12 +10,8 @@
 #include "UHH2/common/include/JetCorrectionSets.h"
 #include "UHH2/common/include/YearRunSwitchers.h"
 
-#include "UHH2/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "UHH2/JetMETObjects/interface/JetCorrectorParameters.h"
-
 #include "UHH2/MTopJet/include/GenericSubJetCorrector_flavor.h"
 #include "UHH2/MTopJet/include/Vector_utils.h"
-
 
 #include <vector>
 #include <iostream>
@@ -29,7 +25,7 @@
 using namespace std;
 using namespace uhh2;
 
-
+class FactorizedJetCorrector;
 
 class CorrectionFactor_JMS: public uhh2::AnalysisModule{
 public:
@@ -63,9 +59,11 @@ private:
   TGraph *AdditionalSys;
 
   // JEC -----------------------------------------------------------------------
-
+  vector<double> get_factor_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc, double point_J);
   JetCorrectionUncertainty* jec_uncertainty;
   int direction =0; // -1 = down, +1 = up, 0 = nominal
   std::unique_ptr<FactorizedJetCorrector> corrector;
+  std::unique_ptr<FactorizedJetCorrector> corrector_MC_2016, corrector_MC_2017, corrector_MC_2018;
+  JetCorrectionUncertainty *uncertainty_MC_2016, *uncertainty_MC_2017, *uncertainty_MC_2018;
 
 };
