@@ -459,12 +459,18 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
         if(isMC){
           if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
         }
-        else if(isElectronStream){
-          if(!trigger_el_B->passes(event))  passed_recsel = false;
-        }
-        else if(isPhotonStream){
-          if(trigger_el_B->passes(event))  passed_recsel = false;
-          if(!trigger_el_C->passes(event))  passed_recsel = false;
+        else{
+          // Treat 2018 differently because of combined strem
+          if(year == Year::is2018){
+            if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) )passed_recsel = false;
+          }
+          else if(isElectronStream){
+            if(!trigger_el_B->passes(event))  passed_recsel = false;
+          }
+          else if(isPhotonStream){
+            if(trigger_el_B->passes(event))  passed_recsel = false;
+            if(!trigger_el_C->passes(event))  passed_recsel = false;
+          }
         }
       }
     }
