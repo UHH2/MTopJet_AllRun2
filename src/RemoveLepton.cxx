@@ -4,7 +4,7 @@ RemoveLepton::RemoveLepton(uhh2::Context & ctx, const std::string & name_jet):
 h_topjets(ctx.get_handle<std::vector<TopJet>>(name_jet)){}
 
 bool RemoveLepton::process(uhh2::Event & event){
-  std::vector<TopJet> topjets = event.get(h_topjets);
+  std::vector<TopJet>   topjets = event.get(h_topjets);
   std::vector<Particle> leptons;
   for(unsigned int i=0; i<event.muons->size(); i++){
     leptons.push_back(event.muons->at(i));

@@ -69,16 +69,16 @@ int main(int argc, char* argv[]){
   }
 
   // fit histograms and extract mean/median value
-  TH1F * resolution  = GetResoPlot(reso, use_median);
+  TH1F * resolution       = GetResoPlot(reso, use_median);
   TH1F * resolution_noJEC = GetResoPlot(reso_noJEC, use_median);
-  TH1F * resolution_cor = GetResoPlot(reso_cor, use_median);
+  TH1F * resolution_cor   = GetResoPlot(reso_cor, use_median);
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
   // calculate non-closure as function of ptrec
   // arguments: (hists, use median?, do ptrec?, mean or error)
-  vector<double> pt = GetMeans(ptrec, use_median, true, "mean");
-  vector<double> pt_err = GetMeans(ptrec, use_median, true, "error");
-  vector<double> MeanForUncert = GetMeans(reso_cor, use_median, false, "mean");
+  vector<double> pt                = GetMeans(ptrec, use_median, true, "mean");
+  vector<double> pt_err            = GetMeans(ptrec, use_median, true, "error");
+  vector<double> MeanForUncert     = GetMeans(reso_cor, use_median, false, "mean");
   vector<double> MeanForUncert_err = GetMeans(reso_cor, use_median, false, "error");
   ////
   TGraphErrors* non_closure = new TGraphErrors(n_ptbin, &pt[0], &MeanForUncert[0], &pt_err[0], &MeanForUncert_err[0]);
@@ -88,8 +88,8 @@ int main(int argc, char* argv[]){
   int n_last = MeanForUncert.size()-1;
   non_closure->SetPoint(non_closure->GetN(), 600, MeanForUncert[n_last]);
 
-  TGraph* area = AreaFromEnvelope(non_closure, "area");
-  TGraph* upvar = AreaFromEnvelope(non_closure, "up");
+  TGraph* area    = AreaFromEnvelope(non_closure, "area");
+  TGraph* upvar   = AreaFromEnvelope(non_closure, "up");
   TGraph* downvar = AreaFromEnvelope(non_closure, "down");
 
   //-----------------------------------------------------------------------

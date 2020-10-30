@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char* argv[]){
   print_seperater();
 
-  bool debug = true;
+  bool debug = false;
   cout.precision(6);
 
   if(argc != 2){
@@ -22,8 +22,8 @@ int main(int argc, char* argv[]){
 
   // #################################################################################################
   // Print Options ###################################################################################
-  Int_t oldLevel = gErrorIgnoreLevel;
-  // Set by: gErrorIgnoreLevel = ...
+  Int_t oldLevel    = gErrorIgnoreLevel;
+  gErrorIgnoreLevel = kWarning;          // suppress TCanvas output
 
   // Year --------------------------------------------------------------------------------------------
   if(debug) cout << "Getting Input Variables" << endl;
@@ -230,10 +230,10 @@ int main(int argc, char* argv[]){
     // Get SYS #########################################################################################
     if(debug) cout << "JEC 1695" << endl;
 
-    TFile *JECup_1695_file = new TFile(dir+year+"/muon/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695.root");
+    TFile *JECup_1695_file   = new TFile(dir+year+"/muon/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695.root");
     TFile *JECdown_1695_file = new TFile(dir+year+"/muon/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695.root");
-    TH1F  *JECup_1695      = (TH1F*)JECup_1695_file->Get(w_mass);
-    TH1F  *JECdown_1695    = (TH1F*)JECdown_1695_file->Get(w_mass);
+    TH1F  *JECup_1695        = (TH1F*)JECup_1695_file->Get(w_mass);
+    TH1F  *JECdown_1695      = (TH1F*)JECdown_1695_file->Get(w_mass);
     JECup_1695->Add(bkg, 1);
     JECdown_1695->Add(bkg, 1);
     TH1F          *JECup_1695_norm       = normalize(JECup_1695);
@@ -405,21 +405,30 @@ int main(int argc, char* argv[]){
       for(int factor=0; factor<5; factor++){ // First only nominal
         // if(factor==1||factor==2) continue;
         // if(factor==3||factor==4) continue;
+        // if(factor==1) continue;
 
-        double bin_content_nom = hists[factor]->GetBinContent(bin+1);
-        double bin_error_nom = hists_err[factor][bin];
+        double bin_content_nom  = hists[factor]->GetBinContent(bin+1);
+        double bin_error_nom    = hists_err[factor][bin];
         double bin_content_1695 = hists_1695[factor]->GetBinContent(bin+1);
-        double bin_error_1695 = hists_1695_err[factor][bin];
+        double bin_error_1695   = hists_1695_err[factor][bin];
         double bin_content_1755 = hists_1755[factor]->GetBinContent(bin+1);
-        double bin_error_1755 = hists_1755_err[factor][bin];
+        double bin_error_1755   = hists_1755_err[factor][bin];
 
         double diff_n6 = fabs(bin_content_nom-bin_content_1695);
         double diff_n7 = fabs(bin_content_nom-bin_content_1755);
         double diff_67 = fabs(bin_content_1695-bin_content_1755);
 
-        double err_n6  = 2*sqrt(pow(bin_error_nom,2)+pow(bin_error_1695,2));
-        double err_n7  = 2*sqrt(pow(bin_error_nom,2)+pow(bin_error_1755,2));
-        double err_67  = 2*sqrt(pow(bin_error_1695,2)+pow(bin_error_1695,2));
+        // double err_n6 = 1*sqrt(pow(bin_error_nom,2)+pow(bin_error_1695,2));
+        // double err_n7 = 1*sqrt(pow(bin_error_nom,2)+pow(bin_error_1755,2));
+        // double err_67 = 1*sqrt(pow(bin_error_1695,2)+pow(bin_error_1695,2));
+
+        // double err_n6 = 2*sqrt(pow(bin_error_nom,2)+pow(bin_error_1695,2));
+        // double err_n7 = 2*sqrt(pow(bin_error_nom,2)+pow(bin_error_1755,2));
+        // double err_67 = 2*sqrt(pow(bin_error_1695,2)+pow(bin_error_1695,2));
+
+        double err_n6 = 3*sqrt(pow(bin_error_nom,2)+pow(bin_error_1695,2));
+        double err_n7 = 3*sqrt(pow(bin_error_nom,2)+pow(bin_error_1755,2));
+        double err_67 = 3*sqrt(pow(bin_error_1695,2)+pow(bin_error_1695,2));
 
         // #################################################################################################
         // Start ###########################################################################################
@@ -452,349 +461,350 @@ int main(int argc, char* argv[]){
 
 
     // // RESET -----------------------------------------------------------------------------------------------
-    // int overlap_ptbin_n6=0    ; int overlap_ptbin_n7=0    ; int overlap_ptbin_67=0    ; int overlap_ptbin_all=0;
-    // int overlap_ptbin_sys_n6=0; int overlap_ptbin_sys_n7=0; int overlap_ptbin_sys_67=0; int overlap_ptbin_sys_all=0;
-    // int total_points_ptbin=0  ; int total_points_ptbin_sys=0;
-
-    // /*
-    // .███████ ████████  █████  ██████  ████████     ███    ███  █████  ███████ ███████
-    // .██         ██    ██   ██ ██   ██    ██        ████  ████ ██   ██ ██      ██
-    // .███████    ██    ███████ ██████     ██        ██ ████ ██ ███████ ███████ ███████
-    // .     ██    ██    ██   ██ ██   ██    ██        ██  ██  ██ ██   ██      ██      ██
-    // .███████    ██    ██   ██ ██   ██    ██        ██      ██ ██   ██ ███████ ███████
-    // */
-    //
-    // for(unsigned int mass=0; mass<3; mass++){ // 0-nominal; 1-1695; 2-1755
-    //   vector<TF2*>    all_fits;      // Fill later - Declare befor loop
-    //   vector<TString> str_all_fits;  // Fill later - Declare befor loop
-    //   /*
-    //   ███████ ██ ████████     ██       ██████   ██████  ██████
-    //   ██      ██    ██        ██      ██    ██ ██    ██ ██   ██
-    //   █████   ██    ██        ██      ██    ██ ██    ██ ██████
-    //   ██      ██    ██        ██      ██    ██ ██    ██ ██
-    //   ██      ██    ██        ███████  ██████   ██████  ██
-    //   */
-    //   TLegend *leg;
-    //   print_seperater();
-    //   if(debug) cout << "Start: looping over bins - mass " << mass << endl;
-    // for(int bin=0; bin < number_bins; bin++){
-    //   if(!(find(peak_bins_v.begin(), peak_bins_v.end(), bin+1) != peak_bins_v.end())) continue;
-    //   if(debug) cout << "---------------------------------------------------------------------------------------- " << bin+1 << endl;
-    //   if(debug) cout << mass_bin[bin] << endl;
-
-    // // #################################################################################################
-    // // Fill Vectors ####################################################################################
-    // if(debug) cout << "Get Bin Content" << endl;
-    //
-    // int bin_h = bin+1;
-    // vector<double> bin_content, bin_content_err;
-    //
-    // for(int factor=0; factor<n_factors; factor++){
-    //   if(mass==0){
-    //     bin_content.push_back(hists[factor]->GetBinContent(bin+1));
-    //     bin_content_err.push_back(hists_err[factor][bin]);
-    //   }
-    //   else if(mass==1){
-    //     bin_content.push_back(hists_1695[factor]->GetBinContent(bin+1));
-    //     bin_content_err.push_back(hists_1695_err[factor][bin]);
-    //   }
-    //   else if(mass==2){
-    //     bin_content.push_back(hists_1755[factor]->GetBinContent(bin+1));
-    //     bin_content_err.push_back(hists_1755_err[factor][bin]);
-    //   }
-    // }
-    //
-    // if(mass==0){
-    //   hists_cont.push_back(bin_content);
-    //   hists_cont_err.push_back(bin_content_err);
-    // }
-    // else if(mass==1){
-    //   hists_1695_cont.push_back(bin_content);
-    //   hists_1695_cont_err.push_back(bin_content_err);
-    // }
-    // else if(mass==2){
-    //   hists_1755_cont.push_back(bin_content);
-    //   hists_1755_cont_err.push_back(bin_content_err);
-    // }
-    //
-    // // #################################################################################################
-    // // Set TGraph ######################################################################################
-    // if(debug) cout << "TGraphError - Single bin " << bin_h << endl;
-    // TGraph2DErrors *bin_fit = new TGraph2DErrors(5, &factor_x[0], &factor_y[0],&bin_content[0],&error_x[0],&error_y[0],&bin_content_err[0]);
-    // bin_fit->SetTitle(mass_bin[bin]);
-    // bin_fit->SetName(number_bin[bin]);
-    // bin_fit->SetMarkerStyle(kFullCircle);
-    // bin_fit->SetMarkerColor(kBlack);
-    // bin_fit->SetMarkerSize(0.5);
-    // bin_fit->SetLineColor(kBlack);
-    //
-    // // #################################################################################################
-    // // set fit function ################################################################################
-    // if(debug) cout << "\nDefine fit function" << endl;
-    // // TF2 *fit_con   = new TF2("fit_con",  "[0]");
-    // // Declared here, because they are reseted each bin
-    // TF2 *fit_lin  = new TF2("fit_lin",  str_fits[0][0]);
-    // TF2 *fit_xy2  = new TF2("fit_xy2",  str_fits[1][0]);
-    // TF2 *fit_x2y  = new TF2("fit_x2y",  str_fits[1][1]);
-    // TF2 *fit_xyy2 = new TF2("fit_xyy2", str_fits[2][0]);
-    // TF2 *fit_xx2y = new TF2("fit_xx2y", str_fits[2][1]);
-    // TF2 *fit_quad = new TF2("fit_quad", str_fits[3][0]);
-    // TF2 *fit_poly = new TF2("fit_poly", str_fits[4][0]);
-    // vector<vector<TF2*>> fits = {{fit_lin}, {fit_xy2, fit_x2y}, {fit_xyy2, fit_xx2y}, {fit_quad}, {fit_poly}};
-    //
-    // // #################################################################################################
-    // // Fit Bin #########################################################################################
-    // if(debug) cout << "Start: Fitting" << endl;
-
-    // /*
-    // ███████ ██ ████████
-    // ██      ██    ██
-    // █████   ██    ██
-    // ██      ██    ██
-    // ██      ██    ██
-    // */
-    //
-    // double chi2_fit, chi2_fit1, chi2_fit2;
-    // double prob, prob1, prob2;
-    // TF2 *used_fit;
-    // int order_index = 0; int index_fit = 0;
-    // for(unsigned int order=0; order<fits.size(); order++){
-    //   if(debug) cout << "\nfit a "+name_fits[order][0]+" function ------------\n";
-    //   bool twoFits = fits[order].size()==2;
-    //
-    //   bin_fit->Fit(fits[order][0], "Q");
-    //   if(twoFits) bin_fit->Fit(fits[order][1], "Q");
-    //
-    //   // -----------------------------------------------------------------------
-    //   if(debug) cout << "Chi2" << endl;
-    //   chi2_fit1 = fits[order][0]->GetChisquare();
-    //   if(twoFits) chi2_fit2 = fits[order][1]->GetChisquare();
-    //
-    //   // -----------------------------------------------------------------------
-    //   if(debug) cout << "prob" << endl;
-    //
-    //   prob1 = TMath::Prob(chi2_fit1,  ndfs[order][0]);
-    //   if(twoFits) prob2 = TMath::Prob(chi2_fit2, ndfs[order][1]);
-    //
-    //   prob = prob1;
-    //   chi2_fit = chi2_fit1;
-    //   index_fit = 0;
-    //   if(twoFits && (prob1 < prob2)){
-    //     prob = prob2;
-    //     chi2_fit = chi2_fit2;
-    //     index_fit = 1;
-    //   }
-    //   if(debug) cout << "ndfs: " << ndfs[order][index_fit] << " | chi2: " << chi2_fit <<" | prob: " << prob << endl;
-    //
-    //   // -----------------------------------------------------------------------
-    //   if(prob>0.05 || ndfs[order][0]==0){ // prob > 0.05 is common in data science
-    //     cout << "Bin " << number_bin[bin] << ": A " << GREEN << name_fits[order][index_fit] << RESET << " fit fullfills the criterion (" << prob << ")" << endl;
-    //     used_fit = new TF2(*fits[order][index_fit]);        // used in Loop
-    //     all_fits.push_back(fits[order][index_fit]);         // TF2*    - used in Projection
-    //     str_all_fits.push_back(str_fits[order][index_fit]); // TString - used in Projection
-    //     all_n_para.push_back(n_fit_para[order][index_fit]); // int     - used in Projection
-    //     break;
-    //   }
-    // }
-    // }
-
-    /*
-    ███████ ██ ████████     ███████ ███    ██ ██████
-    ██      ██    ██        ██      ████   ██ ██   ██
-    █████   ██    ██        █████   ██ ██  ██ ██   ██
-    ██      ██    ██        ██      ██  ██ ██ ██   ██
-    ██      ██    ██        ███████ ██   ████ ██████
-    */
+    // overlap_ptbin_n6=0    ; overlap_ptbin_n7=0    ; overlap_ptbin_67=0    ; overlap_ptbin_all=0;
+    // overlap_ptbin_sys_n6=0; overlap_ptbin_sys_n7=0; overlap_ptbin_sys_67=0; overlap_ptbin_sys_all=0;
+    // total_points_ptbin=0  ; total_points_ptbin_sys=0;
 
     //   /*
-    //   ██████  ██████   ██████       ██ ███████  ██████ ████████ ██  ██████  ███    ██
-    //   ██   ██ ██   ██ ██    ██      ██ ██      ██         ██    ██ ██    ██ ████   ██
-    //   ██████  ██████  ██    ██      ██ █████   ██         ██    ██ ██    ██ ██ ██  ██
-    //   ██      ██   ██ ██    ██ ██   ██ ██      ██         ██    ██ ██    ██ ██  ██ ██
-    //   ██      ██   ██  ██████   █████  ███████  ██████    ██    ██  ██████  ██   ████
+    //   .███████ ████████  █████  ██████  ████████     ███    ███  █████  ███████ ███████
+    //   .██         ██    ██   ██ ██   ██    ██        ████  ████ ██   ██ ██      ██
+    //   .███████    ██    ███████ ██████     ██        ██ ████ ██ ███████ ███████ ███████
+    //   .     ██    ██    ██   ██ ██   ██    ██        ██  ██  ██ ██   ██      ██      ██
+    //   .███████    ██    ██   ██ ██   ██    ██        ██      ██ ██   ██ ███████ ███████
     //   */
-    //   cout << "\n####################################################################\n";
-    //   cout << "######################### Projection ###############################\n";
-    //   cout << "####################################################################\n";
     //
-    //   vector<TString> factor_name = {"JEC", "XC"};
-    //   // #################################################################################################
-    //   // Which correction ################################################################################
-    //   for(int factor=0; factor<2; factor++){
-    //     if(debug) cout << "------------------------------------------------------- " << factor_name[factor] << endl;
-    //     vector<double> oneD_factor     = {-1,0,1};
-    //     vector<double> oneD_factor_err = { 0,0,0};
-    //
-    //     // #################################################################################################
-    //     // Bins ############################################################################################
-    //     int empty_bins = 0; // to skip empty bins
-    //     for(int bin=0; bin<number_bins; bin++){
-    //       if(!(find(peak_bins_v.begin(), peak_bins_v.end(), bin+1) != peak_bins_v.end())){ // Search_peackmethod
-    //         empty_bins++;
-    //         continue;
-    //       }
-    //
-    //       int used_bin = bin-empty_bins;
-    //       vector<double> oneD_events, oneD_events_err;
-    //       vector<vector<double>> hists_cont_gen, hists_cont_gen_err;
-    //       if(mass==0){
-    //         hists_cont_gen    =hists_cont;
-    //         hists_cont_gen_err=hists_cont_err;
-    //       } else if(mass==1){
-    //         hists_cont_gen    =hists_1695_cont;
-    //         hists_cont_gen_err=hists_1695_cont_err;
-    //       } else if(mass==2){
-    //         hists_cont_gen    =hists_1755_cont;
-    //         hists_cont_gen_err=hists_1755_cont_err;
-    //       }
-    //       if(factor==0){
-    //         oneD_events     = {hists_cont_gen[used_bin][1], hists_cont_gen[used_bin][0], hists_cont_gen[used_bin][2]};
-    //         oneD_events_err = {hists_cont_gen_err[used_bin][1], hists_cont_gen_err[used_bin][0], hists_cont_gen_err[used_bin][2]};
-    //       } else if(factor==1){
-    //         oneD_events     = {hists_cont_gen[used_bin][3], hists_cont_gen[used_bin][0], hists_cont_gen[used_bin][4]};
-    //         oneD_events_err = {hists_cont_gen_err[used_bin][3], hists_cont_gen_err[used_bin][0], hists_cont_gen_err[used_bin][4]};
-    //       }
-    //
-    //       // XCone -----------------------------------------------------------------------------------------
-    //       TString str_fit = str_all_fits[used_bin];
-    //       if     (factor==0) str_fit.ReplaceAll("y", "0");
-    //       else if(factor==1){
-    //         str_fit.ReplaceAll("x", "0");
-    //         str_fit.ReplaceAll("y", "x"); // 1D Graph only takes x as argument
-    //       }
-    //
-    //       TF1 *fit = new TF1("fit", str_fit, -2, 2);
-    //       TGraphErrors *graph = new TGraphErrors(3, &oneD_factor[0], &oneD_events[0], &oneD_factor_err[0], &oneD_events_err[0]);
-    //       for(int ipar=0; ipar<all_n_para[used_bin]; ipar++) fit->SetParameter(ipar, all_fits[used_bin]->GetParameter(ipar));
-    //
-    //       if     (mass==0){
-    //         if(factor==0) bin_graph_jec_nom.push_back(graph);
-    //         if(factor==1) bin_graph_xc_nom.push_back(graph);
-    //
-    //         if(factor==0) bin_function_jec_nom.push_back(fit);
-    //         if(factor==1) bin_function_xc_nom.push_back(fit);
-    //       }
-    //       else if(mass==1) {
-    //         if(factor==0) bin_graph_jec_1695.push_back(graph);
-    //         if(factor==1) bin_graph_xc_1695.push_back(graph);
-    //
-    //         if(factor==0) bin_function_jec_1695.push_back(fit);
-    //         if(factor==1) bin_function_xc_1695.push_back(fit);
-    //       }
-    //       else if(mass==2) {
-    //         if(factor==0) bin_graph_jec_1755.push_back(graph);
-    //         if(factor==1) bin_graph_xc_1755.push_back(graph);
-    //
-    //         if(factor==0) bin_function_jec_1755.push_back(fit);
-    //         if(factor==1) bin_function_xc_1755.push_back(fit);
-    //       }
-    //     }
-    //   }
-    // }
-
-    /*
-    ███    ███  █████  ███████ ███████     ███████ ███    ██ ██████
-    ████  ████ ██   ██ ██      ██          ██      ████   ██ ██   ██
-    ██ ████ ██ ███████ ███████ ███████     █████   ██ ██  ██ ██   ██
-    ██  ██  ██ ██   ██      ██      ██     ██      ██  ██ ██ ██   ██
-    ██      ██ ██   ██ ███████ ███████     ███████ ██   ████ ██████
-    */
-    // cout << peak_bins_v.size() << endl;
-    // cout << bin_function_jec_nom.size()  << "     " << bin_graph_jec_nom.size() << endl;
-    // cout << bin_function_jec_1695.size() << "     " << bin_graph_jec_1695.size() << endl;
-    // cout << bin_function_jec_1755.size() << "     " << bin_graph_jec_1755.size() << endl;
-    //
-    // int correct_bin = peak_bins_v[0];
-    //
-    // for(unsigned int factor=0; factor<2; factor++){
-    //   for(unsigned int i=0; i<peak_bins_v.size(); i++){
-    //     TGraphErrors* bin_graph_nom, *bin_graph_1695, *bin_graph_1755;
-    //     TF1* bin_function_nom, *bin_function_1695, *bin_function_1755;
-    //     if(factor==0){
-    //       bin_function_nom  =bin_function_jec_nom[i];
-    //       bin_function_1695 =bin_function_jec_1695[i];
-    //       bin_function_1755 =bin_function_jec_1755[i];
-    //
-    //       bin_graph_nom     =bin_graph_jec_nom[i];
-    //       bin_graph_1695    =bin_graph_jec_1695[i];
-    //       bin_graph_1755    =bin_graph_jec_1755[i];
-    //     }
-    //     else{
-    //       bin_function_nom  =bin_function_xc_nom[i];
-    //       bin_function_1695 =bin_function_xc_1695[i];
-    //       bin_function_1755 =bin_function_xc_1755[i];
-    //
-    //       bin_graph_nom     =bin_graph_xc_nom[i];
-    //       bin_graph_1695    =bin_graph_xc_1695[i];
-    //       bin_graph_1755    =bin_graph_xc_1755[i];
-    //     }
-    //
-    //
-    //     bin_graph_nom->SetTitle(mass_bin[i+correct_bin]);
-    //     if(factor==0) bin_graph_nom->GetXaxis()->SetTitle("JEC");
-    //     else          bin_graph_nom->GetXaxis()->SetTitle("XCone");
-    //     bin_graph_nom->SetMarkerColor(kBlack);
-    //     bin_graph_nom->SetMarkerStyle(kFullCircle);
-    //     bin_graph_nom->SetMarkerSize(0.5);
-    //     bin_graph_nom->SetLineColor(kBlack);
-    //     bin_graph_nom->GetXaxis()->SetLimits(-1.1,1.1);
-    //     bin_function_nom->SetLineColor(kBlack);
-    //
-    //     double xn, yn;
-    //     bin_graph_nom->GetPoint(1, xn, yn);
-    //     bin_graph_nom->GetYaxis()->SetRangeUser(yn/2, yn*1.5);
-    //
-    //     bin_graph_1695->SetMarkerColor(kRed);
-    //     bin_graph_1695->SetMarkerStyle(kFullCircle);
-    //     bin_graph_1695->SetMarkerSize(0.5);
-    //     bin_graph_1695->SetLineColor(kRed);
-    //     bin_function_1695->SetLineColor(kRed);
-    //
-    //     bin_graph_1755->SetMarkerColor(kBlue);
-    //     bin_graph_1755->SetMarkerStyle(kFullCircle);
-    //     bin_graph_1755->SetMarkerSize(0.5);
-    //     bin_graph_1755->SetLineColor(kBlue);
-    //     bin_function_1755->SetLineColor(kBlue);
-    //
-    //     TCanvas *E2;
+    //   for(unsigned int mass=0; mass<3; mass++){ // 0-nominal; 1-1695; 2-1755
+    //     vector<TF2*>    all_fits;      // Fill later - Declare befor loop
+    //     vector<TString> str_all_fits;  // Fill later - Declare befor loop
+    //     /*
+    //     ███████ ██ ████████     ██       ██████   ██████  ██████
+    //     ██      ██    ██        ██      ██    ██ ██    ██ ██   ██
+    //     █████   ██    ██        ██      ██    ██ ██    ██ ██████
+    //     ██      ██    ██        ██      ██    ██ ██    ██ ██
+    //     ██      ██    ██        ███████  ██████   ██████  ██
+    //     */
     //     TLegend *leg;
-    //     if(factor==0) E2 = new TCanvas(number_bin[i+correct_bin]+"E2_JEC_"+to_string(ptbin), "E2", 600, 600);
-    //     else          E2 = new TCanvas(number_bin[i+correct_bin]+"E2_XC_"+to_string(ptbin), "E2", 600, 600);
-    //     bin_graph_nom->Draw("AP");
-    //     bin_graph_1695->Draw("SAME P");
-    //     bin_graph_1755->Draw("SAME P");
+    //     print_seperater();
+    //     if(debug) cout << "Start: looping over bins - mass " << mass << endl;
+    //     for(int bin=0; bin < number_bins; bin++){
+    //       if(!(find(peak_bins_v.begin(), peak_bins_v.end(), bin+1) != peak_bins_v.end())) continue;
+    //       if(debug) cout << "---------------------------------------------------------------------------------------- " << bin+1 << endl;
+    //       if(debug) cout << mass_bin[bin] << endl;
     //
-    //     bin_function_nom->Draw("SAME");
-    //     bin_function_1695->Draw("SAME");
-    //     bin_function_1755->Draw("SAME");
+    //       // #################################################################################################
+    //       // Fill Vectors ####################################################################################
+    //       if(debug) cout << "Get Bin Content" << endl;
     //
-    //     leg = new TLegend(0.20,0.65,0.40,0.85);
-    //     leg->AddEntry(bin_graph_nom ,"1725","pl");
-    //     leg->AddEntry(bin_graph_1695,"1695","pl");
-    //     leg->AddEntry(bin_graph_1755,"1755","pl");
-    //     leg->Draw();
+    //       int bin_h = bin+1;
+    //       vector<double> bin_content, bin_content_err;
     //
-    //     if(factor==0) E2->SaveAs(save_path_general+"/"+addition+"/Bin"+number_bin[i+correct_bin]+"_JEC.pdf");
-    //     else          E2->SaveAs(save_path_general+"/"+addition+"/Bin"+number_bin[i+correct_bin]+"_XC.pdf");
-    //     leg->Clear();
+    //       for(int factor=0; factor<n_factors; factor++){
+    //         if(mass==0){
+    //           bin_content.push_back(hists[factor]->GetBinContent(bin+1));
+    //           bin_content_err.push_back(hists_err[factor][bin]);
+    //         }
+    //         else if(mass==1){
+    //           bin_content.push_back(hists_1695[factor]->GetBinContent(bin+1));
+    //           bin_content_err.push_back(hists_1695_err[factor][bin]);
+    //         }
+    //         else if(mass==2){
+    //           bin_content.push_back(hists_1755[factor]->GetBinContent(bin+1));
+    //           bin_content_err.push_back(hists_1755_err[factor][bin]);
+    //         }
+    //       }
+    //
+    //       if(mass==0){
+    //         hists_cont.push_back(bin_content);
+    //         hists_cont_err.push_back(bin_content_err);
+    //       }
+    //       else if(mass==1){
+    //         hists_1695_cont.push_back(bin_content);
+    //         hists_1695_cont_err.push_back(bin_content_err);
+    //       }
+    //       else if(mass==2){
+    //         hists_1755_cont.push_back(bin_content);
+    //         hists_1755_cont_err.push_back(bin_content_err);
+    //       }
+    //
+    //       // #################################################################################################
+    //       // Set TGraph ######################################################################################
+    //       if(debug) cout << "TGraphError - Single bin " << bin_h << endl;
+    //       TGraph2DErrors *bin_fit = new TGraph2DErrors(5, &factor_x[0], &factor_y[0],&bin_content[0],&error_x[0],&error_y[0],&bin_content_err[0]);
+    //       bin_fit->SetTitle(mass_bin[bin]);
+    //       bin_fit->SetName(number_bin[bin]);
+    //       bin_fit->SetMarkerStyle(kFullCircle);
+    //       bin_fit->SetMarkerColor(kBlack);
+    //       bin_fit->SetMarkerSize(0.5);
+    //       bin_fit->SetLineColor(kBlack);
+    //
+    //       // #################################################################################################
+    //       // set fit function ################################################################################
+    //       if(debug) cout << "\nDefine fit function" << endl;
+    //       // TF2 *fit_con   = new TF2("fit_con",  "[0]");
+    //       // Declared here, because they are reseted each bin
+    //       TF2 *fit_lin  = new TF2("fit_lin",  str_fits[0][0]);
+    //       TF2 *fit_xy2  = new TF2("fit_xy2",  str_fits[1][0]);
+    //       TF2 *fit_x2y  = new TF2("fit_x2y",  str_fits[1][1]);
+    //       TF2 *fit_xyy2 = new TF2("fit_xyy2", str_fits[2][0]);
+    //       TF2 *fit_xx2y = new TF2("fit_xx2y", str_fits[2][1]);
+    //       TF2 *fit_quad = new TF2("fit_quad", str_fits[3][0]);
+    //       TF2 *fit_poly = new TF2("fit_poly", str_fits[4][0]);
+    //       vector<vector<TF2*>> fits = {{fit_lin}, {fit_xy2, fit_x2y}, {fit_xyy2, fit_xx2y}, {fit_quad}, {fit_poly}};
+    //
+    //       // #################################################################################################
+    //       // Fit Bin #########################################################################################
+    //       if(debug) cout << "Start: Fitting" << endl;
+    //
+    //       /*
+    //       ███████ ██ ████████
+    //       ██      ██    ██
+    //       █████   ██    ██
+    //       ██      ██    ██
+    //       ██      ██    ██
+    //       */
+    //
+    //       double chi2_fit, chi2_fit1, chi2_fit2;
+    //       double prob, prob1, prob2;
+    //       TF2 *used_fit;
+    //       int order_index = 0; int index_fit = 0;
+    //       for(unsigned int order=0; order<fits.size(); order++){
+    //         if(debug) cout << "\nfit a "+name_fits[order][0]+" function ------------\n";
+    //         bool twoFits = fits[order].size()==2;
+    //
+    //         bin_fit->Fit(fits[order][0], "Q");
+    //         if(twoFits) bin_fit->Fit(fits[order][1], "Q");
+    //
+    //         // -----------------------------------------------------------------------
+    //         if(debug) cout << "Chi2" << endl;
+    //         chi2_fit1 = fits[order][0]->GetChisquare();
+    //         if(twoFits) chi2_fit2 = fits[order][1]->GetChisquare();
+    //
+    //         // -----------------------------------------------------------------------
+    //         if(debug) cout << "prob" << endl;
+    //
+    //         prob1 = TMath::Prob(chi2_fit1,  ndfs[order][0]);
+    //         if(twoFits) prob2 = TMath::Prob(chi2_fit2, ndfs[order][1]);
+    //
+    //         prob = prob1;
+    //         chi2_fit = chi2_fit1;
+    //         index_fit = 0;
+    //         if(twoFits && (prob1 < prob2)){
+    //           prob = prob2;
+    //           chi2_fit = chi2_fit2;
+    //           index_fit = 1;
+    //         }
+    //         if(debug) cout << "ndfs: " << ndfs[order][index_fit] << " | chi2: " << chi2_fit <<" | prob: " << prob << endl;
+    //
+    //         // -----------------------------------------------------------------------
+    //         if(prob>0.05 || ndfs[order][0]==0){ // prob > 0.05 is common in data science
+    //           cout << "Bin " << number_bin[bin] << ": A " << GREEN << name_fits[order][index_fit] << RESET << " fit fullfills the criterion (" << prob << ")" << endl;
+    //           used_fit = new TF2(*fits[order][index_fit]);        // used in Loop
+    //           all_fits.push_back(fits[order][index_fit]);         // TF2*    - used in Projection
+    //           str_all_fits.push_back(str_fits[order][index_fit]); // TString - used in Projection
+    //           all_n_para.push_back(n_fit_para[order][index_fit]); // int     - used in Projection
+    //           break;
+    //         }
+    //       }
+    //     }
+    //
+    //     /*
+    //     ███████ ██ ████████     ███████ ███    ██ ██████
+    //     ██      ██    ██        ██      ████   ██ ██   ██
+    //     █████   ██    ██        █████   ██ ██  ██ ██   ██
+    //     ██      ██    ██        ██      ██  ██ ██ ██   ██
+    //     ██      ██    ██        ███████ ██   ████ ██████
+    //     */
+    //
+    //     /*
+    //     ██████  ██████   ██████       ██ ███████  ██████ ████████ ██  ██████  ███    ██
+    //     ██   ██ ██   ██ ██    ██      ██ ██      ██         ██    ██ ██    ██ ████   ██
+    //     ██████  ██████  ██    ██      ██ █████   ██         ██    ██ ██    ██ ██ ██  ██
+    //     ██      ██   ██ ██    ██ ██   ██ ██      ██         ██    ██ ██    ██ ██  ██ ██
+    //     ██      ██   ██  ██████   █████  ███████  ██████    ██    ██  ██████  ██   ████
+    //     */
+    //     cout << "\n####################################################################\n";
+    //     cout << "######################### Projection ###############################\n";
+    //     cout << "####################################################################\n";
+    //
+    //     vector<TString> factor_name = {"JEC", "XC"};
+    //     // #################################################################################################
+    //     // Which correction ################################################################################
+    //     for(int factor=0; factor<2; factor++){
+    //       if(debug) cout << "------------------------------------------------------- " << factor_name[factor] << endl;
+    //       vector<double> oneD_factor     = {-1,0,1};
+    //       vector<double> oneD_factor_err = { 0,0,0};
+    //
+    //       // #################################################################################################
+    //       // Bins ############################################################################################
+    //       int empty_bins = 0; // to skip empty bins
+    //       for(int bin=0; bin<number_bins; bin++){
+    //         if(!(find(peak_bins_v.begin(), peak_bins_v.end(), bin+1) != peak_bins_v.end())){ // Search_peackmethod
+    //           empty_bins++;
+    //           continue;
+    //         }
+    //
+    //         int used_bin = bin-empty_bins;
+    //         vector<double> oneD_events, oneD_events_err;
+    //         vector<vector<double>> hists_cont_gen, hists_cont_gen_err;
+    //         if(mass==0){
+    //           hists_cont_gen    =hists_cont;
+    //           hists_cont_gen_err=hists_cont_err;
+    //         } else if(mass==1){
+    //           hists_cont_gen    =hists_1695_cont;
+    //           hists_cont_gen_err=hists_1695_cont_err;
+    //         } else if(mass==2){
+    //           hists_cont_gen    =hists_1755_cont;
+    //           hists_cont_gen_err=hists_1755_cont_err;
+    //         }
+    //         if(factor==0){
+    //           oneD_events     = {hists_cont_gen[used_bin][1], hists_cont_gen[used_bin][0], hists_cont_gen[used_bin][2]};
+    //           oneD_events_err = {hists_cont_gen_err[used_bin][1], hists_cont_gen_err[used_bin][0], hists_cont_gen_err[used_bin][2]};
+    //         } else if(factor==1){
+    //           oneD_events     = {hists_cont_gen[used_bin][3], hists_cont_gen[used_bin][0], hists_cont_gen[used_bin][4]};
+    //           oneD_events_err = {hists_cont_gen_err[used_bin][3], hists_cont_gen_err[used_bin][0], hists_cont_gen_err[used_bin][4]};
+    //         }
+    //
+    //         // XCone -----------------------------------------------------------------------------------------
+    //         TString str_fit = str_all_fits[used_bin];
+    //         if     (factor==0) str_fit.ReplaceAll("y", "0");
+    //         else if(factor==1){
+    //           str_fit.ReplaceAll("x", "0");
+    //           str_fit.ReplaceAll("y", "x"); // 1D Graph only takes x as argument
+    //         }
+    //
+    //         TF1 *fit = new TF1("fit", str_fit, -2, 2);
+    //         TGraphErrors *graph = new TGraphErrors(3, &oneD_factor[0], &oneD_events[0], &oneD_factor_err[0], &oneD_events_err[0]);
+    //         for(int ipar=0; ipar<all_n_para[used_bin]; ipar++) fit->SetParameter(ipar, all_fits[used_bin]->GetParameter(ipar));
+    //
+    //         if     (mass==0){
+    //           if(factor==0) bin_graph_jec_nom.push_back(graph);
+    //           if(factor==1) bin_graph_xc_nom.push_back(graph);
+    //
+    //           if(factor==0) bin_function_jec_nom.push_back(fit);
+    //           if(factor==1) bin_function_xc_nom.push_back(fit);
+    //         }
+    //         else if(mass==1) {
+    //           if(factor==0) bin_graph_jec_1695.push_back(graph);
+    //           if(factor==1) bin_graph_xc_1695.push_back(graph);
+    //
+    //           if(factor==0) bin_function_jec_1695.push_back(fit);
+    //           if(factor==1) bin_function_xc_1695.push_back(fit);
+    //         }
+    //         else if(mass==2) {
+    //           if(factor==0) bin_graph_jec_1755.push_back(graph);
+    //           if(factor==1) bin_graph_xc_1755.push_back(graph);
+    //
+    //           if(factor==0) bin_function_jec_1755.push_back(fit);
+    //           if(factor==1) bin_function_xc_1755.push_back(fit);
+    //         }
+    //       }
+    //     }
     //   }
-    // }
-
-    // /*
-    // ██       █████  ████████ ███████ ██   ██
-    // ██      ██   ██    ██    ██       ██ ██
-    // ██      ███████    ██    █████     ███
-    // ██      ██   ██    ██    ██       ██ ██
-    // ███████ ██   ██    ██    ███████ ██   ██
-    // */
     //
-    // cout << "\n####################################################################\n";
-    // cout << "############################ Latex #################################\n";
-    // cout << "####################################################################\n";
-    // suppress output with &> /dev/null
-
-    // system("python python/projection_comparison_all.py");
-
+    //   /*
+    //   ███    ███  █████  ███████ ███████     ███████ ███    ██ ██████
+    //   ████  ████ ██   ██ ██      ██          ██      ████   ██ ██   ██
+    //   ██ ████ ██ ███████ ███████ ███████     █████   ██ ██  ██ ██   ██
+    //   ██  ██  ██ ██   ██      ██      ██     ██      ██  ██ ██ ██   ██
+    //   ██      ██ ██   ██ ███████ ███████     ███████ ██   ████ ██████
+    //   */
+    //   cout << peak_bins_v.size() << endl;
+    //   cout << bin_function_jec_nom.size()  << "     " << bin_graph_jec_nom.size() << endl;
+    //   cout << bin_function_jec_1695.size() << "     " << bin_graph_jec_1695.size() << endl;
+    //   cout << bin_function_jec_1755.size() << "     " << bin_graph_jec_1755.size() << endl;
+    //
+    //   int correct_bin = peak_bins_v[0];
+    //
+    //   for(unsigned int factor=0; factor<2; factor++){
+    //     for(unsigned int i=0; i<peak_bins_v.size(); i++){
+    //       TGraphErrors* bin_graph_nom, *bin_graph_1695, *bin_graph_1755;
+    //       TF1* bin_function_nom, *bin_function_1695, *bin_function_1755;
+    //       if(factor==0){
+    //         bin_function_nom  =bin_function_jec_nom[i];
+    //         bin_function_1695 =bin_function_jec_1695[i];
+    //         bin_function_1755 =bin_function_jec_1755[i];
+    //
+    //         bin_graph_nom     =bin_graph_jec_nom[i];
+    //         bin_graph_1695    =bin_graph_jec_1695[i];
+    //         bin_graph_1755    =bin_graph_jec_1755[i];
+    //       }
+    //       else{
+    //         bin_function_nom  =bin_function_xc_nom[i];
+    //         bin_function_1695 =bin_function_xc_1695[i];
+    //         bin_function_1755 =bin_function_xc_1755[i];
+    //
+    //         bin_graph_nom     =bin_graph_xc_nom[i];
+    //         bin_graph_1695    =bin_graph_xc_1695[i];
+    //         bin_graph_1755    =bin_graph_xc_1755[i];
+    //       }
+    //
+    //
+    //       bin_graph_nom->SetTitle(mass_bin[i+correct_bin]);
+    //       if(factor==0) bin_graph_nom->GetXaxis()->SetTitle("JEC factor");
+    //       else          bin_graph_nom->GetXaxis()->SetTitle("Additional XCone correction factor");
+    //       bin_graph_nom->SetMarkerColor(kBlack);
+    //       bin_graph_nom->SetMarkerStyle(kFullCircle);
+    //       bin_graph_nom->SetMarkerSize(0.5);
+    //       bin_graph_nom->SetLineColor(kBlack);
+    //       bin_graph_nom->GetXaxis()->SetLimits(-1.1,1.1);
+    //       bin_function_nom->SetLineColor(kBlack);
+    //
+    //       double xn, yn;
+    //       bin_graph_nom->GetPoint(1, xn, yn);
+    //       bin_graph_nom->GetYaxis()->SetRangeUser(yn/2, yn*1.5);
+    //
+    //       bin_graph_1695->SetMarkerColor(kRed);
+    //       bin_graph_1695->SetMarkerStyle(kFullCircle);
+    //       bin_graph_1695->SetMarkerSize(0.5);
+    //       bin_graph_1695->SetLineColor(kRed);
+    //       bin_function_1695->SetLineColor(kRed);
+    //
+    //       bin_graph_1755->SetMarkerColor(kBlue);
+    //       bin_graph_1755->SetMarkerStyle(kFullCircle);
+    //       bin_graph_1755->SetMarkerSize(0.5);
+    //       bin_graph_1755->SetLineColor(kBlue);
+    //       bin_function_1755->SetLineColor(kBlue);
+    //
+    //       TCanvas *E2;
+    //       TLegend *leg;
+    //       if(factor==0) E2 = new TCanvas(number_bin[i+correct_bin]+"E2_JEC_"+to_string(ptbin), "E2", 600, 600);
+    //       else          E2 = new TCanvas(number_bin[i+correct_bin]+"E2_XC_"+to_string(ptbin), "E2", 600, 600);
+    //       bin_graph_nom->Draw("AP");
+    //       bin_graph_1695->Draw("SAME P");
+    //       bin_graph_1755->Draw("SAME P");
+    //
+    //       bin_function_nom->Draw("SAME");
+    //       bin_function_1695->Draw("SAME");
+    //       bin_function_1755->Draw("SAME");
+    //
+    //       leg = new TLegend(0.20,0.15,0.40,0.3);
+    //       leg->SetBorderSize(0);
+    //       leg->AddEntry(bin_graph_nom ,"1725","pl");
+    //       leg->AddEntry(bin_graph_1695,"1695","pl");
+    //       leg->AddEntry(bin_graph_1755,"1755","pl");
+    //       leg->Draw();
+    //
+    //       if(factor==0) E2->SaveAs(save_path_general+"/"+addition+"/Bin"+number_bin[i+correct_bin]+"_JEC.pdf");
+    //       else          E2->SaveAs(save_path_general+"/"+addition+"/Bin"+number_bin[i+correct_bin]+"_XC.pdf");
+    //       leg->Clear();
+    //     }
+    //   }
+    //
+    //   /*
+    //   ██       █████  ████████ ███████ ██   ██
+    //   ██      ██   ██    ██    ██       ██ ██
+    //   ██      ███████    ██    █████     ███
+    //   ██      ██   ██    ██    ██       ██ ██
+    //   ███████ ██   ██    ██    ███████ ██   ██
+    //   */
+    //
+    //   cout << "\n####################################################################\n";
+    //   cout << "############################ Latex #################################\n";
+    //   cout << "####################################################################\n";
+    //   // suppress output with &> /dev/null
+    //
+    //   // system("python python/projection_comparison_all.py");
+    //
   }
   /*
   ███████ ███    ██ ██████      ██████  ████████ ██████  ██ ███    ██

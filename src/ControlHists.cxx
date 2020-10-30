@@ -154,3 +154,14 @@ void JetMassScaleHists::fill_mass(const Event & event, const double mass){
   events->Fill(1, weight);
   events_weight->Fill(1, 1);
 }
+
+// ###########################################################################################################################
+// ###########################################################################################################################
+MissingPtHist::MissingPtHist(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
+  // book all histograms here
+  MPT = book<TH1F>("MPT", "p_{T}^{miss}", 200,0,1000);
+}
+
+void MissingPtHist::fill(const Event & event){
+  MPT->Fill(event.met->pt(), event.weight);
+}

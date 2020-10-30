@@ -10,7 +10,7 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-  bool debug = false;
+  bool debug = true;
 
   // #################################################################################################
   // Modification ####################################################################################
@@ -23,23 +23,33 @@ int main(int argc, char* argv[]){
   // Declare different variables used in the code ####################################################
   print_seperater();
 
-  if(argc != 3){
-    cout << "\n" << "Usage: ./JEC_SYS <year> <rebin_number>\n";
+  if(argc != 4){
+    cout << "\n" << "Usage: ./JEC_SYS <year> <rebin_number> <one_Ptbin>\n";
     cout << "rebin_number:        hist->Rebin(rebin_number)\n";
     return 0;
   }
 
+  /*
+  ██████  ███████ ███████ ██ ███    ██ ███████
+  ██   ██ ██      ██      ██ ████   ██ ██
+  ██   ██ █████   █████   ██ ██ ██  ██ █████
+  ██   ██ ██      ██      ██ ██  ██ ██ ██
+  ██████  ███████ ██      ██ ██   ████ ███████
+  */
+
   // Default -------------------------------------------------------------------
+  cout.precision(6);
   Int_t   oldLevel     = gErrorIgnoreLevel; // Set by: gErrorIgnoreLevel = ... - functions_explain
   gErrorIgnoreLevel    = kWarning;          // suppress TCanvas output
-  TString reconst   = "btag";    // match btag_cut btag_sel compare min_mass
-  TString MC_uncert = "central"; // central avg nominal
-  cout.precision(6);
+  TString reconst      = "btag";    // match btag_cut btag_sel compare min_mass
+  TString MC_uncert    = "central"; // central avg nominal
+  bool    add_mTop     = false;
+  bool    usePeak_in   = true;
 
   // Input ---------------------------------------------------------------------
+  bool    one_Ptbin   = stob(argv[3]);
   int     bin_width   = stoi(argv[2]);
   TString year        = argv[1];
-  bool    add_mTop    = true;
 
   // Rebin -------------------------------------------------------------------------------------------
   int number_bins = 180/bin_width;
@@ -49,9 +59,9 @@ int main(int argc, char* argv[]){
   if(debug) cout << "Getting Input Variables" << endl;
 
   bool is16=false; bool is17=false; bool is18=false; bool isAll=false; bool is1718=false;
-  if     (strcmp(year, "2016")==0) is16       = true;
-  else if(strcmp(year, "2017")==0) is17       = true;
-  else if(strcmp(year, "2018")==0) is18       = true;
+  if     (strcmp(year, "2016")==0)     is16   = true;
+  else if(strcmp(year, "2017")==0)     is17   = true;
+  else if(strcmp(year, "2018")==0)     is18   = true;
   else if(strcmp(year, "combined")==0) isAll  = true;
   else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combined)");
 
@@ -84,13 +94,22 @@ int main(int argc, char* argv[]){
   save_path_general = creat_folder_and_path(save_path_general, "rebin"+str_number_bins);
   if(add_mTop) save_path_general = creat_folder_and_path(save_path_general, "mtop_combi");
 
-  for(int ptbin=0; ptbin<4; ptbin++){ // CHANGE_PT
+  /*
+  ██████  ████████ ██████  ██ ███    ██ ███████
+  ██   ██    ██    ██   ██ ██ ████   ██ ██
+  ██████     ██    ██████  ██ ██ ██  ██ ███████
+  ██         ██    ██   ██ ██ ██  ██ ██      ██
+  ██         ██    ██████  ██ ██   ████ ███████
+  */
+
+  for(int ptbin=0; ptbin<5; ptbin++){ // CHANGE_PT
+    if((ptbin==4)) continue;
     TString addition="";
     if(ptbin==0) addition="_hh"; // CHANGE_PT
     if(ptbin==1) addition="_hl";
     if(ptbin==2) addition="_lh";
     if(ptbin==3) addition="_ll";
-
+    if(ptbin==4) addition="";
 
     /*
     .██████  ███████ ████████     ██   ██ ██ ███████ ████████ ███████
@@ -110,9 +129,8 @@ int main(int argc, char* argv[]){
     if(reconst=="btag"&&ptbin==1) w_mass = hist_class+"wmass_match_ptdiv_hl";
     if(reconst=="btag"&&ptbin==2) w_mass = hist_class+"wmass_match_ptdiv_lh";
     if(reconst=="btag"&&ptbin==3) w_mass = hist_class+"wmass_match_ptdiv_ll";
+    if(reconst=="btag"&&ptbin==4) w_mass = hist_class+"wmass_match";
     // if(reconst=="btag")      w_mass = hist_class+"wjet_pt_match_S1divW_W";              // mass from subjet matched with ak4 with highest_btag close to the xcone fathadjet
-
-
 
     // #################################################################################################
     // Get Background ##################################################################################
@@ -214,7 +232,7 @@ int main(int argc, char* argv[]){
         TH1F  *mTop_JECdown      = (TH1F*)mTop_JECdown_file->Get(w_mass);
         mTop_JECup->Add(bkg, 1);
         mTop_JECdown->Add(bkg, 1);
-        
+
         // ------------------------------------------------------------------------------------------------
         if(debug) cout << "XCone" << endl;
 
@@ -224,7 +242,7 @@ int main(int argc, char* argv[]){
         TH1F  *mTop_XCdown      = (TH1F*)mTop_XCdown_file->Get(w_mass);
         mTop_XCup->Add(bkg, 1);
         mTop_XCdown->Add(bkg, 1);
-        
+
         // #################################################################################################
         // All in one ######################################################################################
         mTop_nominal_v.push_back(mTop);
@@ -278,26 +296,16 @@ int main(int argc, char* argv[]){
     vector<TH1F*> corrections_down_norm = {JECdown_rebin_norm, XConedown_rebin_norm};
 
     // #################################################################################################
-    // Empty Data Bins #################################################################################
-    if(debug) cout << "Empty Bins Data" << endl;
-
-    vector<int> empty_bins_v;
-    for(int bin=0; bin < number_bins; bin++){
-      if(!(abs(data_rebin_norm->GetBinContent(bin+1))>0)){
-        empty_bins_v.push_back(bin+1);
-        if(debug) cout << "Empty Bins: " << empty_bins_v[bin] << "\n";
-      }
-    }
-    int number_empty_bins = empty_bins_v.size();
-    if(debug) cout << "Number Empty Bins: " << number_empty_bins << "\n";
-
-    // #################################################################################################
     // Masspeack #######################################################################################
     if(debug) cout << "Masspeak Bins" << endl;
 
+    bool usePeak =false;
     vector<double> PeakLimit;
-    int Limit = 75;
+    if(isAll&&usePeak_in) usePeak = true;
 
+    double Limit = 75; // 190; // CHANGE_PT
+    vector<int> peak_bins_v;
+    if(usePeak) peak_bins_v = bins_upper_limit(data_rebin, Limit); // Get bins withc bin-content>Limit
 
     /*
     ██████  ██       ██████  ████████ ███████
@@ -324,18 +332,25 @@ int main(int argc, char* argv[]){
     vector<vector<TH1F*>> corrections_down_ = {{JECdown_rebin, XConedown_rebin}, corrections_down_norm};
 
     for(unsigned int norm=0; norm<ttbar_.size(); norm++){
+      if(debug) cout << "Inside Norm - " << norm << endl;
+
       ttbar_[norm]->SetTitle("");
       if     (ptbin==1&&bin_width==5) ttbar_[norm]->GetXaxis()->SetRangeUser(20, 180);
       else if(ptbin==1&&bin_width==6) ttbar_[norm]->GetXaxis()->SetRangeUser(20, 180);
       else                            ttbar_[norm]->GetXaxis()->SetRangeUser(0, 180);
-      ttbar_[norm]->GetYaxis()->SetRangeUser(0, ttbar_[norm]->GetMaximum()*1.1);
+
+      if(bin_width==1)
+      {
+        ttbar_[norm]->GetXaxis()->SetRangeUser(peak_bins_v[0], peak_bins_v[peak_bins_v.size()-1]);
+      }
+      ttbar_[norm]->GetYaxis()->SetRangeUser(0, ttbar_[norm]->GetMaximum()*1.2);
       ttbar_[norm]->GetXaxis()->SetNdivisions(505);
       ttbar_[norm]->GetYaxis()->SetNdivisions(505);
       ttbar_[norm]->GetXaxis()->SetTitleSize(0.04);
       ttbar_[norm]->GetYaxis()->SetTitleSize(0.04);
       ttbar_[norm]->GetXaxis()->SetTitleOffset(0.9);
-      ttbar_[norm]->GetYaxis()->SetTitleOffset(0.9);
-      ttbar_[norm]->GetXaxis()->SetTitle("m_{Wjet}");
+      ttbar_[norm]->GetYaxis()->SetTitleOffset(1.0);
+      ttbar_[norm]->GetXaxis()->SetTitle("m_{Wjet} [GeV]");
       if(norm==0) ttbar_[norm]->GetYaxis()->SetTitle("Events");
       else        ttbar_[norm]->GetYaxis()->SetTitle("#DeltaN/N");
       ttbar_[norm]->GetYaxis()->SetTitleOffset(1.2);
@@ -361,7 +376,7 @@ int main(int argc, char* argv[]){
     // TLine *line = new TLine(0, Limit, 180, Limit);
     // line->SetLineColor(kGray);
     // line->SetLineWidth(1);
-
+    if(debug) cout << "Mass Plots" << endl;
     TString norm_str="";
     for(unsigned int norm=0; norm<ttbar_.size(); norm++){
       if(norm==1) norm_str="_norm";
@@ -382,6 +397,8 @@ int main(int argc, char* argv[]){
         corrections_down_[norm][correction]->SetLineWidth(2);
         corrections_down_[norm][correction]->SetLineColor(kBlue);
 
+        ttbar_[norm]->GetYaxis()->SetTitleOffset(1.3);
+
         TCanvas *A = new TCanvas("A", "A", 600, 600);
         gPad->SetLeftMargin(0.15);
         gPad->SetBottomMargin(0.12);
@@ -391,8 +408,9 @@ int main(int argc, char* argv[]){
         data_[norm]->Draw("SAME P");
         // if(norm==0 && bin_width==1 && isAll) line->Draw("SAME");
         leg = new TLegend(0.6,0.65,0.8,0.85);
-        leg->SetTextSize(0.2);
-        leg->AddEntry(ttbar_[norm],"nominal","l");
+        if(bin_width==1) leg = new TLegend(0.45,0.15,0.6,0.35);;
+        // leg->SetTextSize(0.02);
+        leg->AddEntry(ttbar_[norm],"Nominal","l");
         if(correction==0){
           leg->AddEntry(corrections_up_[norm][correction],"JEC up","l");
           leg->AddEntry(corrections_down_[norm][correction],"JEC down","l");
@@ -402,7 +420,7 @@ int main(int argc, char* argv[]){
           leg->AddEntry(corrections_down_[norm][correction],"XCone down","l");
         }
         leg->AddEntry(data_[norm],"Data","pl");
-        leg->SetTextSize(0.05);
+        leg->SetTextSize(0.03);
         leg->Draw();
         gPad->RedrawAxis();
         if(correction==0) A->SaveAs(save_path_general+"/Wjet_mass_sensitivity_JEC"+addition+norm_str+".pdf");
@@ -410,6 +428,57 @@ int main(int argc, char* argv[]){
         delete A;
         leg->Clear();
       }
+    }
+
+    if(bin_width==1){
+      corrections_up_[1][0]->SetLineWidth(2);
+      corrections_up_[1][0]->SetLineColor(kBlue);
+      corrections_down_[1][0]->SetLineStyle(2);
+      corrections_down_[1][0]->SetLineWidth(2);
+      corrections_down_[1][0]->SetLineColor(kBlue);
+
+      corrections_up_[1][1]->SetLineWidth(2);
+      corrections_up_[1][1]->SetLineColor(kGreen+3);
+      corrections_down_[1][1]->SetLineStyle(2);
+      corrections_down_[1][1]->SetLineWidth(2);
+      corrections_down_[1][1]->SetLineColor(kGreen+3);
+
+      TLine *line_up  = new TLine(0.,0.,1.,1.);
+      TLine *line_down= new TLine(0.,0.,1.,1.);
+      line_up->SetLineStyle(1);
+      line_up->SetLineWidth(2);
+      line_up->SetLineColor(kGray+2);
+      line_down->SetLineStyle(2);
+      line_down->SetLineWidth(2);
+      line_down->SetLineColor(kGray+2);
+
+      ttbar_[1]->GetYaxis()->SetTitleOffset(1.2);
+
+      TCanvas *A = new TCanvas("A", "A", 600, 600);
+      gPad->SetLeftMargin(0.15);
+      gPad->SetBottomMargin(0.12);
+      ttbar_[1]->Draw("HIST");
+      corrections_down_[1][0]->Draw("SAME HIST");
+      corrections_up_[1][0]->Draw("SAME HIST");
+      corrections_down_[1][1]->Draw("SAME HIST");
+      corrections_up_[1][1]->Draw("SAME HIST");
+      data_[1]->Draw("SAME P");
+      // if(norm==0 && bin_width==1 && isAll) line->Draw("SAME");
+      leg = new TLegend(0.45,0.15,0.6,0.35);
+      leg->SetNColumns(2);
+      // leg->SetTextSize(0.02);
+      leg->AddEntry(ttbar_[0],"Nominal","l");
+      leg->AddEntry(data_[0],"Data","pl");
+      leg->AddEntry(corrections_up_[0][0],"JEC","l");
+      leg->AddEntry(line_up,"Up","l");
+      leg->AddEntry(corrections_up_[0][1],"XCone","l");
+      leg->AddEntry(line_down,"Down","l");
+      leg->SetTextSize(0.03);
+      leg->Draw();
+      gPad->RedrawAxis();
+      A->SaveAs(save_path_general+"/Wjet_mass_sensitivity.pdf");
+      delete A;
+      leg->Clear();
     }
   }
 }

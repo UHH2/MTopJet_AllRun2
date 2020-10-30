@@ -27,26 +27,26 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   h_HadJetTau32 = book<TH1F>("ak8_hadjet_tau32", "#tau_{3}/#tau_{2}", 50, 0, 1);
   h_HadJetTau23 = book<TH1F>("ak8_hadjet_tau23", "#tau_{2}/#tau_{3}", 100, 0, 2);
 
-  h_number_ak8_jets = book<TH1F>("ak8_number_matched_hadjets", "number matched AK8 jets", 10, 0, 10);
+  h_number_ak8_jets        = book<TH1F>("ak8_number_matched_hadjets", "number matched AK8 jets", 10, 0, 10);
   h_number_ak8_not_matched = book<TH1F>("ak8_number_unmatched_hadjets", "number unmatched AK8 jets", 1, 0, 1);
-  h_number_ak8_had_jets = book<TH1F>("ak8_number_hadjets", "number AK8 hadjets", 10, 0, 10);
-  h_number_xcone_had_jet = book<TH1F>("xcone_number_hadjets", "number XCone hadjets", 10, 0, 10);
+  h_number_ak8_had_jets    = book<TH1F>("ak8_number_hadjets", "number AK8 hadjets", 10, 0, 10);
+  h_number_xcone_had_jet   = book<TH1F>("xcone_number_hadjets", "number XCone hadjets", 10, 0, 10);
 
   // Gen Histograms --------------------------------------------------------------------------------------------
   if(isTTbar){
-    h_Number_matched_all = book<TH1F>("gen_events_matched_all", "matched with all particles", 2, 0, 2);
-    h_Number_matched_top = book<TH1F>("gen_events_matched_top", "matched with top", 2, 0, 2);
-    h_Number_matched_q1 = book<TH1F>("gen_events_matched_q1", "matched with q1", 2, 0, 2);
-    h_Number_matched_q2 = book<TH1F>("gen_events_matched_q2", "matched with q2", 2, 0, 2);
+    h_Number_matched_all    = book<TH1F>("gen_events_matched_all", "matched with all particles", 2, 0, 2);
+    h_Number_matched_top    = book<TH1F>("gen_events_matched_top", "matched with top", 2, 0, 2);
+    h_Number_matched_q1     = book<TH1F>("gen_events_matched_q1", "matched with q1", 2, 0, 2);
+    h_Number_matched_q2     = book<TH1F>("gen_events_matched_q2", "matched with q2", 2, 0, 2);
     h_Number_matched_bottom = book<TH1F>("gen_events_matched_bottom", "matched with bottom", 2, 0, 2);
 
     h_HadJetMass_fullymerged = book<TH1F>("gen_mass_hadjet_fullymerged", "m_{jet} [GeV]", 50, 0, 500);
-    h_HadJetMass_semimerged = book<TH1F>("gen_mass_hadjet_semimerged", "m_{jet} [GeV]", 50, 0, 500);
-    h_HadJetMass_notmerged = book<TH1F>("gen_mass_hadjet_notmerged", "m_{jet} [GeV]", 50, 0, 500);
+    h_HadJetMass_semimerged  = book<TH1F>("gen_mass_hadjet_semimerged", "m_{jet} [GeV]", 50, 0, 500);
+    h_HadJetMass_notmerged   = book<TH1F>("gen_mass_hadjet_notmerged", "m_{jet} [GeV]", 50, 0, 500);
 
     h_HadJetTau32_fullymerged = book<TH1F>("gen_tau32_hadjet_fullymerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
-    h_HadJetTau32_semimerged = book<TH1F>("gen_tau32_hadjet_semimerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
-    h_HadJetTau32_notmerged = book<TH1F>("gen_tau32_hadjet_notmerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
+    h_HadJetTau32_semimerged  = book<TH1F>("gen_tau32_hadjet_semimerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
+    h_HadJetTau32_notmerged   = book<TH1F>("gen_tau32_hadjet_notmerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
   }
 
   // -----------------------------------------------------------------------------------------------------------
@@ -62,13 +62,13 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
 
   // distance ak4 subjets
   h_distance_ak4_xcone_subjet_btag = book<TH1F>("ak4_distance_xcone_btag", "dR_{small}(ak4, xcone)", 50, 0, 1);
-  h_difference_distance_small_mid = book<TH1F>("ak4_distance_subjets_small_mid", "dR_{small}-dR_{mid}", 40, 0, 4);
+  h_difference_distance_small_mid  = book<TH1F>("ak4_distance_subjets_small_mid", "dR_{small}-dR_{mid}", 40, 0, 4);
   h_difference_distance_small_high = book<TH1F>("ak4_distance_subjets_small_high", "dR_{small}-dR_{high}", 40, 0, 4);
-  h_difference_distance_mid_high = book<TH1F>("ak4_distance_subjets_mid_high", "dR_{mid}-dR_{high}", 40, 0, 4);
+  h_difference_distance_mid_high   = book<TH1F>("ak4_distance_subjets_mid_high", "dR_{mid}-dR_{high}", 40, 0, 4);
 
   // Btag
-  h_btag_difference_high_mid = book<TH1F>("btag_difference_high_mid", "btag_{high}-btag_{mid}", 50, 0, 1);
-  h_btag_percentage_high_mid = book<TH1F>("btag_percentage_high_mid", "btag_{mid}/btag_{high}", 50, 0, 1);
+  h_btag_difference_high_mid              = book<TH1F>("btag_difference_high_mid", "btag_{high}-btag_{mid}", 50, 0, 1);
+  h_btag_percentage_high_mid              = book<TH1F>("btag_percentage_high_mid", "btag_{mid}/btag_{high}", 50, 0, 1);
   h_btag_difference_high_mid_sel_btag_min = book<TH1F>("btag_difference_high_mid_sel_btag_min", "btag_{high}-btag_{mid}", 50, 0, 1);
   h_btag_percentage_high_mid_sel_btag_min = book<TH1F>("btag_percentage_high_mid_sel_btag_min", "btag_{mid}/btag_{high}", 50, 0, 1);
 
@@ -104,11 +104,11 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
 
   // Counting Events
   h_events_no_ak4 = book<TH1F>("number_events_no_ak4", "events with no matched ak4", 1, 0, 1);
-  h_events_ak4 = book<TH1F>("number_events_with_ak4", "events with matched ak4", 1, 0, 1);
+  h_events_ak4    = book<TH1F>("number_events_with_ak4", "events with matched ak4", 1, 0, 1);
 
   // dummy
-  h_number_no_close_subjets = book<TH1F>("number_no_close_subjets", "no jet with dR<0.4", 1, 0, 1);
-  h_number_one_close_subjets = book<TH1F>("number_one_close_subjets", "one jet with dR<0.4", 1, 0, 1);
+  h_number_no_close_subjets       = book<TH1F>("number_no_close_subjets", "no jet with dR<0.4", 1, 0, 1);
+  h_number_one_close_subjets      = book<TH1F>("number_one_close_subjets", "one jet with dR<0.4", 1, 0, 1);
   h_number_multiple_close_subjets = book<TH1F>("number_multiple_close_subjets", "two jets with dR<0.4", 1, 0, 1);
 
   // BtagCut ----------------------------------------------------------------------------------------------------
@@ -116,69 +116,69 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
 
   // WJet
   h_wjet_pt_btagcut = book<TH1F>("wjet_pt_btagcut", "p_{T} [GeV]", 50, 0, 1000);
-  h_wmass_btagcut = book<TH1F>("wmass_btagcut", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_btagcut   = book<TH1F>("wmass_btagcut", "m_{Wjet} [GeV]", 180, 0, 180);
 
   // Counting Events
   h_btagcut_missed = book<TH1F>("selection_miss_btagcut", "event missed btag selection", 1, 0, 1);
-  h_btagcut_passed  = book<TH1F>("selection_pass_btagcut", "event passed btag selection", 1, 0, 1);
+  h_btagcut_passed = book<TH1F>("selection_pass_btagcut", "event passed btag selection", 1, 0, 1);
 
   // Selection: One high btag ----------------------------------------------------------------------------------
-  h_wmass_one_btag = book<TH1F>("wmass_one_btag", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_one_btag   = book<TH1F>("wmass_one_btag", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_one_btag = book<TH1F>("wjet_pt_one_btag", "p_{T} [GeV]", 50, 0, 1000);
 
   // with btagcut
-  h_wmass_btagcut_one_btag = book<TH1F>("wmass_btagcut_one_btag", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_btagcut_one_btag   = book<TH1F>("wmass_btagcut_one_btag", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_btagcut_one_btag = book<TH1F>("wjet_pt_btagcut_one_btag", "p_{T} [GeV]", 50, 0, 1000);
 
   // Counting events
-  h_pass_one_btag = book<TH1F>("selection_pass_one_btag", "", 1, 0, 1);
+  h_pass_one_btag         = book<TH1F>("selection_pass_one_btag", "", 1, 0, 1);
   h_pass_btagcut_one_btag = book<TH1F>("selection_pass_btagcut_one_btag", "", 1, 0, 1);
 
   // Selection: One subjet -------------------------------------------------------------------------------------
-  h_wmass_one_subjet = book<TH1F>("wmass_one_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_one_subjet   = book<TH1F>("wmass_one_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_one_subjet = book<TH1F>("wjet_pt_one_subjet", "p_{T} [GeV]", 50, 0, 1000);
 
   // with btagcut
-  h_wmass_btagcut_one_subjet = book<TH1F>("wmass_btagcut_one_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_btagcut_one_subjet   = book<TH1F>("wmass_btagcut_one_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_btagcut_one_subjet = book<TH1F>("wjet_pt_btagcut_one_subjet", "p_{T} [GeV]", 50, 0, 1000);
 
   // Counting events
-  h_pass_one_subjet = book<TH1F>("selection_pass_one_subjet", "", 1, 0, 1);
+  h_pass_one_subjet         = book<TH1F>("selection_pass_one_subjet", "", 1, 0, 1);
   h_pass_btagcut_one_subjet = book<TH1F>("selection_pass_btagcut_one_subjet", "", 1, 0, 1);
 
   // Selection: One high btag and one subjet  ------------------------------------------------------------------
-  h_wmass_one_btag_subjet = book<TH1F>("wmass_one_btag_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_one_btag_subjet   = book<TH1F>("wmass_one_btag_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_one_btag_subjet = book<TH1F>("wjet_pt_one_btag_subjet", "p_{T} [GeV]", 50, 0, 1000);
 
   // with btagcut
-  h_wmass_btagcut_one_btag_subjet = book<TH1F>("wmass_btagcut_one_btag_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_btagcut_one_btag_subjet   = book<TH1F>("wmass_btagcut_one_btag_subjet", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_btagcut_one_btag_subjet = book<TH1F>("wjet_pt_btagcut_one_btag_subjet", "p_{T} [GeV]", 50, 0, 1000);
 
   // Counting events
-  h_pass_one_btag_subjet = book<TH1F>("selection_pass_one_btag_subjet", "", 1, 0, 1);
+  h_pass_one_btag_subjet         = book<TH1F>("selection_pass_one_btag_subjet", "", 1, 0, 1);
   h_pass_btagcut_one_btag_subjet = book<TH1F>("selection_pass_btagcut_one_btag_subjet", "", 1, 0, 1);
 
   // Selection btag>0.7 and minimal mass -----------------------------------------------------------------------
-  h_wmass_combined_methods = book<TH1F>("wmass_combined_methods", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_combined_methods   = book<TH1F>("wmass_combined_methods", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_combined_methods = book<TH1F>("wjet_pt_combined", "p_{T} [GeV]", 50, 0, 1000);
-  h_wjet_combination = book<TH1F>("wjet_combination", "combination", 4, 0, 4);
+  h_wjet_combination         = book<TH1F>("wjet_combination", "combination", 4, 0, 4);
 
   // Method - Min Mass -----------------------------------------------------------------------------------------
-  h_wmass_min_mass = book<TH1F>("wmass_min", "min m_{ij}", 180, 0, 180);
+  h_wmass_min_mass   = book<TH1F>("wmass_min", "min m_{ij}", 180, 0, 180);
   h_wjet_pt_min_mass = book<TH1F>("wjet_pt_min", "p_{T} [GeV]", 50, 0, 1000);
 
   // Method - Compare ------------------------------------------------------------------------------------------
-  h_wmass_compare = book<TH1F>("wmass_compare", "m_{Wjet} [GeV]", 180, 0, 180);
+  h_wmass_compare   = book<TH1F>("wmass_compare", "m_{Wjet} [GeV]", 180, 0, 180);
   h_wjet_pt_compare = book<TH1F>("wjet_pt_compare", "p_{T} [GeV]", 50, 0, 1000);
 
 
   // -----------------------------------------------------------------------------------------------------------
   // handle for clustered jets ---------------------------------------------------------------------------------
-  h_recjets=ctx.get_handle<std::vector<TopJet>>("topjets"); // jetsAk8CHSSubstructure_SoftDropCHS
-  h_hadjet=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
-  h_lepjet=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
-  h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
-  h_ttbargen=ctx.get_handle<TTbarGen>("ttbargen");
+  h_recjets  = ctx.get_handle<std::vector<TopJet>>("topjets"); // jetsAk8CHSSubstructure_SoftDropCHS
+  h_hadjet   = ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
+  h_lepjet   = ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
+  h_fatjets  = ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
+  h_ttbargen = ctx.get_handle<TTbarGen>("ttbargen");
 }
 
 void RecoGenHists_xcone_topjet::fill(const Event & event){
@@ -210,7 +210,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   //--------------------------------- define needed objects--------------------------------
   //---------------------------------------------------------------------------------------
   // define all objects needed
-  std::vector<TopJet> ak8_jets = event.get(h_recjets);
+  std::vector<TopJet> ak8_jets      = event.get(h_recjets);
   std::vector<TopJet> xcone_had_jet = event.get(h_hadjet);
   std::vector<TopJet> xcone_lep_jet = event.get(h_lepjet);
   std::vector<TopJet> xcone_fatjets = event.get(h_fatjets);
@@ -246,25 +246,25 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   if(ak8_had_v4_vector.size()>=1){
     if(ak8_had_v4_vector.size()==1){
       ak8_had_v4 = ak8_had_v4_vector.at(0);
-      ak8_had = ak8_had_vector.at(0);
+      ak8_had    = ak8_had_vector.at(0);
     }
     else{
       jet1_pt = ak8_had_v4_vector.at(0).Pt();
       jet2_pt = ak8_had_v4_vector.at(1).Pt();
       if(jet1_pt>jet2_pt){
         ak8_had_v4 = ak8_had_v4_vector.at(0);
-        ak8_had = ak8_had_vector.at(0);
+        ak8_had    = ak8_had_vector.at(0);
       }
       else{
         ak8_had_v4 = ak8_had_v4_vector.at(1);
-        ak8_had = ak8_had_vector.at(1);
+        ak8_had    = ak8_had_vector.at(1);
       }
     }
   }
   else if(ak8_had_v4_vector.size()==0) h_number_ak8_not_matched->Fill(0.5, weight);
 
   // N-subjettiness -----------------------------------------------------------------------
-  double tau_32_ak = ak8_had.tau3()/ak8_had.tau2();
+  double tau_32_ak  = ak8_had.tau3()/ak8_had.tau2();
   bool pass_masscut = false;
   if(ak8_had_v4.M()>masscut_) pass_masscut = true;
 

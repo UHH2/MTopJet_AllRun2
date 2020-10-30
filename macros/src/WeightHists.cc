@@ -19,10 +19,10 @@ int main(int argc, char* argv[]){
 
   vector<TString> variations = {"up_4", "down_4"};
 
-  TString semilep = "/muon/test/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_";
+  TString semilep                 = "/muon/test/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_";
   vector<TString> hist_collection = {"Gen_Weights", "Gen_Weights_pass_gen", "Gen_Weights_Massbin_145", "Gen_Weights_Massbin_275"};
-  vector<TString> hists = {"gen_weight_big_1", "gen_weight_medium_1", "gen_weight_small_1"};
-  vector<TString> hists_negetiv = {"gen_weight_negativ_big_1", "gen_weight_negativ_medium_1", "gen_weight_negativ_small_1"};
+  vector<TString> hists           = {"gen_weight_big_1", "gen_weight_medium_1", "gen_weight_small_1"};
+  vector<TString> hists_negetiv   = {"gen_weight_negativ_big_1", "gen_weight_negativ_medium_1", "gen_weight_negativ_small_1"};
 
   TFile* f;
   vector<TH1F*> hists_all, hists_pass_gen, hists_mass145, hists_mass275;

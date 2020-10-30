@@ -166,8 +166,8 @@
 .  ██       ██
 .  ██       ██
 -->
-<!--
-<InputData Version="TTbar_Mtt0000to0700_2L2Nu_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+
+<!-- <InputData Version="TTbar_Mtt0000to0700_2L2Nu_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_Mtt0000to0700_SemiLep_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_Mtt0000to0700_SemiLep;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -259,7 +259,7 @@
 . █████  ██████
 -->
 
-<InputData Version="TTbar_mtop1665_2L2Nu_JECdown_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_mtop1665_2L2Nu_JECdown_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_JECdown_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -298,7 +298,7 @@
 <InputData Version="TTbar_mtop1755_Hadronic_JECdown_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755_Hadronic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_Hadronic_JECdown_2017v2" Lumi="6995843.265" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_Hadronic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_mtop1785_Hadronic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 <!--
@@ -311,7 +311,7 @@
 .*/
 -->
 
-<InputData Version="TTbar_mtop1665_2L2Nu_JECup_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_mtop1665_2L2Nu_JECup_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_JECup_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -350,7 +350,7 @@
 <InputData Version="TTbar_mtop1755_Hadronic_JECup_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755_Hadronic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_Hadronic_JECup_2017v2" Lumi="6995843.265" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_Hadronic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_mtop1785_Hadronic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <!--
 /*
@@ -362,7 +362,7 @@
 */
 -->
 
-<InputData Version="TTbar_mtop1665_2L2Nu_XConedown_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_mtop1665_2L2Nu_XConedown_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_XConedown_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -401,7 +401,7 @@
 <InputData Version="TTbar_mtop1755_Hadronic_XConedown_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755_Hadronic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_Hadronic_XConedown_2017v2" Lumi="6995843.265" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_Hadronic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_mtop1785_Hadronic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 <!--
@@ -414,7 +414,7 @@
 */
 -->
 
-<InputData Version="TTbar_mtop1665_2L2Nu_XConeup_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_mtop1665_2L2Nu_XConeup_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_XConeup_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -453,7 +453,7 @@
 <InputData Version="TTbar_mtop1755_Hadronic_XConeup_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755_Hadronic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_Hadronic_XConeup_2017v2" Lumi="6995843.265" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785_Hadronic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_mtop1785_Hadronic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 <!-- ================================================================================================================================== -->

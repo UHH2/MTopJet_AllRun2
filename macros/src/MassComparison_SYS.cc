@@ -130,8 +130,8 @@ int main(int argc, char* argv[]){
   vector<vector<TH1F*>> DOWNs = {mass_FSRdown_sqrt2, mass_FSRdown_2, mass_FSRdown_4, mass_ISRdown_sqrt2, mass_ISRdown_2, mass_ISRdown_4};
 
   std::vector<TString> file_name = {"FSR_sqrt2_", "FSR_2_", "FSR_4_","ISR_sqrt2_", "ISR_2_", "ISR_4_"};
-  std::vector<TString> mass_name_up = {"FSRup_sqrt2", "FSRup_2", "FSRup_4","ISRup_sqrt2", "ISRup_2", "ISRup_4"};
-  std::vector<TString> mass_name_down = {"FSRdown_sqrt2", "FSRdown_2", "FSRdown_4","ISRdown_sqrt2",  "ISRdown_2", "ISRdown_4"};
+  std::vector<TString> mass_name_up = {"FSRup #sqrt{2}", "FSRup 2", "FSRup 4","ISRup #sqrt{2}", "ISRup 2", "ISRup 4"};
+  std::vector<TString> mass_name_down = {"FSRdown #sqrt{2}", "FSRdown 2", "FSRdown 4","ISRdown #sqrt{2}",  "ISRdown 2", "ISRdown 4"};
 
   /*
   ██████  ██       ██████  ████████
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]){
     mass_nominal[i]->GetYaxis()->SetTitleSize(0.04);
     mass_nominal[i]->GetXaxis()->SetTitleOffset(0.9);
     mass_nominal[i]->GetYaxis()->SetTitleOffset(1.5);
-    mass_nominal[i]->GetXaxis()->SetTitle("M_{jet}");
+    mass_nominal[i]->GetXaxis()->SetTitle("M_{jet} [GeV]");
     mass_nominal[i]->GetYaxis()->SetTitle("Events");
     mass_nominal[i]->SetLineWidth(2);
     mass_nominal[i]->SetLineColor(kRed);
@@ -175,7 +175,7 @@ int main(int argc, char* argv[]){
       UPs[j].at(i)->SetLineColor(kBlue);
       // ---------------------------------------------------------------------------
       DOWNs[j].at(i)->SetLineWidth(2);
-      DOWNs[j].at(i)->SetLineColor(kGreen);
+      DOWNs[j].at(i)->SetLineColor(kGreen+2);
     }
 
 
@@ -189,7 +189,7 @@ int main(int argc, char* argv[]){
     mass_JECup[i]->Draw("SAME HIST");
     mass_JECdown[i]->Draw("SAME HIST");
     leg = new TLegend(0.20,0.55,0.40,0.75);
-    leg->AddEntry(mass_nominal[i],"nominal","l");
+    leg->AddEntry(mass_nominal[i],"Nominal","l");
     leg->AddEntry(mass_JECup[i],"JEC up","l");
     leg->AddEntry(mass_JECdown[i],"JEC down","l");
     leg->SetTextSize(0.05);

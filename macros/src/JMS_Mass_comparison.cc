@@ -137,8 +137,8 @@ int main(int argc, char* argv[]){
   TH1F* ttbar_norm_old          = normalize(ttbar_old);
   TH1F* ttbar_rebin             = rebin(ttbar, bin_width);
   TH1F* ttbar_rebin_old         = rebin(ttbar_old, bin_width);
-  TH1F* ttbar_rebin_norm       = normalize(ttbar_rebin);
-  TH1F* ttbar_rebin_norm_old   = normalize(ttbar_rebin_old);
+  TH1F* ttbar_rebin_norm        = normalize(ttbar_rebin);
+  TH1F* ttbar_rebin_norm_old    = normalize(ttbar_rebin_old);
 
 
   // #################################################################################################
@@ -195,30 +195,58 @@ int main(int argc, char* argv[]){
   ttbar->GetYaxis()->SetTitleSize(0.04);
   ttbar->GetXaxis()->SetTitleOffset(0.9);
   ttbar->GetYaxis()->SetTitleOffset(0.9);
-  ttbar->GetXaxis()->SetTitle("m_{jet}");
-  ttbar->GetYaxis()->SetTitle("");
+  ttbar->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  ttbar->GetYaxis()->SetTitle("Events");
+  ttbar->GetYaxis()->SetTitleOffset(1.5);
   ttbar->SetLineWidth(2);  // ttbar hist style
   ttbar->SetLineColor(kRed);
+
+  ttbar_norm->SetTitle("");
+  ttbar_norm->GetXaxis()->SetRangeUser(100, 300);
+  ttbar_norm->GetYaxis()->SetRangeUser(0, ttbar_norm->GetMaximum()*1.1);
+  ttbar_norm->GetXaxis()->SetNdivisions(505);
+  ttbar_norm->GetYaxis()->SetNdivisions(505);
+  ttbar_norm->GetXaxis()->SetTitleSize(0.05);
+  ttbar_norm->GetYaxis()->SetTitleSize(0.04);
+  ttbar_norm->GetXaxis()->SetTitleOffset(0.9);
+  ttbar_norm->GetYaxis()->SetTitleOffset(0.9);
+  ttbar_norm->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  ttbar_norm->GetYaxis()->SetTitle("#Delta N/N");
+  ttbar_norm->GetYaxis()->SetTitleOffset(1.5);
+  ttbar_norm->SetLineWidth(2);  // ttbar hist style
+  ttbar_norm->SetLineColor(kRed);
 
   // Data --------------------------------------------------------------------------------------------
   data->SetMarkerStyle(8);  // data hist style
   data->SetMarkerColor(kBlack);
   data->SetLineColor(kBlack);
-
+  data_norm->SetMarkerStyle(8);  // data hist style
+  data_norm->SetMarkerColor(kBlack);
+  data_norm->SetLineColor(kBlack);
   // upup --------------------------------------------------------------------------------------------
   JMSuu->SetLineWidth(2);
   JMSuu->SetLineColor(kBlue);
+  JMSuu_norm->SetLineWidth(2);
+  JMSuu_norm->SetLineColor(kBlue);
   // downdown ----------------------------------------------------------------------------------------
   JMSdd->SetLineWidth(2);
-  JMSdd->SetLineColor(kGreen);
+  JMSdd->SetLineColor(kGreen+2);
+  JMSdd_norm->SetLineWidth(2);
+  JMSdd_norm->SetLineColor(kGreen+2);
   // updown ------------------------------------------------------------------------------------------
   JMSud->SetLineWidth(2);
   JMSud->SetLineStyle(7);
-  JMSud->SetLineColor(kGray);
+  JMSud->SetLineColor(kGray+2);
+  JMSud_norm->SetLineWidth(2);
+  JMSud_norm->SetLineStyle(7);
+  JMSud_norm->SetLineColor(kYellow+1);
   // downup ------------------------------------------------------------------------------------------
   JMSdu->SetLineWidth(2);
   JMSdu->SetLineStyle(7);
-  JMSdu->SetLineColor(kOrange);
+  JMSdu->SetLineColor(kMagenta+2);
+  JMSdu_norm->SetLineWidth(2);
+  JMSdu_norm->SetLineStyle(7);
+  JMSdu_norm->SetLineColor(kMagenta+2);
 
   // Legend ------------------------------------------------------------------------------------------
   TLegend *leg;
@@ -239,21 +267,50 @@ int main(int argc, char* argv[]){
   ttbar->Draw("HIST");
   JMSuu->Draw("SAME HIST");
   JMSdd->Draw("SAME HIST");
-  JMSud->Draw("SAME HIST");
-  JMSdu->Draw("SAME HIST");
-  leg = new TLegend(0.62,0.65,0.82,0.85);
-  leg->AddEntry(ttbar,"nominal","l");
-  leg->AddEntry(JMSuu ,"JMS_upup","l");
-  leg->AddEntry(JMSdd ,"JMS_downdown","l");
-  leg->AddEntry(JMSud ,"JMS_updown","l");
-  leg->AddEntry(JMSdu ,"JMS_downup","l");
-  leg->SetTextSize(0.02);
+  // data->Draw("SAME P");
+  leg = new TLegend(0.55,0.55,0.85,0.85);
+  leg->AddEntry(ttbar,"Best fit","l");
+  leg->AddEntry(JMSuu ,"JMS upup","l");
+  leg->AddEntry(JMSdd ,"JMS downdown","l");
+  leg->SetTextSize(0.03);
   leg->Draw();
   gPad->RedrawAxis();
   A->SaveAs(save_path_general+"/mass_comparison_jms_"+year+".pdf");
-  data->Draw("SAME P");
-  leg->AddEntry(data,"Data","pl");
-  A->SaveAs(save_path_general+"/mass_comparison_jms_data_"+year+".pdf");
+
+  JMSud->Draw("SAME HIST");
+  JMSdu->Draw("SAME HIST");
+  leg->AddEntry(JMSud ,"JMS updown","l");
+  leg->AddEntry(JMSdu ,"JMS downup","l");
+  A->SaveAs(save_path_general+"/mass_comparison_jms_add_"+year+".pdf");
+  delete A;
+  leg->Clear();
+
+  // #################################################################################################
+  // Norm ############################################################################################
+  if(debug) cout << "Mass Plots Norm" << endl;
+
+  A = new TCanvas("A", "A", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.12);
+  ttbar_norm->Draw("HIST");
+  // data_norm->Draw("SAME P");
+  JMSuu_norm->Draw("SAME HIST");
+  JMSdd_norm->Draw("SAME HIST");
+  leg = new TLegend(0.55,0.55,0.85,0.85);
+  leg->AddEntry(ttbar_norm,"Best fit","l");
+  leg->AddEntry(data_norm,"Data","pl");
+  leg->AddEntry(JMSuu_norm ,"JMS up","l");
+  leg->AddEntry(JMSdd_norm ,"JMS down","l");
+  leg->SetTextSize(0.03);
+  leg->Draw();
+  gPad->RedrawAxis();
+  A->SaveAs(save_path_general+"/mass_comparison_jms_norm_"+year+".pdf");
+
+  JMSud_norm->Draw("SAME HIST");
+  JMSdu_norm->Draw("SAME HIST");
+  leg->AddEntry(JMSud_norm ,"JMS updown","l");
+  leg->AddEntry(JMSdu_norm ,"JMS downup","l");
+  A->SaveAs(save_path_general+"/mass_comparison_jms_add_norm_"+year+".pdf");
   delete A;
   leg->Clear();
 
@@ -275,10 +332,10 @@ int main(int argc, char* argv[]){
   gPad->SetBottomMargin(0.12);
   ttbar->Draw("HIST");
   ttbar_old->Draw("SAME HIST");
-  leg = new TLegend(0.62,0.65,0.82,0.85);
-  leg->AddEntry(ttbar,"best fit","l");
-  leg->AddEntry(ttbar_old ,"old","l");
-  leg->SetTextSize(0.02);
+  leg = new TLegend(0.60,0.65,0.75,0.85);
+  leg->AddEntry(ttbar,"Best fit","l");
+  leg->AddEntry(ttbar_old ,"Old","l");
+  leg->SetTextSize(0.04);
   leg->Draw();
   gPad->RedrawAxis();
   A->SaveAs(save_path_general+"/method_comparison_jms_old_"+year+".pdf");
@@ -289,6 +346,6 @@ int main(int argc, char* argv[]){
   leg->Clear();
 
   cout << "\nIntegral New: " << ttbar->Integral()<<endl;
-  cout << "Integral Old: " << ttbar_old->Integral()<<endl;
+  cout << "Integral Old: "   << ttbar_old->Integral()<<endl;
 
 }

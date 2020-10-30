@@ -100,3 +100,16 @@ private:
   TH1F *h_mass;
   TH1F *events, *events_weight;
 };
+
+// -----------------------------------------------------------------------------
+class MissingPtHist: public uhh2::Hists {
+public:
+  // use the same constructor arguments as Hists for forwarding:
+  MissingPtHist(uhh2::Context & ctx, const std::string & dirname);
+
+  virtual void fill(const uhh2::Event & ev) override;
+
+private:
+
+  TH1F *MPT;
+};

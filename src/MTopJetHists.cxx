@@ -17,10 +17,10 @@ MTopJetHists::MTopJetHists(uhh2::Context & ctx, const std::string & dirname): Hi
   N_PrimVertices = book<TH1F>("N_PrimVertices", "number of primary vertices", 56, -0.5, 55.5);
   //N_TrueInteractions = book<TH1F>("N_TrueInteractions", "number of true interactions", 50, 0, 50);
   //Weights = book<TH1F>("Weights", "weights", 100,0,2);
-  MET = book<TH1F>("MET", "missing E_{T}", 200,0,1000);
-  HT = book<TH1F>("HT", "H_{T} Jets", 100, 0, 3500);
+  MET   = book<TH1F>("MET", "p_{T}^{miss}", 200,0,1000);
+  HT    = book<TH1F>("HT", "H_{T} Jets", 100, 0, 3500);
   HTLep = book<TH1F>("HTLep", "H_{T} Lep", 100, 0, 1000);
-  ST = book<TH1F>("ST", "S_{T}", 100, 0, 5000);
+  ST    = book<TH1F>("ST", "S_{T}", 100, 0, 5000);
 
   // b-tag for CSVv2
   BTAG_L_CSV = book<TH1F>("BTAG_L_CSV", "N b-tags loose", 10, 0, 10);
@@ -50,9 +50,9 @@ MTopJetHists::MTopJetHists(uhh2::Context & ctx, const std::string & dirname): Hi
   deltaPhi_lep_topjet2 = book<TH1F>("deltaPhi_lep_topjet2", "#Delta Phi(lep,2nd Top Jet)", 80, -7.0, 7.0);
 
   // TopJet number, pt, Mass
-  TopNumber = book<TH1F>("Number Top Jets", "number", 10, 0, 10);
-  TopPT1 = book<TH1F>("1st Top Jet p_{T}", "p_{T}^{topjet1} [GeV/c]", 20, 0, 1000);
-  TopPT2 = book<TH1F>("2nd Top Jet p_{T}", "p_{T}^{topjet2} [GeV/c]", 20, 0, 1000);
+  TopNumber  = book<TH1F>("Number Top Jets", "number", 10, 0, 10);
+  TopPT1     = book<TH1F>("1st Top Jet p_{T}", "p_{T}^{topjet1} [GeV/c]", 20, 0, 1000);
+  TopPT2     = book<TH1F>("2nd Top Jet p_{T}", "p_{T}^{topjet2} [GeV/c]", 20, 0, 1000);
   TopJetMass = book<TH1F>("1st Top Jet Mass","M^{topjet1} [GeV/c^{2}]", 15, 0, 300);
 
   // TopJetMass1 vs TopJetMass2
@@ -126,10 +126,7 @@ void MTopJetHists::fill(const Event & event){
   hist("BTAG_M_DJ")->Fill(jetN__DJM, weight);
   hist("BTAG_T_DJ")->Fill(jetN__DJT, weight);
 
-
-  int prob;
   for(const auto& j : *event.jets) hist("BTAG_VALUE_DJ")->Fill(j.btag_DeepJet(), weight);
-
 
   for(const auto & jet : *event.jets){
     if(jet.btag_combinedSecondaryVertex() > 0.935){

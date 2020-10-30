@@ -35,8 +35,8 @@ int main(int argc, char* argv[]){
   print_seperater();
   cout.precision(6);
 
-  if(argc != 5){
-    cout << "\n" << "Usage: ./JEC_SYS_mTop <year> <mtop> <useOnly_lin> <uncert>\n";
+  if(argc != 3){
+    cout << "\n" << "Usage: ./JEC_SYS_mTop <year> <mtop>\n";
     return 0;
   }
 
@@ -47,31 +47,16 @@ int main(int argc, char* argv[]){
   // Default -------------------------------------------------------------------
   gErrorIgnoreLevel    = kWarning;          // suppress TCanvas output
   Int_t   oldLevel     = gErrorIgnoreLevel; // Set by: gErrorIgnoreLevel = ... - functions_explain
-  int     bin_width    = 4;                 // functions_explain
+  int     bin_width    = 1;                 // functions_explain
   TString reconst      = "btag";            // match btag_cut btag_sel compare min_mass
   bool    print_table  = false;
+  bool    useOnly_lin  = false;
   bool    usePeak_in   = true;
   bool    into_latex   = true;
 
   // Input ---------------------------------------------------------------------
-  bool    useOnly_lin   = stob(argv[3]);
   TString year          = argv[1];
   TString mTop_         = argv[2];
-  TString uncert_in     = argv[4];
-
-  // Uncert --------------------------------------------------------------------
-
-  TString used_uncert;
-  bool onlyData=false; bool McData=false; bool FactorMcData=false;
-  if     (uncert_in=="data"  || uncert_in=="Data"  || uncert_in=="DATA")   onlyData=true;
-  else if(uncert_in=="mc"    || uncert_in=="MC"    || uncert_in=="Mc")     McData=true;
-  else if(uncert_in=="factor"|| uncert_in=="Factor"|| uncert_in=="FACTOR") FactorMcData=true;
-  else throw runtime_error("Which Error to use? (onlyData, McData, FactorMcData) - Start");
-
-  if     (onlyData)     used_uncert = "Data";
-  else if(McData)       used_uncert = "Data+MC";
-  else if(FactorMcData) used_uncert = "Data+Factor*MC";
-  else throw runtime_error("Which Error to use? (onlyData, McData, FactorMcData) - Debug");
 
   // #################################################################################################
   // cout settings ###################################################################################
@@ -84,7 +69,6 @@ int main(int argc, char* argv[]){
   cout << "Peak:      " << usePeak_in   << endl;
   cout << "Only lin:  " << useOnly_lin  << endl;
   cout << "Bin Width: " << bin_width    << endl;
-  cout << "Uncert:    " << used_uncert  << endl;
   cout << "mTop:      " << mTop_        << endl;
 
   // #################################################################################################
@@ -127,12 +111,8 @@ int main(int argc, char* argv[]){
   */
 
   TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS";
-  if(onlyData)          save_path_general = creat_folder_and_path(save_path_general, "only_data_uncert");
-  else if(McData)       save_path_general = creat_folder_and_path(save_path_general, "mc_data_uncert");
-  else if(FactorMcData) save_path_general = creat_folder_and_path(save_path_general, "mc_factor_data_uncert");
-  else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combined) - -Directories. Check with Start");
+  save_path_general = creat_folder_and_path(save_path_general, "chi2");
   save_path_general = creat_folder_and_path(save_path_general, "pt_bins");            // CHANGE_PT
-  save_path_general = creat_folder_and_path(save_path_general,  mTop_);
 
   // #################################################################################################
   // creat subdirectories ############################################################################
@@ -140,6 +120,7 @@ int main(int argc, char* argv[]){
   save_path_general = creat_folder_and_path(save_path_general, year);
   save_path_general = creat_folder_and_path(save_path_general, reconst);
   save_path_general = creat_folder_and_path(save_path_general, "rebin"+str_number_bins);
+  save_path_general = creat_folder_and_path(save_path_general,  mTop_);
   if(useOnly_lin) save_path_general = creat_folder_and_path(save_path_general, "linear");
   if(usePeak_in&&isAll) save_path_general = creat_folder_and_path(save_path_general, "masspeak");
   creat_folder(save_path_general, "single_bins");
@@ -290,8 +271,8 @@ int main(int argc, char* argv[]){
     // Get SYS #########################################################################################
     if(debug) cout << "JEC "+mTop_ << endl;
 
-    TFile *JECup_file   = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+"_JECup.root");
-    TFile *JECdown_file = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+"_JECdown.root");
+    TFile *JECup_file   = new TFile(dir+year+"/muon/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+".root");
+    TFile *JECdown_file = new TFile(dir+year+"/muon/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+".root");
     TH1F  *JECup        = (TH1F*)JECup_file->Get(w_mass);
     TH1F  *JECdown      = (TH1F*)JECdown_file->Get(w_mass);
 
@@ -314,8 +295,8 @@ int main(int argc, char* argv[]){
     // ------------------------------------------------------------------------------------------------
     if(debug) cout << "XCone "+mTop_ << endl;
 
-    TFile *XCup_file   = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+"_XConeup.root");
-    TFile *XCdown_file = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+"_XConedown.root");
+    TFile *XCup_file   = new TFile(dir+year+"/muon/COR_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+".root");
+    TFile *XCdown_file = new TFile(dir+year+"/muon/COR_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mTop_+".root");
     TH1F  *XConeup        = (TH1F*)XCup_file->Get(w_mass);
     TH1F  *XConedown      = (TH1F*)XCdown_file->Get(w_mass);
 
@@ -739,11 +720,7 @@ int main(int argc, char* argv[]){
       double unc_factor = ttbar_rebin_norm_err[bin]/ttbar_nom_rebin_norm_err[bin];  // CHANGE_UNCERT
       double sigma_tot_square;
       vector<double> fit_para; // Ablage - Cannot use chi2_para, since it contains ALL parameters
-      if(onlyData)          sigma_tot_square = pow(data_rebin_norm_err[bin], 2);
-      else if(McData)       sigma_tot_square = pow(data_rebin_norm_err[bin], 2)+pow(ttbar_rebin_norm_err[bin],2);
-      else if(FactorMcData) sigma_tot_square = pow(data_rebin_norm_err[bin], 2)+pow(unc_factor*ttbar_rebin_norm_err[bin],2);
-      else throw runtime_error("Something is wrong with your uncertainties!");
-
+      sigma_tot_square = pow(data_rebin_norm_err[bin], 2)+pow(ttbar_rebin_norm_err[bin],2);
 
       fit_para.push_back(data_rebin_norm_bin_content[bin]);
       chi2_parameters.push_back(data_rebin_norm_bin_content[bin]);
@@ -928,7 +905,7 @@ int main(int argc, char* argv[]){
 
     // Get Points --------------------------------------------------------------
     auto start = high_resolution_clock::now(); // Calculation time - start
-    vector<vector<double>> points = FindXY(chi2_function, twoD_minZ+2.3, twoD_minX-2, twoD_minX+2, twoD_minY-2, twoD_minY+2, 10000, 0.001);
+    vector<vector<double>> points = FindXY(chi2_function, twoD_minZ+2.3, twoD_minX-2, twoD_minX+2, twoD_minY-2, twoD_minY+2, 1000, 0.001);
     auto stop  = high_resolution_clock::now();  // Calculation time - stop
     auto duration = duration_cast<milliseconds>(stop - start);
     cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;
@@ -1140,18 +1117,31 @@ int main(int argc, char* argv[]){
   // Get Points --------------------------------------------------------------------------------------
   vector<vector<double>> points;
   auto start = high_resolution_clock::now(); // Calculation time - start
-  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 15000, 0.001);
+  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 50000, 0.001);
   auto stop = high_resolution_clock::now();  // Calculation time - stop
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;
   if(debug) cout << "Number Points at 1\u03C3: " << points.size() << endl;
 
   // Draw Points -------------------------------------------------------------------------------------
-  TGraph2D *zmin_point = new TGraph2D();
-  zmin_point->SetPoint(0, twoD_minX, twoD_minY, twoD_minZ);
-  zmin_point->SetMarkerColor(kBlack);
-  zmin_point->SetMarkerStyle(kFullCircle);
-  zmin_point->SetMarkerSize(0.5);
+  TGraph2D *zmin_point_new = new TGraph2D();
+  zmin_point_new->SetPoint(0, twoD_minX, twoD_minY, twoD_minZ);
+  zmin_point_new->SetPoint(1, 10, 10, 10); // Otherwise no point is drawn in 1755
+
+
+  TGraph2D *zmin_test  = new TGraph2D();
+  if(mTop_=="1755"){
+    cout << twoD_minX << endl;
+    cout << twoD_minY << endl;
+    zmin_test->SetPoint(0, twoD_minX, twoD_minY, twoD_minZ);
+
+    zmin_test->SetMarkerColor(kBlack);
+    zmin_test->SetMarkerStyle(kFullCircle);
+    zmin_test->SetMarkerSize(0.5);
+  }
+  zmin_point_new->SetMarkerColor(kBlack);
+  zmin_point_new->SetMarkerStyle(kFullCircle);
+  zmin_point_new->SetMarkerSize(0.5);
 
   TGraph2D *sigma_points = new TGraph2D();
   for(unsigned int i=0; i<points.size(); i++) sigma_points->SetPoint(i, points[i][0], points[i][1], points[i][2]);
@@ -1166,9 +1156,11 @@ int main(int argc, char* argv[]){
   TString option = "cont4z";
   TString option_add = "";
   full_chi2_function->SetTitle("");
-  full_chi2_function->GetHistogram()->GetXaxis()->SetTitle("JEC");
-  full_chi2_function->GetHistogram()->GetYaxis()->SetTitle("XCone");
+  full_chi2_function->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
+  full_chi2_function->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
   full_chi2_function->GetHistogram()->GetZaxis()->SetTitle("#chi^{2}");
+  full_chi2_function->GetZaxis()->CenterTitle();
+  full_chi2_function->GetZaxis()->SetTitleOffset(0.5);
 
   full_chi2_function->SetContour(50);   // Contours
   gStyle->SetPalette(kDeepSea);         // kDeepSea kGreyScale kRust
@@ -1177,11 +1169,13 @@ int main(int argc, char* argv[]){
   Z->SetRightMargin(0.12);
   Z->SetLogz();
   full_chi2_function->Draw("cont4z");
+  // full_chi2_function->SetMaximum(1150); // One has to redefine the axis after drawing
+  full_chi2_function->SetMinimum(90);
   Z->SaveAs(save_path_general+"/chi2_all.pdf");
   Z->SetTheta(90);
   Z->SetPhi(0);
-  zmin_point->Draw("SAME P");
   sigma_points->Draw("SAME P");
+  zmin_point_new->Draw("SAME P");
   Z->SaveAs(save_path_general+"/chi2_all_points.pdf");
   Z->Clear();
 
@@ -1271,15 +1265,27 @@ int main(int argc, char* argv[]){
   // #################################################################################################
   // Plot ############################################################################################
   if(debug) cout<< "\nAll 2D Chi2 - plot";
+  cout << "TEST - " << twoD_minX << endl;
+  cout << "TEST - " << twoD_minY << endl;
+  double xx, yy, zz;
+  // zmin_point->GetPoint(0, xx, yy , zz);
+  // cout << "TEST - " << xx << " " << yy << " " << zz << endl;
+  cout << "TEST - " << twoD_minZ << endl;
+
+
 
   gStyle->SetPalette(kDeepSea); // kDeepSea kGreyScale kRust
   TCanvas *Z1 = new TCanvas("Z1","Z1", 600, 600);
   Z1->SetRightMargin(0.12);
   Z1->SetLogz();
   full_chi2_function->Draw("cont4z");
+  // full_chi2_function->SetMaximum(1100); // One has to redefine the axis after drawing
+  full_chi2_function->SetMinimum(99);
+  full_chi2_function->SetContour(60);
   Z1->SetTheta(90);
   Z1->SetPhi(0);
-  zmin_point->Draw("SAME P");
+  zmin_point_new->Draw("SAME P");
+  if(mTop_=="1755") zmin_test->Draw("SAME P");
   sigma_points->Draw("SAME P");
   extreme_points->Draw("SAME P");
   Z1->SaveAs(save_path_general+"/chi2_all_extreme_points.pdf");

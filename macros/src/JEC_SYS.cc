@@ -7,6 +7,10 @@
 #include <sys/stat.h>
 #include <chrono>
 
+Double_t plane(Double_t *x, Double_t *par){
+  return 0.;
+}
+
 // #include <io.h>
 using namespace std;
 
@@ -36,7 +40,7 @@ int main(int argc, char* argv[]){
   cout.precision(6);
 
   if(argc != 3){
-    cout << "\n" << "Usage: ./JEC_SYS <year> <useOnly_lin>\n";
+    cout << "\n" << "Usage: ./JEC_SYS <year> <pt_bins>\n";
     return 0;
   }
 
@@ -52,12 +56,13 @@ int main(int argc, char* argv[]){
   bool    usePeak_in   = true;
   bool    into_latex   = true;
   bool    print_table  = false;
-  bool    add_mTop     = true;
+  bool    add_mTop     = false;
   bool    onlyData     = false;
+  bool    useOnly_lin  = false;      // functions_explain
 
   // Input ---------------------------------------------------------------------
-  bool    useOnly_lin = stob(argv[2]);      // functions_explain
-  TString year        = argv[1];
+  bool    pt_bins      = stob(argv[2]);
+  TString year         = argv[1];
 
   // #################################################################################################
   // cout settings ###################################################################################
@@ -67,8 +72,8 @@ int main(int argc, char* argv[]){
   cout << "Table:     " << print_table << endl;
   cout << "\n============================= Calculation Settings\n";
   cout << "Peak:      " << usePeak_in  << endl;
+  cout << "Pt bins:   " << pt_bins     << endl;
   cout << "Only lin:  " << useOnly_lin << endl;
-  cout << "onlyData:  " << onlyData    << endl;
   cout << "Bin Width: " << bin_width   << endl;
   cout << "Add mTop:  " << add_mTop    << endl;
 
@@ -119,9 +124,9 @@ int main(int argc, char* argv[]){
   positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
   */
   TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS";
-  if(onlyData)save_path_general = creat_folder_and_path(save_path_general, "only_data_uncert");
-  else        save_path_general = creat_folder_and_path(save_path_general, "mc_data_uncert");
-  save_path_general = creat_folder_and_path(save_path_general, "pt_bins");               // CHANGE_PT
+  save_path_general = creat_folder_and_path(save_path_general, "chi2");
+  if(pt_bins) save_path_general = creat_folder_and_path(save_path_general, "pt_bins");               // CHANGE_PT
+  else        save_path_general = creat_folder_and_path(save_path_general, "no_bins");
 
   // #################################################################################################
   // creat subdirectories ############################################################################
@@ -150,17 +155,26 @@ int main(int argc, char* argv[]){
   TString chi2_str_hh, chi2_str_hl, chi2_str_lh, chi2_str_ll;
   vector<double> chi2_parameters_hh, chi2_parameters_hl, chi2_parameters_lh, chi2_parameters_ll;
 
+  double number_bins_total = 0;
+  double number_not_lin    = 0;
+
   for(int ptbin=0; ptbin<5; ptbin++){
     /* Four ptbins: "W-pT" and ratio of "subjet_high-pT/W-pT" - each two bins || CHANGE_PT */
-    if(ptbin==4) continue;
+
+    if(pt_bins){
+      if(ptbin==4)    continue;
+    } else{
+      if(!(ptbin==4)) continue;
+    }
     TString ptbin_str = to_string(ptbin);
     if(ptbin==0) addition="_hh";
     if(ptbin==1) addition="_hl";
     if(ptbin==2) addition="_lh";
     if(ptbin==3) addition="_ll";
     if(ptbin==4) addition="";
+    creat_folder(save_path_general, "single_bins/"+addition);
 
-    cout << "\n!-- "+addition+" --!\n";
+    cout << "\n!----- "+addition+" -----!\n";
 
     /*
     .██████  ███████ ████████     ██   ██ ██ ███████ ████████ ███████
@@ -367,7 +381,9 @@ int main(int argc, char* argv[]){
     vector<double> PeakLimit;
     if(isAll&&usePeak_in) usePeak = true;
 
-    double Limit = 75;
+    double Limit;
+    if(!pt_bins) Limit = 190;
+    else         Limit = 75;
     vector<int> peak_bins_v;
     if(usePeak) peak_bins_v = bins_upper_limit(data_rebin, Limit); // Get bins withc bin-content>Limit
 
@@ -616,6 +632,7 @@ int main(int argc, char* argv[]){
       cout << "\n";
       if(debug) cout << "---------------------------------------------------------------------------------------- " << bin+1 << endl;
       if(debug) cout << mass_bin_title[bin] << endl;
+      number_bins_total++;
 
       // #################################################################################################
       // Fill Vectors ####################################################################################
@@ -708,11 +725,14 @@ int main(int argc, char* argv[]){
           used_fits.AddBinContent(bin+1, order+1);           // Dummy Hist - Each bin
           break;
         }
-        else cout << "Bin " << number_bin[bin] << ": A "<< RED << name_fits[order][index_fit] << RESET << " fit is rejected (" << prob << ")" << endl;
+        else{
+          if(order==0) number_not_lin++;
+          cout << "Bin " << number_bin[bin] << ": A "<< RED << name_fits[order][index_fit] << RESET << " fit is rejected (" << prob << ")" << endl;
+        }
       }
 
-      // #################################################################################################
-      // Plot  ###########################################################################################
+      // #######################################################################
+      // Plot ##################################################################
       if(debug) cout << "Plot Fitting" << endl;
 
       // -----------------------------------------------------------------------
@@ -733,25 +753,94 @@ int main(int argc, char* argv[]){
       bin_fit->SetPointError(6, 0., 0., 0.);
 
       bin_fit->SetTitle(mass_bin_title[bin]);
-      bin_fit->GetHistogram()->GetXaxis()->SetTitle("JEC");
-      bin_fit->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction");
-      bin_fit->GetHistogram()->GetXaxis()->SetTitleOffset(-0.5);
-      bin_fit->GetHistogram()->GetYaxis()->SetTitleOffset(-0.5);
-
+      bin_fit->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
+      bin_fit->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
+      bin_fit->GetHistogram()->GetZaxis()->SetTitle("#DeltaN/N");
+      bin_fit->GetHistogram()->GetXaxis()->SetTitleOffset(2.5);
+      bin_fit->GetHistogram()->GetYaxis()->SetTitleOffset(2.5);
+      bin_fit->GetHistogram()->GetZaxis()->SetTitleOffset(2.6);
+      bin_fit->GetHistogram()->GetXaxis()->SetTitleSize(0.026);
+      bin_fit->GetHistogram()->GetYaxis()->SetTitleSize(0.026);
+      bin_fit->GetHistogram()->GetZaxis()->SetTitleSize(0.026);
       bin_fit->SetMarkerStyle(20);
-      TCanvas *B = new TCanvas(number_bin[bin]+"B"+ptbin_str, "B", 600, 600); // name used to avoid Warning
+
+      // -----------------------------------------------------------------------
+      // PolyLine to Mark Points in 2D Graph -----------------------------------
+      TPolyLine3D *xup= new TPolyLine3D(2);
+      xup->SetPoint(0, 0, 1, min_bin_content*0.8); // min_bin_content*0.8
+      xup->SetPoint(1, 0, 1, bin_content[4]-bin_content_err[4]);
+      xup->SetLineStyle(2);
+      xup->SetLineColor(kRed);
+      xup->SetLineWidth(1);
+
+      TPolyLine3D *xdo= new TPolyLine3D(2);
+      xdo->SetPoint(0, 0, -1, min_bin_content*0.8); // min_bin_content*0.8
+      xdo->SetPoint(1, 0, -1, bin_content[3]-bin_content_err[3]);
+      xdo->SetLineStyle(2);
+      xdo->SetLineColor(kRed);
+      xdo->SetLineWidth(1);
+
+      TPolyLine3D *jup= new TPolyLine3D(2);
+      jup->SetPoint(0, 1, 0, min_bin_content*0.8); // min_bin_content*0.8
+      jup->SetPoint(1, 1, 0, bin_content[2]-bin_content_err[2]);
+      jup->SetLineStyle(2);
+      jup->SetLineColor(kRed);
+      jup->SetLineWidth(1);
+
+      TPolyLine3D *jdo= new TPolyLine3D(2);
+      jdo->SetPoint(0, -1, 0, min_bin_content*0.8); // min_bin_content*0.8
+      jdo->SetPoint(1, -1, 0, bin_content[1]-bin_content_err[1]);
+      jdo->SetLineStyle(2);
+      jdo->SetLineColor(kRed);
+      jdo->SetLineWidth(1);
+
+      TPolyLine3D *mid= new TPolyLine3D(2);
+      mid->SetPoint(0, 0, 0, min_bin_content*0.8); // min_bin_content*0.8
+      mid->SetPoint(1, 0, 0, bin_content[0]-bin_content_err[0]);
+      mid->SetLineStyle(2);
+      mid->SetLineColor(kRed);
+      mid->SetLineWidth(1);
+
+      TPolyLine3D *xax= new TPolyLine3D(2);
+      xax->SetPoint(0, -1.05, 0, min_bin_content*0.8); // min_bin_content*0.8
+      xax->SetPoint(1,  1.05, 0, min_bin_content*0.8);
+      xax->SetLineStyle(3);
+      xax->SetLineColor(kBlack);
+      xax->SetLineWidth(1);
+      TPolyLine3D *yax= new TPolyLine3D(2);
+      yax->SetPoint(0, 0, -1.05, min_bin_content*0.8); // min_bin_content*0.8
+      yax->SetPoint(1, 0,  1.05, min_bin_content*0.8);
+      yax->SetLineStyle(3);
+      yax->SetLineColor(kBlack);
+      yax->SetLineWidth(1);
+
+      // -----------------------------------------------------------------------
+      // -----------------------------------------------------------------------
+
+      TCanvas *B = new TCanvas(number_bin[bin]+"B"+ptbin_str, "B", 800, 800); // name used to avoid Warning
       bin_fit->GetHistogram()->GetXaxis()->SetRangeUser(-2, 2);
       bin_fit->GetHistogram()->GetYaxis()->SetRangeUser(-2, 2);
       bin_fit->GetHistogram()->GetZaxis()->SetRangeUser(min_bin_content*0.8, max_bin_content*1.2);
 
+      B->SetRightMargin(0.09);
+      B->SetLeftMargin(0.15);
+
       bin_fit->Draw("err P");
-      B->SaveAs(save_path_general+"/single_bins/Bin"+number_bin[bin]+"_Points.pdf");
+      jup->Draw("same");
+      jdo->Draw("same");
+      mid->Draw("same");
+      xup->Draw("same");
+      xdo->Draw("same");
+      yax->Draw("same");
+      xax->Draw("same");
+
+      B->SaveAs(save_path_general+"/single_bins/"+addition+"/Bin"+number_bin[bin]+"_Points.pdf"); // Double / (//) does not affect the dir
       used_fit->Draw("same surf4");
-      B->SaveAs(save_path_general+"/single_bins/Bin"+number_bin[bin]+"_Combined"+addition+".pdf");
+      B->SaveAs(save_path_general+"/single_bins/"+addition+"/Bin"+number_bin[bin]+"_Combined.pdf");
       B->Clear();
       used_fit->SetRange(-2, -2, -1, 2, 2, 1);
       used_fit->Draw("surf4");
-      B->SaveAs(save_path_general+"/single_bins/Bin"+number_bin[bin]+"_Fit"+addition+".pdf");
+      B->SaveAs(save_path_general+"/single_bins/"+addition+"/Bin"+number_bin[bin]+"_Fit.pdf");
       B->Clear();
 
       // Remove Additional Points for fit --------------------------------------
@@ -963,7 +1052,7 @@ int main(int argc, char* argv[]){
 
     // Get Points --------------------------------------------------------------
     auto start = high_resolution_clock::now(); // Calculation time - start
-    vector<vector<double>> points = FindXY(chi2_function, twoD_minZ+2.3, twoD_minX-2, twoD_minX+2, twoD_minY-2, twoD_minY+2, 5000, 0.001);
+    vector<vector<double>> points = FindXY(chi2_function, twoD_minZ+2.3, twoD_minX-2, twoD_minX+2, twoD_minY-2, twoD_minY+2, 1000, 0.001);
     auto stop  = high_resolution_clock::now();  // Calculation time - stop
     auto duration = duration_cast<milliseconds>(stop - start);
     cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;
@@ -984,8 +1073,8 @@ int main(int argc, char* argv[]){
     sigma_points->SetMarkerSize(0.1);
 
     chi2_function->SetTitle("");
-    chi2_function->GetHistogram()->GetXaxis()->SetTitle("JEC");
-    chi2_function->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction");
+    chi2_function->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
+    chi2_function->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
     chi2_function->GetHistogram()->GetZaxis()->SetTitle("#chi^{2}");
     chi2_function->GetHistogram()->GetZaxis()->CenterTitle();
     chi2_function->GetHistogram()->GetZaxis()->SetTitleOffset(0.5);
@@ -1003,6 +1092,7 @@ int main(int argc, char* argv[]){
     chi2_function->SetContour(50);        // Contours
     gStyle->SetPalette(kDeepSea);         // kDeepSea kGreyScale kRust
     if(ptbin==0) TColor::InvertPalette(); // CHANGE_PT
+    // if(ptbin==4) TColor::InvertPalette(); // CHANGE_PT
 
     TCanvas *D = new TCanvas("D"+ptbin_str,"D", 600, 600);
     D->SetRightMargin(0.12);
@@ -1077,8 +1167,13 @@ int main(int argc, char* argv[]){
         // Plot ############################################################################################
         graph->SetTitle(mass_bin_title[bin]);
         TCanvas *E2 = new TCanvas(number_bin[bin]+"E2_"+factor_name[factor]+to_string(ptbin), "E2", 600, 600);
-        if(factor==0) graph->GetXaxis()->SetTitle("JEC");
-        else          graph->GetXaxis()->SetTitle("XCone");
+        gPad->SetLeftMargin(0.15);
+        gPad->SetRightMargin(0.05);
+        if(factor==0) graph->GetXaxis()->SetTitle("JEC factor");
+        else          graph->GetXaxis()->SetTitle("Additional XCone correction factor");
+        graph->GetYaxis()->SetTitle("#Delta N/N");
+        graph->GetYaxis()->SetTitleOffset(2.2);
+
         graph->Draw("AP");
         fit->Draw("SAME");
         E2->SaveAs(save_path_general+"/projection/Bin"+number_bin[bin]+"_"+factor_name[factor]+addition+".pdf");
@@ -1108,7 +1203,9 @@ int main(int argc, char* argv[]){
     }
   }
 
-
+  cout << "\nNumber bins:" << setw(4) << number_bins_total << endl;
+  cout << "Not linear: "   << setw(4) << number_not_lin    << " (" << (number_not_lin/number_bins_total)*100 << "%)" << endl;
+  if(!pt_bins) return 0;
   /*
   .█████  ██████  ██████       ██████ ██   ██ ██ ██████
   ██   ██ ██   ██ ██   ██     ██      ██   ██ ██      ██
@@ -1177,7 +1274,7 @@ int main(int argc, char* argv[]){
   // Get Points --------------------------------------------------------------------------------------
   vector<vector<double>> points;
   auto start = high_resolution_clock::now(); // Calculation time - start
-  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 5000, 0.001, true);
+  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 20000, 0.001, true);
   auto stop = high_resolution_clock::now();  // Calculation time - stop
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;
@@ -1204,8 +1301,8 @@ int main(int argc, char* argv[]){
   TString option_add = "";
   full_chi2_function->SetTitle("");
 
-  full_chi2_function->GetXaxis()->SetTitle("JEC");
-  full_chi2_function->GetYaxis()->SetTitle("Additional XCone correction");
+  full_chi2_function->GetXaxis()->SetTitle("JEC factor");
+  full_chi2_function->GetYaxis()->SetTitle("Additional XCone correction factor");
   full_chi2_function->GetZaxis()->SetTitle("#chi^{2}");
   full_chi2_function->GetZaxis()->CenterTitle();
   full_chi2_function->GetZaxis()->SetTitleOffset(0.5);
@@ -1269,10 +1366,7 @@ int main(int argc, char* argv[]){
   int index_min_l_s = ReturnIndex_Low(dist_left);
   int index_min_r_s = ReturnIndex_Low(dist_right);
 
-  int index_max_l;
-  int index_max_r;
-  int index_min_l;
-  int index_min_r;
+  int index_max_l, index_max_r, index_min_l, index_min_r;
 
   // Compare ------------------------------------------------------------------------------------------
   for(unsigned int i=0; i<dist_all.size(); i++){
@@ -1312,7 +1406,7 @@ int main(int argc, char* argv[]){
 
   extreme_points->SetMarkerColor(kBlue);
   extreme_points->SetMarkerStyle(kFullCircle);
-  extreme_points->SetMarkerSize(0.3);
+  extreme_points->SetMarkerSize(0.4);
 
 
   // #################################################################################################

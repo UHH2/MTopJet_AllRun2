@@ -4,11 +4,11 @@
 RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
 
-  HadJetMass = book<TH1F>("M_jet1", "m_{jet} [GeV]", 50, 0, 500);
-  HadJetMass_B = book<TH1F>("M_jet1_B", "m_{jet} [GeV]", 100, 0, 500);
+  HadJetMass       = book<TH1F>("M_jet1", "m_{jet} [GeV]", 50, 0, 500);
+  HadJetMass_B     = book<TH1F>("M_jet1_B", "m_{jet} [GeV]", 100, 0, 500);
   HadJetMass_rebin = book<TH1F>("M_jet1_", "m_{jet} [GeV]", 25, 0, 500);
 
-  LepJetMass = book<TH1F>("M_jet2", "m_{jet + lepton}", 50, 0, 500);
+  LepJetMass     = book<TH1F>("M_jet2", "m_{jet + lepton}", 50, 0, 500);
   HadMassLepMass = book<TH1F>("M_jet1-M_jet2+lep", "m_{jet1} - m_{jet2 + lepton}", 40, -200, 200);
 
   HadJetEta = book<TH1F>("eta_jet1", "#eta", 50, -5, 5);
@@ -16,13 +16,13 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   LepJetEta = book<TH1F>("eta_jet2", "#eta", 50, -5, 5);
   LepJetPhi = book<TH1F>("phi_jet2", "#phi", 50, -2*M_PI, 2*M_PI);
 
-  DeltaR_btagT_xcone = book<TH1F>("DeltaR_btagT_xcone", "#Delta R (b-tag medium, next jet) ", 40, 0, 4);
+  DeltaR_btagT_xcone   = book<TH1F>("DeltaR_btagT_xcone", "#Delta R (b-tag medium, next jet) ", 40, 0, 4);
   DeltaR_btagM_nextjet = book<TH1F>("DeltaR_btagM_nextjet", "#Delta R (b-tag medium, next jet) ", 40, 0, 4);
   DeltaR_btagT_nextjet = book<TH1F>("DeltaR_btagT_nextjet", "#Delta R (b-tag tight, next jet) ", 40, 0, 4);
-  number_smalldR_all = book<TH1F>("number_smalldR_all", "number", 1, 0.5, 1.5);
-  number_smalldR_pass = book<TH1F>("number_smalldR_pass", "number", 1, 0.5, 1.5);
-  number_largedR_all = book<TH1F>("number_largedR_all", "number", 1, 0.5, 1.5);
-  number_largedR_pass = book<TH1F>("number_largedR_pass", "number", 1, 0.5, 1.5);
+  number_smalldR_all   = book<TH1F>("number_smalldR_all", "number", 1, 0.5, 1.5);
+  number_smalldR_pass  = book<TH1F>("number_smalldR_pass", "number", 1, 0.5, 1.5);
+  number_largedR_all   = book<TH1F>("number_largedR_all", "number", 1, 0.5, 1.5);
+  number_largedR_pass  = book<TH1F>("number_largedR_pass", "number", 1, 0.5, 1.5);
 
   csvmax = book<TH1F>("csvmax", "csv max", 50, 0, 1);
 
@@ -33,18 +33,18 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   HadJetPT = book<TH1F>("pt_jet1", "p_{T}", 50, 0, 1000);
   LepJetPT = book<TH1F>("pt_jet2", "p_{T}", 50, 0, 1000);
 
-  RhoA_fat = book<TH1F>("RhoA_fat", "#rho A_{fat}", 50, 0, 100);
-  RhoA = book<TH1F>("RhoA", "#rho A_{final}", 50, 0, 100);
+  RhoA_fat  = book<TH1F>("RhoA_fat", "#rho A_{fat}", 50, 0, 100);
+  RhoA      = book<TH1F>("RhoA", "#rho A_{final}", 50, 0, 100);
   RhoA_diff = book<TH1F>("RhoA_diff", "#rho (A_{fat} - A_{final})", 50, -50, 50);
-  E_diff = book<TH1F>("E_diff", "E_{fat} - E_{final}", 50, -50, 50);
+  E_diff    = book<TH1F>("E_diff", "E_{fat} - E_{final}", 50, -50, 50);
 
 
   FatJetPT_had = book<TH1F>("FatJetPT_had", "p_{T, fat had jet}", 50, 0, 1000);
   FatJetPT_lep = book<TH1F>("FatJetPT_lep", "p_{T, fat lep jet}", 50, 0, 1000);
 
-  FatJetPTDiff_had = book<TH1F>("FatJetPTDiff_had", "p_{T, fat} - p_{T, jet1}", 50, -50, 200);
+  FatJetPTDiff_had   = book<TH1F>("FatJetPTDiff_had", "p_{T, fat} - p_{T, jet1}", 50, -50, 200);
   FatJetMassDiff_had = book<TH1F>("FatJetMassDiff_had", "M_{fat} - m_{jet1}", 50, -200, 200);
-  FatJetPTDiff_lep = book<TH1F>("FatJetPTDiff_lep", "p_{T, fat} - p_{T, jet1}", 50, -50, 200);
+  FatJetPTDiff_lep   = book<TH1F>("FatJetPTDiff_lep", "p_{T, fat} - p_{T, jet1}", 50, -50, 200);
   FatJetMassDiff_lep = book<TH1F>("FatJetMassDiff_lep", "M_{fat} - m_{jet1}", 50, -200, 200);
 
   number_hadjet = book<TH1F>("number_hadjet", "number", 10, 0, 10);
