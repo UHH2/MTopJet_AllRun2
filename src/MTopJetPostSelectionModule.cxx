@@ -252,6 +252,10 @@ protected:
   bool isTTbar; //define here to use it in "process" part
   bool debug;
   bool isMTop;
+
+  bool year_16;
+  bool year_17;
+  bool year_18;
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
@@ -266,9 +270,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   */
   if(debug) cout << "\nStart Module - CTX\n";
 
-  bool year_16 = false;
-  bool year_17 = false;
-  bool year_18 = false;
+  year_16 = false;
+  year_17 = false;
+  year_18 = false;
   year = extract_year(ctx);
 
   if(year == Year::is2016v3) year_16 = true;
