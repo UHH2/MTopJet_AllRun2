@@ -790,7 +790,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
   bool scale_ttbar = true;           // match MC and data cross-section (for plots only)?
-  double SF_tt = 0.720007; // estimated in muon 2016
+  double SF_tt=0;
+  if(year_16)      SF_tt = 0.728693;
+  else if(year_17) SF_tt = 0.896576;
+  else if(year_18) SF_tt = 0.847446;
+  else throw runtime_error{"Year is wrong in PostSel: ttbar scale factor"}; // dummy
   // get lumi weight = genweight (inkl scale variation)
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
