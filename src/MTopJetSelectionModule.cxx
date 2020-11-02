@@ -465,11 +465,25 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
             if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) )passed_recsel = false;
           }
           else if(isElectronStream){
-            if(!trigger_el_B->passes(event))  passed_recsel = false;
+            // 2017B Does not have the ELe115
+            if(year == Year::is2017v2 && event.run <= 299329){
+              if(!trigger_el_A->passes(event))  passed_recsel = false;
+            }
+            else{
+              if(!trigger_el_B->passes(event))  passed_recsel = false;
+            }
+
           }
           else if(isPhotonStream){
-            if(trigger_el_B->passes(event))  passed_recsel = false;
-            if(!trigger_el_C->passes(event))  passed_recsel = false;
+            // 2017B Does not have the ELe115
+            if(year == Year::is2017v2 && event.run <= 299329){
+              if(trigger_el_A->passes(event))  passed_recsel = false;
+              if(!trigger_el_C->passes(event))  passed_recsel = false;
+            }
+            else{
+              if(trigger_el_B->passes(event))  passed_recsel = false;
+              if(!trigger_el_C->passes(event))  passed_recsel = false;
+            }
           }
         }
       }
