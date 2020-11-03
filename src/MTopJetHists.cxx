@@ -17,10 +17,10 @@ MTopJetHists::MTopJetHists(uhh2::Context & ctx, const std::string & dirname): Hi
   N_PrimVertices = book<TH1F>("N_PrimVertices", "number of primary vertices", 56, -0.5, 55.5);
   //N_TrueInteractions = book<TH1F>("N_TrueInteractions", "number of true interactions", 50, 0, 50);
   //Weights = book<TH1F>("Weights", "weights", 100,0,2);
-  MET   = book<TH1F>("MET", "p_{T}^{miss}", 200,0,1000);
-  HT    = book<TH1F>("HT", "H_{T} Jets", 100, 0, 3500);
-  HTLep = book<TH1F>("HTLep", "H_{T} Lep", 100, 0, 1000);
-  ST    = book<TH1F>("ST", "S_{T}", 100, 0, 5000);
+  MET   = book<TH1F>("MET", "missing p_{T} [GeV]", 200,0,1000);
+  HT    = book<TH1F>("HT", "H_{T} Jets [GeV]", 100, 0, 3500);
+  HTLep = book<TH1F>("HTLep", "H_{T} Lep [GeV]", 100, 0, 1000);
+  ST    = book<TH1F>("ST", "S_{T} [GeV]", 100, 0, 5000);
 
   // b-tag for CSVv2
   BTAG_L_CSV = book<TH1F>("BTAG_L_CSV", "N b-tags loose", 10, 0, 10);

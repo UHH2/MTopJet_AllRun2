@@ -1274,7 +1274,7 @@ int main(int argc, char* argv[]){
   // Get Points --------------------------------------------------------------------------------------
   vector<vector<double>> points;
   auto start = high_resolution_clock::now(); // Calculation time - start
-  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 20000, 0.001, true);
+  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 30000, 0.001, true);
   auto stop = high_resolution_clock::now();  // Calculation time - stop
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;

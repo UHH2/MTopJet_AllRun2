@@ -10,7 +10,7 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   // Tau Histograms --------------------------------------------------------------------------------------------
 
   // Reco Histograms -------------------------------------------------------------------------------------------
-  h_HadJetPt = book<TH1F>("ak8_hadjet_pt", "p_{T}", 50, 0, 1000);
+  h_HadJetPt = book<TH1F>("ak8_hadjet_pt", "p_{T} [GeV]", 50, 0, 1000);
   h_HadJetMass = book<TH1F>("ak8_hadjet_mass", "m_{jet} [GeV]", 50, 0, 500);
   h_HadJetEta = book<TH1F>("ak8_hadjet_eta", "#eta", 50, -5, 5);
   h_HadJetPhi = book<TH1F>("ak8_hadjet_phi", "#phi", 50, -2*M_PI, 2*M_PI);
@@ -33,21 +33,21 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   h_number_xcone_had_jet   = book<TH1F>("xcone_number_hadjets", "number XCone hadjets", 10, 0, 10);
 
   // Gen Histograms --------------------------------------------------------------------------------------------
-  if(isTTbar){
-    h_Number_matched_all    = book<TH1F>("gen_events_matched_all", "matched with all particles", 2, 0, 2);
-    h_Number_matched_top    = book<TH1F>("gen_events_matched_top", "matched with top", 2, 0, 2);
-    h_Number_matched_q1     = book<TH1F>("gen_events_matched_q1", "matched with q1", 2, 0, 2);
-    h_Number_matched_q2     = book<TH1F>("gen_events_matched_q2", "matched with q2", 2, 0, 2);
-    h_Number_matched_bottom = book<TH1F>("gen_events_matched_bottom", "matched with bottom", 2, 0, 2);
-
-    h_HadJetMass_fullymerged = book<TH1F>("gen_mass_hadjet_fullymerged", "m_{jet} [GeV]", 50, 0, 500);
-    h_HadJetMass_semimerged  = book<TH1F>("gen_mass_hadjet_semimerged", "m_{jet} [GeV]", 50, 0, 500);
-    h_HadJetMass_notmerged   = book<TH1F>("gen_mass_hadjet_notmerged", "m_{jet} [GeV]", 50, 0, 500);
-
-    h_HadJetTau32_fullymerged = book<TH1F>("gen_tau32_hadjet_fullymerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
-    h_HadJetTau32_semimerged  = book<TH1F>("gen_tau32_hadjet_semimerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
-    h_HadJetTau32_notmerged   = book<TH1F>("gen_tau32_hadjet_notmerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
-  }
+  // if(isTTbar){
+  //   h_Number_matched_all    = book<TH1F>("gen_events_matched_all", "matched with all particles", 2, 0, 2);
+  //   h_Number_matched_top    = book<TH1F>("gen_events_matched_top", "matched with top", 2, 0, 2);
+  //   h_Number_matched_q1     = book<TH1F>("gen_events_matched_q1", "matched with q1", 2, 0, 2);
+  //   h_Number_matched_q2     = book<TH1F>("gen_events_matched_q2", "matched with q2", 2, 0, 2);
+  //   h_Number_matched_bottom = book<TH1F>("gen_events_matched_bottom", "matched with bottom", 2, 0, 2);
+  //
+  //   h_HadJetMass_fullymerged = book<TH1F>("gen_mass_hadjet_fullymerged", "m_{jet} [GeV]", 50, 0, 500);
+  //   h_HadJetMass_semimerged  = book<TH1F>("gen_mass_hadjet_semimerged", "m_{jet} [GeV]", 50, 0, 500);
+  //   h_HadJetMass_notmerged   = book<TH1F>("gen_mass_hadjet_notmerged", "m_{jet} [GeV]", 50, 0, 500);
+  //
+  //   h_HadJetTau32_fullymerged = book<TH1F>("gen_tau32_hadjet_fullymerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
+  //   h_HadJetTau32_semimerged  = book<TH1F>("gen_tau32_hadjet_semimerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
+  //   h_HadJetTau32_notmerged   = book<TH1F>("gen_tau32_hadjet_notmerged", "#tau_{3}/#tau_{2}", 50, 0, 1);
+  // }
 
   // -----------------------------------------------------------------------------------------------------------
   // -----------------------------------------------------------------------------------------------------------
@@ -76,14 +76,14 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
 
   //Wjet
   h_wjet_bigger_pt_subjet  = book<TH1F>("wjet_bigger_pt_subjet", "", 2, 0, 2);
-  h_wjet_pt_match          = book<TH1F>("wjet_pt_match", "p_{T}", 50, 0, 1000);
-  h_wjet_pt_match_subjet1  = book<TH1F>("wjet_pt_match_subjet1", "p_{T}", 100, 0, 1000);
-  h_wjet_pt_match_subjet2  = book<TH1F>("wjet_pt_match_subjet2", "p_{T}", 100, 0, 1000);
-  h_wjet_pt_match_S1divS2  = book<TH1F>("wjet_pt_match_S1divS2", "p_{T}", 100, 0, 10);
-  h_wjet_pt_match_S1divW   = book<TH1F>("wjet_pt_match_S1divW", "p_{T}", 20, 0, 1);
-  h_wjet_pt_match_S1mS2    = book<TH1F>("wjet_pt_match_S1mS2", "p_{T}", 51, -10, 500);
-  h_wjet_pt_match_S1_S2    = book<TH2F>("wjet_pt_match_S1_S2", "W Subjet pt", 100, 0, 1000, 100, 0, 1000);
-  h_wjet_pt_match_S1divW_W = book<TH2F>("wjet_pt_match_S1divW_W", "W Subjet pt", 100, 0, 1000, 100, 0, 1);
+  h_wjet_pt_match          = book<TH1F>("wjet_pt_match", "p_{T} [GeV]", 50, 0, 1000);
+  h_wjet_pt_match_subjet1  = book<TH1F>("wjet_pt_match_subjet1", "p_{T} [GeV]", 100, 0, 1000);
+  h_wjet_pt_match_subjet2  = book<TH1F>("wjet_pt_match_subjet2", "p_{T} [GeV]", 100, 0, 1000);
+  h_wjet_pt_match_S1divS2  = book<TH1F>("wjet_pt_match_S1divS2", "p_{T} [GeV]", 100, 0, 10);
+  h_wjet_pt_match_S1divW   = book<TH1F>("wjet_pt_match_S1divW", "p_{T} [GeV]", 20, 0, 1);
+  h_wjet_pt_match_S1mS2    = book<TH1F>("wjet_pt_match_S1mS2", "p_{T} [GeV]", 51, -10, 500);
+  h_wjet_pt_match_S1_S2    = book<TH2F>("wjet_pt_match_S1_S2", "W Subjet pt [GeV]", 100, 0, 1000, 100, 0, 1000);
+  h_wjet_pt_match_S1divW_W = book<TH2F>("wjet_pt_match_S1divW_W", "W Subjet pt [GeV]", 100, 0, 1000, 100, 0, 1);
   h_wmass_match            = book<TH1F>("wmass_match", "m_{Wjet} [GeV]", 180, 0, 180);
 
   // pt bins
@@ -355,34 +355,34 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
       if(debug) std::cout << "Tau: Gen fill" << '\n';
 
 
-      if(matched_top) h_Number_matched_top->Fill(1, weight);
-      else h_Number_matched_top->Fill(0.1, weight);
+      // if(matched_top) h_Number_matched_top->Fill(1, weight);
+      // else h_Number_matched_top->Fill(0.1, weight);
 
-      if(matched_q1) h_Number_matched_q1->Fill(1, weight);
-      else h_Number_matched_q1->Fill(0.1, weight);
+      // if(matched_q1) h_Number_matched_q1->Fill(1, weight);
+      // else h_Number_matched_q1->Fill(0.1, weight);
 
-      if(matched_q2) h_Number_matched_q2->Fill(1, weight);
-      else h_Number_matched_q2->Fill(0.1, weight);
+      // if(matched_q2) h_Number_matched_q2->Fill(1, weight);
+      // else h_Number_matched_q2->Fill(0.1, weight);
 
-      if(matched_bottom) h_Number_matched_bottom->Fill(1, weight);
-      else h_Number_matched_bottom->Fill(0.1, weight);
+      // if(matched_bottom) h_Number_matched_bottom->Fill(1, weight);
+      // else h_Number_matched_bottom->Fill(0.1, weight);
 
       if(semimatched){
-        h_HadJetTau32_semimerged->Fill(tau_32_ak, weight);
-        h_HadJetMass_semimerged->Fill(ak8_had_v4.M(), weight);
+      // h_HadJetTau32_semimerged->Fill(tau_32_ak, weight);
+      // h_HadJetMass_semimerged->Fill(ak8_had_v4.M(), weight);
       }
 
       if(notmatched){
-        h_HadJetTau32_notmerged->Fill(tau_32_ak, weight);
-        h_HadJetMass_notmerged->Fill(ak8_had_v4.M(), weight);
+      // h_HadJetTau32_notmerged->Fill(tau_32_ak, weight);
+      // h_HadJetMass_notmerged->Fill(ak8_had_v4.M(), weight);
       }
 
       if(matched){
-        h_Number_matched_all->Fill(1, weight);
-        h_HadJetMass_fullymerged->Fill(ak8_had_v4.M(), weight);
-        h_HadJetTau32_fullymerged->Fill(tau_32_ak, weight);
+      // h_Number_matched_all->Fill(1, weight);
+      // h_HadJetMass_fullymerged->Fill(ak8_had_v4.M(), weight);
+      // h_HadJetTau32_fullymerged->Fill(tau_32_ak, weight);
       }
-      else h_Number_matched_all->Fill(0.1, weight);
+      //else h_Number_matched_all->Fill(0.1, weight);
     }
   }
 
