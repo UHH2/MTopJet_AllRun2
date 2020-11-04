@@ -137,8 +137,8 @@
   <InputData Version="DATA_SingleElecH_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <InputData Version="DATA_SinglePhotonB_ver1_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
-  <In FileName="&SinglePhotonB_ver1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <!-- <InputData Version="DATA_SinglePhotonB_ver1_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&SinglePhotonB_ver1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
   <InputData Version="DATA_SinglePhotonB_ver2_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonB_ver2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
   <InputData Version="DATA_SinglePhotonC_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
