@@ -272,14 +272,14 @@ int main(int argc, char* argv[]){
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetNdivisions(505);
         FSRup_general[a].at(b).at(c)->GetYaxis()->SetNdivisions(505);
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetTitleSize(0.05);
-        FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleSize(0.04);
+        FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleSize(0.05);
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetTitleOffset(0.9);
         FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleOffset(0.9);
         FSRup_general[a].at(b).at(c)->GetXaxis()->SetTitle("#tau_{32}");
         if(a==0)
         {
           FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitle("Events");
-          FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleOffset(1.5);
+          FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitleOffset(0.9);
         }
         else     FSRup_general[a].at(b).at(c)->GetYaxis()->SetTitle("#DeltaN/N");
         FSRup_general[a].at(b).at(c)->SetLineWidth(2);
@@ -296,21 +296,23 @@ int main(int argc, char* argv[]){
         FSRdown_general[a].at(b).at(c)->Draw("SAME HIST");
         ttbar_general[a].at(b)->Draw("SAME HIST");
         data_general[a].at(b)->Draw("SAME P");
-        leg = new TLegend(0.19,0.65,0.39,0.85);
+        leg = new TLegend(0.15,0.65,0.35,0.85);
         leg->AddEntry(ttbar_general[a].at(b),"Nominal","l");
         leg->AddEntry(FSRup_general[a].at(b).at(c) ,"FSR up","l");
         leg->AddEntry(FSRdown_general[a].at(b).at(c) ,"FSR down","l");
         leg->AddEntry(data_general[a].at(b) ,"Data","pl");
-        leg->SetTextSize(0.025);
+        leg->SetTextSize(0.03);
         leg->Draw();
         gPad->RedrawAxis();
         if(a==0){ // not norm
           if(b==0) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+".pdf");
           if(b==1) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+"_Rebin.pdf");
+          if(is16) A->SaveAs(save_path+"/tau32_SYS_all.pdf");
         }
         if(a==1){ // norm
           if(b==0) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+"_norm.pdf");
           if(b==1) A->SaveAs(save_path+"/tau32_SYS_"+FSR_strings[c]+"_Rebin_norm.pdf");
+          if(is16) A->SaveAs(save_path+"/tau32_SYS_all_norm.pdf");
         }
         delete A;
       }
@@ -336,9 +338,9 @@ int main(int argc, char* argv[]){
         ttbar_general[a].at(b)->GetXaxis()->SetNdivisions(505);
         ttbar_general[a].at(b)->GetYaxis()->SetNdivisions(505);
         ttbar_general[a].at(b)->GetXaxis()->SetTitleSize(0.05);
-        ttbar_general[a].at(b)->GetYaxis()->SetTitleSize(0.04);
+        ttbar_general[a].at(b)->GetYaxis()->SetTitleSize(0.05);
         ttbar_general[a].at(b)->GetXaxis()->SetTitleOffset(0.9);
-        ttbar_general[a].at(b)->GetYaxis()->SetTitleOffset(1.5);
+        ttbar_general[a].at(b)->GetYaxis()->SetTitleOffset(0.9);
         ttbar_general[a].at(b)->GetXaxis()->SetTitle("#tau_{32}");
         ttbar_general[a].at(b)->GetYaxis()->SetTitle("");
         cout << "Highest Peak: " << get_highest_peak(FSRup_general[a].at(b)) << endl;
@@ -371,7 +373,7 @@ int main(int argc, char* argv[]){
         // ---------------------------------------------------------------------
 
         TCanvas *A = new TCanvas("A", "A", 600, 600);
-        gPad->SetLeftMargin(0.15);
+        gPad->SetLeftMargin(0.12);
         gPad->SetBottomMargin(0.12);
         ttbar_general[a].at(b)->Draw("HIST");
         data_general[a].at(b)->Draw("SAME P");
@@ -380,7 +382,7 @@ int main(int argc, char* argv[]){
           FSRup_general[a].at(b).at(c)->Draw("SAME HIST");
           FSRdown_general[a].at(b).at(c)->Draw("SAME HIST");
         }
-        leg = new TLegend(0.19,0.65,0.39,0.85);
+        leg = new TLegend(0.15,0.65,0.35,0.85);
         leg->SetNColumns(2);
         leg->AddEntry(ttbar_general[a].at(b),"Nominal","l");
         leg->AddEntry((TObject*)0,"","");
@@ -793,9 +795,12 @@ int main(int argc, char* argv[]){
   // chi2_function->SetTitle("#chi^{2} of "+year);
   chi2_function->SetTitle("");
   chi2_function->GetHistogram()->GetXaxis()->SetTitle("log(x_{FSR})");
+  chi2_function->GetHistogram()->GetXaxis()->SetTitleSize(0.05);
   chi2_function->GetHistogram()->GetXaxis()->SetTitleOffset(1.2);
   chi2_function->GetHistogram()->GetYaxis()->SetTitle("#chi^{2}");
+  chi2_function->GetHistogram()->GetYaxis()->SetTitleSize(0.05);
   chi2_function->GetHistogram()->GetYaxis()->SetTitleOffset(0.9);
+
 
   if(debug) cout << "Chi2 - Function" << endl;
   TCanvas *B = new TCanvas("B","B", 600, 600);
@@ -871,11 +876,15 @@ int main(int argc, char* argv[]){
   // chi2_function_shifted->SetTitle("#chi^{2} of "+year);
   chi2_function_shifted->SetTitle("");
   chi2_function_shifted->GetHistogram()->GetXaxis()->SetTitle("log(x_{FSR})");
-  chi2_function_shifted->GetHistogram()->GetXaxis()->SetTitleOffset(1.2);
+  chi2_function_shifted->GetHistogram()->GetXaxis()->SetTitleOffset(1.0);
+  chi2_function_shifted->GetHistogram()->GetXaxis()->SetTitleSize(0.05);
   chi2_function_shifted->GetHistogram()->GetYaxis()->SetTitle("#chi^{2}");
-  chi2_function_shifted->GetHistogram()->GetYaxis()->SetTitleOffset(1.4);
+  chi2_function_shifted->GetHistogram()->GetYaxis()->SetTitleOffset(1.1);
+  chi2_function_shifted->GetHistogram()->GetYaxis()->SetTitleSize(0.05);
 
   TCanvas *T = new TCanvas("T","T", 600, 600);
+  gPad->SetLeftMargin(0.13);
+  gPad->SetBottomMargin(0.13);
   // chi2_function_shifted->GetXaxis()->SetRangeUser(shifted_limit_down, shifted_limit_up);
   chi2_function_shifted->Draw();
   // extreme_points->Draw("P same");
@@ -934,9 +943,9 @@ int main(int argc, char* argv[]){
   h_FSRup_min->GetXaxis()->SetNdivisions(505);
   h_FSRup_min->GetYaxis()->SetNdivisions(505);
   h_FSRup_min->GetXaxis()->SetTitleSize(0.05);
-  h_FSRup_min->GetYaxis()->SetTitleSize(0.03);
+  h_FSRup_min->GetYaxis()->SetTitleSize(0.05);
   h_FSRup_min->GetXaxis()->SetTitleOffset(0.9);
-  h_FSRup_min->GetYaxis()->SetTitleOffset(1.5);
+  h_FSRup_min->GetYaxis()->SetTitleOffset(0.9);
   h_FSRup_min->GetXaxis()->SetTitle("#tau_{32}");
   h_FSRup_min->GetYaxis()->SetTitle("#DeltaN/N");
   h_FSRup_min->SetLineWidth(1);
@@ -954,7 +963,7 @@ int main(int argc, char* argv[]){
 
   if(debug) cout << "Draw New Histogram with correct Minimum from Chi2" << endl;
   TCanvas *C = new TCanvas("C", "C", 600, 600);
-  gPad->SetLeftMargin(0.15);
+  gPad->SetLeftMargin(0.12);
   gPad->SetBottomMargin(0.12);
   h_FSRup_min->Draw("HIST");
   errors->Draw("SAME 2");
@@ -962,11 +971,11 @@ int main(int argc, char* argv[]){
   ttbar_all_norm[1]->Draw("SAME HIST");
   data_all_norm[1]->Draw("SAME P");
 
-  leg = new TLegend(0.20,0.65,0.40,0.85);
+  leg = new TLegend(0.15,0.65,0.35,0.85);
   leg->AddEntry(ttbar_all_norm[1],"Nominal","l");
   leg->AddEntry(h_FSRup_min, "FSR best fit value","l");
   leg->AddEntry(data_all_norm[1], "Data","pl");
-  leg->SetTextSize(0.02);
+  leg->SetTextSize(0.03);
   leg->Draw();
   gPad->RedrawAxis();
   C->SaveAs(save_path+"/tau32_minimum_factor.pdf");

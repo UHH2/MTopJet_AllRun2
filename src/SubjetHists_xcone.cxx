@@ -3,28 +3,28 @@
 
 SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
-  pt_had_subjets = book<TH1F>("pt_had_subjets", "p_{T}^{had subjets}", 50, 0, 500);
-  pt_had_subjets_fine = book<TH1F>("pt_had_subjets_fine", "p_{T}^{had subjets}", 100, 0, 500);
-  pt_had_subjet1_fine = book<TH1F>("pt_had_subjet1_fine", "p_{T}^{1st had subjet}", 100, 0, 500);
-  pt_had_subjet2_fine = book<TH1F>("pt_had_subjet2_fine", "p_{T}^{2nd had subjet}", 100, 0, 500);
-  pt_had_subjet3_fine = book<TH1F>("pt_had_subjet3_fine", "p_{T}^{3rd had subjet}", 100, 0, 500);
-  pt_had_subjet1 = book<TH1F>("pt_had_subjet1", "p_{T}^{1st had subjet}", 50, 0, 500);
-  pt_had_subjet2 = book<TH1F>("pt_had_subjet2", "p_{T}^{2nd had subjet}", 50, 0, 500);
-  pt_had_subjet3 = book<TH1F>("pt_had_subjet3", "p_{T}^{3rd had subjet}", 50, 0, 500);
+  pt_had_subjets = book<TH1F>("pt_had_subjets", "p_{T}^{had subjets} [GeV]", 50, 0, 500);
+  pt_had_subjets_fine = book<TH1F>("pt_had_subjets_fine", "p_{T}^{had subjets} [GeV]", 100, 0, 500);
+  pt_had_subjet1_fine = book<TH1F>("pt_had_subjet1_fine", "p_{T}^{1st had subjet} [GeV]", 100, 0, 500);
+  pt_had_subjet2_fine = book<TH1F>("pt_had_subjet2_fine", "p_{T}^{2nd had subjet} [GeV]", 100, 0, 500);
+  pt_had_subjet3_fine = book<TH1F>("pt_had_subjet3_fine", "p_{T}^{3rd had subjet} [GeV]", 100, 0, 500);
+  pt_had_subjet1 = book<TH1F>("pt_had_subjet1", "p_{T}^{1st had subjet} [GeV]", 50, 0, 500);
+  pt_had_subjet2 = book<TH1F>("pt_had_subjet2", "p_{T}^{2nd had subjet} [GeV]", 50, 0, 500);
+  pt_had_subjet3 = book<TH1F>("pt_had_subjet3", "p_{T}^{3rd had subjet} [GeV]", 50, 0, 500);
   eta_had_subjets = book<TH1F>("eta_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   eta_abs_had_subjets = book<TH1F>("eta_abs_had_subjets", "#eta^{had subjets}", 100, -5, 5);
   area_had_subjets = book<TH1F>("area_had_subjets", "jet area (had subjets)", 100, 0, 2);
   area_had1_subjet = book<TH1F>("area_had1_subjet", "jet area (had subjet 1)", 100, 0, 2);
   area_had2_subjet = book<TH1F>("area_had2_subjet", "jet area (had subjet 2)", 100, 0, 2);
   area_had3_subjet = book<TH1F>("area_had3_subjet", "jet area (had subjet 3)", 100, 0, 2);
-  pt_lep_subjets = book<TH1F>("pt_lep_subjets", "p_{T}^{lep subjets}", 100, 0, 500);
+  pt_lep_subjets = book<TH1F>("pt_lep_subjets", "p_{T}^{lep subjets} [GeV]", 100, 0, 500);
   eta_lep_subjets = book<TH1F>("eta_lep_subjets", "#eta^{lep subjets}", 100, -5, 5);
   area_lep_subjets = book<TH1F>("area_lep_subjets", "jet area (lep subjets)", 100, 0, 2);
   area_lep1_subjet = book<TH1F>("area_lep1_subjet", "jet area (lep subjet 1)", 100, 0, 2);
   area_lep2_subjet = book<TH1F>("area_lep2_subjet", "jet area (lep subjet 2)", 100, 0, 2);
   area_lep3_subjet = book<TH1F>("area_lep3_subjet", "jet area (lep subjet 3)", 100, 0, 2);
   area_all_subjets = book<TH1F>("area_all_subjets", "jet area (all subjets)", 100, 0, 2);
-  pt_all_subjets = book<TH1F>("pt_all_subjets", "p_{T}^{all subjets}", 100, 0, 500);
+  pt_all_subjets = book<TH1F>("pt_all_subjets", "p_{T}^{all subjets} [GeV]", 100, 0, 500);
   eta_all_subjets = book<TH1F>("eta_all_subjets", "#eta^{all subjets}", 100, -5, 5);
   AreaVsPT = book<TH2F>("AreaVsPT", "x=p_{T}^{had subjets} y=Area", 100, 0, 500, 30, 0, 0.6);
 
@@ -71,16 +71,16 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   area_final = book<TH1F>("area_final", "jet area (final had jet)", 100, 0, 3);
   area_pt_final = book<TH2F>("area_pt_final", "x=area y=PT", 100, 0, 3,  100, 0, 2000);
 
-  pt_lep_combine = book<TH1F>("pt_lep_combine", "p_{T}^{lep combined}", 50, 0, 1000);
-  pt_had_combine = book<TH1F>("pt_had_combine", "p_{T}^{had combined}", 50, 0, 1000);
-  mass_lep_combine = book<TH1F>("mass_lep_combine", "M^{lep combined}", 50, 0, 500);
-  mass_had_combine = book<TH1F>("mass_had_combine", "M^{had combined}", 50, 0, 500);
+  pt_lep_combine = book<TH1F>("pt_lep_combine", "p_{T}^{lep combined} [GeV]", 50, 0, 1000);
+  pt_had_combine = book<TH1F>("pt_had_combine", "p_{T}^{had combined} [GeV]", 50, 0, 1000);
+  mass_lep_combine = book<TH1F>("mass_lep_combine", "M^{lep combined} [GeV]", 50, 0, 500);
+  mass_had_combine = book<TH1F>("mass_had_combine", "M^{had combined} [GeV]", 50, 0, 500);
   mass_had_combine_cut = book<TH1F>("mass_had_combine_cut", "M^{had combined}", 50, 0, 500);
 
-  min_mass_Wjet = book<TH1F>("min_mass_Wjet", "min m_{ij}", 36, 0, 180);
-  min_mass_Wjet_ptlow = book<TH1F>("min_mass_Wjet_ptlow", "min m_{ij}", 50, 50, 150);
-  min_mass_Wjet_pthigh = book<TH1F>("min_mass_Wjet_pthigh", "min m_{ij}", 50, 50, 150);
-  all_mass_Wjet = book<TH1F>("all_mass_Wjet", "all m_{ij}", 50, 50, 150);
+  min_mass_Wjet = book<TH1F>("min_mass_Wjet", "min m_{ij} [GeV]", 36, 0, 180);
+  min_mass_Wjet_ptlow = book<TH1F>("min_mass_Wjet_ptlow", "min m_{ij} [GeV]", 50, 50, 150);
+  min_mass_Wjet_pthigh = book<TH1F>("min_mass_Wjet_pthigh", "min m_{ij} [GeV]", 50, 50, 150);
+  all_mass_Wjet = book<TH1F>("all_mass_Wjet", "all m_{ij} [GeV]", 50, 50, 150);
 
   min_mass_Wjet_zoom = book<TH1F>("min_mass_Wjet_zoom", "min m_{ij}", 60, 60, 120);
   pt_Wjet = book<TH1F>("pt_Wjet", "p_{T,ij}", 100, 0, 500);
@@ -91,7 +91,7 @@ SubjetHists_xcone::SubjetHists_xcone(uhh2::Context & ctx, const std::string & di
   Wjet_combination = book<TH1F>("Wjet_combination", "combination", 3, 0, 3);
 
   area_ak4 = book<TH1F>("area_ak4", "jet area (ak4)", 100, 0, 2);
-  pt_ak4 = book<TH1F>("pt_ak4", "p_{T}^{ak4}", 100, 0, 500);
+  pt_ak4 = book<TH1F>("pt_ak4", "p_{T}^{ak4} [GeV]", 100, 0, 500);
   eta_ak4 = book<TH1F>("eta_ak4", "#eta^{ak4}", 100, -5, 5);
   JEC_ak4 = book<TH1F>("JEC_ak4", "JEC factor", 100, 0, 2);
   JEC_L1_ak4 = book<TH1F>("JEC_L1_ak4", "JEC factor L1", 100, 0, 2);
