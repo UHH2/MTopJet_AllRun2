@@ -427,21 +427,19 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   bool elec_is_isolated = false;
   if(channel_ == muon){
     if(passed_recsel){
-      if(!isMC) {
-        if(year == Year::is2016v3){
-          if(event.run < 274954){
-            if(!trigger_mu_A->passes(event)) passed_recsel = false;
-          }
-          else{
-            if( !(trigger_mu_A->passes(event) || trigger_mu_B->passes(event)) ) passed_recsel = false;
-          }
-        }
-        if(year == Year::is2017v2){
+      if(year == Year::is2016v3){
+        if(!isMC && event.run < 274954){
           if(!trigger_mu_A->passes(event)) passed_recsel = false;
         }
-        if(year == Year::is2018){
-          if(!trigger_mu_A->passes(event)) passed_recsel = false;
+        else{
+          if( !(trigger_mu_A->passes(event) || trigger_mu_B->passes(event)) ) passed_recsel = false;
         }
+      }
+      if(year == Year::is2017v2){
+        if(!trigger_mu_A->passes(event)) passed_recsel = false;
+      }
+      if(year == Year::is2018){
+        if(!trigger_mu_A->passes(event)) passed_recsel = false;
       }
     }
   }
@@ -449,16 +447,20 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // for pt > 120 use triggerB || triggerC
   else if(channel_ == elec){
     if(passed_recsel){
+      // pt < 120
       if(!elec_sel_120->passes(event)){
         if(isPhotonStream) passed_recsel = false;
         if(!trigger_el_A->passes(event))      passed_recsel = false;
         if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
         if(passed_recsel) elec_is_isolated = false;
       }
+      // pt > 120
       else{
+        // MC + pt > 120
         if(isMC){
           if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
         }
+        // DATA + pt > 120
         else{
           // Treat 2018 differently because of combined strem
           if(year == Year::is2018){
