@@ -575,7 +575,7 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_MET_lumi->fill(event);
   }
 
-  /* *********** MET selection *********** */
+  /* *********** bad HCAL selection for 2018 *********** */
   if(!sel_badhcal->passes(event)) passed_recsel = false;
 
 
