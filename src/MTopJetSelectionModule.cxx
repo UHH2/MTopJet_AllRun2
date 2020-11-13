@@ -135,7 +135,6 @@ protected:
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
-  bool recsel_only;
   bool isElectronStream;
   bool isPhotonStream;
 
@@ -161,7 +160,6 @@ protected:
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
-  recsel_only = false;
   year = extract_year(ctx); // Ask for the year of Event
 
   //======================= YearSwitcher =======================================
@@ -612,9 +610,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(presel && pass_twodcut && pass_met && !passed_btag) h_cuts_all_but_btag->fill(event);
 
   // only keep events that passed rec or gen solution
-  if(recsel_only){
-    if(!passed_recsel) return false;
-  }
   if(!passed_gensel && !passed_recsel) return false;
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */
