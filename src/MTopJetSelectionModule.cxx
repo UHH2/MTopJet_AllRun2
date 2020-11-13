@@ -99,6 +99,7 @@ protected:
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
+  std::unique_ptr<Selection> sel_badhcal;
 
   Event::Handle<bool>h_gensel;
   Event::Handle<bool>h_recsel;
@@ -279,6 +280,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   met_sel.reset(new METCut  (metcut , uhh2::infinity));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
+  sel_badhcal.reset(new BadHCALSelection(ctx));
 
   //// Obj Cleaning
   common.reset(new CommonModules());
@@ -572,6 +574,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_MET_jets->fill(event);
     h_MET_lumi->fill(event);
   }
+
+  /* *********** MET selection *********** */
+  if(!sel_badhcal->passes(event)) passed_recsel = false;
+
 
   /* *********** b-tag counter *********** */
   bool passed_btag = false;
