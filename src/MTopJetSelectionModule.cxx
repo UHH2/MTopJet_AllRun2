@@ -185,6 +185,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   if(dataset_version.Contains("SinglePhoton")) isPhotonStream = true;
   else isPhotonStream = false;
 
+  if(isPhotonStream)   cout << "PHOTON STREAM DETECTED" << endl;
+  if(isElectronStream) cout << "ELECTRON STREAM DETECTED" << endl;
+
+
   // ttbar gen
   const std::string ttbar_gen_label("ttbargen");
   if(isTTbar) ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
@@ -245,11 +249,17 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // define IDs
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
   // this is only used for cleaner and electron veto
-  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight_noIso);
+  ElectronId eleid_noiso55;
+  if(year_16) eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight_noIso);
+  else        eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight_noIso);
   // this is used to decide which ele trigger is used
-  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Summer16_tight_noIso);
+  ElectronId eleid_noiso120;
+  if(year_16) eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Summer16_tight_noIso);
+  else        eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Fall17_tight_noIso);
   // this is used in combination with iso trigger
-  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
+  ElectronId eleid_iso55;
+  if(year_16)   eleid_iso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
+  else          eleid_iso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight);
   // jet ids
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
   ////
@@ -452,19 +462,19 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
         if(isPhotonStream) passed_recsel = false;
         if(!trigger_el_A->passes(event))      passed_recsel = false;
         if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
-        if(passed_recsel) elec_is_isolated = false;
+        if(passed_recsel) elec_is_isolated = true;
       }
       // pt > 120
       else{
         // MC + pt > 120
         if(isMC){
-          if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
+          if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) ) passed_recsel = false;
         }
         // DATA + pt > 120
         else{
           // Treat 2018 differently because of combined strem
           if(year == Year::is2018){
-            if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) )passed_recsel = false;
+            if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) )passed_recsel = false;
           }
           else if(isElectronStream){
             // 2017B Does not have the ELe115
@@ -474,7 +484,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
             else{
               if(!trigger_el_B->passes(event))  passed_recsel = false;
             }
-
           }
           else if(isPhotonStream){
             // 2017B Does not have the ELe115
