@@ -146,6 +146,10 @@ protected:
 
   Year year;
 
+  int N_all = 0;
+  int N_trigger = 0;
+  int N_sel = 0;
+
 };
 
 /*
@@ -266,9 +270,13 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // define Trigger
   trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
   trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
-  trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
+  if(year_16)      trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
+  else if(year_17) trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele35_WPTight_Gsf_v*");
+  else if(year_18) trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele32_WPTight_Gsf_v*");
   trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
-  trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+  if(year_16) trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+  else        trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon200_v*");
+
   /*Only select event with exacly 1 muon or electron */
   if(channel_ == elec){
     muon_sel.reset(new NMuonSelection(0, 0, muid));
@@ -466,35 +474,49 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
       }
       // pt > 120
       else{
-        // MC + pt > 120
+        // MC: A || B
         if(isMC){
           if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) ) passed_recsel = false;
         }
-        // DATA + pt > 120
+        // DATA 2016: if elec B, if photon !B && C
         else{
-          // Treat 2018 differently because of combined strem
-          if(year == Year::is2018){
-            if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) )passed_recsel = false;
-          }
-          else if(isElectronStream){
-            // 2017B Does not have the ELe115
-            if(year == Year::is2017v2 && event.run <= 299329){
-              if(!trigger_el_A->passes(event))  passed_recsel = false;
-            }
-            else{
-              if(!trigger_el_B->passes(event))  passed_recsel = false;
-            }
-          }
-          else if(isPhotonStream){
-            // 2017B Does not have the ELe115
-            if(year == Year::is2017v2 && event.run <= 299329){
-              if(trigger_el_A->passes(event))  passed_recsel = false;
-              if(!trigger_el_C->passes(event))  passed_recsel = false;
-            }
-            else{
+          if(year == Year::is2016v3){
+            if(isPhotonStream){
               if(trigger_el_B->passes(event))  passed_recsel = false;
               if(!trigger_el_C->passes(event))  passed_recsel = false;
             }
+            else if(isElectronStream){
+              if(!trigger_el_B->passes(event))  passed_recsel = false;
+            }
+          }
+          // DATA 2017: if elec B, if photon !B && C
+          else if(year == Year::is2017v2){
+            // Trigger B does not exist in 2017B, so use A here
+            if(event.run <= 299329){
+              if(isPhotonStream){
+                if(trigger_el_A->passes(event))  passed_recsel = false;
+                if(!trigger_el_C->passes(event))  passed_recsel = false;
+              }
+              else if(isElectronStream){
+                if(!trigger_el_A->passes(event))  passed_recsel = false;
+                if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
+                if(passed_recsel) elec_is_isolated = true;
+              }
+            }
+            // For all other runs, same as in 2016
+            else{
+              if(isPhotonStream){
+                if(trigger_el_B->passes(event))  passed_recsel = false;
+                if(!trigger_el_C->passes(event))  passed_recsel = false;
+              }
+              else if(isElectronStream){
+                if(!trigger_el_B->passes(event))  passed_recsel = false;
+              }
+            }
+          }
+          // DATA 2018: B || C
+          else if(year == Year::is2018){
+            if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) )passed_recsel = false;
           }
         }
       }
