@@ -356,7 +356,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   mass_sel.reset(new MassCutXCone(ctx, jet_label_had, jet_label_lep));
 
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(60., 2.4));
-  ElectronId eleid = AndId<Electron>(PtEtaSCCut(60., 2.4), ElectronID_Summer16_tight);
+  ElectronId eleid;
+  if(year_16) eleid = AndId<Electron>(PtEtaSCCut(60., 2.4), ElectronID_Summer16_tight_noIso);
+  else        eleid = AndId<Electron>(PtEtaSCCut(60., 2.4), ElectronID_Fall17_tight_noIso);
 
   if(channel_ == muon) lepton_sel.reset(new NMuonSelection(1, -1, muid));
   else                 lepton_sel.reset(new NElectronSelection(1, -1, eleid));
@@ -410,20 +412,28 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(year_16){
     muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", false, MuScale_variation));
     muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", false, MuTrigger_variation));
+    ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
+    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
+    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
   }
   else if(year_17){
     muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MuonID_94X_RunBCDEF_SF_ID.root","NUM_TightID_DEN_genTracks_pt_abseta",1, "tightID", true, MuScale_variation));
     muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MuonTrigger_EfficienciesAndSF_RunBtoF_Nov17Nov2017.root","Mu50_PtEtaBins/pt_abseta_ratio",1, "muonTrigger", true, MuTrigger_variation));
+    ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins")); // NEEDS TO BE UPDATED
+    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2017/2017_ElectronTight.root", 1.0, "tight_id", ElID_variation));
+    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2017/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root", 1.0, "reco", ElReco_variation));
   }
   else if(year_18){
     muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/Muon_ID_SF_RunABCD.root","NUM_TightID_DEN_TrackerMuons_pt_abseta",1, "tightID", true, MuScale_variation));
     muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/Muon_Trigger_Eff_SF_AfterMuonHLTUpdate.root","Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",1, "muonTrigger", true, MuTrigger_variation));
+    ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins")); // NEEDS TO BE UPDATED
+    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2018/2018_ElectronTight.root", 1.0, "tight_id", ElID_variation));
+    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2018/egammaEffi.txt_EGM2D_updatedAll.root", 1.0, "reco", ElReco_variation));
   }
-  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
+  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v3, 2017_v2 or 2018!");
 
-  ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
-  ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
-  ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
+  // UPDATE THIS FOR 2017 + 2018!!
+
   /*************************** Set up Hists classes **********************************************************************************/
   if(debug) cout << "\nSetup Hists \n";
   //BTagMCEfficiencyHists
