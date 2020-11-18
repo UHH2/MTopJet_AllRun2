@@ -759,7 +759,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     else if(jms_direction == "downdown") points = {0.3011,  0.1198}; // clostest point, left
     else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown)");
     if(debug) cout << "JMS - get_mass_BestFit\n";
-    if(eta_sel->passes(event)) mass_jms = BestFit->get_mass_BestFit(event, points);
+    mass_jms = BestFit->get_mass_BestFit(event, points);
     event.set(h_mass_jms, mass_jms);
   }
   else{
