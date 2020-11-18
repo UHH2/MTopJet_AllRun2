@@ -319,8 +319,8 @@ vector<double> CorrectionFactor_JMS::get_factor_JEC(FactorizedJetCorrector & cor
     // ignore jets with very low pt or high eta, avoiding a crash from the JESUncertainty tool
     double pt = jet_v4_corrected.Pt();
     double eta = jet_v4_corrected.Eta();
-    if (!(pt<5. || fabs(eta)>5.)){
-      JEC_factors.push_back(-1);
+    if(pt<5. || fabs(eta)>5.){
+      JEC_factors.push_back(0);
     }
     else{
       jec_unc->setJetEta(eta);
