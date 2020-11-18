@@ -99,6 +99,7 @@ protected:
   std::unique_ptr<uhh2::Selection> met_sel;
   std::unique_ptr<uhh2::Selection> pv_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
+  std::unique_ptr<Selection> sel_badhcal;
 
   Event::Handle<bool>h_gensel;
   Event::Handle<bool>h_recsel;
@@ -134,7 +135,6 @@ protected:
 
   bool isMC; //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
-  bool recsel_only;
   bool isElectronStream;
   bool isPhotonStream;
 
@@ -145,6 +145,10 @@ protected:
   JetId btag_tight;
 
   Year year;
+
+  int N_all = 0;
+  int N_trigger = 0;
+  int N_sel = 0;
 
 };
 
@@ -160,7 +164,6 @@ protected:
 
 MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
-  recsel_only = false;
   year = extract_year(ctx); // Ask for the year of Event
 
   //======================= YearSwitcher =======================================
@@ -185,6 +188,10 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
 
   if(dataset_version.Contains("SinglePhoton")) isPhotonStream = true;
   else isPhotonStream = false;
+
+  if(isPhotonStream)   cout << "PHOTON STREAM DETECTED" << endl;
+  if(isElectronStream) cout << "ELECTRON STREAM DETECTED" << endl;
+
 
   // ttbar gen
   const std::string ttbar_gen_label("ttbargen");
@@ -246,20 +253,30 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // define IDs
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
   // this is only used for cleaner and electron veto
-  ElectronId eleid_noiso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight_noIso);
+  ElectronId eleid_noiso55;
+  if(year_16) eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight_noIso);
+  else        eleid_noiso55 = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight_noIso);
   // this is used to decide which ele trigger is used
-  ElectronId eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Summer16_tight_noIso);
+  ElectronId eleid_noiso120;
+  if(year_16) eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Summer16_tight_noIso);
+  else        eleid_noiso120 = AndId<Electron>(PtEtaSCCut(120., 2.4), ElectronID_Fall17_tight_noIso);
   // this is used in combination with iso trigger
-  ElectronId eleid_iso55    = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
+  ElectronId eleid_iso55;
+  if(year_16)   eleid_iso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Summer16_tight);
+  else          eleid_iso55  = AndId<Electron>(PtEtaSCCut(55., 2.4), ElectronID_Fall17_tight);
   // jet ids
   JetId jetid_cleaner = AndId<Jet>(JetPFID(JetPFID::WP_TIGHT_CHS), PtEtaCut(30.0, 2.4));
   ////
   // define Trigger
   trigger_mu_A = uhh2::make_unique<TriggerSelection>("HLT_Mu50_v*");
   trigger_mu_B = uhh2::make_unique<TriggerSelection>("HLT_TkMu50_v*");
-  trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
+  if(year_16)      trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele27_WPTight_Gsf_v*");
+  else if(year_17) trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele35_WPTight_Gsf_v*");
+  else if(year_18) trigger_el_A = uhh2::make_unique<TriggerSelection>("HLT_Ele32_WPTight_Gsf_v*");
   trigger_el_B = uhh2::make_unique<TriggerSelection>("HLT_Ele115_CaloIdVT_GsfTrkIdT_v*");
-  trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+  if(year_16) trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon175_v*");
+  else        trigger_el_C = uhh2::make_unique<TriggerSelection>("HLT_Photon200_v*");
+
   /*Only select event with exacly 1 muon or electron */
   if(channel_ == elec){
     muon_sel.reset(new NMuonSelection(0, 0, muid));
@@ -279,6 +296,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   met_sel.reset(new METCut  (metcut , uhh2::infinity));
   twodcut_sel.reset(new TwoDCut1(0.4, 40));
   pv_sel.reset(new NPVSelection(1, -1, PrimaryVertexId(StandardPrimaryVertexId())));
+  sel_badhcal.reset(new BadHCALSelection(ctx));
 
   //// Obj Cleaning
   common.reset(new CommonModules());
@@ -452,40 +470,53 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
         if(isPhotonStream) passed_recsel = false;
         if(!trigger_el_A->passes(event))      passed_recsel = false;
         if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
-        if(passed_recsel) elec_is_isolated = false;
+        if(passed_recsel) elec_is_isolated = true;
       }
       // pt > 120
       else{
-        // MC + pt > 120
+        // MC: A || B
         if(isMC){
-          if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) ) passed_recsel = false;
+          if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) ) passed_recsel = false;
         }
-        // DATA + pt > 120
+        // DATA 2016: if elec B, if photon !B && C
         else{
-          // Treat 2018 differently because of combined strem
-          if(year == Year::is2018){
-            if( !(trigger_el_B->passes(event) || trigger_el_C->passes(event)) )passed_recsel = false;
-          }
-          else if(isElectronStream){
-            // 2017B Does not have the ELe115
-            if(year == Year::is2017v2 && event.run <= 299329){
-              if(!trigger_el_A->passes(event))  passed_recsel = false;
-            }
-            else{
-              if(!trigger_el_B->passes(event))  passed_recsel = false;
-            }
-
-          }
-          else if(isPhotonStream){
-            // 2017B Does not have the ELe115
-            if(year == Year::is2017v2 && event.run <= 299329){
-              if(trigger_el_A->passes(event))  passed_recsel = false;
-              if(!trigger_el_C->passes(event))  passed_recsel = false;
-            }
-            else{
+          if(year == Year::is2016v3){
+            if(isPhotonStream){
               if(trigger_el_B->passes(event))  passed_recsel = false;
               if(!trigger_el_C->passes(event))  passed_recsel = false;
             }
+            else if(isElectronStream){
+              if(!trigger_el_B->passes(event))  passed_recsel = false;
+            }
+          }
+          // DATA 2017: if elec B, if photon !B && C
+          else if(year == Year::is2017v2){
+            // Trigger B does not exist in 2017B, so use A here
+            if(event.run <= 299329){
+              if(isPhotonStream){
+                if(trigger_el_A->passes(event))  passed_recsel = false;
+                if(!trigger_el_C->passes(event))  passed_recsel = false;
+              }
+              else if(isElectronStream){
+                if(!trigger_el_A->passes(event))  passed_recsel = false;
+                if(!elec_sel_triggerA->passes(event)) passed_recsel = false;
+                if(passed_recsel) elec_is_isolated = true;
+              }
+            }
+            // For all other runs, same as in 2016
+            else{
+              if(isPhotonStream){
+                if(trigger_el_B->passes(event))  passed_recsel = false;
+                if(!trigger_el_C->passes(event))  passed_recsel = false;
+              }
+              else if(isElectronStream){
+                if(!trigger_el_B->passes(event))  passed_recsel = false;
+              }
+            }
+          }
+          // DATA 2018: B || C
+          else if(year == Year::is2018){
+            if( !trigger_el_B->passes(event) && !trigger_el_C->passes(event) )passed_recsel = false;
           }
         }
       }
@@ -573,6 +604,10 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
     h_MET_lumi->fill(event);
   }
 
+  /* *********** bad HCAL selection for 2018 *********** */
+  if(!sel_badhcal->passes(event)) passed_recsel = false;
+
+
   /* *********** b-tag counter *********** */
   bool passed_btag = false;
   int jetbtagN(0);
@@ -606,9 +641,6 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   if(presel && pass_twodcut && pass_met && !passed_btag) h_cuts_all_but_btag->fill(event);
 
   // only keep events that passed rec or gen solution
-  if(recsel_only){
-    if(!passed_recsel) return false;
-  }
   if(!passed_gensel && !passed_recsel) return false;
 
   /* *********** now produce final XCone Jets and write output (especially weight) *********** */

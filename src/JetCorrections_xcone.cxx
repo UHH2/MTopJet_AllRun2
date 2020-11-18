@@ -105,24 +105,23 @@ void JER_Smearer_xcone::init(uhh2::Context & ctx, const std::string& jet_collect
 
 
   JERSmearing::SFtype1 JER_sf;
-  std::string filenameAppend = "AK4PFPuppi.txt";
 
+  std::string jer_tag = "";
+  std::string jetCollection = "AK4PFchs";
   const Year & year = extract_year(ctx);
-  std::string resFilename = "";
+
   if (year == Year::is2016v3) {
-    JER_sf = JERSmearing::SF_13TeV_Summer16_25nsV1;
-    resFilename = "2016/Summer16_25nsV1_MC_PtResolution_"+filenameAppend;
+    jer_tag = "Summer16_25nsV1";
   } else if (year == Year::is2017v2) {
-    JER_sf = JERSmearing::SF_13TeV_Fall17_V3;
-    resFilename = "2017/Fall17_V3_MC_PtResolution_"+filenameAppend;
+    jer_tag = "Fall17_V3";
   } else if (year == Year::is2018) {
-    JER_sf = JERSmearing::SF_13TeV_Autumn18_RunABCD_V4;
-    resFilename = "2018/Autumn18_V4_MC_PtResolution_"+filenameAppend;
+    jer_tag = "Autumn18_V7";
   } else {
     throw runtime_error("Cannot find suitable jet resolution file & scale factors for this year for JetResolutionSmearer");
   }
 
-  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx, "xconeCHS", jet_collection_gen, JER_sf, resFilename));
+  JER_Smearer.reset(new GenericJetResolutionSmearer(ctx,  "xconeCHS", jet_collection_gen, JERFiles::JERPathStringMC(jer_tag,jetCollection,"SF"), JERFiles::JERPathStringMC(jer_tag,jetCollection,"PtResolution")));
+
 }
 
 

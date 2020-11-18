@@ -32,7 +32,8 @@ void LeptonicTop_Hists::fill(const Event & event){
   //=== Get Lepton =============================================================
   Particle lepton;
   if(event.muons->size() > 0) lepton = event.muons->at(0);
-  else throw runtime_error("In LeptonicTop_Hists: Event should have one muon.");
+  else if(event.electrons->size() > 0) lepton = event.electrons->at(0);
+  else throw runtime_error("In LeptonicTop_Hists: Event should have one muon or electron.");
   //=== Get Fatjets ============================================================
   std::vector<TopJet> fatjets = event.get(h_fatjets);
   if(fatjets.size() != 2) throw runtime_error("In LeptonicTop_Hists: fatjet should contain two jets.");
