@@ -122,36 +122,36 @@
     ██████  ██   ██    ██    ██   ██
   -->
 
-  <InputData Version="DATA_SingleElecB_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecB_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecB;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleElecC_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecC_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleElecD_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecD_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecD;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleElecE_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecE_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleElecF_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecF_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecF;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleElecG_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecG_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecG;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleElecH_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleElecH_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleElecH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!-- <InputData Version="DATA_SinglePhotonB_ver1_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <!-- <InputData Version="DATA_SinglePhotonB_ver1_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonB_ver1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-  <InputData Version="DATA_SinglePhotonB_ver2_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonB_ver2_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonB_ver2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SinglePhotonC_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonC_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SinglePhotonD_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonD_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonD;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SinglePhotonE_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonE_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SinglePhotonF_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonF_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonF;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SinglePhotonG_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonG_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonG;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SinglePhotonH_2016v3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SinglePhotonH_2016v3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SinglePhotonH;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
   <!--

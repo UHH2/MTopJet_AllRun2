@@ -118,22 +118,22 @@
     ██████  ██   ██    ██    ██   ██
   -->
 
-  <InputData Version="DATA_EGammaA_2018" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_EGammaA_2018" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaA;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <InputData Version="DATA_EGammaB_2018" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_EGammaB_2018" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaB;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <InputData Version="DATA_EGammaC_2018" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_EGammaC_2018" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <InputData Version="DATA_EGammaD_2018_1" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_EGammaD_2018_1" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaD_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <InputData Version="DATA_EGammaD_2018_2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_EGammaD_2018_2" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaD_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <InputData Version="DATA_EGammaD_2018_3" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_EGammaD_2018_3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaD_3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
