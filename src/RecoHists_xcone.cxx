@@ -25,6 +25,7 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   number_largedR_pass  = book<TH1F>("number_largedR_pass", "number", 1, 0.5, 1.5);
 
   csvmax = book<TH1F>("csvmax", "csv max", 50, 0, 1);
+  deepjetmax = book<TH1F>("deepjetmax", "deep jet max", 50, 0, 1);
 
   SoftdropMass_had = book<TH1F>("SoftdropMass_had", "Soft Drop Mass [GeV]", 25, 0, 500);
   SoftdropMass_Sel = book<TH1F>("SoftdropMass_Sel", "Soft Drop Mass [GeV]", 25, 0, 500);
@@ -249,7 +250,14 @@ void RecoHists_xcone::fill(const Event & event){
       maxcsv = event.jets->at(i).btag_combinedSecondaryVertex();
     }
   }
+  double maxdeepjet = -1;
+  for(unsigned int i=0; i<event.jets->size(); i++){
+    if(event.jets->at(i).btag_DeepJet() > maxdeepjet){
+      maxdeepjet = event.jets->at(i).btag_DeepJet();
+    }
+  }
   csvmax->Fill(maxcsv, weight);
+  deepjetmax->Fill(maxdeepjet, weight);
   //---------------------------------------------------------------------------------------
   //--------------------------------- Clear all used objects ------------------------------
   //---------------------------------------------------------------------------------------

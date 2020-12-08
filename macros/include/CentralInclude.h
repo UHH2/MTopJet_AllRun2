@@ -44,7 +44,7 @@
 
 using namespace std;
 
-TString dir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/";
+TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/";
 
 // -------------------------------------------------------------------------------------------
 void SetupGlobalStyle()
@@ -97,7 +97,7 @@ void CMSLabel(bool prelim, double x=0.25, double y=0.83){
   text->Draw();
 
   if(prelim){
-    TString simtext = "Preliminary";
+    TString simtext = "Work in Progress";
     TLatex *text3 = new TLatex(3.5, 24, simtext);
     text3->SetNDC();
     text3->SetTextAlign(13);

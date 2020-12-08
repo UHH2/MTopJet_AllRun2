@@ -71,7 +71,7 @@ double CorrectionFactor_JMS::get_factor_XCone(double pt, double eta, const doubl
 
 void CorrectionFactor_JMS::get_function(TString & year){
 
-  TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/CorrectionFile/";
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
   filename = dir + "Correction_allHad_"+year+".root";
   TFile *file = new TFile(filename);
@@ -95,7 +95,7 @@ void CorrectionFactor_JMS::get_function(TString & year){
 
 void CorrectionFactor_JMS::get_additionalSYS(){
 
-  TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/CorrectionFile/";
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
   filename = dir + "Correction_SysFromResolution_"+str_year+".root";
   TFile *file = new TFile(filename);

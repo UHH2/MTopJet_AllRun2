@@ -179,6 +179,7 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   h_lepjet   = ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
   h_fatjets  = ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   h_ttbargen = ctx.get_handle<TTbarGen>("ttbargen");
+
 }
 
 void RecoGenHists_xcone_topjet::fill(const Event & event){
@@ -294,6 +295,8 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
     h_HadJetTau3->Fill(ak8_had.tau3(), weight);
     h_HadJetTau32->Fill(tau_32_ak, weight);
     h_HadJetTau23->Fill(1/tau_32_ak, weight);
+
+    tau32 = tau_32_ak;
 
     h_distance_hadx_hadak->Fill(deltaR(xcone_had_jet.at(0), ak8_had), weight);
 
@@ -823,4 +826,8 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
       h_btag_percentage_high_mid_sel_btag_min->Fill(btag_v[btag_v_size-2]/btag_v[btag_v_size-1], weight);
     }
   }
+}
+
+double RecoGenHists_xcone_topjet::get_tau32(){
+  return tau32;
 }

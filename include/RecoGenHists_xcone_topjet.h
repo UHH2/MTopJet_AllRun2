@@ -21,6 +21,7 @@ public:
   RecoGenHists_xcone_topjet(uhh2::Context & ctx, const std::string & dirname, bool & isTTbar, const double &masscut);
 
   virtual void fill(const uhh2::Event & ev) override;
+  double get_tau32();
 
 private:
   bool isTTbar_;
@@ -77,5 +78,6 @@ protected:
 
   uhh2::Event::Handle<std::vector<TopJet>> h_recjets, h_hadjet, h_lepjet, h_fatjets;
   uhh2::Event::Handle<TTbarGen> h_ttbargen;
+  double tau32 = -1;
 
 };
