@@ -5,8 +5,8 @@
 
 <!ENTITY channel "muon">
 
-<!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/Selection/muon">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/muon">
+<!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2017/muon">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2017/muon">
 
 <!-- =============================================== DATA =========================================================================== -->
 <!ENTITY SingleMuonB    "&INdir;/uhh2.AnalysisModuleRunner.DATA.DATA_SingleMuonB_2017v2.root">
@@ -14,7 +14,6 @@
 <!ENTITY SingleMuonD    "&INdir;/uhh2.AnalysisModuleRunner.DATA.DATA_SingleMuonD_2017v2.root">
 <!ENTITY SingleMuonE    "&INdir;/uhh2.AnalysisModuleRunner.DATA.DATA_SingleMuonE_2017v2.root">
 <!ENTITY SingleMuonF    "&INdir;/uhh2.AnalysisModuleRunner.DATA.DATA_SingleMuonF_2017v2.root">
-
 
 <!-- =============================================== Single Top ===================================================================== -->
 <!ENTITY ST_t-channel_antitop    "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_t-channel_antitop_2017v2.root">
@@ -24,9 +23,25 @@
 <!ENTITY ST_tW_top               "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_tW_top_2017v2.root">
 
 <!-- =============================================== ttbar =========================================================================== -->
-<!ENTITY TTbar_2L2Nu          "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_2L2Nu_2017v2.root">
-<!ENTITY TTbar_SemiLep        "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_SemiLep_2017v2.root">
-<!ENTITY TTbar_Hadronic       "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Hadronic_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu          "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep        "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic       "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_up       "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_up     "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_up    "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_down     "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_down   "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_down  "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_Xup      "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_Xup    "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_Xup   "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_Xdown    "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_Xdown  "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2017v2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic_Xdown "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2017v2.root">
 
 <!-- =============================================== ttbar other samples ============================================================= -->
 <!ENTITY TTbar_mtop1665_2L2Nu               "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_2L2Nu_2017v2.root">
@@ -50,12 +65,41 @@
 <!ENTITY TTbar_mtop1755_Hadronic            "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2017v2.root">
 <!ENTITY TTbar_mtop1785_Hadronic            "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785_Hadronic_2017v2.root">
 
+
+<!ENTITY TTbar_mtop1695_2L2Nu_Jd            "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1755_2L2Nu_Jd            "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1695_SemiLeptonic_Jd     "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1755_SemiLeptonic_Jd     "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1695_Hadronic_Jd         "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_Hadronic_2017v2.root">
+<!ENTITY TTbar_mtop1755_Hadronic_Jd         "&INdir;/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_mtop1695_2L2Nu_Ju            "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1755_2L2Nu_Ju            "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1695_SemiLeptonic_Ju     "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1755_SemiLeptonic_Ju     "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1695_Hadronic_Ju         "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_Hadronic_2017v2.root">
+<!ENTITY TTbar_mtop1755_Hadronic_Ju         "&INdir;/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_mtop1695_2L2Nu_Xd            "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1755_2L2Nu_Xd            "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1695_SemiLeptonic_Xd     "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1755_SemiLeptonic_Xd     "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1695_Hadronic_Xd         "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_Hadronic_2017v2.root">
+<!ENTITY TTbar_mtop1755_Hadronic_Xd         "&INdir;/XCone_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2017v2.root">
+
+<!ENTITY TTbar_mtop1695_2L2Nu_Xu            "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1755_2L2Nu_Xu            "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_2L2Nu_2017v2.root">
+<!ENTITY TTbar_mtop1695_SemiLeptonic_Xu     "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1755_SemiLeptonic_Xu     "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_SemiLeptonic_2017v2.root">
+<!ENTITY TTbar_mtop1695_Hadronic_Xu         "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_Hadronic_2017v2.root">
+<!ENTITY TTbar_mtop1755_Hadronic_Xu         "&INdir;/XCone_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2017v2.root">
+
 <!-- =============================================== DiBoson =========================================================================== -->
 <!ENTITY  WW    "&INdir;/uhh2.AnalysisModuleRunner.MC.Diboson_WW_2017v2.root">
 <!ENTITY  WZ    "&INdir;/uhh2.AnalysisModuleRunner.MC.Diboson_WZ_2017v2.root">
 <!ENTITY  ZZ    "&INdir;/uhh2.AnalysisModuleRunner.MC.Diboson_ZZ_2017v2.root">
 <!-- =============================================== QCD Mu =========================================================================== -->
-<!ENTITY  QCD_Pt-0015to0020_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0015to0020_MuEnrichedPt5_2017v2.root">
+<!-- <!ENTITY  QCD_Pt-0015to0020_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0015to0020_MuEnrichedPt5_2017v2.root"> -->
 <!ENTITY  QCD_Pt-0020to0030_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0020to0030_MuEnrichedPt5_2017v2.root">
 <!ENTITY  QCD_Pt-0030to0050_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0030to0050_MuEnrichedPt5_2017v2.root">
 <!ENTITY  QCD_Pt-0050to0080_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0050to0080_MuEnrichedPt5_2017v2.root">
@@ -67,23 +111,15 @@
 <!ENTITY  QCD_Pt-0600to0800_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0600to0800_MuEnrichedPt5_2017v2.root">
 <!ENTITY  QCD_Pt-0800to1000_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0800to1000_MuEnrichedPt5_2017v2.root">
 <!ENTITY  QCD_Pt-1000toInft_MuEnrichedPt5    "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-1000toInft_MuEnrichedPt5_2017v2.root">
-
 <!-- =============================================== W+jets =========================================================================== -->
-<!ENTITY  WJetsToLNu_HT-0070to0100      	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0070to0100_2017v2.root">
-<!ENTITY  WJetsToLNu_HT-0100to0200      	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0100to0200_2017v2.root">
-<!ENTITY  WJetsToLNu_HT-0200to0400      	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0200to0400_2017v2.root">
-<!ENTITY  WJetsToLNu_HT-0400to0600      	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0400to0600_2017v2.root">
-<!ENTITY  WJetsToLNu_HT-0600to0800_1    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0600to0800_2017v2_1.root">
-<!ENTITY  WJetsToLNu_HT-0600to0800_2    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0600to0800_2017v2_2.root">
-<!ENTITY  WJetsToLNu_HT-0800to1200      	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0800to1200_2017v2.root">
-<!ENTITY  WJetsToLNu_HT-1200to2500_1    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-1200to2500_2017v2_1.root">
-<!ENTITY  WJetsToLNu_HT-1200to2500_2    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-1200to2500_2017v2_2.root">
-<!ENTITY  WJetsToLNu_HT-1200to2500_3    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-1200to2500_2017v2_3.root">
-<!ENTITY  WJetsToLNu_HT-1200to2500_4     	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-1200to2500_2017v2_4.root">
-<!ENTITY  WJetsToLNu_HT-2500toInft_1    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-2500toInft_2017v2_1.root">
-<!ENTITY  WJetsToLNu_HT-2500toInft_2    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-2500toInft_2017v2_2.root">
-<!ENTITY  WJetsToLNu_HT-2500toInft_3    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-2500toInft_2017v2_3.root">
-<!ENTITY  WJetsToLNu_HT-2500toInft_4    	   "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-2500toInft_2017v2_4.root">
+<!ENTITY  WJetsToLNu_HT-0070to0100    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0070to0100_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-0100to0200    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0100to0200_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-0200to0400    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0200to0400_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-0400to0600    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0400to0600_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-0600to0800    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0600to0800_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-0800to1200    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0800to1200_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-1200to2500    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-1200to2500_2017v2.root">
+<!ENTITY  WJetsToLNu_HT-2500toInft    "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-2500toInft_2017v2.root">
 <!-- =============================================== Z+jets =========================================================================== -->
 <!ENTITY DYJetsToLL_LO_M50_HT0070to0100    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0070to0100_2017v2.root">
 <!ENTITY DYJetsToLL_LO_M50_HT0100to0200    "&INdir;/uhh2.AnalysisModuleRunner.MC.DYJetsToLL_LO_M50_HT0100to0200_2017v2.root">
@@ -97,8 +133,8 @@
 ]>
 
 <!--
-<ConfigParse NEventsBreak="200000" LastBreak="0" FileSplit="0"/>
-<ConfigSGE RAM="4" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="Workdir_PostSelMu_2017"/>
+<ConfigParse NEventsBreak="20000" LastBreak="0" FileSplit="0"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelMu_2017"/>
 -->
 
 <JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
@@ -111,6 +147,7 @@
 
 
 
+
     <!--
     ██████   █████  ████████  █████
     ██   ██ ██   ██    ██    ██   ██
@@ -119,16 +156,17 @@
     ██████  ██   ██    ██    ██   ██
   -->
 
-  <InputData Version="DATA_SingleMuonB_2017v2" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <!-- <InputData Version="DATA_SingleMuonB_2017v2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleMuonB;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleMuonC_2017v2" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleMuonC_2017v2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleMuonC;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleMuonD_2017v2" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleMuonD_2017v2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleMuonD;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleMuonE_2017v2" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <InputData Version="DATA_SingleMuonE_2017v2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&SingleMuonE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-  <InputData Version="DATA_SingleMuonF_2017v2" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
-  <In FileName="&SingleMuonF;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+  <InputData Version="DATA_SingleMuonF_2017v2" Lumi="36814" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+  <In FileName="&SingleMuonF;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
 
   <!--
   ███████ ██ ███    ██  ██████  ██      ███████     ████████  ██████  ██████
@@ -138,7 +176,7 @@
   ███████ ██ ██   ████  ██████  ███████ ███████        ██     ██████  ██
 -->
 
-<InputData Version="ST_t-channel_antitop_2017v2" Lumi="2015134.883" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="ST_t-channel_antitop_2017v2" Lumi="2015134.883" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_t-channel_antitop;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="ST_t-channel_top_2017v2" Lumi="5192499.578" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_t-channel_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -147,7 +185,7 @@
 <InputData Version="ST_tW_antitop_2017v2" Lumi="10052727.74" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_tW_antitop;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="ST_tW_top_2017v2" Lumi="8837195.004" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&ST_tW_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&ST_tW_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 <!--
@@ -173,15 +211,40 @@
 .  ██       ██
 -->
 
-<InputData Version="TTbar_2L2Nu_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!-- <InputData Version="TTbar_Mtt0000to0700_2L2Nu_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_Hadronic_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-<InputData Version="TTbar_SemiLep_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_SemiLep;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!-- <InputData Version="TTbar_Mtt0000to0700_2L2Nu_JECup_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_JECup_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_Hadronic_JECup_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_up;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<InputData Version="TTbar_Hadronic_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_2L2Nu_JECdown_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_JECdown_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_Hadronic_JECdown_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_down;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
+<InputData Version="TTbar_Mtt0000to0700_2L2Nu_XConeup_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu_Xup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_XConeup_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep_Xup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_Hadronic_XConeup_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_Xup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_Mtt0000to0700_2L2Nu_XConedown_2017v2" Lumi="7427723.054" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu_Xdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_XConedown_2017v2" Lumi="35279949.78" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep_Xdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_Hadronic_XConedown_2017v2" Lumi="109490.4712" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_Hadronic_Xdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <!--
 ███    ███ ████████  ██████  ██████
@@ -191,7 +254,7 @@
 ██      ██    ██     ██████  ██
 -->
 
-<InputData Version="TTbar_mtop1665_2L2Nu_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_mtop1665_2L2Nu_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -234,6 +297,61 @@
 
 
 
+<InputData Version="TTbar_mtop1695_2L2Nu_JECdown_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_2L2Nu_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_2L2Nu_JECdown_2017v2" Lumi="3764005.9" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_2L2Nu_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_SemiLeptonic_JECdown_2017v2" Lumi="17846378.04" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_SemiLeptonic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_SemiLeptonic_JECdown_2017v2" Lumi="15029229.34" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_SemiLeptonic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_Hadronic_JECdown_2017v2" Lumi="16800249.08" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_Hadronic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_Hadronic_JECdown_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_Hadronic_Jd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_mtop1695_2L2Nu_JECup_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_2L2Nu_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_2L2Nu_JECup_2017v2" Lumi="3764005.9" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_2L2Nu_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_SemiLeptonic_JECup_2017v2" Lumi="17846378.04" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_SemiLeptonic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_SemiLeptonic_JECup_2017v2" Lumi="15029229.34" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_SemiLeptonic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_Hadronic_JECup_2017v2" Lumi="16800249.08" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_Hadronic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_Hadronic_JECup_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_Hadronic_Ju;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+
+
+<!-- <InputData Version="TTbar_mtop1695_2L2Nu_XConedown_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_2L2Nu_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_2L2Nu_XConedown_2017v2" Lumi="3764005.9" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_2L2Nu_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_SemiLeptonic_XConedown_2017v2" Lumi="17846378.04" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_SemiLeptonic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_SemiLeptonic_XConedown_2017v2" Lumi="15029229.34" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_SemiLeptonic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_Hadronic_XConedown_2017v2" Lumi="16800249.08" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_Hadronic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_Hadronic_XConedown_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_Hadronic_Xd;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+<!-- <InputData Version="TTbar_mtop1695_2L2Nu_XConeup_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_2L2Nu_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_2L2Nu_XConeup_2017v2" Lumi="3764005.9" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_2L2Nu_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_SemiLeptonic_XConeup_2017v2" Lumi="17846378.04" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_SemiLeptonic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_SemiLeptonic_XConeup_2017v2" Lumi="15029229.34" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_SemiLeptonic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_Hadronic_XConeup_2017v2" Lumi="16800249.08" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_Hadronic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_Hadronic_XConeup_2017v2" Lumi="14988125.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_Hadronic_Xu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+
 
 <!--
 ██     ██      ██ ███████ ████████ ███████
@@ -243,45 +361,23 @@
 .███ ███   █████  ███████    ██    ███████
 -->
 
-
-<InputData Version="WJetsToLNu_HT-0070to0100_2017v2" Lumi="7337.300986" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="WJetsToLNu_HT-0070to0100_2017v2" Lumi="7337.300986" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0070to0100;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="WJetsToLNu_HT-0100to0200_2017v2" Lumi="24497.36654" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&WJetsToLNu_HT-0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-<InputData Version="WJetsToLNu_HT-0200to0400_2017v2" Lumi="45872.06211" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="WJetsToLNu_HT-0200to0400_2017v2" Lumi="45872.06211" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0200to0400;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="WJetsToLNu_HT-0400to0600_2017v2" Lumi="246755.2208" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0400to0600;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
-<InputData Version="WJetsToLNu_HT-0600to0800_2017v2_1" Lumi="1662735.67" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-0600to0800_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-0600to0800_2017v2_2" Lumi="1662735.67" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-0600to0800_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
+<InputData Version="WJetsToLNu_HT-0600to0800_2017v2" Lumi="1662735.67" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&WJetsToLNu_HT-0600to0800;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="WJetsToLNu_HT-0800to1200_2017v2" Lumi="2182790.874" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0800to1200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
-<InputData Version="WJetsToLNu_HT-1200to2500_2017v2_1" Lumi="39031433.57" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-1200to2500_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-1200to2500_2017v2_2" Lumi="39031433.57" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-1200to2500_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-1200to2500_2017v2_3" Lumi="39031433.57" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-1200to2500_3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-1200to2500_2017v2_4" Lumi="39031433.57" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-1200to2500_4;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
-<InputData Version="WJetsToLNu_HT-2500toInft_2017v2_1" Lumi="2656452174" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-2500toInft_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-2500toInft_2017v2_2" Lumi="2656452174" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-2500toInft_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-2500toInft_2017v2_3" Lumi="2656452174" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-2500toInft_3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-2500toInft_2017v2_4" Lumi="2656452174" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-2500toInft_4;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
+<InputData Version="WJetsToLNu_HT-1200to2500_2017v2" Lumi="39031433.57" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&WJetsToLNu_HT-1200to2500;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="WJetsToLNu_HT-2500toInft_2017v2" Lumi="2656452174" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&WJetsToLNu_HT-2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <!--
 ██████  ██    ██
@@ -291,8 +387,9 @@
 ██████     ██
 -->
 
-<InputData Version="DYJetsToLL_LO_M50_HT0100to0200_2017v2" Lumi="69226.78638" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&DYJetsToLL_LO_M50_HT0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<!-- <InputData Version="DYJetsToLL_LO_M50_HT0100to0200_2017v2" Lumi="69226.78638" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&DYJetsToLL_LO_M50_HT0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
 <InputData Version="DYJetsToLL_LO_M50_HT0200to0400_2017v2" Lumi="219614.0918" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&DYJetsToLL_LO_M50_HT0200to0400;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="DYJetsToLL_LO_M50_HT0400to0600_2017v2" Lumi="1476963.275" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -317,40 +414,29 @@
 
 <!-- <InputData Version="QCD_Pt-0015to0020_MuEnrichedPt5_2017v2" Lumi="2.053754835" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0015to0020_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0020to0030_MuEnrichedPt5_2017v2" Lumi="10.95535913" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&QCD_Pt-0020to0030_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
-
+<In FileName="&QCD_Pt-0020to0030_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="QCD_Pt-0030to0050_MuEnrichedPt5_2017v2" Lumi="21.41854512" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0030to0050_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0050to0080_MuEnrichedPt5_2017v2" Lumi="63.38724552" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0050to0080_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0080to0120_MuEnrichedPt5_2017v2" Lumi="248.4389353" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0080to0120_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0120to0170_MuEnrichedPt5_2017v2" Lumi="892.6900519" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&QCD_Pt-0120to0170_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&QCD_Pt-0120to0170_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <InputData Version="QCD_Pt-0170to0300_MuEnrichedPt5_2017v2" Lumi="5853.217916" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0170to0300_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0300to0470_MuEnrichedPt5_2017v2" Lumi="28419.7047" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0300to0470_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0470to0600_MuEnrichedPt5_2017v2" Lumi="412478.7446" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0470to0600_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0600to0800_MuEnrichedPt5_2017v2" Lumi="956436.3725" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0600to0800_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-0800to1000_MuEnrichedPt5_2017v2" Lumi="4936430.727" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0800to1000_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 <InputData Version="QCD_Pt-1000toInft_MuEnrichedPt5_2017v2" Lumi="10695312.91" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-1000toInft_MuEnrichedPt5;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-
 
 <!-- ================================================================================================================================== -->
 <!-- ====================================================== User Config =============================================================== -->
@@ -379,13 +465,13 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2017_elec.root"/>
-  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepFlavour_94XSF_V4_B_F.csv" />
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2017_muon.root"/>
+  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/DeepFlavour_94XSF_WP_V3_B_F.csv"/>
 
-  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MyDataPileupHistogram.root" />
-  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MyMCPileupHistogram.root" />
-  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MyDataPileupHistogram2017_72383.root" />
-  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MyDataPileupHistogram2017_66017.root" />
+  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MyDataPileupHistogram.root" />
+  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MyMCPileupHistogram.root" />
+  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MyDataPileupHistogram2017_72383.root" />
+  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MyDataPileupHistogram2017_66017.root" />
 
   <Item Name="ScaleVariationMuR" Value="none"/>
   <Item Name="ScaleVariationMuF" Value="none"/>

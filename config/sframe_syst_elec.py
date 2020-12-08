@@ -9,19 +9,12 @@ sys.path.append('/nfs/dust/cms/user/tholenhe/installs/varial-stable/Varial')
 
 sys_uncerts = {
      #'name' : {'item name': 'item value', ...},
-     
-     # 'FSRup_sqrt2'              : {'PS_variation':'FSRup_sqrt2'},
-     # 'FSRdown_sqrt2'            : {'PS_variation':'FSRdown_sqrt2'},
-     # 'FSRup_2'                  : {'PS_variation':'FSRup_2'},
-     # 'FSRdown_2'                : {'PS_variation':'FSRdown_2'},
-     # 'FSRup_4'                  : {'PS_variation':'FSRup_4'},
-     # 'FSRdown_4'                : {'PS_variation':'FSRdown_4'},
-     # 'ISRup_sqrt2'              : {'PS_variation':'ISRup_sqrt2'},
-     # 'ISRdown_sqrt2'            : {'PS_variation':'ISRdown_sqrt2'},
-     # 'ISRup_2'                  : {'PS_variation':'ISRup_2'},
-     # 'ISRdown_2'                : {'PS_variation':'ISRdown_2'},
-     # 'ISRup_4'                  : {'PS_variation':'ISRup_4'},
-     # 'ISRdown_4'                : {'PS_variation':'ISRdown_4'},
+     'JEC_up'                : {'jecsmear_direction':'up'},
+     'JEC_down'              : {'jecsmear_direction':'down'},
+     'JER_up'                : {'jersmear_direction':'up'},
+     'JER_down'              : {'jersmear_direction':'down'},
+     'COR_up'                : {'JetCorrection_direction':'up'},
+     'COR_down'              : {'JetCorrection_direction':'down'},
      'JMS_upup'                 : {'JetMassScale_direction':'upup'},
      'JMS_updown'               : {'JetMassScale_direction':'updown'},
      'JMS_downup'               : {'JetMassScale_direction':'downup'},
@@ -78,7 +71,7 @@ class MySFrameBatch(SFrame):
         self.xml_doctype = self.xml_doctype + """
 <!--
    <ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
-   <ConfigSGE RAM="2" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="/nfs/dust/cms/user/paaschal/PostSelMu_workdir"/>
+   <ConfigSGE RAM="2" DISK="2" Mail="dennis.schwarz@desy.de" Notification="as" Workdir="PostSelSYSEl_workdir"/>
 -->
 """
         if os.path.exists(self.cwd + 'workdir'):

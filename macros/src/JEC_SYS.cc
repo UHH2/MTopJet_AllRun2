@@ -56,7 +56,6 @@ int main(int argc, char* argv[]){
   bool    usePeak_in   = true;
   bool    into_latex   = true;
   bool    print_table  = false;
-  bool    add_mTop     = false;
   bool    onlyData     = false;
   bool    useOnly_lin  = false;      // functions_explain
 
@@ -75,7 +74,6 @@ int main(int argc, char* argv[]){
   cout << "Pt bins:   " << pt_bins     << endl;
   cout << "Only lin:  " << useOnly_lin << endl;
   cout << "Bin Width: " << bin_width   << endl;
-  cout << "Add mTop:  " << add_mTop    << endl;
 
 
 
@@ -123,7 +121,7 @@ int main(int argc, char* argv[]){
   .           0007 is ------rwx
   positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
   */
-  TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS";
+  TString save_path_general = "/afs/desy.de/user/s/schwarzd/Plots/JEC_SYS";
   save_path_general = creat_folder_and_path(save_path_general, "chi2");
   if(pt_bins) save_path_general = creat_folder_and_path(save_path_general, "pt_bins");               // CHANGE_PT
   else        save_path_general = creat_folder_and_path(save_path_general, "no_bins");
@@ -134,7 +132,6 @@ int main(int argc, char* argv[]){
   save_path_general = creat_folder_and_path(save_path_general, year);
   save_path_general = creat_folder_and_path(save_path_general, reconst);
   save_path_general = creat_folder_and_path(save_path_general, "rebin"+str_number_bins);
-  if(add_mTop)          save_path_general = creat_folder_and_path(save_path_general, "mtop_combi");
   if(useOnly_lin)       save_path_general = creat_folder_and_path(save_path_general, "linear");
   if(usePeak_in&&isAll) save_path_general = creat_folder_and_path(save_path_general, "masspeak");
   creat_folder(save_path_general, "single_bins");
@@ -200,8 +197,20 @@ int main(int argc, char* argv[]){
 
     vector<TFile*>  file_bkg_v;
     vector<TH1F*>   hists_bkg_v;
-    vector<TString> path_bkg_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.SingleTop.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
-    for(unsigned int i=0; i<path_bkg_v.size(); i++) file_bkg_v.push_back(new TFile(dir+year+"/muon/"+path_bkg_v[i]));
+    TString prefix = "uhh2.AnalysisModuleRunner.MC.";
+    vector<TString> channels = {"elec", "muon"};
+    vector<TString> path_bkg_v = {"other", "SingleTop", "WJets"};
+    vector<TString> years;
+    if(is16) years = {"2016v3"};
+    else if(is17) years = {"2017v2"};
+    else if(is18) years = {"2018"};
+    else if(isAll) years = {"2016v3", "2017v2", "2018"};
+
+    for(auto y: years){
+      for(auto channel: channels){
+        for(unsigned int i=0; i<path_bkg_v.size(); i++) file_bkg_v.push_back(new TFile(dir+"/"+channel+"/"+prefix+path_bkg_v[i]+"_"+y+".root"));
+      }
+    }
     for(unsigned int i=0; i<file_bkg_v.size(); i++) hists_bkg_v.push_back((TH1F*)file_bkg_v[i]->Get(w_mass));
     TH1F *bkg = AddHists(hists_bkg_v, 1);
 
@@ -209,9 +218,17 @@ int main(int argc, char* argv[]){
     // Get Data ########################################################################################
     if(debug) cout << "Data" << endl;
 
-    TString data_path        = "uhh2.AnalysisModuleRunner.DATA.DATA.root";
-    TFile  *data_file        = new TFile(dir+year+"/muon/"+data_path);
-    TH1F   *data             = (TH1F*)data_file->Get(w_mass);
+    vector<TFile*> data_files;
+    vector<TH1F*> data_hists;
+    TString data_path        = "uhh2.AnalysisModuleRunner.DATA.DATA";
+    for(auto y: years){
+      for(auto channel: channels){
+        data_files.push_back(new TFile(dir+"/"+channel+"/"+data_path+"_"+y+".root"));
+      }
+    }
+
+    for(unsigned int i=0; i<data_files.size(); i++) data_hists.push_back((TH1F*)data_files[i]->Get(w_mass));
+    TH1F   *data             = AddHists(data_hists, 1);
 
     TH1F   *data_rebin       = rebin(data, bin_width);
     TH1F   *data_norm        = normalize(data);
@@ -226,113 +243,36 @@ int main(int argc, char* argv[]){
     // #################################################################################################
     // Get TTbar #######################################################################################
     if(debug) cout << "TTbar" << endl;
+    vector<TFile*> ttbar_files, ttbar_files_jecup, ttbar_files_jecdown, ttbar_files_corup, ttbar_files_cordown;
+    vector<TH1F*> ttbar_hists, ttbar_hists_jecup, ttbar_hists_jecdown, ttbar_hists_corup, ttbar_hists_cordown;
+    TString ttbar_path        = "uhh2.AnalysisModuleRunner.MC.TTbar";
+    for(auto y: years){
+      for(auto channel: channels){
+        ttbar_files.push_back(new TFile(dir+"/"+channel+"/"+ttbar_path+"_"+y+".root"));
+        ttbar_files_jecup.push_back(new TFile(dir+"/"+channel+"/JEC_up/"+ttbar_path+"_"+y+".root"));
+        ttbar_files_jecdown.push_back(new TFile(dir+"/"+channel+"/JEC_down/"+ttbar_path+"_"+y+".root"));
+        ttbar_files_corup.push_back(new TFile(dir+"/"+channel+"/COR_up/"+ttbar_path+"_"+y+".root"));
+        ttbar_files_cordown.push_back(new TFile(dir+"/"+channel+"/COR_down/"+ttbar_path+"_"+y+".root"));
+      }
+    }
 
-    TString ttbar_path       = "uhh2.AnalysisModuleRunner.MC.TTbar.root"; // CHANGE_NORMAL
-    TFile  *ttbar_file       = new TFile(dir+year+"/muon/"+ttbar_path);
-    TH1F   *ttbar            = (TH1F*)ttbar_file->Get(w_mass);
+    for(unsigned int i=0; i<ttbar_files.size(); i++) ttbar_hists.push_back((TH1F*)ttbar_files[i]->Get(w_mass));
+    for(unsigned int i=0; i<ttbar_files_jecup.size(); i++) ttbar_hists_jecup.push_back((TH1F*)ttbar_files_jecup[i]->Get(w_mass));
+    for(unsigned int i=0; i<ttbar_files_jecdown.size(); i++) ttbar_hists_jecdown.push_back((TH1F*)ttbar_files_jecdown[i]->Get(w_mass));
+    for(unsigned int i=0; i<ttbar_files_corup.size(); i++) ttbar_hists_corup.push_back((TH1F*)ttbar_files_corup[i]->Get(w_mass));
+    for(unsigned int i=0; i<ttbar_files_cordown.size(); i++) ttbar_hists_cordown.push_back((TH1F*)ttbar_files_cordown[i]->Get(w_mass));
+
+    TH1F   *ttbar             = AddHists(ttbar_hists, 1);
+    TH1F   *JECup             = AddHists(ttbar_hists_jecup, 1);
+    TH1F   *JECdown           = AddHists(ttbar_hists_jecdown, 1);
+    TH1F   *XConeup             = AddHists(ttbar_hists_corup, 1);
+    TH1F   *XConedown           = AddHists(ttbar_hists_cordown, 1);
+
     ttbar->Add(bkg, 1);
-
-    // #################################################################################################
-    // Get SYS #########################################################################################
-    if(debug) cout << "JEC" << endl;
-
-    TFile *JECup_file   = new TFile(dir+year+"/muon/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar.root");
-    TFile *JECdown_file = new TFile(dir+year+"/muon/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar.root");
-    TH1F  *JECup        = (TH1F*)JECup_file->Get(w_mass);
-    TH1F  *JECdown      = (TH1F*)JECdown_file->Get(w_mass);
-
-    // Add hists from JEC and background ---------------------------------------------------------------
-    if(debug) cout << "JEC+Background" << endl;
-
     JECup->Add(bkg, 1);
     JECdown->Add(bkg, 1);
-
-    // ------------------------------------------------------------------------------------------------
-    if(debug) cout << "XCone" << endl;
-
-    TFile *XCup_file   = new TFile(dir+year+"/muon/COR_up/uhh2.AnalysisModuleRunner.MC.TTbar.root");
-    TFile *XCdown_file = new TFile(dir+year+"/muon/COR_down/uhh2.AnalysisModuleRunner.MC.TTbar.root");
-    TH1F  *XConeup     = (TH1F*)XCup_file->Get(w_mass);
-    TH1F  *XConedown   = (TH1F*)XCdown_file->Get(w_mass);
-
-    // Add hists from FSR and background ---------------------------------------------------------------
-    if(debug) cout << "XCone+Background" << endl;
-
     XConeup->Add(bkg, 1);
     XConedown->Add(bkg, 1);
-
-    /*
-    ███    ███ ████████  ██████  ██████
-    ████  ████    ██    ██    ██ ██   ██
-    ██ ████ ██    ██    ██    ██ ██████
-    ██  ██  ██    ██    ██    ██ ██
-    ██      ██    ██     ██████  ██
-    */
-
-    /*
-    If mTop is used, the histograms need to be added to the nominal ones before the normalization
-    is done. Therefore, the Code normalizes, rebins and calculates the error after the decision is made
-    to include the mTop samples
-    */
-
-    vector<TH1F*> mTop_nominal_v, mTop_jecup_v, mTop_jecdown_v, mTop_xcup_v, mTop_xcdown_v;
-    vector<TString> mtop_names = {"1665", "1695", "1715", "1735", "1755", "1785"};
-    if(add_mTop&&isAll){
-      for(int mtop=0; mtop<6; mtop++){
-        // if(mtop!=1&&mtop!=4) continue;
-        // if(debug) cout << "mTop "+mtop_names[mtop] << endl;
-        cout << "mTop "+mtop_names[mtop] << endl;
-
-        TString mTop_path       = "uhh2.AnalysisModuleRunner.MC.TTbar.root"; // CHANGE_NORMAL
-        TFile  *mTop_file       = new TFile(dir+year+"/muon/"+mTop_path);
-        TH1F   *mTop            = (TH1F*)mTop_file->Get(w_mass);
-        mTop->Add(bkg, 1);
-
-        // #################################################################################################
-        // Get SYS #########################################################################################
-        if(debug) cout << "JEC" << endl;
-
-        TFile *mTop_JECup_file   = new TFile(dir+year+"/muon/JEC_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mtop_names[mtop]+".root");
-        TFile *mTop_JECdown_file = new TFile(dir+year+"/muon/JEC_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mtop_names[mtop]+".root");
-        TH1F  *mTop_JECup        = (TH1F*)mTop_JECup_file->Get(w_mass);
-        TH1F  *mTop_JECdown      = (TH1F*)mTop_JECdown_file->Get(w_mass);
-        mTop_JECup->Add(bkg, 1);
-        mTop_JECdown->Add(bkg, 1);
-
-        // ------------------------------------------------------------------------------------------------
-        if(debug) cout << "XCone" << endl;
-
-        TFile *mTop_XCup_file   = new TFile(dir+year+"/muon/COR_up/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mtop_names[mtop]+".root");
-        TFile *mTop_XCdown_file = new TFile(dir+year+"/muon/COR_down/uhh2.AnalysisModuleRunner.MC.TTbar_mtop"+mtop_names[mtop]+".root");
-        TH1F  *mTop_XCup        = (TH1F*)mTop_XCup_file->Get(w_mass);
-        TH1F  *mTop_XCdown      = (TH1F*)mTop_XCdown_file->Get(w_mass);
-        mTop_XCup->Add(bkg, 1);
-        mTop_XCdown->Add(bkg, 1);
-
-        // #################################################################################################
-        // All in one ######################################################################################
-        mTop_nominal_v.push_back(mTop);
-        mTop_jecup_v.push_back(mTop_JECup);
-        mTop_jecdown_v.push_back(mTop_JECdown);
-        mTop_xcup_v.push_back(mTop_XCup);
-        mTop_xcdown_v.push_back(mTop_XCdown);
-      }
-
-      TH1F* mTop_nominal = AddHists(mTop_nominal_v ,1);
-      TH1F* mTop_jecup   = AddHists(mTop_jecup_v ,1);
-      TH1F* mTop_jecdown = AddHists(mTop_jecdown_v ,1);
-      TH1F* mTop_xcup    = AddHists(mTop_xcup_v ,1);
-      TH1F* mTop_xcdown  = AddHists(mTop_xcdown_v ,1);
-
-      // #################################################################################################
-      // Nominal+samples #################################################################################
-
-      ttbar->Add(mTop_nominal ,1);
-      JECup->Add(mTop_jecup ,1);
-      JECdown->Add(mTop_jecdown ,1);
-      XConeup->Add(mTop_xcup ,1);
-      XConedown->Add(mTop_xcdown ,1);
-    }
 
     TH1F* ttbar_rebin          = rebin(ttbar, bin_width);
     TH1F* ttbar_norm           = normalize(ttbar);
@@ -383,7 +323,7 @@ int main(int argc, char* argv[]){
 
     double Limit;
     if(!pt_bins) Limit = 190;
-    else         Limit = 75;
+    else         Limit = 100;
     vector<int> peak_bins_v;
     if(usePeak) peak_bins_v = bins_upper_limit(data_rebin, Limit); // Get bins withc bin-content>Limit
 
@@ -1315,12 +1255,7 @@ int main(int argc, char* argv[]){
   Z->SetLogz();
   full_chi2_function->Draw("cont4z");
   full_chi2_function->SetMaximum(1100); // One has to redefine the axis after drawing
-  full_chi2_function->SetMinimum(90);
-  if(add_mTop&&bin_width==1){
-    full_chi2_function->SetMaximum(10000); // One has to redefine the axis after drawing
-    full_chi2_function->SetMinimum(100);
-    full_chi2_function->SetContour(60);   // Contours
-  }
+  full_chi2_function->SetMinimum(200);
   Z->SaveAs(save_path_general+"/chi2_all.pdf");
   Z->SetTheta(90);
   Z->SetPhi(0);

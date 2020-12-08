@@ -73,7 +73,6 @@
 <!ENTITY  QCD_Pt-0170to0250_bcToE  "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0170to0250_bcToE_2016v3.root">
 <!ENTITY  QCD_Pt-0250toInft_bcToE  "&INdir;/uhh2.AnalysisModuleRunner.MC.QCD_Pt-0250toInft_bcToE_2016v3.root">
 <!-- =============================================== W+jets =========================================================================== -->
-<!ENTITY  WJetsToLNu_HT-0100to0200  "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0070to0100_2016v3.root">
 <!ENTITY  WJetsToLNu_HT-0100to0200  "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0100to0200_2016v3.root">
 <!ENTITY  WJetsToLNu_HT-0200to0400  "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0200to0400_2016v3.root">
 <!ENTITY  WJetsToLNu_HT-0400to0600  "&INdir;/uhh2.AnalysisModuleRunner.MC.WJetsToLNu_HT-0400to0600_2016v3.root">
@@ -107,8 +106,7 @@
     <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
 
 
-<?ignore BEGIN
- END ?>
+
     <!--
     ██████   █████  ████████  █████
     ██   ██ ██   ██    ██    ██   ██
@@ -249,8 +247,6 @@
 .███ ███   █████  ███████    ██    ███████
 -->
 
-<InputData Version="WJetsToLNu_HT-0070to0100_2016v3" Lumi="7597.068234" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&WJetsToLNu_HT-0070to0100;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="WJetsToLNu_HT-0100to0200_2016v3" Lumi="24239.87096" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="WJetsToLNu_HT-0200to0400_2016v3" Lumi="43814.59297" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
@@ -357,13 +353,13 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_muon.root"/>
-  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2016/DeepJet_2016LegacySF_WP_V1.csv" />
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_elec.root"/>
+  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepJet_2016LegacySF_V1.csv" />
 
-  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
-  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
-  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
-  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
+  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
+  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
+  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
+  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
 
   <Item Name="ScaleVariationMuR" Value="none"/>
   <Item Name="ScaleVariationMuF" Value="none"/>
@@ -376,6 +372,10 @@
   <Item Name="ElTrigger_variation" Value="nominal" />
 
   <Item Name="JetMassScale_direction" Value="nominal" />
+  <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+  <Item Name="jersmear_direction" Value="nominal" />            <!-- has to be: nominal, up or down! -->
+  <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
+  <Item Name="NonClosureUncertainty" Value="false" />  <!-- has to be: true or false! -->
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>

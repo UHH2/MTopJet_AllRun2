@@ -15,13 +15,15 @@ int main(int argc, char* argv[]){
     return 0;
   }
 
+  TFile* infile = new TFile("FSR_hists.root");
+
   // #################################################################################################
   // Only one fit for all bins #######################################################################
   // Default -------------------------------------------------------------------
   Int_t   oldLevel  = gErrorIgnoreLevel; // Set by: gErrorIgnoreLevel = ... - functions_explain
   gErrorIgnoreLevel = kWarning;          // suppress TCanvas output
-  int     bin_width = 5;                 // functions_explain
-  bool    debug     = false;
+  int     bin_width = 1;                 // functions_explain
+  bool    debug     = true;
   bool    rel_error = false;
 
   // Input ---------------------------------------------------------------------
@@ -61,7 +63,7 @@ int main(int argc, char* argv[]){
   */
   if(debug) cout << "Directiories" << endl;
 
-  TString save_path = "/afs/desy.de/user/p/paaschal/Plots/Radiation_SYS";
+  TString save_path = "/afs/desy.de/user/s/schwarzd/Plots/Radiation_SYS";
   save_path = creat_folder_and_path(save_path, year);
   save_path = creat_folder_and_path(save_path, "rebin"+to_string(bin_width));
   // #################################################################################################
@@ -101,64 +103,87 @@ int main(int argc, char* argv[]){
   // Get Background ##################################################################################
   if(debug) cout << "Background" << endl;
 
-  vector<TFile*>  file_v;
-  vector<TH1F*>   hist_v;
-  vector<TString> path_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.SingleTop.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
-  for(unsigned int i=0; i<path_v.size(); i++) file_v.push_back(new TFile(dir+year+"/muon/"+path_v[i]));
-  if(debug) cout << "Bkg number files " << file_v.size() << endl;
-  for(unsigned int i=0; i<file_v.size(); i++) hist_v.push_back((TH1F*)file_v[i]->Get(tau32));
-  if(debug) cout << "Bkg number hists " << hist_v.size() << endl;
-  TH1F *bkg      = AddHists(hist_v, 1);
-  if(is1718) bkg = add_second_year("2018", bkg, dir, path_v, tau32);
-
+  TH1F *bkg;
+  if(is16) bkg = (TH1F*) infile->Get("bgr_16");
+  else if(is17) bkg = (TH1F*) infile->Get("bgr_17");
+  else if(is18) bkg = (TH1F*) infile->Get("bgr_18");
+  else if(is1718){
+    bkg = (TH1F*) infile->Get("bgr_17");
+    TH1F *bkg2 = (TH1F*) infile->Get("bgr_18");
+    bkg->Add(bkg2);
+  }
   // #################################################################################################
   // Get Data ########################################################################################
   if(debug) cout << "Data" << endl;
 
-  TString data_path = "uhh2.AnalysisModuleRunner.DATA.DATA.root";
-  TFile *data_file = new TFile(dir+year+"/muon/"+data_path);
-  TH1F *data = (TH1F*)data_file->Get(tau32);
-  if(is1718) data = add_second_year("2018", data, dir, data_path, tau32);
+  TH1F *data;
+  if(is16) data = (TH1F*) infile->Get("data_16");
+  else if(is17) data = (TH1F*) infile->Get("data_17");
+  else if(is18) data = (TH1F*) infile->Get("data_18");
+  else if(is1718){
+    data = (TH1F*) infile->Get("data_17");
+    TH1F *data2 = (TH1F*) infile->Get("data_18");
+    data->Add(data2);
+  }
 
   // #################################################################################################
   // Get TTbar #######################################################################################
   if(debug) cout << "TTbar" << endl;
 
-  TString ttbar_path = "uhh2.AnalysisModuleRunner.MC.TTbar.root";
-  TFile *ttbar_file = new TFile(dir+year+"/muon/"+ttbar_path);
-  TH1F *ttbar = (TH1F*)ttbar_file->Get(tau32);
-  ttbar->Add(bkg, 1);
-  if(is1718) ttbar = add_second_year("2018", ttbar, dir, ttbar_path, tau32);
+  TH1F *ttbar;
+  if(is16) ttbar = (TH1F*) infile->Get("nominal_16");
+  else if(is17) ttbar = (TH1F*) infile->Get("nominal_17");
+  else if(is18) ttbar = (TH1F*) infile->Get("nominal_18");
+  else if(is1718){
+    ttbar = (TH1F*) infile->Get("nominal_17");
+    TH1F *ttbar2 = (TH1F*) infile->Get("nominal_18");
+    ttbar->Add(ttbar2);
+  }
 
   // #################################################################################################
   // Get FSR #########################################################################################
   if(debug) cout << "FSR" << endl;
 
-  tau32 = "comparison_topjet_xcone_pass_rec_masscut_140/ak8_hadjet_tau32";
-  vector<TFile*> FSRup_file, FSRdown_file;
   vector<TH1F*> FSRup, FSRdown;
-
-  if(is17 || is18 || is1718){
-    for(unsigned int i=0; i<FSRup_strings.size();i++){
-      FSRup_file.push_back(new TFile(dir+year+"/muon/"+FSRup_strings[i]+"/"+ttbar_path));
-      FSRdown_file.push_back(new TFile(dir+year+"/muon/"+FSRdown_strings[i]+"/"+ttbar_path));
-
-      FSRup.push_back((TH1F*)FSRup_file[i]->Get(tau32));
-      FSRdown.push_back((TH1F*)FSRdown_file[i]->Get(tau32));
-
-      if(is1718){
-        FSRup[i]   = add_second_year("2018", FSRup[i], dir, FSRup_strings[i]+"/"+ttbar_path, tau32);
-        FSRdown[i] = add_second_year("2018", FSRdown[i], dir, FSRdown_strings[i]+"/"+ttbar_path, tau32);
-      }
-    }
-  }
-
   if(is16){
-    TFile *FSRup_2016   = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_fsrup_2016v3.root");
-    TFile *FSRdown_2016 = new TFile(dir+year+"/muon/uhh2.AnalysisModuleRunner.MC.TTbar_fsrdown_2016v3.root");
-
-    FSRup.push_back((TH1F*)  FSRup_2016->Get(tau32));
-    FSRdown.push_back((TH1F*)FSRdown_2016->Get(tau32));
+    FSRup.push_back((TH1F*) infile->Get("fsrup2_16"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdown2_16"));
+  }
+  else if(is17){
+    FSRup.push_back((TH1F*) infile->Get("fsrupsqrt2_17"));
+    FSRup.push_back((TH1F*) infile->Get("fsrup2_17"));
+    FSRup.push_back((TH1F*) infile->Get("fsrup4_17"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdownsqrt2_17"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdown2_17"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdown4_17"));
+  }
+  else if(is18){
+    FSRup.push_back((TH1F*) infile->Get("fsrupsqrt2_18"));
+    FSRup.push_back((TH1F*) infile->Get("fsrup2_18"));
+    FSRup.push_back((TH1F*) infile->Get("fsrup4_18"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdownsqrt2_18"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdown2_18"));
+    FSRdown.push_back((TH1F*) infile->Get("fsrdown4_18"));
+  }
+  else if(is1718){
+    TH1F* h_upsqrt2 = (TH1F*) infile->Get("fsrupsqrt2_17");
+    h_upsqrt2->Add((TH1F*) infile->Get("fsrupsqrt2_18"));
+    FSRup.push_back(h_upsqrt2);
+    TH1F* h_up2 = (TH1F*) infile->Get("fsrup2_17");
+    h_up2->Add((TH1F*) infile->Get("fsrup2_18"));
+    FSRup.push_back(h_up2);
+    TH1F* h_up4 = (TH1F*) infile->Get("fsrup4_17");
+    h_up4->Add((TH1F*) infile->Get("fsrup4_18"));
+    FSRup.push_back(h_up4);
+    TH1F* h_downsqrt2 = (TH1F*) infile->Get("fsrdownsqrt2_17");
+    h_downsqrt2->Add((TH1F*) infile->Get("fsrdownsqrt2_18"));
+    FSRdown.push_back(h_downsqrt2);
+    TH1F* h_down2 = (TH1F*) infile->Get("fsrdown2_17");
+    h_down2->Add((TH1F*) infile->Get("fsrdown2_18"));
+    FSRdown.push_back(h_down2);
+    TH1F* h_down4 = (TH1F*) infile->Get("fsrdown4_17");
+    h_down4->Add((TH1F*) infile->Get("fsrdown4_18"));
+    FSRdown.push_back(h_down4);
   }
   if(debug) cout << "Number FSR Hists: " << FSRup.size() << endl;
 
@@ -170,6 +195,8 @@ int main(int argc, char* argv[]){
     FSRup[i]->Add(bkg, 1);
     FSRdown[i]->Add(bkg, 1);
   }
+  // Add hists from ttbar and background -------------------------------------------------------------
+  ttbar->Add(bkg);
 
   // #################################################################################################
   // Rebin ###########################################################################################
@@ -211,11 +238,11 @@ int main(int argc, char* argv[]){
   // Normalize Error ###############################################################################
   if(debug) cout << "Normalized Error" << endl;
 
-  vector<double> ttbar_rebin_norm_err = normalize_error(ttbar_all_norm[1]);
-  vector<double> data_rebin_norm_err  = normalize_error(data_all_norm[1]);
+  vector<double> ttbar_rebin_norm_err = normalize_error(ttbar_all[1]);
+  vector<double> data_rebin_norm_err  = normalize_error(data_all[1]);
 
-  vector<vector<double>> FSRup_rebin_norm_err   = normalize_error(FSRup_rebin_norm);
-  vector<vector<double>> FSRdown_rebin_norm_err = normalize_error(FSRdown_rebin_norm);
+  vector<vector<double>> FSRup_rebin_norm_err   = normalize_error(FSRup_rebin);
+  vector<vector<double>> FSRdown_rebin_norm_err = normalize_error(FSRdown_rebin);
 
   // #################################################################################################
   // Combine Non normalized and normalized ###########################################################

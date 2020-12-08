@@ -3,10 +3,10 @@
 
 <!ENTITY NEVT "-1">
 
-<!ENTITY channel "muon">
+<!ENTITY channel "elec">
 
-<!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/Selection/muon">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/muon">
+<!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/Selection/elec">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/elec">
 
 <!-- =============================================== ttbar =========================================================================== -->
 <!ENTITY TTbar_Mtt0000to0700    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2016v3.root">
