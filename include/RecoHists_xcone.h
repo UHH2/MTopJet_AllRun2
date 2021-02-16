@@ -36,7 +36,7 @@ protected:
   TH1F *JER_factor;
   TH1F *DeltaR_btagT_nextjet, *DeltaR_btagM_nextjet, *DeltaR_btagT_xcone;
   TH1F *pt_probe1, *pt_probe2;
-  TH1F *csvmax;
+  TH1F *csvmax, *deepjetmax;
   TH1F *number_smalldR_all,*number_smalldR_pass,*number_largedR_all,*number_largedR_pass;
   TH1F *mass_W, *mass_subjet, *pt_subjet, *number_btag_tight_subjet;
 

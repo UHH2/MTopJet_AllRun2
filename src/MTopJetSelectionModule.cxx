@@ -180,7 +180,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   //// CONFIGURATION
 
   TString dataset_version = (TString) ctx.get("dataset_version");
-  if(dataset_version.Contains("TTbar")) isTTbar = true;
+  if(dataset_version.Contains("TTbar") || dataset_version.Contains("TTTo")) isTTbar = true;
   else  isTTbar = false;
 
   if(dataset_version.Contains("SingleElec")) isElectronStream = true;
@@ -219,9 +219,9 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   if(isMC) remove_lepton_gen33.reset(new RemoveLeptonGen(ctx, "genXCone33TopJets"));
 
   // combine XCone
-  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
+  // jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
   jetprod_reco_noJEC.reset(new CombineXCone33(ctx, "XCone33_had_Combined_noJEC", "XCone33_lep_Combined_noJEC", "xconeCHS" ));
-  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
+  // jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
   copy_jet.reset(new CopyJets(ctx, "xconeCHS", "xconeCHS_noJEC"));
 
   if(isTTbar) jetprod_gen33.reset(new CombineXCone33_gen(ctx, isTTbar));
@@ -233,22 +233,22 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   // ttbar_reweight.reset(new TopPtReweight(ctx,0.159,-0.00141,"","weight_ttbar",true,0.9910819)); // 8 TeV
   ttbar_reweight.reset(new TopPtReweight(ctx,0.0615,-0.0005,"","weight_ttbar",true)); // 13 TeV
   // double jecsysfactor = 1.0;
-  corvar = ctx.get("JetCorrection_direction","nominal"); // "nominal" nur wenn nicht up oder down
-  nonclosureSYS = ctx.get("NonClosureUncertainty","false");
-  if(nonclosureSYS == "true") do_nonClosure = true;
+  // corvar = ctx.get("JetCorrection_direction","nominal"); // "nominal" nur wenn nicht up oder down
+  // nonclosureSYS = ctx.get("NonClosureUncertainty","false");
+  // if(nonclosureSYS == "true") do_nonClosure = true;
   // correct subjets (JEC + additional correction)
-  JetCorrections.reset(new JetCorrections_xcone());
-  JetCorrections->init(ctx, "xconeCHS");
+  // JetCorrections.reset(new JetCorrections_xcone());
+  // JetCorrections->init(ctx, "xconeCHS");
   // smear jets after Correction
-  JERSmearing.reset(new JER_Smearer_xcone());
-  JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
+  // JERSmearing.reset(new JER_Smearer_xcone());
+  // JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
 
-  if(year_16) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2016"));
-  else if(year_17) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2017"));
-  else if(year_18) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2018"));
-  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
+  // if(year_16) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2016"));
+  // else if(year_17) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2017"));
+  // else if(year_18) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2018"));
+  // else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
 
-  NonClosureSYS.reset(new NonClosureUncertainty(ctx));
+  // NonClosureSYS.reset(new NonClosureUncertainty(ctx));
   //// EVENT SELECTION
   // define IDs
   MuonId muid = AndId<Muon>(MuonID(Muon::Tight), PtEtaCut(55., 2.4));
@@ -661,12 +661,12 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
   // Here all the Correction is happening
   jetprod_reco_noJEC->process(event);      // first store sum of 'raw' subjets
   copy_jet->process(event);                // copy 'raw' Fatets (with subjets) and name one copy 'noJEC'
-  JetCorrections->process(event);          // apply AK4 JEC to subjets of the original Fatjet Collection
-  JERSmearing->process(event);             // apply JER smearing to subjets
-  if(do_nonClosure) NonClosureSYS->process(event);           // do nonClosure variation here
-  jetprod_reco->process(event);            // now store sum of 'jec' subjets
-  Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
-  jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
+  // JetCorrections->process(event);          // apply AK4 JEC to subjets of the original Fatjet Collection
+  // JERSmearing->process(event);             // apply JER smearing to subjets
+  // if(do_nonClosure) NonClosureSYS->process(event);           // do nonClosure variation here
+  // jetprod_reco->process(event);            // now store sum of 'jec' subjets
+  // Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
+  // jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
   ////
   output->process(event);
   /* *********** just a check ****************************************** */

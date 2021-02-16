@@ -46,3 +46,31 @@ bool PartonShowerWeight::process(uhh2::Event & event){
 
   return true;
 }
+
+std::vector<float> PartonShowerWeight::get_factors(uhh2::Event & event){
+  std::vector<float> factors;
+  if( event.genInfo->weights().size() == 1) {
+    std::cout << "no parton shower weights stored. Nothing to be done." << std::endl;
+    return factors;
+  }
+  double centralWeight = event.genInfo->weights().at(0);
+  double weight_fsr_upsqrt2 = event.genInfo->weights().at(3);
+  double weight_fsr_up2 = event.genInfo->weights().at(7);
+  double weight_fsr_up4 = event.genInfo->weights().at(11);
+  double weight_fsr_downsqrt2 = event.genInfo->weights().at(5);
+  double weight_fsr_down2 = event.genInfo->weights().at(9);
+  double weight_fsr_down4 = event.genInfo->weights().at(13);
+  double weight_isr_up2 = event.genInfo->weights().at(6);
+  double weight_isr_down2 = event.genInfo->weights().at(8);
+
+  factors.push_back(weight_fsr_upsqrt2/centralWeight);
+  factors.push_back(weight_fsr_up2/centralWeight);
+  factors.push_back(weight_fsr_up4/centralWeight);
+  factors.push_back(weight_fsr_downsqrt2/centralWeight);
+  factors.push_back(weight_fsr_down2/centralWeight);
+  factors.push_back(weight_fsr_down4/centralWeight);
+  factors.push_back(weight_isr_up2/centralWeight);
+  factors.push_back(weight_isr_down2/centralWeight);
+
+  return factors;
+}

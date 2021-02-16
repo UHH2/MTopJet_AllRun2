@@ -36,6 +36,7 @@
 #include <UHH2/MTopJet/include/RecoHists_xcone.h>
 #include <UHH2/MTopJet/include/RecoHists_puppi.h>
 #include <UHH2/MTopJet/include/SubjetHists_xcone.h>
+#include <UHH2/MTopJet/include/StoreBJet.h>
 
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/CorrectionFactor.h>
@@ -104,9 +105,6 @@ protected:
   // get weight (with all SF and weight applied in previous cycle)
   Event::Handle<double>h_weight;
 
-  // Get Events from MCWeights from UHH2 and creat an additional Handle
-  Event::Handle<float>h_weight_btag;
-  Event::Handle<float>h_btag_sf;
 
   // use top pt reweight module instead of derived sf?
   std::unique_ptr<TopPtReweight> ttbar_reweight;
@@ -120,6 +118,37 @@ protected:
   Event::Handle<std::vector<TopJet>>h_fatjets;
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
+
+  // store weights (or factor to get to these weights)
+  Event::Handle<float> h_muid_up;
+  Event::Handle<float> h_muid_down;
+  Event::Handle<float> h_mutr_up;
+  Event::Handle<float> h_mutr_down;
+  Event::Handle<float> h_elid_up;
+  Event::Handle<float> h_elid_down;
+  Event::Handle<float> h_eltr_up;
+  Event::Handle<float> h_eltr_down;
+  Event::Handle<float> h_elreco_up;
+  Event::Handle<float> h_elreco_down;
+  Event::Handle<float> h_pu_up;
+  Event::Handle<float> h_pu_down;
+  Event::Handle<float> h_btag_up;
+  Event::Handle<float> h_btag_down;
+  Event::Handle<float> h_scale_upup;
+  Event::Handle<float> h_scale_upnone;
+  Event::Handle<float> h_scale_noneup;
+  Event::Handle<float> h_scale_nonedown;
+  Event::Handle<float> h_scale_downnone;
+  Event::Handle<float> h_scale_downdown;
+  Event::Handle<float> h_fsr_upsqrt2;
+  Event::Handle<float> h_fsr_up2;
+  Event::Handle<float> h_fsr_up4;
+  Event::Handle<float> h_fsr_downsqrt2;
+  Event::Handle<float> h_fsr_down2;
+  Event::Handle<float> h_fsr_down4;
+  Event::Handle<float> h_isr_up2;
+  Event::Handle<float> h_isr_down2;
+  ////
 
   Event::Handle<bool>h_matched;
   Event::Handle<bool>h_measure_rec;
@@ -153,8 +182,58 @@ protected:
   Event::Handle<std::vector<GenTopJet>>h_genjets33_had;
   Event::Handle<std::vector<GenTopJet>>h_genfatjets;
 
-  std::unique_ptr<uhh2::AnalysisModule> ps_weights;
+  std::unique_ptr<PartonShowerWeight> ps_weights;
   std::unique_ptr<uhh2::AnalysisModule> ttgenprod;
+
+  // Weights
+  Event::Handle<float>h_weight_muid;
+  Event::Handle<float>h_weight_muid_up;
+  Event::Handle<float>h_weight_muid_down;
+  Event::Handle<float>h_weight_mutr;
+  Event::Handle<float>h_weight_mutr_up;
+  Event::Handle<float>h_weight_mutr_down;
+  Event::Handle<float>h_weight_elid;
+  Event::Handle<float>h_weight_elid_up;
+  Event::Handle<float>h_weight_elid_down;
+  Event::Handle<float>h_weight_eltr;
+  Event::Handle<float>h_weight_eltr_up;
+  Event::Handle<float>h_weight_eltr_down;
+  Event::Handle<float>h_weight_elreco;
+  Event::Handle<float>h_weight_elreco_up;
+  Event::Handle<float>h_weight_elreco_down;
+  Event::Handle<float>h_weight_pu;
+  Event::Handle<float>h_weight_pu_up;
+  Event::Handle<float>h_weight_pu_down;
+  Event::Handle<float> h_weight_scale_upup;
+  Event::Handle<float> h_weight_scale_upnone;
+  Event::Handle<float> h_weight_scale_noneup;
+  Event::Handle<float> h_weight_scale_nonedown;
+  Event::Handle<float> h_weight_scale_downnone;
+  Event::Handle<float> h_weight_scale_downdown;
+  Event::Handle<float> h_weight_btag;
+  // Event::Handle<float> h_weight_btag_jesup;
+  // Event::Handle<float> h_weight_btag_jesdown;
+  // Event::Handle<float> h_weight_btag_lfup;
+  // Event::Handle<float> h_weight_btag_lfdown;
+  // Event::Handle<float> h_weight_btag_hfup;
+  // Event::Handle<float> h_weight_btag_hfdown;
+  // Event::Handle<float> h_weight_btag_hfstats1up;
+  // Event::Handle<float> h_weight_btag_hfstats1down;
+  // Event::Handle<float> h_weight_btag_hfstats2up;
+  // Event::Handle<float> h_weight_btag_hfstats2down;
+  // Event::Handle<float> h_weight_btag_lfstats1up;
+  // Event::Handle<float> h_weight_btag_lfstats1down;
+  // Event::Handle<float> h_weight_btag_lfstats2up;
+  // Event::Handle<float> h_weight_btag_lfstats2down;
+  // Event::Handle<float> h_weight_btag_cferr1up;
+  // Event::Handle<float> h_weight_btag_cferr1down;
+  // Event::Handle<float> h_weight_btag_cferr2up;
+  // Event::Handle<float> h_weight_btag_cferr2down;
+  std::vector<Event::Handle<float>> h_weight_btag_upvars;
+  std::vector<Event::Handle<float>> h_weight_btag_downvars;
+
+
+  Event::Handle<float> h_ak8tau, h_ak8mass;
 
   //width reweight
   std::unique_ptr<tt_width_reweight> width2_reweight;
@@ -220,8 +299,8 @@ protected:
   std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350, h_XCone_GEN_Sel_ptsub;
   std::unique_ptr<Hists> h_PDFHists;
 
-  std::unique_ptr<Hists> h_comparison_topjet_xcone_pass_gen, h_comparison_topjet_xcone_pass_rec, h_comparison_topjet_xcone_pass_genrec, h_comparison_topjet_xcone;
-  std::unique_ptr<Hists> h_comparison_topjet_xcone_pass_rec_masscut_120, h_comparison_topjet_xcone_pass_rec_masscut_130, h_comparison_topjet_xcone_pass_rec_masscut_140, h_comparison_topjet_xcone_pass_rec_masscut_150;
+  std::unique_ptr<RecoGenHists_xcone_topjet> h_comparison_topjet_xcone_pass_gen, h_comparison_topjet_xcone_pass_rec, h_comparison_topjet_xcone_pass_genrec, h_comparison_topjet_xcone;
+  std::unique_ptr<RecoGenHists_xcone_topjet> h_comparison_topjet_xcone_pass_rec_masscut_120, h_comparison_topjet_xcone_pass_rec_masscut_130, h_comparison_topjet_xcone_pass_rec_masscut_140, h_comparison_topjet_xcone_pass_rec_masscut_150;
 
   std::unique_ptr<Hists> h_gen_weights, h_gen_weights_pass_gen, h_gen_weights_massbin_145, h_gen_weights_massbin_275;
   std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_gensel_300;
@@ -231,12 +310,20 @@ protected:
 
   std::unique_ptr<BTagMCEfficiencyHists> BTagEffHists;
 
-  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors, BTagReshape;
+  std::unique_ptr<uhh2::AnalysisModule> BTagScaleFactors, BTagReshape, CreateBTagJets;
   std::unique_ptr<uhh2::AnalysisModule> muo_tight_noniso_SF, muo_trigger_SF;
   std::unique_ptr<uhh2::AnalysisModule> ele_id_SF, ele_trigger_SF, ele_reco_SF;
 
   BTag::algo btag_algo;
   BTag::wp wp_loose, wp_medium, wp_tight;
+
+  // Jet Correction Stuff
+  std::unique_ptr<JetCorrections_xcone> JetCorrections;
+  std::unique_ptr<JER_Smearer_xcone> JERSmearing;
+  std::unique_ptr<uhh2::AnalysisModule> Correction;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
+  std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
+  ////
 
   string BTag_variation ="central";
   string MuScale_variation ="nominal";
@@ -246,6 +333,7 @@ protected:
   string ElTrigger_variation ="nominal";
   string PU_variation ="nominal";
   TString jms_direction ="nominal";
+  string corvar ="nominal";
   Year year;
 
   bool isMC;    //define here to use it in "process" part
@@ -256,6 +344,8 @@ protected:
   bool year_16;
   bool year_17;
   bool year_18;
+
+  bool do_ps = false;
 };
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
@@ -284,12 +374,14 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   isMC = (ctx.get("dataset_type") == "MC");
 
   TString dataset_version = (TString) ctx.get("dataset_version");
-  if(dataset_version.Contains("TTbar")) isTTbar = true;
+  if(dataset_version.Contains("TTbar") || dataset_version.Contains("TTTo")) isTTbar = true;
   else  isTTbar = false;
 
   // Avoid empty fatjets for JMS
   if(dataset_version.Contains("_mtop")&&year_17) isMTop = true;
   else                                           isMTop = false;
+
+  if(dataset_version.Contains("TTbar") && !dataset_version.Contains("_mtop") && !year_16) do_ps = true;
 
   if(isMTop) h_wrong_events_mtop_17.reset(new CountingEventHists(ctx, "Wrong_17_mTop_events"));
 
@@ -332,6 +424,56 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_recjets_had = ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
   if(isTTbar) h_genjets33_had = ctx.get_handle<std::vector<GenTopJet>>("GEN_XCone33_had_Combined");
   h_genfatjets = ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
+
+  // weight handles
+  h_weight_muid = ctx.get_handle<float>("weight_sfmu_tightID");
+  h_weight_muid_up = ctx.get_handle<float>("weight_sfmu_tightID_up");
+  h_weight_muid_down = ctx.get_handle<float>("weight_sfmu_tightID_down");
+  h_weight_mutr = ctx.get_handle<float>("weight_sfmu_trigger");
+  h_weight_mutr_up = ctx.get_handle<float>("weight_sfmu_trigger_up");
+  h_weight_mutr_down = ctx.get_handle<float>("weight_sfmu_trigger_down");
+  h_weight_elid = ctx.get_handle<float>("weight_sfelec_tightID");
+  h_weight_elid_up = ctx.get_handle<float>("weight_sfelec_tightID_up");
+  h_weight_elid_down = ctx.get_handle<float>("weight_sfelec_tightID_down");
+  h_weight_elreco = ctx.get_handle<float>("weight_sfelec_reco");
+  h_weight_elreco_up = ctx.get_handle<float>("weight_sfelec_reco_up");
+  h_weight_elreco_down = ctx.get_handle<float>("weight_sfelec_reco_down");
+  h_weight_eltr = ctx.get_handle<float>("weight_sfelec_trigger");
+  h_weight_eltr_up = ctx.get_handle<float>("weight_sfelec_trigger_up");
+  h_weight_eltr_down = ctx.get_handle<float>("weight_sfelec_trigger_down");
+  h_weight_pu = ctx.get_handle<float>("weight_pu");
+  h_weight_pu_up = ctx.get_handle<float>("weight_pu_up");
+  h_weight_pu_down = ctx.get_handle<float>("weight_pu_down");
+  h_weight_scale_upup = ctx.get_handle<float>("weight_murmuf_upup");
+  h_weight_scale_upnone = ctx.get_handle<float>("weight_murmuf_upnone");
+  h_weight_scale_noneup = ctx.get_handle<float>("weight_murmuf_noneup");
+  h_weight_scale_nonedown = ctx.get_handle<float>("weight_murmuf_nonedown");
+  h_weight_scale_downnone = ctx.get_handle<float>("weight_murmuf_downnone");
+  h_weight_scale_downdown = ctx.get_handle<float>("weight_murmuf_downdown");
+
+  h_weight_btag = ctx.get_handle<float>("weight_btagdisc_central");
+
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_jesup"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfup"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfup"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats1up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats2up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats1up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats2up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr1up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr2up"));
+
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_jesdown"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfdown"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfdown"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats1down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats2down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats1down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats2down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr1down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr2down"));
+
+
 
   /*************************** Setup Subjet Corrector **********************************************************************************/
   // Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected"));
@@ -405,30 +547,31 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ElReco_variation = ctx.get("ElReco_variation","nominal");
   ElTrigger_variation = ctx.get("ElTrigger_variation","nominal");
 
-  //BTagReshape.reset(new MCCSVv2ShapeSystematic(ctx, "jets", BTag_variation, "iterativefit", "", "BTagCalibration"));
-  BTagScaleFactors.reset(new MCBTagScaleFactor(ctx, btag_algo, wp_tight,"jets",BTag_variation,"comb"));
+  string bjet_collection = "highest_deepjet_jet";
+  CreateBTagJets.reset(new StoreBJet(ctx, bjet_collection));
+  BTagReshape.reset(new MCBTagDiscriminantReweighting(ctx, btag_algo, bjet_collection, BTag_variation, "iterativefit", "", "BTagCalibration"));
+  // BTagScaleFactors.reset(new MCBTagScaleFactor(ctx, btag_algo, wp_tight,"jets",BTag_variation,"comb"));
 
-  // NOT HARDCODED!!!!!
   if(year_16){
-    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root","MC_NUM_TightID_DEN_genTracks_PAR_pt_eta",1, "tightID", false, MuScale_variation));
-    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "muonTrigger", false, MuTrigger_variation));
-    ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins"));
-    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "", ElReco_variation));
-    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "", ElID_variation));
+    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root","NUM_TightID_DEN_genTracks_eta_pt",1, "tightID", false, MuScale_variation));
+    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root","IsoMu50_OR_IsoTkMu50_PtEtaBins",1, "trigger", false, MuTrigger_variation));
+    ele_trigger_SF.reset(new ElectronTriggerWeights(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/electrSF", ElTrigger_variation));
+    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root", 1, "reco", ElReco_variation));
+    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root", 1, "tightID", ElID_variation));
   }
   else if(year_17){
-    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MuonID_94X_RunBCDEF_SF_ID.root","NUM_TightID_DEN_genTracks_pt_abseta",1, "tightID", true, MuScale_variation));
-    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2017/MuonTrigger_EfficienciesAndSF_RunBtoF_Nov17Nov2017.root","Mu50_PtEtaBins/pt_abseta_ratio",1, "muonTrigger", true, MuTrigger_variation));
-    ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins")); // NEEDS TO BE UPDATED
-    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2017/2017_ElectronTight.root", 1.0, "tight_id", ElID_variation));
-    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2017/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root", 1.0, "reco", ElReco_variation));
+    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MuonID_94X_RunBCDEF_SF_ID.root","NUM_TightID_DEN_genTracks_pt_abseta",1, "tightID", true, MuScale_variation));
+    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MuonTrigger_EfficienciesAndSF_RunBtoF_Nov17Nov2017.root","Mu50_PtEtaBins/pt_abseta_ratio",1, "trigger", true, MuTrigger_variation));
+    ele_trigger_SF.reset(new ElectronTriggerWeights(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/electrSF", ElTrigger_variation));
+    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/2017_ElectronTight.root", 1.0, "tightID", ElID_variation));
+    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root", 1.0, "reco", ElReco_variation));
   }
   else if(year_18){
-    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/Muon_ID_SF_RunABCD.root","NUM_TightID_DEN_TrackerMuons_pt_abseta",1, "tightID", true, MuScale_variation));
-    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/Muon_Trigger_Eff_SF_AfterMuonHLTUpdate.root","Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",1, "muonTrigger", true, MuTrigger_variation));
-    ele_trigger_SF.reset(new ElecTriggerSF(ctx, ElTrigger_variation, "eta_ptbins")); // NEEDS TO BE UPDATED
-    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2018/2018_ElectronTight.root", 1.0, "tight_id", ElID_variation));
-    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_10/src/UHH2/common/data/2018/egammaEffi.txt_EGM2D_updatedAll.root", 1.0, "reco", ElReco_variation));
+    muo_tight_noniso_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2018/Muon_ID_SF_RunABCD.root","NUM_TightID_DEN_TrackerMuons_pt_abseta",1, "tightID", true, MuScale_variation));
+    muo_trigger_SF.reset(new MCMuonScaleFactor(ctx,"/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2018/Muon_Trigger_Eff_SF_AfterMuonHLTUpdate.root","Mu50_OR_OldMu100_OR_TkMu100_PtEtaBins/pt_abseta_ratio",1, "trigger", true, MuTrigger_variation));
+    ele_trigger_SF.reset(new ElectronTriggerWeights(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/electrSF", ElTrigger_variation));
+    ele_id_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2018/2018_ElectronTight.root", 1.0, "tightID", ElID_variation));
+    ele_reco_SF.reset(new MCElecScaleFactor(ctx, "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2018/egammaEffi.txt_EGM2D_updatedAll.root", 1.0, "reco", ElReco_variation));
   }
   else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v3, 2017_v2 or 2018!");
 
@@ -652,13 +795,33 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     BestFit.reset(new CorrectionFactor_JMS(ctx, "XCone33_had_Combined_noJEC", "genXCone33TopJets", year));
   }
 
+  // Jet Correction Stuff
+  corvar = ctx.get("JetCorrection_direction","nominal"); // "nominal" nur wenn nicht up oder down
+  // correct subjets (JEC + additional correction)
+  JetCorrections.reset(new JetCorrections_xcone());
+  JetCorrections->init(ctx, "xconeCHS");
+  // smear jets after Correction
+  JERSmearing.reset(new JER_Smearer_xcone());
+  JERSmearing->init(ctx, "xconeCHS", "genXCone33TopJets", "sub");
+
+  // Xcone correction
+  if(year_16) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2016"));
+  else if(year_17) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2017"));
+  else if(year_18) Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected", corvar, true, "2018"));
+  else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
+
+  // combine jets after correction
+  jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
+  jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
+
+
   // get handles
   if(debug) cout << "\nHandels\n";
   h_weight = ctx.get_handle<double>("weight");
   h_gensel_2 = ctx.get_handle<bool>("passed_gensel_2");
   h_recsel_2 = ctx.get_handle<bool>("passed_recsel_2");
   h_musf_central = ctx.get_handle<double>("passed_recsel_2");
-  h_weight_btag = ctx.get_handle<float>("weight_btag");
+  // h_weight_btag = ctx.get_handle<float>("weight_btag");
 
   h_hadjets_raw=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
 
@@ -696,14 +859,63 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_factor_8width = ctx.declare_event_output<double>("factor_8width");
   h_pdf_weights = ctx.declare_event_output<vector<double>>("pdf_weights");
   h_bquark_pt = ctx.declare_event_output<vector<double>>("bquark_pt");
-  h_btag_sf = ctx.declare_event_output<float>("btag_sf");
   h_softdropmass_rec = ctx.declare_event_output<double>("SoftDropMass_Rec");
+  h_muid_up = ctx.declare_event_output<float>("sf_muid_up");
+  h_muid_down = ctx.declare_event_output<float>("sf_muid_down");
+  h_mutr_up = ctx.declare_event_output<float>("sf_mutr_up");
+  h_mutr_down = ctx.declare_event_output<float>("sf_mutr_down");
+  h_elid_up = ctx.declare_event_output<float>("sf_elid_up");
+  h_elid_down = ctx.declare_event_output<float>("sf_elid_down");
+  h_eltr_up = ctx.declare_event_output<float>("sf_eltr_up");
+  h_eltr_down = ctx.declare_event_output<float>("sf_eltr_down");
+  h_elreco_up = ctx.declare_event_output<float>("sf_elreco_up");
+  h_elreco_down = ctx.declare_event_output<float>("sf_elreco_down");
+  h_pu_up = ctx.declare_event_output<float>("sf_pu_up");
+  h_pu_down = ctx.declare_event_output<float>("sf_pu_down");
+  h_btag_up = ctx.declare_event_output<float>("sf_btag_up");
+  h_btag_down = ctx.declare_event_output<float>("sf_btag_down");
+  h_scale_upup = ctx.declare_event_output<float>("sf_scale_upup");
+  h_scale_upnone = ctx.declare_event_output<float>("sf_scale_upnone");
+  h_scale_noneup = ctx.declare_event_output<float>("sf_scale_noneup");
+  h_scale_nonedown = ctx.declare_event_output<float>("sf_scale_nonedown");
+  h_scale_downnone = ctx.declare_event_output<float>("sf_scale_downnone");
+  h_scale_downdown = ctx.declare_event_output<float>("sf_scale_downdown");
+  h_fsr_upsqrt2 = ctx.declare_event_output<float>("sf_fsr_upsqrt2");
+  h_fsr_up2 = ctx.declare_event_output<float>("sf_fsr_up2");
+  h_fsr_up4 = ctx.declare_event_output<float>("sf_fsr_up4");
+  h_fsr_downsqrt2 = ctx.declare_event_output<float>("sf_fsr_downsqrt2");
+  h_fsr_down2 = ctx.declare_event_output<float>("sf_fsr_down2");
+  h_fsr_down4 = ctx.declare_event_output<float>("sf_fsr_down4");
+  h_isr_up2 = ctx.declare_event_output<float>("sf_isr_up2");
+  h_isr_down2 = ctx.declare_event_output<float>("sf_isr_down2");
+  h_ak8tau = ctx.declare_event_output<float>("tau32_ak8_had");
+  h_ak8mass = ctx.declare_event_output<float>("mass_ak8_had");
+
 
   /*********************************************************************************************************************************/
 
 }
 
+/*
+██████  ██████   ██████   ██████ ███████ ███████ ███████
+██   ██ ██   ██ ██    ██ ██      ██      ██      ██
+██████  ██████  ██    ██ ██      █████   ███████ ███████
+██      ██   ██ ██    ██ ██      ██           ██      ██
+██      ██   ██  ██████   ██████ ███████ ███████ ███████
+*/
+
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
+
+  /***************************  First do JEC/JER/XCONE *******************************************************************************/
+
+  JetCorrections->process(event);          // apply AK4 JEC to subjets of the original Fatjet Collection
+  JERSmearing->process(event);             // apply JER smearing to subjets
+  jetprod_reco->process(event);            // now store sum of 'jec' subjets
+  Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
+  jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
+
+
+  /************************************************************************************************************************************/
 
   if(debug) cout << "\nStart process --------------------------------------------------------------\n";
   if(isMTop){
@@ -716,14 +928,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     }
   }
 
-  /*
-  ██████  ██████   ██████   ██████ ███████ ███████ ███████
-  ██   ██ ██   ██ ██    ██ ██      ██      ██      ██
-  ██████  ██████  ██    ██ ██      █████   ███████ ███████
-  ██      ██   ██ ██    ██ ██      ██           ██      ██
-  ██      ██   ██  ██████   ██████ ███████ ███████ ███████
-  */
-  // if(debug) cout << "Start Process\n";
   if(isMC) h_GenProcess->fill(event);
 
   // get bools for selections from root files
@@ -735,6 +939,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // check if event has one had and one lep jet
   if( !(njet_had->passes(event)) ) return false;
   if( !(njet_lep->passes(event)) ) return false;
+
   ////
   // fill ttbargen class
   if(isTTbar) ttgenprod->process(event);
@@ -752,11 +957,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   double mass_jms =0;
   if(isMC){
     // Data+MC
-    if     (jms_direction == "nominal")  points = {0.4904,  0.2047}; // BestFit point
-    else if(jms_direction == "upup")     points = {0.6848,  0.2707}; // clostest point, right
-    else if(jms_direction == "updown")   points = {0.7601, -0.5318}; // furthest point, down
-    else if(jms_direction == "downup")   points = {0.2153,  0.9424}; // furthest point, up
-    else if(jms_direction == "downdown") points = {0.3011,  0.1198}; // clostest point, left
+    if     (jms_direction == "nominal")  points = {0.7495, -0.3392}; // BestFit point
+    else if(jms_direction == "upup")     points = {0.887884, -0.291257}; // clostest point, right
+    else if(jms_direction == "updown")   points = {0.953384, -0.923157}; // furthest point, down
+    else if(jms_direction == "downup")   points = {0.533584,  0.256443}; // furthest point, up
+    else if(jms_direction == "downdown") points = {0.610384, -0.389157}; // clostest point, left
     else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown)");
     if(debug) cout << "JMS - get_mass_BestFit\n";
     mass_jms = BestFit->get_mass_BestFit(event, points);
@@ -767,11 +972,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
 
   if(debug) cout << "Gen Mass\n";
-  double mass_gen33;
+  double mass_gen33 = 0;
+  double pt_gen33 = 0;
   if(isTTbar){
     std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
-    mass_gen33 = gen_hadjets33.at(0).v4().M();
-    double pt_gen33 = gen_hadjets33.at(0).v4().Pt();
+    if(gen_hadjets33.size()>0){
+      mass_gen33 = gen_hadjets33.at(0).v4().M();
+      pt_gen33 = gen_hadjets33.at(0).v4().Pt();
+    }
     event.set(h_mass_gen33, mass_gen33);
     event.set(h_pt_gen33, pt_gen33);
   }
@@ -779,6 +987,18 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_mass_gen33, 0.); // set gen mass to 0 for data
     event.set(h_pt_gen33, 0.);   // set gen pt to 0 for data
   }
+
+  if(debug) cout << "Write SD mass\n";
+  // SoftDropMass for HadJet
+  std::vector<TopJet> hadjets_raw = event.get(h_hadjets_raw);
+  std::vector<TopJet> hadjets     = event.get(h_hadjets);
+  std::vector<TopJet> lepjets     = event.get(h_lepjets);
+  std::vector<TopJet> fatjets     = event.get(h_fatjets);
+  TopJet hadjet;
+  if(deltaR(lepjets.at(0), fatjets.at(0)) < deltaR(hadjets.at(0), fatjets.at(0))) hadjet = fatjets.at(1);
+  else hadjet = fatjets.at(0);
+  event.set(h_softdropmass_rec, hadjet.softdropmass());
+
   // also set bquark pt
   vector<double> bquark_pt = {0.0, 0.0};
   if(isTTbar){
@@ -791,15 +1011,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     }
   }
   event.set(h_bquark_pt, bquark_pt);
-  // SoftDropMass for HadJet
-  std::vector<TopJet> hadjets_raw = event.get(h_hadjets_raw);
-  std::vector<TopJet> hadjets     = event.get(h_hadjets);
-  std::vector<TopJet> lepjets     = event.get(h_lepjets);
-  std::vector<TopJet> fatjets     = event.get(h_fatjets);
-  TopJet hadjet;
-  if(deltaR(lepjets.at(0), fatjets.at(0)) < deltaR(hadjets.at(0), fatjets.at(0))) hadjet = fatjets.at(1);
-  else hadjet = fatjets.at(0);
-
 
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
@@ -812,10 +1023,60 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // get lumi weight = genweight (inkl scale variation)
   // now get full weight from prev. Selection (weight = gen_weight * rec_weight)
   event.weight = event.get(h_weight);
+  if(debug) cout << "Vary scale\n";
   scale_variation->process(event);
-  if(isTTbar){
+  if(isMC){
+    // For the scale variations, the SF is directly stored, so just put them in own handles
+    event.set(h_scale_upup, event.get(h_weight_scale_upup));
+    event.set(h_scale_upnone, event.get(h_weight_scale_upnone));
+    event.set(h_scale_noneup, event.get(h_weight_scale_noneup));
+    event.set(h_scale_nonedown, event.get(h_weight_scale_nonedown));
+    event.set(h_scale_downnone, event.get(h_weight_scale_downnone));
+    event.set(h_scale_downdown, event.get(h_weight_scale_downdown));
+  }
+  else{
+    event.set(h_scale_upup, 1.);
+    event.set(h_scale_upnone, 1.);
+    event.set(h_scale_noneup, 1.);
+    event.set(h_scale_nonedown, 1.);
+    event.set(h_scale_downnone, 1.);
+    event.set(h_scale_downdown, 1.);
+  }
+
+  if(debug) cout << "Vary PS\n";
+  if(isTTbar && do_ps){
     ps_weights->process(event);
-    // h_gen_weights->fill(event);
+    vector<float> ps_factors = ps_weights->get_factors(event);
+    if(ps_factors.size()>0){
+      event.set(h_fsr_upsqrt2, ps_factors[0]);
+      event.set(h_fsr_up2, ps_factors[1]);
+      event.set(h_fsr_up4, ps_factors[2]);
+      event.set(h_fsr_downsqrt2, ps_factors[3]);
+      event.set(h_fsr_down2, ps_factors[4]);
+      event.set(h_fsr_down4, ps_factors[5]);
+      event.set(h_isr_up2, ps_factors[6]);
+      event.set(h_isr_down2, ps_factors[7]);
+    }
+    else{
+      event.set(h_fsr_upsqrt2, 1.);
+      event.set(h_fsr_up2, 1.);
+      event.set(h_fsr_up4, 1.);
+      event.set(h_fsr_downsqrt2, 1.);
+      event.set(h_fsr_down2, 1.);
+      event.set(h_fsr_down4, 1.);
+      event.set(h_isr_up2, 1.);
+      event.set(h_isr_down2, 1.);
+    }
+  }
+  else{
+    event.set(h_fsr_upsqrt2, 1.);
+    event.set(h_fsr_up2, 1.);
+    event.set(h_fsr_up4, 1.);
+    event.set(h_fsr_downsqrt2, 1.);
+    event.set(h_fsr_down2, 1.);
+    event.set(h_fsr_down4, 1.);
+    event.set(h_isr_up2, 1.);
+    event.set(h_isr_down2, 1.);
   }
   double gen_weight = event.weight;
 
@@ -827,6 +1088,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
 
   // FILL CONTROL PLOTS
+  if(debug) cout << "\nFill PreSel01\n";
   if(passed_recsel){
     h_MTopJet_PreSel01->fill(event);
     h_Muon_PreSel01->fill(event);
@@ -853,6 +1115,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   h_weights01->fill(event);
 
   /** store weights for pdf variation *********************/
+  if(debug) cout << "\nVary PDF\n";
   std::vector<double> pdf_weights;
   if(isTTbar){
     if(event.genInfo->systweights().size()){
@@ -863,9 +1126,13 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     }
   }
   /** PU Reweighting *********************/
+  if(debug) cout << "\nVary PU\n";
   PUreweight->process(event);
+  event.set(h_pu_up, event.get(h_weight_pu_up)/event.get(h_weight_pu));
+  event.set(h_pu_down, event.get(h_weight_pu_down)/event.get(h_weight_pu));
   h_weights02->fill(event);
   // FILL CONTROL PLOTS
+  if(debug) cout << "\nFill PreSel02\n";
   if(passed_recsel){
     h_MTopJet_PreSel02->fill(event);
     h_Muon_PreSel02->fill(event);
@@ -876,17 +1143,43 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /** muon SF *********************/
   if(channel_ == muon){
+    if(debug) cout << "\nMuon SF\n";
     muo_tight_noniso_SF->process(event);
     muo_trigger_SF->process(event);
+    // now store factors to get all the weights in unfolding
+    event.set(h_muid_up, event.get(h_weight_muid_up)/event.get(h_weight_muid));
+    event.set(h_muid_down, event.get(h_weight_muid_down)/event.get(h_weight_muid));
+    event.set(h_mutr_up, event.get(h_weight_mutr_up)/event.get(h_weight_mutr));
+    event.set(h_mutr_down, event.get(h_weight_mutr_down)/event.get(h_weight_mutr));
+    event.set(h_elid_up, 1.);
+    event.set(h_elid_down, 1.);
+    event.set(h_elreco_up, 1.);
+    event.set(h_elreco_down, 1.);
+    event.set(h_eltr_up, 1.);
+    event.set(h_eltr_down, 1.);
   }
   else{
+    if(debug) cout << "\nElectron SF\n";
     ele_id_SF->process(event);
     ele_reco_SF->process(event);
     ele_trigger_SF->process(event);
+    event.set(h_elreco_up, event.get(h_weight_elreco_up)/event.get(h_weight_elreco));
+    event.set(h_elreco_down, event.get(h_weight_elreco_down)/event.get(h_weight_elreco));
+    event.set(h_elid_up, event.get(h_weight_elid_up)/event.get(h_weight_elid));
+    event.set(h_elid_down, event.get(h_weight_elid_down)/event.get(h_weight_elid));
+    event.set(h_eltr_up, event.get(h_weight_eltr_up)/event.get(h_weight_eltr));
+    event.set(h_eltr_down, event.get(h_weight_eltr_down)/event.get(h_weight_eltr));
+    event.set(h_muid_up, 1.);
+    event.set(h_muid_down, 1.);
+    event.set(h_mutr_up, 1.);
+    event.set(h_mutr_down, 1.);
   }
+
+
   h_weights03->fill(event);
 
   // FILL CONTROL PLOTS
+  if(debug) cout << "\nFill PreSel03\n";
   if(passed_recsel){
     h_MTopJet_PreSel03->fill(event);
     h_Muon_PreSel03->fill(event);
@@ -898,7 +1191,44 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /** b-tagging *********************/
   // first do cvs reshape (instead of SF)
-  //BTagReshape->process(event);
+  if(debug) cout << "\nb tag reshape\n";
+  CreateBTagJets->process(event); // First store a jet vector with only the highest btag
+  BTagReshape->process(event);
+  float btag_shift_up2 = 0;
+  float btag_shift_down2 = 0;
+  float btag_central = event.get(h_weight_btag);
+
+  for(auto h: h_weight_btag_upvars){
+    double sf_sys = event.get(h);
+    if(sf_sys == 1.0) sf_sys = btag_central;
+    btag_shift_up2 += pow(sf_sys-btag_central,2);
+  }
+  for(auto h: h_weight_btag_downvars){
+    double sf_sys = event.get(h);
+    if(sf_sys == 1.0) sf_sys = btag_central;
+    btag_shift_down2 += pow(sf_sys-btag_central,2);
+  }
+
+  float btag_factor_up = (btag_central+sqrt(btag_shift_up2))/btag_central;
+  float btag_factor_down = (btag_central-sqrt(btag_shift_up2))/btag_central;
+  event.set(h_btag_up, btag_factor_up);
+  event.set(h_btag_down, btag_factor_down);
+
+
+  // cout << "=========== " << endl;
+  // cout << "central = " <<  btag_central << endl;
+  // cout << "shift up = " <<  sqrt(btag_shift_up2) << endl;
+  // cout << "shift down = " <<  sqrt(btag_shift_down2) << endl;
+  // cout << "factor up = " <<  btag_factor_up << endl;
+  // cout << "factor down = " <<  btag_factor_down << endl;
+
+  if(passed_recsel){
+    h_MTopJet_PreSel03b->fill(event);
+    h_Muon_PreSel03b->fill(event);
+    h_Elec_PreSel03b->fill(event);
+    h_Jets_PreSel03b->fill(event);
+    h_XCone_cor_PreSel03b->fill(event);
+  }
   bool passed_btag;
   bool passed_btag_medium;
   bool passed_btag_loose;
@@ -916,20 +1246,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   else passed_btag_medium = false;
   if(jetbtagN_loose >= 1) passed_btag_loose = true;
   else passed_btag_loose = false;
-  if(passed_recsel && passed_btag){
-    h_MTopJet_PreSel03b->fill(event);
-    h_Muon_PreSel03b->fill(event);
-    h_Elec_PreSel03b->fill(event);
-    h_Jets_PreSel03b->fill(event);
-    h_XCone_cor_PreSel03b->fill(event);
-  }
 
-  BTagScaleFactors->process(event);
   h_weights04->fill(event);
-  // get BTag SF
-  float weight_btag;
-  weight_btag = event.get(h_weight_btag);
-  event.set(h_btag_sf, weight_btag);
 
   /** calculate recweight now *********************/
   double rec_weight;
@@ -1102,6 +1420,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     }
   }
 
+  event.set(h_ak8tau, -1.); // set default value
+  event.set(h_ak8mass, -1.); // set default value
+
   if(debug) cout << "pass_measurement_rec\n";
   if(pass_measurement_rec){
     h_PDFHists->fill(event);
@@ -1128,6 +1449,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_comparison_topjet_xcone_pass_rec_masscut_130->fill(event);
     h_comparison_topjet_xcone_pass_rec_masscut_140->fill(event);
     h_comparison_topjet_xcone_pass_rec_masscut_150->fill(event);
+    double tau32 = h_comparison_topjet_xcone_pass_rec_masscut_140->get_tau32();
+    double mass = h_comparison_topjet_xcone_pass_rec_masscut_140->get_mass();
+    event.set(h_ak8tau, tau32);
+    event.set(h_ak8mass, mass);
 
     if(isTTbar && scale_ttbar) event.weight *= SF_tt;
 
@@ -1245,7 +1570,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_genweight, gen_weight);
   event.set(h_recweight, rec_weight);
   event.set(h_genweight_ttfactor, ttfactor);
-  event.set(h_softdropmass_rec, hadjet.softdropmass());
 
   event.set(h_measure_rec, pass_measurement_rec);
   event.set(h_measure_gen, pass_measurement_gen);

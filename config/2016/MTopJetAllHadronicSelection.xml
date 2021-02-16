@@ -80,12 +80,12 @@
       <Item Name="use_sframe_weight" Value="false"/>
       <Item Name="dometfilters" Value="true" />
       <Item Name="dopvfilter" Value="true" />
-      <Item Name="lumi_file" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+      <Item Name="lumi_file" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
 
-      <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
-      <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
-      <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
-      <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
+      <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
+      <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
+      <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
+      <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
       <Item Name="channel" Value="&channel;"/>
 
       <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->

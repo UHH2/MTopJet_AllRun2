@@ -179,6 +179,7 @@ RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const 
   h_lepjet   = ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
   h_fatjets  = ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   h_ttbargen = ctx.get_handle<TTbarGen>("ttbargen");
+
 }
 
 void RecoGenHists_xcone_topjet::fill(const Event & event){
@@ -265,6 +266,9 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
 
   // N-subjettiness -----------------------------------------------------------------------
   double tau_32_ak  = ak8_had.tau3()/ak8_had.tau2();
+  mass = ak8_had_v4.M();
+  tau32 = tau_32_ak;
+
   bool pass_masscut = false;
   if(ak8_had_v4.M()>masscut_) pass_masscut = true;
 
@@ -368,19 +372,19 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
       // else h_Number_matched_bottom->Fill(0.1, weight);
 
       if(semimatched){
-      // h_HadJetTau32_semimerged->Fill(tau_32_ak, weight);
-      // h_HadJetMass_semimerged->Fill(ak8_had_v4.M(), weight);
+        // h_HadJetTau32_semimerged->Fill(tau_32_ak, weight);
+        // h_HadJetMass_semimerged->Fill(ak8_had_v4.M(), weight);
       }
 
       if(notmatched){
-      // h_HadJetTau32_notmerged->Fill(tau_32_ak, weight);
-      // h_HadJetMass_notmerged->Fill(ak8_had_v4.M(), weight);
+        // h_HadJetTau32_notmerged->Fill(tau_32_ak, weight);
+        // h_HadJetMass_notmerged->Fill(ak8_had_v4.M(), weight);
       }
 
       if(matched){
-      // h_Number_matched_all->Fill(1, weight);
-      // h_HadJetMass_fullymerged->Fill(ak8_had_v4.M(), weight);
-      // h_HadJetTau32_fullymerged->Fill(tau_32_ak, weight);
+        // h_Number_matched_all->Fill(1, weight);
+        // h_HadJetMass_fullymerged->Fill(ak8_had_v4.M(), weight);
+        // h_HadJetTau32_fullymerged->Fill(tau_32_ak, weight);
       }
       //else h_Number_matched_all->Fill(0.1, weight);
     }
@@ -473,6 +477,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
 
   if(debug) std::cout << " - Identify Wjet: Distance AK4 to subjets" << '\n';
   // Matching AK4 jet with highest btag to the three XCone subjets
+  if(xcone_had_subjets.size()<3) return;
   double dR_subjet1_ak4 = deltaR(xcone_had_subjets[0], ak4_highest_btag);
   double dR_subjet2_ak4 = deltaR(xcone_had_subjets[1], ak4_highest_btag);
   double dR_subjet3_ak4 = deltaR(xcone_had_subjets[2], ak4_highest_btag);
@@ -823,4 +828,12 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
       h_btag_percentage_high_mid_sel_btag_min->Fill(btag_v[btag_v_size-2]/btag_v[btag_v_size-1], weight);
     }
   }
+}
+
+double RecoGenHists_xcone_topjet::get_tau32(){
+  return tau32;
+}
+
+double RecoGenHists_xcone_topjet::get_mass(){
+  return mass;
 }

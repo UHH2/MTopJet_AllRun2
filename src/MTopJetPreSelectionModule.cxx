@@ -123,8 +123,8 @@ MTopJetPreSelectionModule::MTopJetPreSelectionModule(uhh2::Context& ctx){
 
   ttgenprod.reset(new TTbarGenProducer(ctx, ttbar_gen_label, false));
 
-
-  if(ctx.get("dataset_version") == "TTbar_Mtt0000to0700_2016v3" || ctx.get("dataset_version") == "TTbar_Mtt0000to0700"){
+  TString samplename = ctx.get("dataset_version");
+  if( samplename.Contains("Mtt0000to0700") ){
     genmttbar_sel.reset(new MttbarGenSelection(0., 700.));
   }
   else{

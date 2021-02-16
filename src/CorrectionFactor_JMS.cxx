@@ -71,7 +71,7 @@ double CorrectionFactor_JMS::get_factor_XCone(double pt, double eta, const doubl
 
 void CorrectionFactor_JMS::get_function(TString & year){
 
-  TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/CorrectionFile/";
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
   filename = dir + "Correction_allHad_"+year+".root";
   TFile *file = new TFile(filename);
@@ -95,7 +95,7 @@ void CorrectionFactor_JMS::get_function(TString & year){
 
 void CorrectionFactor_JMS::get_additionalSYS(){
 
-  TString dir = "/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/MTopJet/CorrectionFile/";
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
   TString filename;
   filename = dir + "Correction_SysFromResolution_"+str_year+".root";
   TFile *file = new TFile(filename);
@@ -281,6 +281,7 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
 
   // Creat new hadjet ----------------------------------------------------------------------------------------------
   if(debug) std::cout << "\nBestFit: Set new fatjet";
+  if(newsubjets.size() < 3) return -1.0;
   LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
   if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
   // return mass _--------------------------------------------------------------------------------------------------
@@ -319,16 +320,21 @@ vector<double> CorrectionFactor_JMS::get_factor_JEC(FactorizedJetCorrector & cor
     // ignore jets with very low pt or high eta, avoiding a crash from the JESUncertainty tool
     double pt = jet_v4_corrected.Pt();
     double eta = jet_v4_corrected.Eta();
-    jec_unc->setJetEta(eta);
-    jec_unc->setJetPt(pt);
+    if(pt<5. || fabs(eta)>5.){
+      JEC_factors.push_back(0);
+    }
+    else{
+      jec_unc->setJetEta(eta);
+      jec_unc->setJetPt(pt);
 
-    double unc = 0.;
-    unc = jec_unc->getUncertainty(true);
-    double correctionfactor_up = correctionfactor * (1 + fabs(unc));
+      double unc = 0.;
+      unc = jec_unc->getUncertainty(true);
+      double correctionfactor_up = correctionfactor * (1 + fabs(unc));
 
-    // now calculate old factor
-    double correctionfactor_jms = correctionfactor + point_J * fabs(correctionfactor_up-correctionfactor);
-    JEC_factors.push_back(correctionfactor_jms);
+      // now calculate old factor
+      double correctionfactor_jms = correctionfactor + point_J * fabs(correctionfactor_up-correctionfactor);
+      JEC_factors.push_back(correctionfactor_jms);
+    }
   }
   return JEC_factors;
 }

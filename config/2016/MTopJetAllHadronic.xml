@@ -62,7 +62,7 @@
     <!--        <Item Name="METName"                 Value="slimmedMETsNoHF"/> -->
     <Item Name="METName"                 Value="slimmedMETs"/>
 
-    <Item Name="lumi_file" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_10/src/UHH2/common/data/2016/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+    <Item Name="lumi_file" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
     <Item Name="lumihists_lumi_per_bin" Value="200"/>
 
     <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->

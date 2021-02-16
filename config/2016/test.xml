@@ -170,6 +170,7 @@
   <Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop" />
 
   <Item Name="additionalBranches" Value="weight xconePuppi xconeCHS xconeCHS_noJEC xconeCHS_Corrected genXCone33TopJets genXCone33TopJets_softdrop XCone33_had_Combined XCone33_lep_Combined XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC XCone33_had_Combined_Corrected XCone33_lep_Combined_Corrected GEN_XCone33_had_Combined GEN_XCone33_lep_Combined passed_gensel_2 passed_recsel_2 cor_factor_had cor_factor_lep"/>
+  <!-- <Item Name="additionalBranches" Value="weight xconePuppi xconeCHS xconeCHS_noJEC genXCone33TopJets genXCone33TopJets_softdrop XCone33_had_Combined_noJEC XCone33_lep_Combined_noJEC GEN_XCone33_had_Combined GEN_XCone33_lep_Combined passed_gensel_2 passed_recsel_2 cor_factor_had cor_factor_lep"/> -->
 
   <Item Name="METName" Value="slimmedMETs"/>
 
