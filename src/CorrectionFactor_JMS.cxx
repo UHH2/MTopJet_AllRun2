@@ -281,6 +281,7 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
 
   // Creat new hadjet ----------------------------------------------------------------------------------------------
   if(debug) std::cout << "\nBestFit: Set new fatjet";
+  if(newsubjets.size() < 3) return -1.0;
   LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
   if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
   // return mass _--------------------------------------------------------------------------------------------------

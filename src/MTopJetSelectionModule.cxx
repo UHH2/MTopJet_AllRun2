@@ -180,7 +180,7 @@ MTopJetSelectionModule::MTopJetSelectionModule(uhh2::Context& ctx){
   //// CONFIGURATION
 
   TString dataset_version = (TString) ctx.get("dataset_version");
-  if(dataset_version.Contains("TTbar")) isTTbar = true;
+  if(dataset_version.Contains("TTbar") || dataset_version.Contains("TTTo")) isTTbar = true;
   else  isTTbar = false;
 
   if(dataset_version.Contains("SingleElec")) isElectronStream = true;

@@ -35,6 +35,8 @@ int main(int argc, char* argv[]){
   TH1F * h_muon = (TH1F*)f_muon->Get("Unfold_XS_totuncert");
   TH1F * h_muon_stat = (TH1F*)f_muon->Get("Unfold_XS_statuncert");
 
+  cout << "Converting to TGraph..." << endl;
+
   TGraphAsymmErrors* elec = ConvertToGraph(h_elec, "left");
   TGraphAsymmErrors* elec_stat = ConvertToGraph(h_elec_stat, "left");
   TGraphAsymmErrors* muon = ConvertToGraph(h_muon, "right");

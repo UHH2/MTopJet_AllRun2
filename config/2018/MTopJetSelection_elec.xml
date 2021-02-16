@@ -27,11 +27,18 @@
 <!ENTITY ST_tW_top               "&INdir;/uhh2.AnalysisModuleRunner.MC.ST_tW_top_NoFullyHadronicDecays_2018.root">
 
 <!-- =============================================== ttbar =========================================================================== -->
-<!ENTITY TTbar_2L2Nu_1      "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2018_1.root">
+<!-- <!ENTITY TTbar_2L2Nu_1      "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2018_1.root">
 <!ENTITY TTbar_2L2Nu_2      "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2018_2.root">
 <!ENTITY TTbar_SemiLep_1    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2018_1.root">
 <!ENTITY TTbar_SemiLep_2    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2018_2.root">
-<!ENTITY TTbar_Hadronic     "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2018.root">
+<!ENTITY TTbar_Hadronic     "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2018.root"> -->
+
+<!ENTITY TTTo2L2Nu_Mtt0000to0700         "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTbar_2L2Nu_Mtt0000to0700_2018.root">
+<!ENTITY TTToSemiLeptonic_Mtt0000to0700  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTbar_SemiLeptonic_Mtt0000to0700_2018.root">
+<!ENTITY TTToHadronic_Mtt0000to0700      "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTbar_Hadronic_Mtt0000to0700_2018.root">
+
+<!ENTITY TT_Mtt0700to1000      "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0700to1000_2018.root">
+<!ENTITY TT_Mtt1000toInft      "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt1000toInft_2018.root">
 
 <!-- =============================================== ttbar other samples ============================================================= -->
 <!ENTITY TTbar_mtop1665_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_2L2Nu_2018.root">
@@ -54,6 +61,27 @@
 <!ENTITY TTbar_mtop1735_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735_Hadronic_2018.root">
 <!ENTITY TTbar_mtop1755_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2018.root">
 <!ENTITY TTbar_mtop1785_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785_Hadronic_2018.root">
+
+<!ENTITY  TTToSemiLeptonic_GluonMove "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToSemiLeptonic_GluonMove_2018.root">
+<!ENTITY  TTToSemiLeptonic_QCDbased  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToSemiLeptonic_QCDbased_2018.root">
+<!ENTITY  TTToSemiLeptonic_TuneUp    "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToSemiLeptonic_TuneUp_2018.root">
+<!ENTITY  TTToSemiLeptonic_TuneDown  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToSemiLeptonic_TuneDown_2018.root">
+<!ENTITY  TTToSemiLeptonic_hdampUp   "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToSemiLeptonic_hdampUp_2018.root">
+<!ENTITY  TTToSemiLeptonic_hdampDown "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToSemiLeptonic_hdampDown_2018.root">
+
+<!ENTITY  TTToHadronic_GluonMove "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToHadronic_GluonMove_2018.root">
+<!ENTITY  TTToHadronic_QCDbased  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToHadronic_QCDbased_2018.root">
+<!ENTITY  TTToHadronic_TuneUp    "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToHadronic_TuneUp_2018.root">
+<!ENTITY  TTToHadronic_TuneDown  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToHadronic_TuneDown_2018.root">
+<!ENTITY  TTToHadronic_hdampUp   "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToHadronic_hdampUp_2018.root">
+<!ENTITY  TTToHadronic_hdampDown "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTToHadronic_hdampDown_2018.root">
+
+<!ENTITY  TTTo2L2Nu_GluonMove "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTTo2L2Nu_GluonMove_2018.root">
+<!ENTITY  TTTo2L2Nu_QCDbased  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTTo2L2Nu_QCDbased_2018.root">
+<!ENTITY  TTTo2L2Nu_TuneUp    "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTTo2L2Nu_TuneUp_2018.root">
+<!ENTITY  TTTo2L2Nu_TuneDown  "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTTo2L2Nu_TuneDown_2018.root">
+<!ENTITY  TTTo2L2Nu_hdampUp   "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTTo2L2Nu_hdampUp_2018.root">
+<!ENTITY  TTTo2L2Nu_hdampDown "&INdir_elec;/uhh2.AnalysisModuleRunner.MC.TTTo2L2Nu_hdampDown_2018.root">
 
 <!-- =============================================== DiBoson =========================================================================== -->
 <!ENTITY  WW    "&INdir;/uhh2.AnalysisModuleRunner.MC.WW_2018.root">
@@ -186,7 +214,7 @@
 .  ██       ██
 -->
 
-<InputData Version="TTbar_2L2Nu_2018_1" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_2L2Nu_2018_1" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_2L2Nu_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_2L2Nu_2018_2" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_2L2Nu_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -197,8 +225,22 @@
 <In FileName="&TTbar_SemiLep_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <InputData Version="TTbar_Hadronic_2018" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
+<InputData Version="TTbar_2L2Nu_Mtt0000to0700_2018" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTTo2L2Nu_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_SemiLeptonic_Mtt0000to0700_2018" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTToSemiLeptonic_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_Hadronic_Mtt0000to0700_2018" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTToHadronic_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_Mtt0700to1000_2018" Lumi="306394668.8" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TT_Mtt0700to1000;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_Mtt1000toInft_2018" Lumi="726814208.8" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TT_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <!--
 ███    ███ ████████  ██████  ██████
@@ -263,6 +305,64 @@
 
 <InputData Version="TTbar_mtop1785_Hadronic_2018" Lumi="6870630.933" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1785_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+
+
+      <InputData Version="TTToSemiLeptonic_QCDbased_2018" Lumi="22036344.97" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToSemiLeptonic_QCDbased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToSemiLeptonic_GluonMove_2018" Lumi="22703554.52" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToSemiLeptonic_GluonMove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToSemiLeptonic_TuneUp_2018" Lumi="22248206.1" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToSemiLeptonic_TuneUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToSemiLeptonic_TuneDown_2018" Lumi="16909903.72" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToSemiLeptonic_TuneDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToSemiLeptonic_hdampUp_2018" Lumi="22262166.7" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToSemiLeptonic_hdampUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToSemiLeptonic_hdampDown_2018" Lumi="21287456.27" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToSemiLeptonic_hdampDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+
+      <InputData Version="TTToHadronic_QCDbased_2018" Lumi="22576622.42" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToHadronic_QCDbased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToHadronic_GluonMove_2018" Lumi="22690829.22" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToHadronic_GluonMove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToHadronic_TuneUp_2018" Lumi="19389345.07" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToHadronic_TuneUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToHadronic_TuneDown_2018" Lumi="21821387.72" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToHadronic_TuneDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToHadronic_hdampUp_2018" Lumi="20608466.23" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToHadronic_hdampUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTToHadronic_hdampDown_2018" Lumi="21812455.89" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTToHadronic_hdampDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+
+      <InputData Version="TTTo2L2Nu_QCDbased_2018" Lumi="12178870.54" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTTo2L2Nu_QCDbased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTTo2L2Nu_GluonMove_2018" Lumi="12344801" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTTo2L2Nu_GluonMove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTTo2L2Nu_TuneUp_2018" Lumi="4494536.105" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTTo2L2Nu_TuneUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTTo2L2Nu_TuneDown_2018" Lumi="4089112.612" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTTo2L2Nu_TuneDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTTo2L2Nu_hdampUp_2018" Lumi="4341253.272" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTTo2L2Nu_hdampUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+      <InputData Version="TTTo2L2Nu_hdampDown_2018" Lumi="4504940.516" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+      <In FileName="&TTTo2L2Nu_hdampDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
       <!--

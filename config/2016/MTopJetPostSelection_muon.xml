@@ -45,6 +45,10 @@
 <!ENTITY TTbar_hdampup   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2016v3.root">
 <!ENTITY TTbar_hdampdown "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2016v3.root">
 
+<!ENTITY TTbar_GluonMove "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2016v3.root">
+<!ENTITY TTbar_QCDbased  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2016v3.root">
+<!ENTITY TTbar_TuneUp    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2016v3.root">
+<!ENTITY TTbar_TuneDown  "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2016v3.root">
 <!-- =============================================== ttbar variations ============================================================= -->
 
 
@@ -215,6 +219,16 @@
 <In FileName="&TTbar_hdampup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_hdampdown_2016v3" Lumi="70098.79412" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+
+<InputData Version="TTbar_GluonMove_2016v3" Lumi="71435.02934" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_GluonMove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_QCDbased_2016v3" Lumi="34020.75118" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_QCDbased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_TuneUp_2016v3" Lumi="35074.66096" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_TuneUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_TuneDown_2016v3" Lumi="33930.56651" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_TuneDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
 <!--
