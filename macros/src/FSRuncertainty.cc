@@ -22,8 +22,7 @@ TString year;
 TString save_path;
 
 int main(int argc, char* argv[]){
-  TString save_path = get_save_path();
-  
+
   bool debug = false;
   if(argc != 2){
     cout << "Usage: ./FSRuncertainty <year>" << endl;
@@ -39,7 +38,7 @@ int main(int argc, char* argv[]){
 
   for(auto mass_string: masswindows){
 
-    save_path = save_path+"/Plots/FSRuncertainty/";
+    save_path = get_save_path()+"/Plots/FSRuncertainty/";
     save_path = creat_folder_and_path(save_path, year);
     save_path = creat_folder_and_path(save_path, mass_string);
 
@@ -306,7 +305,6 @@ void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band, int bin, int fir
   graph->Draw("P SAME");
   fit->Draw("SAME");
 
-
   c->SaveAs(save_path+"/Bin"+binnr+".pdf");
   if(bin == firstbin)     c->Print(save_path+"/AllBins.pdf(","pdf");
   else if(bin == lastbin) c->Print(save_path+"/AllBins.pdf)","pdf");
@@ -470,8 +468,6 @@ TH1F* SubtractBackgrounds(TH1F* data, vector<TH1F*> bgr, vector<double> syssize)
 }
 
 TH1F* GetSYS(TH1F* hist, TH1F* up, TH1F* down, TString sysname){
-  TString save_path = get_save_path();
-
   int nbins = hist->GetXaxis()->GetNbins();
   TH1F* sys = (TH1F*) hist->Clone();
   sys->Reset();
@@ -498,8 +494,6 @@ TH1F* GetSYS(TH1F* hist, TH1F* up, TH1F* down, TString sysname){
 
 
 void PlotError(TH1F* hist, TString sysname){
-  TString save_path = get_save_path();
-
   int nbins = hist->GetXaxis()->GetNbins();
   TH1F* sys = (TH1F*) hist->Clone();
   sys->Reset();
