@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
-
+  TString save_path = get_save_path();
   TString channel;
   TString year;
 
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]){
   vector<double> error_stat;
   vector<double> measured;
   vector<double> error;
-  TString directory = "/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/"+year+"/";
+  TString directory = save_path+"/Plots/Unfolding_Run2/"+year+"/";
   // vector<string> massdir = {"Pseudo1695/", "Pseudo1715/", "Pseudo1/", "Pseudo1735/", "Pseudo1755/"};
   vector<TString> massdir = {"Pseudo1695/", "Pseudo1715/", "Pseudo1735/", "Pseudo1755/"};
   int i=0;
@@ -140,7 +140,7 @@ int main(int argc, char* argv[]){
   // leg->AddEntry(Area, "fit uncertainty", "f");
   leg->Draw();
   gPad->RedrawAxis();
-  A->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/MassCalibratrion_"+year+"_"+channel+"_stat.pdf");
+  A->SaveAs(save_path+"/Plots/Unfolding_Run2/MassCalibratrion_"+year+"_"+channel+"_stat.pdf");
 
   TCanvas *B = new TCanvas("B", "B", 600, 600);
   gPad->SetTicks();
@@ -180,6 +180,6 @@ int main(int argc, char* argv[]){
   // leg->AddEntry(Area, "fit uncertainty", "f");
   leg2->Draw();
   gPad->RedrawAxis();
-  B->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/MassCalibratrion_"+year+"_"+channel+".pdf");
+  B->SaveAs(save_path+"/Plots/Unfolding_Run2/MassCalibratrion_"+year+"_"+channel+".pdf");
 
 }

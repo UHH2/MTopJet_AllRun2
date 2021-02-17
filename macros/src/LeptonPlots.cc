@@ -3,6 +3,7 @@
 using namespace std;
 
 int main(){
+  TString save_path = get_save_path();
 
   TString uhh = "2016/muon/uhh2.AnalysisModuleRunner.MC.";
   vector<TString> name = {"nominal", "1695", "1715", "1735", "1755"};
@@ -127,12 +128,12 @@ int main(){
     leg->SetTextSize(0.03);
     leg->Draw();
     gPad->RedrawAxis();
-    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_name[i]+"_main_2016.pdf");
+    A->SaveAs(save_path+"/Plots/LeptonPlots/"+all_vector_name[i]+"_main_2016.pdf");
     all_vector[i].at(2)->Draw("SAME HIST");
     all_vector[i].at(3)->Draw("SAME HIST");
     leg->AddEntry(all_vector[i].at(2),"mTop 171.5","l");
     leg->AddEntry(all_vector[i].at(3),"mTop 173.5","l");
-    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_name[i]+"_full_2016.pdf");
+    A->SaveAs(save_path+"/Plots/LeptonPlots/"+all_vector_name[i]+"_full_2016.pdf");
     delete A;
     leg->Clear();
   }
@@ -177,12 +178,12 @@ int main(){
     leg->SetTextSize(0.03);
     leg->Draw();
     gPad->RedrawAxis();
-    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_boost_perp_name[i]+"_main_2016.pdf");
+    A->SaveAs(save_path+"/Plots/LeptonPlots/"+all_vector_boost_perp_name[i]+"_main_2016.pdf");
     all_vector_boost_perp[i].at(2)->Draw("SAME HIST");
     all_vector_boost_perp[i].at(3)->Draw("SAME HIST");
     leg->AddEntry(all_vector_boost_perp[i].at(2),"mTop 171.5","l");
     leg->AddEntry(all_vector_boost_perp[i].at(3),"mTop 173.5","l");
-    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_boost_perp_name[i]+"_full_2016.pdf");
+    A->SaveAs(save_path+"/Plots/LeptonPlots/"+all_vector_boost_perp_name[i]+"_full_2016.pdf");
     delete A;
     leg->Clear();
   }
@@ -228,12 +229,12 @@ int main(){
     leg->SetTextSize(0.03);
     leg->Draw();
     gPad->RedrawAxis();
-    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_rebin10_name[i]+"_main_2016.pdf");
+    A->SaveAs(save_path+"/Plots/LeptonPlots/"+all_vector_rebin10_name[i]+"_main_2016.pdf");
     all_vector_rebin10[i].at(2)->Draw("SAME HIST");
     all_vector_rebin10[i].at(3)->Draw("SAME HIST");
     leg->AddEntry(all_vector_rebin10[i].at(2),"mTop 171.5","l");
     leg->AddEntry(all_vector_rebin10[i].at(3),"mTop 173.5","l");
-    A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/LeptonPlots/"+all_vector_rebin10_name[i]+"_full_2016.pdf");
+    A->SaveAs(save_path+"/Plots/LeptonPlots/"+all_vector_rebin10_name[i]+"_full_2016.pdf");
     delete A;
     leg->Clear();
   }

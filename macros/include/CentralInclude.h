@@ -41,10 +41,24 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <unistd.h>
+#include <stdio.h>
 
 using namespace std;
 
+// -------------------------------------------------------------------------------------------
+// Get path
+
 TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/";
+
+TString get_save_path(){
+  TString user = get_current_dir_name();
+  TString save_dir = "/afs/desy.de/user/s/schwarzd";
+  if(user.Contains("paaschal")){
+    save_dir = "/afs/desy.de/user/p/paaschal/files";
+  }
+  return save_dir;
+}
 
 // -------------------------------------------------------------------------------------------
 void SetupGlobalStyle()

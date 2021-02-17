@@ -1,4 +1,5 @@
 #include "../include/CentralInclude.h"
+#include "../include/Utils.h"
 
 using namespace std;
 
@@ -43,6 +44,8 @@ int main(int argc, char* argv[]){
 }
 
 void Plot(TGraphAsymmErrors* elec, TGraphAsymmErrors* elec_stat, TGraphAsymmErrors* muon, TGraphAsymmErrors* muon_stat){
+  TString save_path = get_save_path();
+  creat_folder(save_path+"/Plots/Unfolding_Run2/");
 
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
@@ -112,7 +115,7 @@ void Plot(TGraphAsymmErrors* elec, TGraphAsymmErrors* elec_stat, TGraphAsymmErro
   l->AddEntry(muon,"Muon channel","pe");
   l->SetTextSize(0.03);
   l->Draw();
-  c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/ChannelComparison_"+year+".pdf");
+  c->SaveAs(save_path+"/Plots/Unfolding_Run2/ChannelComparison_"+year+".pdf");
   delete c;
 }
 

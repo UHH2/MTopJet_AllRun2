@@ -7,7 +7,7 @@ int main(int argc, char* argv[]){
 
   TString ttbar_string = "uhh2.AnalysisModuleRunner.MC.TTbar.root";
   TString data_string = "uhh2.AnalysisModuleRunner.DATA.DATA.root";
-  TString save_path = "/afs/desy.de/user/p/paaschal/Plots/Comparison_ak8/";
+  TString save_path = get_save_path()+"/Plots/Comparison_ak8/";
 
   vector<TString> masscut = {"no_masscut", "masscut_120", "masscut_130", "masscut_140", "masscut_150"};
   vector<TString> classes = {"AK8_tau_pass_rec", "AK8_tau_pass_rec_masscut_120", "AK8_tau_pass_rec_masscut_130", "AK8_tau_pass_rec_masscut_140", "AK8_tau_pass_rec_masscut_150"};

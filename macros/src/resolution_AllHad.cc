@@ -10,7 +10,7 @@ TGraph *AreaFromEnvelope(TGraph* uncert, TString updown);
 vector<double> GetMeans(vector<TH1F*> hists, bool use_median, bool do_ptrec, TString error);
 
 int main(int argc, char* argv[]){
-
+  TString save_path = get_save_path();
   bool use_median = false;
   if(argc >1 && strcmp(argv[1], "median") == 0) use_median = true;
 
@@ -210,12 +210,12 @@ int main(int argc, char* argv[]){
   text1.DrawLatex(.22,.2, "all hadronic t#bar{t}");
   gPad->RedrawAxis();
   // first save without additional correction
-  c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_noAdditional_"+year+".pdf");
+  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_noAdditional_"+year+".pdf");
   // and once again with the additional correction
   resolution_cor->Draw("SAME E1");
   leg1->AddEntry(resolution_cor,"AK4 + additional correction","le");
   // leg1->AddEntry((TObject*)0, "all hadronic t#bar{t}", "");
-  c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_"+year+".pdf");
+  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_"+year+".pdf");
 
 
   TCanvas *c2 = new TCanvas();
@@ -238,7 +238,7 @@ int main(int argc, char* argv[]){
   text2.SetTextSize(18);
   text2.DrawLatex(.2,.2, "all hadronic");
   gPad->RedrawAxis();
-  c2->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_seperateJets_"+year+".pdf");
+  c2->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_seperateJets_"+year+".pdf");
 
   TCanvas *c3 = new TCanvas();
   gPad->SetLeftMargin(0.15);
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]){
   leg3->AddEntry(area_percent, "non-closure", "f");
   leg3->Draw();
   gPad->RedrawAxis();
-  c3->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/nonClosure"+mean_median+"_"+year+".pdf");
+  c3->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/nonClosure"+mean_median+"_"+year+".pdf");
 
   return 0;
 }

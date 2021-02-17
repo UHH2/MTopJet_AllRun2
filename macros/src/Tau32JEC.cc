@@ -4,6 +4,7 @@ using namespace std;
 
 int main(){
 
+  TString save_path = get_save_path();
   vector<TString> years = {"2016v3", "2017v2", "2018"};
   vector<TString> variations = {"HOME","JEC_up", "JEC_down", "COR_up", "COR_down", "JMS_upup", "JMS_downdown"};
   vector<TString> LegendEntries = {"nominal", "JEC up", "JEC down", "XCone up", "XCone down", "JMS upup", "JMS downdown"};
@@ -58,7 +59,7 @@ int main(){
     for(auto h: hists) h->Draw("HIST SAME");
     leg->Draw();
     gPad->RedrawAxis();
-    c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Tau32_JEC/Tau32_"+year+".pdf");
+    c->SaveAs(save_path+"/Plots/Tau32_JEC/Tau32_"+year+".pdf");
   }
 
 

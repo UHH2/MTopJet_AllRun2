@@ -14,7 +14,7 @@ TH1F* GetRatioUncert(TH1F* mc);
 
 
 int main(int argc, char* argv[]){
-
+  TString save_path = get_save_path();
   TString year = "FullRun2";
   if(argc > 1){
     if(strcmp(argv[1], "2016") == 0)      year = "2016";
@@ -232,7 +232,7 @@ int main(int argc, char* argv[]){
   h_ratio_data->Draw(o_tot+" SAME");
   gPad->RedrawAxis();
 
-  c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/Unfold_norm_"+year+".pdf");
+  c->SaveAs(save_path+"/Plots/Unfolding_Run2/Unfold_norm_"+year+".pdf");
   delete c;
 }
 

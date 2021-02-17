@@ -9,6 +9,8 @@ int main(int argc, char* argv[]){
     return 0;
   }
 
+  TString save_path = get_save_path();
+  
   bool isCut = false;
   if(strcmp(argv[2], "true") == 0) isCut = true;
   string cut;
@@ -195,8 +197,8 @@ int main(int argc, char* argv[]){
     leg->SetTextSize(0.05);
     leg->Draw();
     gPad->RedrawAxis();
-    if(isCut) JEC->SaveAs("/afs/desy.de/user/p/paaschal/Plots/ComparisonMass/"+level+"/gencut/"+cut+"/MassComparison_JEC_"+level+"_" +year[i]+".pdf");
-    else JEC->SaveAs("/afs/desy.de/user/p/paaschal/Plots/ComparisonMass/"+level+"/MassComparison_JEC_"+level+"_" +year[i]+".pdf");
+    if(isCut) JEC->SaveAs(save_path+"/Plots/ComparisonMass/"+level+"/gencut/"+cut+"/MassComparison_JEC_"+level+"_" +year[i]+".pdf");
+    else JEC->SaveAs(save_path+"/Plots/ComparisonMass/"+level+"/MassComparison_JEC_"+level+"_" +year[i]+".pdf");
     delete JEC;
     leg->Clear();
     for(unsigned int j=0; j<DOWNs.size(); j++){
@@ -215,8 +217,8 @@ int main(int argc, char* argv[]){
       leg->SetTextSize(0.05);
       leg->Draw();
       gPad->RedrawAxis();
-      if(isCut) SYS->SaveAs("/afs/desy.de/user/p/paaschal/Plots/ComparisonMass/"+level+"/gencut/"+cut+"/MassComparison_"+file_name[j]+level+"_"+year[i]+".pdf");
-      else SYS->SaveAs("/afs/desy.de/user/p/paaschal/Plots/ComparisonMass/"+level+"/MassComparison_"+file_name[j]+level+"_"+year[i]+".pdf");
+      if(isCut) SYS->SaveAs(save_path+"/Plots/ComparisonMass/"+level+"/gencut/"+cut+"/MassComparison_"+file_name[j]+level+"_"+year[i]+".pdf");
+      else SYS->SaveAs(save_path+"/Plots/ComparisonMass/"+level+"/MassComparison_"+file_name[j]+level+"_"+year[i]+".pdf");
       delete SYS;
       leg->Clear();
     }

@@ -12,6 +12,8 @@ using namespace std;
 
 int main(int argc, char* argv[]){
   bool debug = false;
+  TString save_path = get_save_path();
+
   /*
   storage: PlaceToKeep/storage_JEC_SYS.txt
   functions_explain:
@@ -110,7 +112,7 @@ int main(int argc, char* argv[]){
   positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
   */
 
-  TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS";
+  TString save_path_general = save_path+"/Plots/JEC_SYS";
   save_path_general = creat_folder_and_path(save_path_general, "chi2");
   save_path_general = creat_folder_and_path(save_path_general, "pt_bins");            // CHANGE_PT
 

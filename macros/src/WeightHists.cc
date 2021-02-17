@@ -4,6 +4,7 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+  TString save_path = get_save_path();
   TString year, year_v;
 
   bool isCut = false;
@@ -71,7 +72,7 @@ int main(int argc, char* argv[]){
           gPad->SetBottomMargin(0.12);
           every_hist[j].at(k)->Draw("HIST");
           gPad->RedrawAxis();
-          CUT->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Weights/"+year+"/cut/"+hist_collection[j]+"_"+hists[k]+"_FSR"+variations[i]+"_cut_on_y10.pdf");
+          CUT->SaveAs(save_path+"/Plots/Weights/"+year+"/cut/"+hist_collection[j]+"_"+hists[k]+"_FSR"+variations[i]+"_cut_on_y10.pdf");
           delete CUT;
         }
         else{
@@ -92,7 +93,7 @@ int main(int argc, char* argv[]){
           gPad->SetBottomMargin(0.12);
           every_hist[j].at(k)->Draw("HIST");
           gPad->RedrawAxis();
-          A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Weights/"+year+"/"+hist_collection[j]+"_"+hists[k]+"_FSR"+variations[i]+".pdf");
+          A->SaveAs(save_path+"/Plots/Weights/"+year+"/"+hist_collection[j]+"_"+hists[k]+"_FSR"+variations[i]+".pdf");
           delete A;
         }
       }

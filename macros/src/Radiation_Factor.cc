@@ -10,6 +10,8 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+  TString save_path = get_save_path();
+
   if(argc != 2){
     cout << "Usage: ./Radiation_SYS <year>" << endl;
     return 0;
@@ -68,7 +70,7 @@ int main(int argc, char* argv[]){
     */
     if(debug) cout << "Directiories" << endl;
 
-    TString save_path = "/afs/desy.de/user/s/schwarzd/Plots/Radiation_SYS/mjet"+mass_string;
+    TString save_path = save_path+"/Plots/Radiation_SYS/mjet"+mass_string;
     save_path = creat_folder_and_path(save_path);
     save_path = creat_folder_and_path(save_path, year);
     save_path = creat_folder_and_path(save_path, "rebin"+to_string(bin_width));
@@ -1061,7 +1063,7 @@ int main(int argc, char* argv[]){
   TGraphAsymmErrors * results = new TGraphAsymmErrors(f_fsr.size(), &xvalues[0], &central[0], &xdown[0], &xup[0], &down[0], &up[0]);
   results->SetMarkerStyle(8);
   results->Draw("P");
-  c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Radiation_SYS/Results_"+year+".pdf");
+  c->SaveAs(save_path+"/Plots/Radiation_SYS/Results_"+year+".pdf");
 
   return 0;
 

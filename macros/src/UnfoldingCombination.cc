@@ -330,6 +330,8 @@ TH1F* NormalizeHist(TH1F* old_hist){
 }
 
 void Plot(TH1F* h_data_XS_tot, TH1F* h_data_XS_stat, vector<TH1F*> truth, vector<TH1F*> truth2, vector<TString> legnames, TH1F* h_ratio_data, TH1F* h_ratio_data_stat, TH1F* h_ratio_powheg){
+  TString save_path = get_save_path();
+
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
@@ -508,12 +510,14 @@ void Plot(TH1F* h_data_XS_tot, TH1F* h_data_XS_stat, vector<TH1F*> truth, vector
   h_ratio_data->Draw(o_tot + " SAME");
   gPad->RedrawAxis();
 
-  c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/Unfold_combination_"+mode+".pdf");
+  c->SaveAs(save_path+"/Plots/Unfolding_Run2/Unfold_combination_"+mode+".pdf");
   delete c;
   return;
 }
 
 void Plot_norm(TH1F* h_data_XS_tot, TH1F* h_data_XS_stat, vector<TH1F*> truth, vector<TH1F*> truth2, vector<TString> legnames, TH1F* h_ratio_data, TH1F* h_ratio_data_stat, vector<TH1F*> ratios_mtop){
+  TString save_path = get_save_path();
+
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
@@ -695,7 +699,7 @@ void Plot_norm(TH1F* h_data_XS_tot, TH1F* h_data_XS_stat, vector<TH1F*> truth, v
   h_ratio_data->Draw(o_tot + " SAME");
   gPad->RedrawAxis();
 
-  c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/Unfold_combination_norm_"+mode+".pdf");
+  c->SaveAs(save_path+"/Plots/Unfolding_Run2/Unfold_combination_norm_"+mode+".pdf");
   delete c;
   return;
 }
@@ -885,6 +889,8 @@ double chi2fit::ComputeChi2(TH1F* MC, std::vector<int> bins){
 
 
 void Plot_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2_, double mass, double uncert, TString file_name){
+  TString save_path = get_save_path();
+  
   TF1 * fit = (TF1*)fit_->Clone("fit");
   TVectorD masses(masses_.size());
   TVectorD chi2(chi2_.size());
@@ -925,7 +931,7 @@ void Plot_chi2(TF1 * fit_, std::vector<double> masses_, std::vector<double> chi2
   masstext += " #pm ";
   masstext += uncert_text;
   text.DrawLatex(.4,.6, masstext);
-  c->SaveAs("/afs/desy.de/user/s/schwarzd/Plots/Unfolding_Run2/Unfold_combination_chi2_"+mode+".pdf");
+  c->SaveAs(save_path+"/Plots/Unfolding_Run2/Unfold_combination_chi2_"+mode+".pdf");
   delete c;
   return;
 }

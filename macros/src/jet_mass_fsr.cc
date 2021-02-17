@@ -12,6 +12,7 @@ using namespace std;
 
 int main(int argc, char* argv[]){
   bool debug   = false;
+  TString save_path = get_save_path();
   TString year = "2017";
 
   print_seperater();
@@ -102,6 +103,6 @@ int main(int argc, char* argv[]){
   ttbar_nom->Draw("HIST");
   ttbar_up->Draw("same hist");
   ttbar_down->Draw("same hist");
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/ComparisonMass/FSRup4_2017.pdf");
+  A->SaveAs(save_path+"/Plots/ComparisonMass/FSRup4_2017.pdf");
 
 }

@@ -160,6 +160,8 @@ inline void set_ellipse(TEllipse *ellipse, int color){
 
 // ------------------------------------------------------------------------------------------------
 inline void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color,  vector<TString> names, TString name){
+  TString save_path = get_save_path();
+  
   for(unsigned int i=0; i<color.size(); i++){
     if(i==0) set_main_graph(graph[i], color[i]);
     else     set_graph(graph[i], color[i]);
@@ -188,7 +190,7 @@ inline void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> c
   for(unsigned int i=0; i<color.size(); i++) leg->AddEntry(ellipse[i], names[i],"l");
   leg->Draw();
   gPad->RedrawAxis();
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/JEC_SYS/ellipse/"+name+".pdf");
+  A->SaveAs(save_path+"/Plots/JEC_SYS/ellipse/"+name+".pdf");
 }
 
 /*
@@ -204,6 +206,7 @@ int main(int argc, char* argv[]){
   bool debug = true;
   bool show_points = true;
   if(debug) show_points=true;
+  TString save_path = get_save_path();
 
   // /*
   // ███    ███ ████████  ██████  ██████
@@ -216,7 +219,7 @@ int main(int argc, char* argv[]){
   // #################################################################################################
   // Get Path ########################################################################################
 
-  TString dir            = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS/";
+  TString dir            = save_path+"/Plots/JEC_SYS/";
   TString unc            = "chi2/";
   TString ptbins         = "pt_bins/";
   vector<TString> masses = {"combined/", "1695/combined/", "1755/combined/"};
@@ -511,7 +514,7 @@ int main(int argc, char* argv[]){
   // // #################################################################################################
   // // Get Path ########################################################################################
   //
-  // TString dir          = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS/mc_data_uncert/pt_bins/combined/btag/rebin180/";
+  // TString dir          = save_path+"/Plots/JEC_SYS/mc_data_uncert/pt_bins/combined/btag/rebin180/";
   // TString file_txt     = "jec_factor_all.txt";
   // vector<TString> fits = {"masspeak/", "mtop_combi/masspeak/"};
   //

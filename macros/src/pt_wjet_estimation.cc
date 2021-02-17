@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]){
   bool debug = true;
-  TString path_save = "/afs/desy.de/user/p/paaschal/Plots/JEC_SYS";
+  TString path_save = get_save_path()+"/Plots/JEC_SYS";
   TString path_plot = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/";
   vector<TString> years = {"2016", "2017", "2018"};
   vector<TH1F*> hists;

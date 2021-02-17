@@ -8,6 +8,7 @@ int main(int argc, char* argv[]){
     return 0;
   }
 
+  TString save_path = get_save_path();
   TString year = argv[1];
 
   TString uhh = year+"/muon/uhh2.AnalysisModuleRunner.MC.";
@@ -76,7 +77,7 @@ int main(int argc, char* argv[]){
   leg->Draw();
   leg->Clear();
   gPad->RedrawAxis();
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/MassSensitivity/HadjetMass_main_"+year+".pdf");
+  A->SaveAs(save_path+"/Plots/MassSensitivity/HadjetMass_main_"+year+".pdf");
   hists[1]->Draw("SAME HIST");
   hists[3]->Draw("SAME HIST");
   hists[4]->Draw("SAME HIST");
@@ -88,7 +89,7 @@ int main(int argc, char* argv[]){
   leg->AddEntry(hists[4],"mTop 173.5","l");
   leg->AddEntry(hists[5],"mTop 175.5","l");
   leg->AddEntry(hists[6],"mTop 178.5","l");
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/MassSensitivity/HadjetMass_full_"+year+".pdf");
+  A->SaveAs(save_path+"/Plots/MassSensitivity/HadjetMass_full_"+year+".pdf");
   delete A;
   leg->Clear();
 
@@ -131,7 +132,7 @@ int main(int argc, char* argv[]){
   leg->SetTextSize(0.03);
   leg->Draw();
   gPad->RedrawAxis();
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/MassSensitivity/HadjetMass_main_"+year+"_norm.pdf");
+  A->SaveAs(save_path+"/Plots/MassSensitivity/HadjetMass_main_"+year+"_norm.pdf");
   hists_norm[1]->Draw("SAME HIST");
   hists_norm[3]->Draw("SAME HIST");
   hists_norm[4]->Draw("SAME HIST");
@@ -140,7 +141,7 @@ int main(int argc, char* argv[]){
   leg->AddEntry(hists_norm[3],"mTop 171.5","l");
   leg->AddEntry(hists_norm[4],"mTop 173.5","l");
   leg->AddEntry(hists_norm[6],"mTop 178.5","l");
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/MassSensitivity/HadjetMass_full_"+year+"_norm.pdf");
+  A->SaveAs(save_path+"/Plots/MassSensitivity/HadjetMass_full_"+year+"_norm.pdf");
   delete A;
   leg->Clear();
 

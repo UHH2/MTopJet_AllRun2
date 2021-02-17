@@ -31,6 +31,8 @@ TGraph *UncertaintyFromDiff(TF1* central, TF1* pol1, TF1* pol2, TString mode);
 
 int main(int argc, char* argv[]){
 
+  TString save_path = get_save_path();
+
   /*
   ██████  ███████ ███████ ██ ███    ██ ███████     ███████ ██ ████████     ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██
   ██   ██ ██      ██      ██ ████   ██ ██          ██      ██    ██        ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██
@@ -408,7 +410,7 @@ int main(int argc, char* argv[]){
   h_ratio_mean->GetZaxis()->SetTitleOffset(0.9);
   h_ratio_mean->Draw("COLZ");
   h_ratio_mean->Draw("text:same");
-  A->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Ratio_Mean_"+year+".pdf");
+  A->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/Ratio_Mean_"+year+".pdf");
 
   TCanvas *B = new TCanvas();
   gPad->SetRightMargin(0.15);
@@ -425,7 +427,7 @@ int main(int argc, char* argv[]){
   h_ptrec_mean->GetZaxis()->SetTitleOffset(0.9);
   h_ptrec_mean->Draw("COLZ");
   h_ptrec_mean->Draw("text:same");
-  B->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Ptrec_Mean_"+year+".pdf");
+  B->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/Ptrec_Mean_"+year+".pdf");
 
   TCanvas *C = new TCanvas();
   gPad->SetRightMargin(0.15);
@@ -442,7 +444,7 @@ int main(int argc, char* argv[]){
   h_ratio_mean_err->GetZaxis()->SetTitleOffset(0.9);
   h_ratio_mean_err->Draw("COLZ");
   h_ratio_mean_err->Draw("text:same");
-  C->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Ratio_MEAN_ERR_"+year+".pdf");
+  C->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/Ratio_MEAN_ERR_"+year+".pdf");
 
   TCanvas *D = new TCanvas();
   gPad->SetRightMargin(0.15);
@@ -459,7 +461,7 @@ int main(int argc, char* argv[]){
   h_ptrec_mean_err->GetZaxis()->SetTitleOffset(0.9);
   h_ptrec_mean_err->Draw("COLZ");
   h_ptrec_mean_err->Draw("text:same");
-  D->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Ptrec_MEAN_ERR_"+year+".pdf");
+  D->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/Ptrec_MEAN_ERR_"+year+".pdf");
 
 
   TCanvas *E = new TCanvas();
@@ -532,7 +534,7 @@ int main(int argc, char* argv[]){
 
     gPad->RedrawAxis();
   }
-  E->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Fits_"+year+".pdf");
+  E->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/Fits_"+year+".pdf");
 
 
   TCanvas *F = new TCanvas();
@@ -573,7 +575,7 @@ int main(int argc, char* argv[]){
       ratio_line->Draw("SAME");
       gPad->RedrawAxis();
     }
-    TString name = "/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Fits_ratio_ptbin";
+    TString name = save_path+"/Plots/Correction_allHad/"+year+"/Fits_ratio_ptbin";
     TString ending = std::to_string(pt_bin) + "_"+year+".pdf";
     F->SaveAs(name+ending);
   }
@@ -611,7 +613,7 @@ int main(int argc, char* argv[]){
       ptrec_line->Draw("SAME");
       gPad->RedrawAxis();
     }
-    TString name = "/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/ptrec_mean_ptbin";
+    TString name = save_path+"/Plots/Correction_allHad/"+year+"/ptrec_mean_ptbin";
     TString ending = std::to_string(pt_bin) + "_"+year+".pdf";
     F2->SaveAs(name+ending);
   }
@@ -649,7 +651,7 @@ int main(int argc, char* argv[]){
 
     gPad->RedrawAxis();
 
-    TString filename = "/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Fits_";
+    TString filename = save_path+"/Plots/Correction_allHad/"+year+"/Fits_";
     filename += eta_bin;
     filename += "_"+year_s+".pdf";
     G->SaveAs(filename);
@@ -667,14 +669,14 @@ int main(int argc, char* argv[]){
   ptrec[2][3]->Draw("HIST");
   example_line->Draw("SAME");
   gPad->RedrawAxis();
-  G2->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/ptrec_mean_example_"+year+".pdf");
+  G2->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/ptrec_mean_example_"+year+".pdf");
 
   TCanvas *G3 = new TCanvas("G3", "G3", 600, 600);
   gPad->SetLeftMargin(0.15);
   ratio[2][3]->Draw("HIST");
   ratio_fit[2][3]->Draw("SAME");
   gPad->RedrawAxis();
-  G3->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/ratio_mean_example_"+year+".pdf");
+  G3->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/ratio_mean_example_"+year+".pdf");
 
   TCanvas *H = new TCanvas("H", "H", 1800, 600);
   gPad->SetRightMargin(0.15);
@@ -691,7 +693,7 @@ int main(int argc, char* argv[]){
   h_count->GetZaxis()->SetTitleOffset(0.9);
   h_count->Draw("COLZ");
   h_count->Draw("text:same");
-  H->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year+"/Event_Count_"+year+".pdf");
+  H->SaveAs(save_path+"/Plots/Correction_allHad/"+year+"/Event_Count_"+year+".pdf");
 
   return 0;
 }
@@ -1005,7 +1007,8 @@ vector<double> CalculateParameterUncertainty(TGraphErrors* data_, TString functi
 
 
 void PlotRatio(TGraphErrors* data_, TF1* fit_, TGraph* uncert_, int etabin, TString year_){
-
+  TString save_path = get_save_path();
+  
   TGraphErrors* data = (TGraphErrors*) data_->Clone();
   TF1* fit = (TF1*) fit_->Clone();
   TGraph* uncert = (TGraphErrors*) uncert_->Clone();
@@ -1069,7 +1072,7 @@ void PlotRatio(TGraphErrors* data_, TF1* fit_, TGraph* uncert_, int etabin, TStr
   leg->AddEntry(uncert,"fit uncertainty","f");
   leg->Draw();
 
-  TString filename = "/afs/desy.de/user/p/paaschal/Plots/Correction_allHad/"+year_+"/FitRatio_";
+  TString filename = save_path+"/Plots/Correction_allHad/"+year_+"/FitRatio_";
   filename += etabin;
   filename += "_"+year_+".pdf";
   C->SaveAs(filename);

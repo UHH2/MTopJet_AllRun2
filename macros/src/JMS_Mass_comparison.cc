@@ -16,6 +16,8 @@ int main(int argc, char* argv[]){
   using the BestFit method.
   */
   bool debug = true;
+  TString save_path = get_save_path();
+
   print_seperater();
 
 
@@ -73,7 +75,7 @@ int main(int argc, char* argv[]){
   positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
   */
 
-  TString save_path_general = "/afs/desy.de/user/p/paaschal/Plots"; // CHANGE_PT
+  TString save_path_general = save_path+"/Plots"; // CHANGE_PT
   save_path_general = creat_folder_and_path(save_path_general, "JMS");
 
 

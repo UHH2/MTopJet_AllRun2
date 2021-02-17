@@ -11,6 +11,7 @@ vector<double> GetMeans(vector<TH1F*> hists, bool use_median, bool do_ptrec, TSt
 
 int main(int argc, char* argv[]){
 
+  TString save_path = get_save_path();
   TString channel = "muon";
 
   bool use_median = false;
@@ -169,11 +170,11 @@ int main(int argc, char* argv[]){
   text1.DrawLatex(.2,.2, "lepton+jets");
   gPad->RedrawAxis();
   // first save without additional correction
-  c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+"_noAdditional.pdf");
+  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+"_noAdditional.pdf");
   // and once again with the additional correction
   resolution_cor->Draw("SAME E1");
   leg1->AddEntry(resolution_cor,"additional correction","l");
-  c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+".pdf");
+  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+".pdf");
 
   // ---------------------------------------------------------------------------
 
@@ -197,7 +198,7 @@ int main(int argc, char* argv[]){
   leg2->AddEntry(area_percent, "non-closure", "f");
   leg2->Draw();
   gPad->RedrawAxis();
-  c2->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/"+channel+"/nonClosure_"+mean_median+"_"+year+".pdf");
+  c2->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/nonClosure_"+mean_median+"_"+year+".pdf");
 
   return 0;
 }

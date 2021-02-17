@@ -10,7 +10,7 @@ TGraph *AreaFromEnvelope(TGraph* uncert, TString updown);
 vector<double> GetMeans(vector<TH1F*> hists, bool use_median, bool do_ptrec, TString error);
 
 int main(int argc, char* argv[]){
-
+  TString save_path = get_save_path();
   TString channel = "muon";
 
   // this is for naming of pdf files
@@ -157,9 +157,9 @@ int main(int argc, char* argv[]){
     text1.DrawLatex(.2,.2, "lepton+jets");
     gPad->RedrawAxis();
     // first save without additional correction
-    if(index==0) c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_all_years_raw.pdf");
-    if(index==1) c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_all_years_jec.pdf");
-    if(index==2) c1->SaveAs("/afs/desy.de/user/p/paaschal/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_all_years_xcone.pdf");
+    if(index==0) c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_all_years_raw.pdf");
+    if(index==1) c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_all_years_jec.pdf");
+    if(index==2) c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_all_years_xcone.pdf");
 
     index++;
   }
