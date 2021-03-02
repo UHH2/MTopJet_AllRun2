@@ -306,7 +306,7 @@ void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* b
   graph->GetXaxis()->SetTitle("(f^{FSR})^{2}");
   graph->GetYaxis()->SetTitle("a.u.");
   graph->Draw("AP");
-  // fit->Draw("SAME");
+  fit->SetLineColor(kBlack);
 
   band2->SetLineColorAlpha(kOrange-4,0.5);
   band2->SetFillColorAlpha(kOrange-4,0.5);
@@ -329,10 +329,13 @@ void PlotChi2(TF1* chi2function, vector<double> FSRvalues){
   TCanvas* c = new TCanvas("", "", 600, 600);
   gPad->SetLeftMargin(0.2);
   gPad->SetBottomMargin(0.2);
-  gPad->SetLogx();
+  // gPad->SetLogx();
   chi2function->SetTitle(" ");
+  chi2function->GetXaxis()->SetRangeUser(0.1, 25);
+  chi2function->GetYaxis()->SetRangeUser(0, 100);
   chi2function->GetXaxis()->SetTitle("(f^{FSR})^{2}");
   chi2function->GetYaxis()->SetTitle("#chi^{2}");
+  chi2function->GetYaxis()->SetTitleOffset(1.2);
   chi2function->Draw();
   c->SaveAs(save_path+"/chi2.pdf");
   delete c;
