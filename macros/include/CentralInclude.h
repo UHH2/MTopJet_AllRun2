@@ -65,7 +65,7 @@ void SetupGlobalStyle()
 {
   // general appearance and style
 
-  gROOT->SetStyle("Plain");
+  // gROOT->SetStyle("Plain");
   gStyle->SetOptStat(0);
   gStyle -> SetPadTickX(1);
   gStyle -> SetPadTickY(1);
@@ -94,7 +94,9 @@ void SetupGlobalStyle()
   gStyle->SetTickLength(0.03, "XYZ");
   gStyle->SetNdivisions(510, "XYZ");
 
-  gStyle->UseCurrentStyle();
+  gStyle->SetLegendBorderSize(0);
+
+  // gStyle->UseCurrentStyle();
 
 }
 

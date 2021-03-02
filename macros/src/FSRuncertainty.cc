@@ -10,7 +10,7 @@ using namespace std;
 
 TH1F* Normalize(TH1F* hist);
 void PlotTau32(TH1F* data, TH1F* ttbar, vector<TH1F*> FSRup, vector<TH1F*> FSRdown);
-void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band, int bin, int firstbin, int lastbin);
+void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* band2, int bin, int firstbin, int lastbin);
 void PlotChi2(TF1* chi2function, vector<double> FSRvalues);
 vector<double> ExtractFSRValues(TF1* chi2function);
 void PlotResults(vector<vector<double>> Values, vector<TString> masswindows);
@@ -139,7 +139,7 @@ int main(int argc, char* argv[]){
     if(fitformula.Contains("[4]")) Npar = 5;
     if(fitformula.Contains("[5]")) Npar = 6;
 
-    vector<TGraphErrors*> graphs, bands;
+    vector<TGraphErrors*> graphs, bands1, bands2;
     vector<TF1*> fits;
     for(int bin=1; bin<=nbins; bin++){
       // Ignore empty bins
@@ -162,19 +162,23 @@ int main(int argc, char* argv[]){
       // Write bin contents and error in vectors in correct order
       vector<double> bincontents;
       vector<double> binerrors;
+      vector<double> binerrors_large;
       vector<double> xerrors;
 
       for(auto fsr: FSRdown_norm){
         bincontents.push_back(fsr->GetBinContent(bin));
         binerrors.push_back(fsr->GetBinError(bin));
+        binerrors_large.push_back(FSRup_norm[FSRup_norm.size()-1]->GetBinError(bin)); // use always largest error
         xerrors.push_back(0.0);
       }
       bincontents.push_back(ttbar_norm->GetBinContent(bin));
       binerrors.push_back(ttbar_norm->GetBinError(bin));
+      binerrors_large.push_back(FSRup_norm[FSRup_norm.size()-1]->GetBinError(bin)); // use always largest error
       xerrors.push_back(0.0);
       for(auto fsr: FSRup_norm){
         bincontents.push_back(fsr->GetBinContent(bin));
         binerrors.push_back(fsr->GetBinError(bin));
+        binerrors_large.push_back(FSRup_norm[FSRup_norm.size()-1]->GetBinError(bin)); // use always largest error
         xerrors.push_back(0.0);
       }
 
@@ -185,16 +189,22 @@ int main(int argc, char* argv[]){
       graph->Fit("fit", "Q");
       vector<double> params;
       for(int i=0; i<Npar; i++) params.push_back(fit->GetParameter(i));
-      TGraphErrors* band = (TGraphErrors*) graph->Clone();
+
+      // Set Fit uncertainty
+      TGraphErrors* band1 = (TGraphErrors*) graph->Clone();
       TFitter* fitter = (TFitter*) TVirtualFitter::GetFitter();
-      fitter->GetConfidenceIntervals(band, 0.68);
+      fitter->GetConfidenceIntervals(band1, 0.68);
+      TGraphErrors* band2 = new TGraphErrors(npoints, &FSRvalues[0], &bincontents[0], &xerrors[0], &binerrors_large[0]);
+
+
       fitparameters.push_back(params);
       graphs.push_back(graph);
       fits.push_back(fit);
-      bands.push_back(band);
+      bands1.push_back(band1);
+      bands2.push_back(band2);
     }
     for(int i=0; i<validbins.size();i++){
-      PlotFit(graphs[i], fits[i], bands[i], validbins[i], validbins[0], validbins[validbins.size()-1]);
+      PlotFit(graphs[i], fits[i], bands1[i], bands2[i], validbins[i], validbins[0], validbins[validbins.size()-1]);
     }
 
     // #################################################################################################
@@ -285,7 +295,7 @@ TH1F* Normalize(TH1F* hist){
 }
 
 
-void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band, int bin, int firstbin, int lastbin){
+void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* band2, int bin, int firstbin, int lastbin){
   TString binnr = to_string(bin);
   TCanvas* c = new TCanvas("", "", 600, 600);
   gPad->SetLeftMargin(0.2);
@@ -296,11 +306,14 @@ void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band, int bin, int fir
   graph->GetXaxis()->SetTitle("(f^{FSR})^{2}");
   graph->GetYaxis()->SetTitle("a.u.");
   graph->Draw("AP");
-  // fit->Draw("SAME");
+  fit->SetLineColor(kBlack);
 
-  band->SetLineColorAlpha(kOrange-4,0.5);
-  band->SetFillColorAlpha(kOrange-4,0.5);
-  band->Draw("L3 SAME");
+  band2->SetLineColorAlpha(kOrange-4,0.5);
+  band2->SetFillColorAlpha(kOrange-4,0.5);
+  band1->SetLineColorAlpha(kAzure-4,0.8);
+  band1->SetFillColorAlpha(kAzure-4,0.8);
+  band2->Draw("L3 SAME");
+  // band1->Draw("L3 SAME");
 
   graph->Draw("P SAME");
   fit->Draw("SAME");
@@ -316,10 +329,13 @@ void PlotChi2(TF1* chi2function, vector<double> FSRvalues){
   TCanvas* c = new TCanvas("", "", 600, 600);
   gPad->SetLeftMargin(0.2);
   gPad->SetBottomMargin(0.2);
-  gPad->SetLogx();
+  // gPad->SetLogx();
   chi2function->SetTitle(" ");
+  chi2function->GetXaxis()->SetRangeUser(0.1, 25);
+  chi2function->GetYaxis()->SetRangeUser(0, 100);
   chi2function->GetXaxis()->SetTitle("(f^{FSR})^{2}");
   chi2function->GetYaxis()->SetTitle("#chi^{2}");
+  chi2function->GetYaxis()->SetTitleOffset(1.2);
   chi2function->Draw();
   c->SaveAs(save_path+"/chi2.pdf");
   delete c;
