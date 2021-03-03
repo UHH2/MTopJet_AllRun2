@@ -306,7 +306,7 @@ void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* b
   graph->GetXaxis()->SetTitle("(f^{FSR})^{2}");
   graph->GetYaxis()->SetTitle("a.u.");
   graph->Draw("AP");
-  fit->SetLineColor(kBlack);
+  //fit->SetLineColor(kBlack);
 
   band2->SetLineColorAlpha(kOrange-4,0.5);
   band2->SetFillColorAlpha(kOrange-4,0.5);
