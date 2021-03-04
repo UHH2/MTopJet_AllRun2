@@ -166,6 +166,10 @@ protected:
   Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen33;
   Event::Handle<double>h_mass_rec;
+  Event::Handle<double>h_ptsub1_rec;
+  Event::Handle<double>h_ptsub2_rec;
+  Event::Handle<double>h_ptsub3_rec;
+  Event::Handle<double>h_mW_rec;
   Event::Handle<double>h_mass_jms;
   Event::Handle<double>h_softdropmass_rec;
   Event::Handle<double>h_pt_gen33;
@@ -849,6 +853,11 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
   h_mass_rec = ctx.declare_event_output<double>("Mass_Rec_old");
   h_mass_jms = ctx.declare_event_output<double>("Mass_Rec");
+  h_ptsub1_rec = ctx.declare_event_output<double>("ptsub1");
+  h_ptsub2_rec = ctx.declare_event_output<double>("ptsub2");
+  h_ptsub3_rec = ctx.declare_event_output<double>("ptsub3");
+  h_mW_rec = ctx.declare_event_output<double>("mW");
+
   h_pt_gen33 = ctx.declare_event_output<double>("Pt_Gen33");
   h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
   h_genweight = ctx.declare_event_output<double>("gen_weight");
@@ -950,6 +959,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
+  vector<Jet> subjets = rec_hadjets.at(0).subjets();
+  event.set(h_ptsub1_rec, subjets.at(0).v4().Pt());
+  event.set(h_ptsub2_rec, subjets.at(1).v4().Pt());
+  event.set(h_ptsub3_rec, subjets.at(2).v4().Pt());
 
   // JetMassScale --------------------------------------------------------------
   if(debug) cout << "JMS\n";
