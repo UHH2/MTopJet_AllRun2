@@ -2,6 +2,7 @@
 #include "../include/HistogramUtils.h"
 #include "../include/GraphUtils.h"
 #include "../include/Utils.h"
+#include "../include/CreatHists.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -20,9 +21,8 @@ int main(int argc, char* argv[]){
 
   print_seperater();
 
-
-  if(argc != 3){
-    cout << "\n" << "Usage: ./JEC_SYS <year> <rebin>\n";
+  if(argc != 4){
+    cout << "\n" << "Usage: ./JEC_SYS <year> <rebin> <channel>\n";
     return 0;
   }
 
@@ -37,16 +37,26 @@ int main(int argc, char* argv[]){
   // Input ---------------------------------------------------------------------
   int     bin_width   = stoi(argv[2]);
   TString year        = argv[1];
+  TString channel     = argv[3];
 
   // Year --------------------------------------------------------------------------------------------
   if(debug) cout << "Getting Input Year" << endl;
 
-  bool is16=false; bool is17=false; bool is18=false; bool isAll=false; bool is1718=false;
-  if     (strcmp(year, "2016")==0) is16   = true;
-  else if(strcmp(year, "2017")==0) is17   = true;
-  else if(strcmp(year, "2018")==0) is18   = true;
-  else if(strcmp(year,  "combined")==0) isAll  = true;
-  else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combined)");
+  bool is16=false; bool is17=false; bool is18=false; bool isAll=false;
+  if     (strcmp(year, "2016")==0)     is16   = true;
+  else if(strcmp(year, "2017")==0)     is17   = true;
+  else if(strcmp(year, "2018")==0)     is18   = true;
+  else if(strcmp(year,  "combine")==0) isAll  = true;
+  else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combine)");
+
+  // Channel -----------------------------------------------------------------------------------------
+  if(debug) cout << "Getting Input Year" << endl;
+
+  bool isMuon=false; bool isElec=false; bool isCombine=false;
+  if     (strcmp(channel, "muon")==0)     isMuon    = true;
+  else if(strcmp(channel, "elec")==0)     isElec    = true;
+  else if(strcmp(channel,  "combine")==0) isCombine = true;
+  else throw runtime_error("Give me the correct channel please (muon, elec or combine)");
 
   // Rebin -------------------------------------------------------------------------------------------
   if(debug) cout << "Set Number Bins" << endl;
@@ -94,27 +104,69 @@ int main(int argc, char* argv[]){
   TString hist_old; TString hist_class_old = "XCone_cor/";
   hist_old = hist_class_old+"M_jet1";
 
+  vector<TString> year_file;
+  if(is16)      year_index = 0;
+  else if(is17) year_index = 1;
+  else if(is18) year_index = 2;
+  else          year_index = 3;
+
   // #################################################################################################
   // Get Background ##################################################################################
   if(debug) cout << "Background" << endl;
 
   vector<TFile*> file_bkg_v;
   vector<TH1F*> hists_bkg_v, hists_bkg_old_v;
-  vector<TString> path_bkg_v = {"uhh2.AnalysisModuleRunner.MC.other.root", "uhh2.AnalysisModuleRunner.MC.SingleTop.root", "uhh2.AnalysisModuleRunner.MC.WJets.root"};
-  for(unsigned int i=0; i<path_bkg_v.size(); i++) file_bkg_v.push_back(new TFile(dir+year+"/muon/"+path_bkg_v[i]));
+  vector<TString> path_bkg_v = {"uhh2.AnalysisModuleRunner.MC.other", "uhh2.AnalysisModuleRunner.MC.SingleTop", "uhh2.AnalysisModuleRunner.MC.WJets"};
+  for(TString bkg_: path_bkg_v){
+    for(TString channel_: channel_v){
+      for(TString year_: year_file){
+        file_bkg_v.push_back(new TFile(dir+channel_+"/"+bkg_+year_+".root"));
+      }
+    }
+  }
+
   for(unsigned int i=0; i<file_bkg_v.size(); i++){
     hists_bkg_v.push_back((TH1F*)file_bkg_v[i]->Get(hist));
     hists_bkg_old_v.push_back((TH1F*)file_bkg_v[i]->Get(hist_old));
   }
+
   TH1F *bkg = AddHists(hists_bkg_v, 1);
   TH1F *bkg_old = AddHists(hists_bkg_old_v, 1);
+
+  // #################################################################################################
+  // Get Hists #######################################################################################
+  if(debug) cout << "Get Hists" << endl;
+
+  vector<TH1F*> data_muon_hists      = get_hists(data_muon, hist);
+  vector<TH1F*> data_muon_hists_old  = get_hists(data_muon, hist_old);
+  vector<TH1F*> data_elec_hists      = get_hists(data_muon, hist);
+  vector<TH1F*> data_elec_hists_old  = get_hists(data_muon, hist_old);
+
+  vector<TH1F*> ttbar_muon_hists     = get_hists(ttbar_muon, hist);
+  vector<TH1F*> ttbar_muon_hists_old = get_hists(ttbar_muon, hist_old);
+  vector<TH1F*> ttbar_elec_hists     = get_hists(ttbar_muon, hist);
+  vector<TH1F*> ttbar_elec_hists_old = get_hists(ttbar_muon, hist_old);
+
+  vector<TH1F*> st_muon_hists        = get_hists(st_muon, hist);
+  vector<TH1F*> st_muon_hists_old    = get_hists(st_muon, hist_old);
+  vector<TH1F*> st_elec_hists        = get_hists(st_muon, hist);
+  vector<TH1F*> st_elec_hists_old    = get_hists(st_muon, hist_old);
+
+  vector<TH1F*> wjets_muon_hists     = get_hists(wjets_muon, hist);
+  vector<TH1F*> wjets_muon_hists_old = get_hists(wjets_muon, hist_old);
+  vector<TH1F*> wjets_elec_hists     = get_hists(wjets_muon, hist);
+  vector<TH1F*> wjets_elec_hists_old = get_hists(wjets_muon, hist_old);
+
+  vector<TH1F*> other_muon_hists     = get_hists(other_muon, hist);
+  vector<TH1F*> other_muon_hists_old = get_hists(other_muon, hist_old);
+  vector<TH1F*> other_elec_hists     = get_hists(other_muon, hist);
+  vector<TH1F*> other_elec_hists_old = get_hists(other_muon, hist_old);
 
   // #################################################################################################
   // Get Data ########################################################################################
   if(debug) cout << "Data" << endl;
 
-  TString data_path     = "uhh2.AnalysisModuleRunner.DATA.DATA.root";
-  TFile *data_file      = new TFile(dir+year+"/muon/"+data_path);
+
   TH1F  *data           = (TH1F*)data_file->Get(hist);
   TH1F  *data_old       = (TH1F*)data_file->Get(hist_old);
 
@@ -127,8 +179,6 @@ int main(int argc, char* argv[]){
   // Get TTbar #######################################################################################
   if(debug) cout << "TTbar" << endl;
 
-  TString ttbar_path = "uhh2.AnalysisModuleRunner.MC.TTbar.root";
-  TFile *ttbar_file  = new TFile(dir+year+"/muon/"+ttbar_path);
   TH1F  *ttbar       = (TH1F*)ttbar_file->Get(hist);
   TH1F  *ttbar_old   = (TH1F*)ttbar_file->Get(hist_old);
 
@@ -349,5 +399,8 @@ int main(int argc, char* argv[]){
 
   cout << "\nIntegral New: " << ttbar->Integral()<<endl;
   cout << "Integral Old: "   << ttbar_old->Integral()<<endl;
+
+  // Calculate mean
+  cout << ttbar->GetMean() << endl;
 
 }

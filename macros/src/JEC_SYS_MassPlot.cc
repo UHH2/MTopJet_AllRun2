@@ -7,6 +7,9 @@
 #include <sys/stat.h>
 
 // #include <io.h>
+
+bool forTalk = true;
+
 using namespace std;
 
 int main(int argc, char* argv[]){
@@ -45,7 +48,7 @@ int main(int argc, char* argv[]){
   TString reconst      = "btag";    // match btag_cut btag_sel compare min_mass
   TString MC_uncert    = "central"; // central avg nominal
   bool    add_mTop     = false;
-  bool    usePeak_in   = true;
+  bool    usePeak_in   = false;
 
   // Input ---------------------------------------------------------------------
   bool    one_Ptbin   = stob(argv[3]);
@@ -408,9 +411,8 @@ int main(int argc, char* argv[]){
         corrections_up_[norm][correction]->Draw("SAME HIST");
         data_[norm]->Draw("SAME P");
         // if(norm==0 && bin_width==1 && isAll) line->Draw("SAME");
-        leg = new TLegend(0.6,0.65,0.8,0.85);
+        leg = new TLegend(0.15,0.65,0.35,0.85);
         if(bin_width==1) leg = new TLegend(0.45,0.15,0.6,0.35);;
-        // leg->SetTextSize(0.02);
         leg->AddEntry(ttbar_[norm],"Nominal","l");
         if(correction==0){
           leg->AddEntry(corrections_up_[norm][correction],"JEC up","l");
@@ -421,9 +423,32 @@ int main(int argc, char* argv[]){
           leg->AddEntry(corrections_down_[norm][correction],"XCone down","l");
         }
         leg->AddEntry(data_[norm],"Data","pl");
-        leg->SetTextSize(0.03);
+        leg->SetTextSize(0.02);
         leg->Draw();
         gPad->RedrawAxis();
+
+        if(forTalk){
+          TString cmstext = "CMS";
+          TLatex *text2 = new TLatex(3.5, 24, cmstext);
+          text2->SetNDC();
+          text2->SetTextAlign(13);
+          text2->SetX(0.6);
+          text2->SetTextFont(62);
+          text2->SetTextSize(0.05);
+          text2->SetY(0.84);
+          text2->Draw();
+
+          TString preltext = "Work in Progress";
+          TLatex *text3 = new TLatex(3.5, 24, preltext);
+          text3->SetNDC();
+          text3->SetTextAlign(13);
+          text3->SetX(0.6);
+          text3->SetTextFont(52);
+          text3->SetTextSize(0.035);
+          text3->SetY(0.78);
+          text3->Draw();
+        }
+
         if(correction==0) A->SaveAs(save_path_general+"/Wjet_mass_sensitivity_JEC"+addition+norm_str+".pdf");
         if(correction==1) A->SaveAs(save_path_general+"/Wjet_mass_sensitivity_XCone"+addition+norm_str+".pdf");
         delete A;

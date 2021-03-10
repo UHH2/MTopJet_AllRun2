@@ -21,6 +21,8 @@ void PlotError(TH1F* hist, TString sysname);
 TString year;
 TString save_path;
 
+bool forTalk = true;
+
 int main(int argc, char* argv[]){
 
   bool debug = false;
@@ -318,6 +320,28 @@ void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* b
   graph->Draw("P SAME");
   fit->Draw("SAME");
 
+  if(forTalk){
+    TString cmstext = "CMS";
+    TLatex *text2 = new TLatex(3.5, 24, cmstext);
+    text2->SetNDC();
+    text2->SetTextAlign(13);
+    text2->SetX(0.6);
+    text2->SetTextFont(62);
+    text2->SetTextSize(0.05);
+    text2->SetY(0.84);
+    text2->Draw();
+
+    TString preltext = "Work in Progress";
+    TLatex *text3 = new TLatex(3.5, 24, preltext);
+    text3->SetNDC();
+    text3->SetTextAlign(13);
+    text3->SetX(0.6);
+    text3->SetTextFont(52);
+    text3->SetTextSize(0.035);
+    text3->SetY(0.78);
+    text3->Draw();
+  }
+
   c->SaveAs(save_path+"/Bin"+binnr+".pdf");
   if(bin == firstbin)     c->Print(save_path+"/AllBins.pdf(","pdf");
   else if(bin == lastbin) c->Print(save_path+"/AllBins.pdf)","pdf");
@@ -337,6 +361,29 @@ void PlotChi2(TF1* chi2function, vector<double> FSRvalues){
   chi2function->GetYaxis()->SetTitle("#chi^{2}");
   chi2function->GetYaxis()->SetTitleOffset(1.2);
   chi2function->Draw();
+
+  if(forTalk){
+    TString cmstext = "CMS";
+    TLatex *text2 = new TLatex(3.5, 24, cmstext);
+    text2->SetNDC();
+    text2->SetTextAlign(13);
+    text2->SetX(0.4);
+    text2->SetTextFont(62);
+    text2->SetTextSize(0.05);
+    text2->SetY(0.84);
+    text2->Draw();
+
+    TString preltext = "Work in Progress";
+    TLatex *text3 = new TLatex(3.5, 24, preltext);
+    text3->SetNDC();
+    text3->SetTextAlign(13);
+    text3->SetX(0.4);
+    text3->SetTextFont(52);
+    text3->SetTextSize(0.035);
+    text3->SetY(0.78);
+    text3->Draw();
+  }
+
   c->SaveAs(save_path+"/chi2.pdf");
   delete c;
 }
@@ -462,6 +509,29 @@ void PlotTau32(TH1F* data, TH1F* ttbar, vector<TH1F*> FSRup, vector<TH1F*> FSRdo
   }
   leg->Draw();
   gPad->RedrawAxis();
+
+  if(forTalk){
+    TString cmstext = "CMS";
+    TLatex *text2 = new TLatex(3.5, 24, cmstext);
+    text2->SetNDC();
+    text2->SetTextAlign(13);
+    text2->SetX(0.6);
+    text2->SetTextFont(62);
+    text2->SetTextSize(0.05);
+    text2->SetY(0.84);
+    text2->Draw();
+
+    TString preltext = "Work in Progress";
+    TLatex *text3 = new TLatex(3.5, 24, preltext);
+    text3->SetNDC();
+    text3->SetTextAlign(13);
+    text3->SetX(0.6);
+    text3->SetTextFont(52);
+    text3->SetTextSize(0.035);
+    text3->SetY(0.78);
+    text3->Draw();
+  }
+
   c->SaveAs(save_path+"/Tau32.pdf");
   delete c;
 }
