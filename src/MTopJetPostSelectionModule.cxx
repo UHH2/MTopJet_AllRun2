@@ -960,11 +960,13 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   ////
   /***************************  get jets to write mass *****************************************************************************************************/
   std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
+  if(rec_hadjets.size()<1) return false;
   double mass_rec = rec_hadjets.at(0).v4().M();
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
   vector<Jet> subjets = rec_hadjets.at(0).subjets();
+  if(subjets.size()<3) return false;
   event.set(h_ptsub1_rec, subjets.at(0).v4().Pt());
   event.set(h_ptsub2_rec, subjets.at(1).v4().Pt());
   event.set(h_ptsub3_rec, subjets.at(2).v4().Pt());
