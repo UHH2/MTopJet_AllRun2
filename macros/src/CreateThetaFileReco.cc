@@ -2,7 +2,7 @@
 
 using namespace std;
 
-TH1F* get_hist(TFile* file, TH1F* dummy, TString obs_name, TString weightname);
+TH1F* get_hist(TFile* file, TH1F* dummy, TString obs_name, TString sel_name, TString weightname);
 
 /*
 ███    ███  █████  ██ ███    ██
@@ -14,10 +14,15 @@ TH1F* get_hist(TFile* file, TH1F* dummy, TString obs_name, TString weightname);
 
 int main(int argc, char* argv[]){
 
-  vector<TString> obsnames = {"Mass_Rec", "Pt_Rec"};
+  vector<TString> obsnames = {"Mass_Rec", "Pt_Rec", "mW", "ptsub1", "ptsub2", "ptsub3", "ptsub3_subsel"};
   vector<TH1F*> dummyhists;
   dummyhists.push_back(new TH1F("mjet", "mjet", 25, 0, 500));
   dummyhists.push_back(new TH1F("pt", "pt", 30, 400, 1000));
+  dummyhists.push_back(new TH1F("mW", "mW", 36, 0, 180));
+  dummyhists.push_back(new TH1F("ptsub1", "ptsub1", 35, 0, 700));
+  dummyhists.push_back(new TH1F("ptsub2", "ptsub2", 25, 0, 500));
+  dummyhists.push_back(new TH1F("ptsub3", "ptsub3", 30, 0, 300));
+  dummyhists.push_back(new TH1F("ptsub3_subsel", "ptsub3_subsel", 10, 0, 30));
 
   TString directory = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/";
   TString prefix_mc = "uhh2.AnalysisModuleRunner.MC.";
@@ -26,8 +31,12 @@ int main(int argc, char* argv[]){
   vector<TString> channels = {"elec", "muon"};
   vector<TString> processes = {"DATA", "TTbar", "SingleTop", "WJets", "other"};
   vector<TString> years = {"2016v3", "2017v2", "2018"};
-  // vector<TString> systematics = {"muid_up", "muid_down", "mutr_up", "mutr_down", "elid_up", "elid_down", "eltr_up", "eltr_down", "elreco_up", "elreco_down", "pu_up", "pu_down", "btag_up", "btag_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "COR_up", "COR_down", "JMS_up", "JMS_down"};
-  vector<TString> systematics = {"JEC_up", "JEC_down", "JER_up", "JER_down", "COR_up", "COR_down", "JMS_up", "JMS_down"};
+  double sf16 = 0.778;
+  double sf17 = 0.870;
+  double sf18 = 0.881;
+
+  vector<TString> systematics = {"muid_up", "muid_down", "mutr_up", "mutr_down", "elid_up", "elid_down", "eltr_up", "eltr_down", "elreco_up", "elreco_down", "pu_up", "pu_down", "btag_up", "btag_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "COR_up", "COR_down", "JMS_up", "JMS_down"};
+  // vector<TString> systematics = {"JEC_up", "JEC_down", "JER_up", "JER_down", "COR_up", "COR_down", "JMS_up", "JMS_down"};
 
   TFile * outfile = new TFile("RecoLevelPlots.root","RECREATE");
   for(int i=0; i<obsnames.size(); i++){
@@ -36,16 +45,24 @@ int main(int argc, char* argv[]){
       bool isfirsthist = true;
       TH1F* hist;
       for(auto year: years){
+        double sf;
+        if(year == "2016v3")      sf = sf16;
+        else if(year == "2017v2") sf = sf17;
+        else if(year == "2018")   sf = sf18;
         for(auto channel: channels){
           TString prefix = prefix_mc;
           if(process == "DATA") prefix = prefix_data;
           TFile* file = new TFile(dir+"/"+channel+"/"+prefix+process+"_"+year+".root");
           if(isfirsthist){
-            hist = get_hist(file, dummyhists[i], obsnames[i], "none");
+            hist = get_hist(file, dummyhists[i], obsnames[i], "passed_measurement_rec", "none");
+            if(obsnames[i] == "ptsub3_subsel") hist = get_hist(file, dummyhists[i], "ptsub3", "passed_subptmigration_rec", "none");
+            if(process == "TTbar") hist->Scale(sf);
             isfirsthist = false;
           }
           else{
-            TH1F* h = get_hist(file, dummyhists[i], obsnames[i], "none");
+            TH1F* h = get_hist(file, dummyhists[i], obsnames[i], "passed_measurement_rec", "none");
+            if(obsnames[i] == "ptsub3_subsel") h = get_hist(file, dummyhists[i], "ptsub3", "passed_subptmigration_rec", "none");
+            if(process == "TTbar") h->Scale(sf);
             hist->Add(h);
           }
         }
@@ -58,6 +75,10 @@ int main(int argc, char* argv[]){
       bool isfirsthist = true;
       TH1F* hist;
       for(auto year: years){
+        double sf;
+        if(year == "2016v3")      sf = sf16;
+        else if(year == "2017v2") sf = sf17;
+        else if(year == "2018")   sf = sf18;
         for(auto channel: channels){
           TFile* file;
           TString weightname = "sf_"+sys;
@@ -74,11 +95,15 @@ int main(int argc, char* argv[]){
           }
 
           if(isfirsthist){
-            hist = get_hist(file, dummyhists[i], obsnames[i], weightname);
+            hist = get_hist(file, dummyhists[i], obsnames[i], "passed_measurement_rec", weightname);
+            if(obsnames[i] == "ptsub3_subsel") hist = get_hist(file, dummyhists[i], "ptsub3", "passed_subptmigration_rec", "none");
+            hist->Scale(sf);
             isfirsthist = false;
           }
           else{
-            TH1F* h = get_hist(file, dummyhists[i], obsnames[i], weightname);
+            TH1F* h = get_hist(file, dummyhists[i], obsnames[i], "passed_measurement_rec", weightname);
+            if(obsnames[i] == "ptsub3_subsel") h = get_hist(file, dummyhists[i], "ptsub3", "passed_subptmigration_rec", "none");
+            h->Scale(sf);
             hist->Add(h);
           }
         }
@@ -100,7 +125,7 @@ int main(int argc, char* argv[]){
 return 0;
 }
 
-TH1F* get_hist(TFile* file, TH1F* dummyhist, TString obs_name, TString weightname){
+TH1F* get_hist(TFile* file, TH1F* dummyhist, TString obs_name, TString sel_name, TString weightname){
 
   TTree* tree = (TTree *) file->Get("AnalysisTree");
 
@@ -112,8 +137,8 @@ TH1F* get_hist(TFile* file, TH1F* dummyhist, TString obs_name, TString weightnam
   Float_t additional_factor;
 
   tree->ResetBranchAddresses();
-  tree->SetBranchAddress(obs_name,&obs);
-  tree->SetBranchAddress("passed_measurement_rec",&passed_measurement_rec);
+  tree->SetBranchAddress(obs_name, &obs);
+  tree->SetBranchAddress(sel_name, &passed_measurement_rec);
   tree->SetBranchAddress("rec_weight",&rec_weight);
   tree->SetBranchAddress("gen_weight",&gen_weight);
   if(weightname != "none"){
