@@ -116,6 +116,7 @@ protected:
   Event::Handle<std::vector<TopJet>>h_hadjets;
   Event::Handle<std::vector<TopJet>>h_lepjets;
   Event::Handle<std::vector<TopJet>>h_fatjets;
+  Event::Handle<std::vector<TopJet>>h_fatjets_raw;
   Event::Handle<bool>h_gensel_2;
   Event::Handle<bool>h_recsel_2;
 
@@ -327,6 +328,7 @@ protected:
   std::unique_ptr<uhh2::AnalysisModule> Correction;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
+  std::unique_ptr<CombineXCone33> wmass_indices;
   ////
 
   string BTag_variation ="central";
@@ -818,6 +820,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
   jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
 
+  wmass_indices.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
 
   // get handles
   if(debug) cout << "\nHandels\n";
@@ -829,9 +832,11 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   h_hadjets_raw=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_noJEC");
 
-  h_hadjets=ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
-  h_lepjets=ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
-  h_fatjets=ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
+  h_hadjets    =ctx.get_handle<std::vector<TopJet>>("XCone33_had_Combined_Corrected");
+  h_lepjets    =ctx.get_handle<std::vector<TopJet>>("XCone33_lep_Combined_Corrected");
+  h_fatjets    =ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
+  h_fatjets_raw=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
+
 
   // undeclare event output (jet collections etc) to get small root files
   ctx.undeclare_all_event_output();
@@ -968,6 +973,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(debug) cout << "JMS\n";
   vector<double> points;
   double mass_jms =0;
+  double mass_wjms = 0;
+  vector<int> WSubjetIndex = wmass_indices->GetWSubjetsIndices(event);
+  TopJet wjet = wmass_indices->GetHadronicWJet(event, WSubjetIndex);
+  double mass_wjet_rec = wjet.v4().M();
+
   if(isMC){
     // Data+MC
     if     (jms_direction == "nominal")  points = {0.7495, -0.3392}; // BestFit point
@@ -979,8 +989,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(debug) cout << "JMS - get_mass_BestFit\n";
     mass_jms = BestFit->get_mass_BestFit(event, points);
     event.set(h_mass_jms, mass_jms);
+    mass_wjms = BestFit->get_wmass_BestFit(event, points, WSubjetIndex);
+    event.set(h_mW_rec, mass_wjms);
   }
   else{
+    event.set(h_mW_rec, mass_wjet_rec);
     event.set(h_mass_jms, mass_rec);
   }
 
@@ -1602,6 +1615,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   event.set(h_pdf_weights, pdf_weights);
   /*************************** only store events that survive one of the selections (use looser pt cut) ****************************************************************/
+  if(debug) cout << "Event Set\n";
   bool in_migrationmatrix = ( pass_measurement_rec ||
     pass_measurement_gen ||
     pass_pt350migration_rec ||
@@ -1613,8 +1627,16 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     pass_subptmigration_gen ||
     pass_leptonptmigration_rec ||
     pass_leptonptmigration_gen   );
+    if(debug) cout << "Event Set\n";
 
     if(!in_migrationmatrix) return false;
+
+
+
+
+
+
+
     else return true;
 
   }

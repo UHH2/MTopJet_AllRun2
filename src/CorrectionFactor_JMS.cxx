@@ -215,6 +215,15 @@ bool CorrectionFactor_JMS::process(uhh2::Event & event){ // Dummy
 
 // #################################################################################################################
 // #################################################################################################################
+
+/*
+██   ██  █████  ██████       ██ ███████ ████████
+██   ██ ██   ██ ██   ██      ██ ██         ██
+███████ ███████ ██   ██      ██ █████      ██
+██   ██ ██   ██ ██   ██ ██   ██ ██         ██
+██   ██ ██   ██ ██████   █████  ███████    ██
+*/
+
 double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<double>& points){
   double debug = false;
   if(debug) std::cout << "\nBestFit: Start Get_Mass_BestFit";
@@ -284,9 +293,99 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
   if(newsubjets.size() < 3) return -1.0;
   LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
   if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
-  // return mass _--------------------------------------------------------------------------------------------------
+  // return mass ---------------------------------------------------------------------------------------------------
   return xcone_had_jms_JER_v4.M();
   if(debug) std::cout << "\n\n";
+}
+
+
+// #################################################################################################################
+// #################################################################################################################
+
+/*
+██     ██      ██ ███████ ████████
+██     ██      ██ ██         ██
+██  █  ██      ██ █████      ██
+██ ███ ██ ██   ██ ██         ██
+ ███ ███   █████  ███████    ██
+*/
+
+double CorrectionFactor_JMS::get_wmass_BestFit(uhh2::Event & event, const vector<double>& points, const std::vector<int>& WSubIndices){
+  double debug = false;
+  if(debug) std::cout << "\nBestFitW: Start Get_Mass_BestFit";
+  std::vector<TopJet> oldjets = event.get(h_oldjets);
+
+  // Get points from input vector ----------------------------------------------------------------------------------
+  double point_J = points[0];
+  double point_X = points[1];
+  vector<float> factors_had, factors_X, factors_J;
+  if(debug) cout << point_J  << "     " << point_X << endl;
+  // Get new correction factors for XCone and JEC ------------------------------------------------------------------
+  if(debug) std::cout << "\nBestFitW: Get oldsubjets";
+  std::vector<Jet> oldsubjets = oldjets.at(0).subjets();
+  if(debug) std::cout << "\nBestFitW: number oldsubjets " << oldsubjets.size() << endl;
+  // first get JEC factors
+  vector<double> factor_J;
+  if(debug) std::cout << "\nBestFitW: Get J_factor";
+  if(year == Year::is2016v3) factor_J = get_factor_JEC(*corrector_MC_2016, oldsubjets, event, uncertainty_MC_2016, point_J);
+  else if(year == Year::is2017v2) factor_J = get_factor_JEC(*corrector_MC_2017, oldsubjets, event, uncertainty_MC_2017, point_J);
+  else if(year == Year::is2018) factor_J = get_factor_JEC(*corrector_MC_2018, oldsubjets, event, uncertainty_MC_2018, point_J);
+  // Now get XCone factor using corrected jet
+  vector<double> factor_X;
+  if(debug) std::cout << "\nBestFitW: Get X_factor";
+  for (unsigned int i=0; i<oldsubjets.size(); i++){
+    double pt = oldsubjets[i].pt()*factor_J[i];
+    double eta = oldsubjets[i].eta();
+    factor_X.push_back(get_factor_XCone(pt, eta, point_X));
+  }
+
+  // Apply new correction factors for each subjet ------------------------------------------------------------------
+  if(debug) std::cout << "\nBestFitW: Set newsubjets";
+  std::vector<TLorentzVector> newsubjets_v4;
+  std::vector<Jet> newsubjets;
+  LorentzVector xcone_had_jms_noJER_v4;
+
+  for(unsigned int subjet=0; subjet<factor_J.size(); subjet++)
+  {
+    if(debug) cout << "Factor JEC   = " << factor_J[subjet] << endl;
+    if(debug) cout << "Factor XCone = " << factor_X[subjet] << endl;
+
+    newsubjets_v4.push_back(jet_to_tlorentz(oldsubjets[subjet]));
+    newsubjets_v4[subjet] *= factor_J[subjet]*factor_X[subjet];
+
+    // Set Jets for JER
+    LorentzVector newsubjets_lorentz = tlorentz_to_lorentz(newsubjets_v4[subjet]); // .set_v4 does not take TLorentzVector!
+    Jet newsubjet;
+    newsubjets.push_back(newsubjet);
+    newsubjets[subjet].set_v4(newsubjets_lorentz);
+    xcone_had_jms_noJER_v4 +=  newsubjets_lorentz;
+  }
+
+  if(debug) cout << "\nNo JER Wmass: " << xcone_had_jms_noJER_v4.M();
+  // Apply JER for each subjet -------------------------------------------------------------------------------------
+  if(debug) std::cout << "\nBestFitW: JER";
+  std::vector<GenTopJet>* gen_topjets = &event.get(h_genjets);
+  // match gentopjet to rectopjet
+  double dR0 = deltaR(oldjets.at(0), gen_topjets->at(0));
+  double dR1 = deltaR(oldjets.at(0), gen_topjets->at(1));
+  unsigned int index_gen=0;
+  if(dR0 > dR1) index_gen=1;
+
+  std::vector<GenJet> gen_subjets = gen_topjets->at(index_gen).subjets();
+  JER_Smearer->apply_JER_smearing(newsubjets, gen_subjets, 0.4, event.rho);
+
+  LorentzVector Wjet_v4_match = newsubjets[WSubIndices[0]].v4() + newsubjets[WSubIndices[1]].v4();
+  cout << "mw: " << Wjet_v4_match.M() << endl;
+  return Wjet_v4_match.M();
+
+  // // Creat new hadjet ----------------------------------------------------------------------------------------------
+  // if(debug) std::cout << "\nBestFit: Set new fatjet";
+  // if(newsubjets.size() < 3) return -1.0;
+  // LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
+  // if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
+  // // return mass _--------------------------------------------------------------------------------------------------
+  // return xcone_had_jms_JER_v4.M();
+  // if(debug) std::cout << "\n\n";
 }
 
 

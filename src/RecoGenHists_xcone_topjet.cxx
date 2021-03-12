@@ -1,7 +1,8 @@
 #include <UHH2/MTopJet/include/RecoGenHists_xcone_topjet.h>
 
 
-RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const std::string & dirname, bool & isTTbar, const double & masscut): Hists(ctx, dirname), isTTbar_(isTTbar), masscut_(masscut){
+RecoGenHists_xcone_topjet::RecoGenHists_xcone_topjet(uhh2::Context & ctx, const std::string & dirname, bool & isTTbar, const double & masscut):
+Hists(ctx, dirname), isTTbar_(isTTbar), masscut_(masscut){
 
   h_number_events = book<TH1F>("number_events_total", "events", 1, 0, 1);
 
@@ -333,7 +334,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
       bool matched = false;
       bool semimatched = false;
       bool notmatched = false;
-      bool matched_top = false;
+      // bool matched_top = false;
       bool matched_q1 = false;
       bool matched_q2 = false;
       bool matched_bottom = false;

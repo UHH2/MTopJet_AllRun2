@@ -139,28 +139,28 @@ int main(int argc, char* argv[]){
 
   vector<TH1F*> data_muon_hists      = get_hists(data_muon, hist);
   vector<TH1F*> data_muon_hists_old  = get_hists(data_muon, hist_old);
-  vector<TH1F*> data_elec_hists      = get_hists(data_muon, hist);
-  vector<TH1F*> data_elec_hists_old  = get_hists(data_muon, hist_old);
+  vector<TH1F*> data_elec_hists      = get_hists(data_elec, hist);
+  vector<TH1F*> data_elec_hists_old  = get_hists(data_elec, hist_old);
 
   vector<TH1F*> ttbar_muon_hists     = get_hists(ttbar_muon, hist);
   vector<TH1F*> ttbar_muon_hists_old = get_hists(ttbar_muon, hist_old);
-  vector<TH1F*> ttbar_elec_hists     = get_hists(ttbar_muon, hist);
-  vector<TH1F*> ttbar_elec_hists_old = get_hists(ttbar_muon, hist_old);
+  vector<TH1F*> ttbar_elec_hists     = get_hists(ttbar_elec, hist);
+  vector<TH1F*> ttbar_elec_hists_old = get_hists(ttbar_elec, hist_old);
 
   vector<TH1F*> st_muon_hists        = get_hists(st_muon, hist);
   vector<TH1F*> st_muon_hists_old    = get_hists(st_muon, hist_old);
-  vector<TH1F*> st_elec_hists        = get_hists(st_muon, hist);
-  vector<TH1F*> st_elec_hists_old    = get_hists(st_muon, hist_old);
+  vector<TH1F*> st_elec_hists        = get_hists(st_elec, hist);
+  vector<TH1F*> st_elec_hists_old    = get_hists(st_elec, hist_old);
 
   vector<TH1F*> wjets_muon_hists     = get_hists(wjets_muon, hist);
   vector<TH1F*> wjets_muon_hists_old = get_hists(wjets_muon, hist_old);
-  vector<TH1F*> wjets_elec_hists     = get_hists(wjets_muon, hist);
-  vector<TH1F*> wjets_elec_hists_old = get_hists(wjets_muon, hist_old);
+  vector<TH1F*> wjets_elec_hists     = get_hists(wjets_elec, hist);
+  vector<TH1F*> wjets_elec_hists_old = get_hists(wjets_elec, hist_old);
 
   vector<TH1F*> other_muon_hists     = get_hists(other_muon, hist);
   vector<TH1F*> other_muon_hists_old = get_hists(other_muon, hist_old);
-  vector<TH1F*> other_elec_hists     = get_hists(other_muon, hist);
-  vector<TH1F*> other_elec_hists_old = get_hists(other_muon, hist_old);
+  vector<TH1F*> other_elec_hists     = get_hists(other_elec, hist);
+  vector<TH1F*> other_elec_hists_old = get_hists(other_elec, hist_old);
 
   // #################################################################################################
   // Get Data ########################################################################################

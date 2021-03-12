@@ -116,6 +116,38 @@ GenTopJet CombineXCone::CreateTopJetFromSubjets_gen(vector<GenJet> subjets, doub
   return jet;
 }
 
+TopJet CombineXCone::FindHadjet(uhh2::Event &event, const vector<TopJet>& fatjets){
+  CombineXCone* combine = new CombineXCone();
+  bool lepton_in_event = combine->FindLepton(event);
+  TopJet fathadjet, fatlepjet;
+  if(lepton_in_event){
+    Particle lepton = combine->GetLepton(event);
+    float dR1 = deltaR(lepton, fatjets.at(0));
+    float dR2 = deltaR(lepton, fatjets.at(1));
+    if(dR1 < dR2){
+      fatlepjet = fatjets.at(0);
+      fathadjet = fatjets.at(1);
+    }
+    else{
+      fatlepjet = fatjets.at(1);
+      fathadjet = fatjets.at(0);
+    }
+  }
+  else{
+    fatlepjet = fatjets.at(1);
+    fathadjet = fatjets.at(0);
+  }
+
+  return fathadjet;
+}
+
+/*
+██████  ███████  ██████
+██   ██ ██      ██
+██████  █████   ██
+██   ██ ██      ██
+██   ██ ███████  ██████
+*/
 
 
 // Get final Jets from 3+3 Method on Reco level
@@ -177,6 +209,138 @@ bool CombineXCone33::process(uhh2::Event & event){
 
   return true;
 }
+
+//---------------------------------------------------------------------------------------
+//--------------------------------- W Subjets -------------------------------------------
+//---------------------------------------------------------------------------------------
+
+vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
+  bool debug = false;
+  // Select Subjets for Wjet ---------------------------------------------------------------------------------------
+  // Select only ak4 jets with are close to the hadronic xcone jet
+  std::vector<TopJet> fatjets = event.get(h_fatjets);
+
+  //------------- define had and lep jet (deltaR) -----------------------------------------
+  CombineXCone* combine = new CombineXCone();
+  bool lepton_in_event = combine->FindLepton(event);
+  TopJet fathadjet, fatlepjet;
+  if(lepton_in_event){
+    Particle lepton = combine->GetLepton(event);
+    float dR1 = deltaR(lepton, fatjets.at(0));
+    float dR2 = deltaR(lepton, fatjets.at(1));
+    if(dR1 < dR2){
+      fatlepjet = fatjets.at(0);
+      fathadjet = fatjets.at(1);
+    }
+    else{
+      fatlepjet = fatjets.at(1);
+      fathadjet = fatjets.at(0);
+    }
+  }
+  else{
+    fatlepjet = fatjets.at(1);
+    fathadjet = fatjets.at(0);
+  }
+
+  //------------- Collect AK4 jets --------------------------------------------------------
+  std::vector<Jet> ak4_matched_xcone_had;
+  for(const auto& j : *event.jets){
+    if(deltaR(j, fathadjet)<1.2) ak4_matched_xcone_had.push_back(j);
+  }
+
+  if(debug) std::cout << " - search for AK4 jet with higest btag" << '\n';
+  std::vector<double> btag_v; // Using a vector to identifie events with ambigous btag results (two high btags i.e. through a c-quark)
+  double btag_high = 0;
+  Jet ak4_highest_btag;
+
+  if(ak4_matched_xcone_had.size()==0) return {0,1};
+  else{
+    for(unsigned int i=0; i<ak4_matched_xcone_had.size(); i++){
+      btag_v.push_back(ak4_matched_xcone_had[i].btag_DeepJet());
+      if(i==0){
+        btag_high = btag_v[i];
+        ak4_highest_btag = ak4_matched_xcone_had[i];
+      }
+      if(i>0 && btag_high<btag_v[i]){
+        btag_high = btag_v[i];
+        ak4_highest_btag = ak4_matched_xcone_had[i];
+      }
+    }
+  }
+
+  if(debug) std::cout << " - Identify Wjet: Distance AK4 to subjets" << '\n';
+  std::vector<Jet> xcone_had_subjets = fathadjet.subjets();
+  // Matching AK4 jet with highest btag to the three XCone subjets
+  double dR_subjet1_ak4 = deltaR(xcone_had_subjets[0], ak4_highest_btag);
+  double dR_subjet2_ak4 = deltaR(xcone_had_subjets[1], ak4_highest_btag);
+  double dR_subjet3_ak4 = deltaR(xcone_had_subjets[2], ak4_highest_btag);
+
+  if(debug) std::cout << " - Identify Wjet: Compare Distance" << '\n';
+  int index_Wjet1 = -1; int index_Wjet2 = -1;
+  if(dR_subjet1_ak4<dR_subjet2_ak4 && dR_subjet1_ak4<dR_subjet3_ak4){ // bjet is 0
+    index_Wjet1 = 1;
+    index_Wjet2 = 2;
+  }
+  else if(dR_subjet2_ak4<dR_subjet1_ak4 && dR_subjet2_ak4<dR_subjet3_ak4){ // bjet is 1
+    index_Wjet1 = 0;
+    index_Wjet2 = 2;
+  }
+  else{ // bjet is 2
+    index_Wjet1 = 0;
+    index_Wjet2 = 1;
+  }
+
+  vector<int> WSubjetsIndex = {index_Wjet1, index_Wjet2};
+  return WSubjetsIndex;
+}
+
+TopJet CombineXCone33::GetHadronicWJet(uhh2::Event & event, const vector<int>& Indices){
+  bool debug = false;
+  // Select Subjets for Wjet ---------------------------------------------------------------------------------------
+  // Select only ak4 jets with are close to the hadronic xcone jet
+  std::vector<TopJet> fatjets = event.get(h_fatjets);
+
+  //------------- define had and lep jet (deltaR) -----------------------------------------
+  if(debug) cout << "GetHadronicWJet: FindHadjet" << endl;
+  CombineXCone* combine = new CombineXCone();
+  TopJet fathadjet = combine->FindHadjet(event, fatjets);
+
+  std::vector<Jet> xcone_had_subjets = fathadjet.subjets();
+  Jet WSubjet1 = xcone_had_subjets[Indices[0]];
+  Jet WSubjet2 = xcone_had_subjets[Indices[1]];
+  vector<Jet> WSubjets = {WSubjet1, WSubjet2};
+
+  TLorentzVector jet_v4;
+  TopJet WJet;
+
+  // first store subjets
+  if(debug) cout << "GetHadronicWJet: Creat WJet from Subjets" << endl;
+  WJet.set_subjets(WSubjets);
+
+  double px=0, py=0, pz=0, E=0;
+  for(unsigned int i=0; i < WSubjets.size(); ++i){
+    px += WSubjets.at(i).v4().Px();
+    py += WSubjets.at(i).v4().Py();
+    pz += WSubjets.at(i).v4().Pz();
+    E += WSubjets.at(i).v4().E();
+  }
+  jet_v4.SetPxPyPzE(px, py, pz, E);
+  WJet.set_pt(jet_v4.Pt());
+  WJet.set_eta(jet_v4.Eta());
+  WJet.set_phi(jet_v4.Phi());
+  WJet.set_energy(jet_v4.E());
+
+  return WJet;
+}
+
+/*
+.██████  ███████ ███    ██
+██       ██      ████   ██
+██   ███ █████   ██ ██  ██
+██    ██ ██      ██  ██ ██
+.██████  ███████ ██   ████
+*/
+
 
 // Get final Jets from 3+3 Method on Gen level
 CombineXCone33_gen::CombineXCone33_gen(uhh2::Context & ctx, bool isTTbar):

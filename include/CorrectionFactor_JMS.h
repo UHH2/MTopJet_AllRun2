@@ -33,6 +33,7 @@ public:
   explicit CorrectionFactor_JMS(uhh2::Context &,  const std::string &, const std::string &, Year year_);
   virtual bool process(uhh2::Event & event) override;
   double get_mass_BestFit(uhh2::Event &, const vector<double>&);
+  double get_wmass_BestFit(uhh2::Event &, const vector<double>&, const std::vector<int>&);
 
 private:
 

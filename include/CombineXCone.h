@@ -28,6 +28,14 @@ class CombineXCone{
   GenParticle GetLepton_gen(uhh2::Event &);
   TopJet CreateTopJetFromSubjets(vector<Jet> subjets, double ptmin, double etamax);
   GenTopJet CreateTopJetFromSubjets_gen(vector<GenJet> subjets, double ptmin, double etamax);
+  TopJet FindHadjet(uhh2::Event &, const vector<TopJet> &);
+
+private:
+
+  uhh2::Event::Handle<std::vector<TopJet>>h_xcone33hadjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_xcone33lepjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_fatjets;
+
 };
 
 
@@ -36,6 +44,8 @@ public:
 
   explicit CombineXCone33(uhh2::Context &,  const std::string &, const std::string & , const std::string &);
   virtual bool process(uhh2::Event & ) override;
+  vector<int> GetWSubjetsIndices(uhh2::Event & );
+  TopJet GetHadronicWJet(uhh2::Event &, const vector<int>&);
 
 private:
 

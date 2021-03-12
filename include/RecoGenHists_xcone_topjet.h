@@ -28,6 +28,7 @@ public:
 private:
   bool isTTbar_;
   double masscut_;
+  std::vector<int> WSubIndex_;
 
 protected:
 
