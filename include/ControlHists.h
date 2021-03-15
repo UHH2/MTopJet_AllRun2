@@ -92,12 +92,12 @@ public:
   JetMassScaleHists(uhh2::Context & ctx, const std::string & dirname);
 
   virtual void fill(const uhh2::Event & ev) override;
-  virtual void fill_mass(const uhh2::Event & ev, const double mass);
+  virtual void fill_mass(const uhh2::Event & ev, const double mass, const double wmass);
 
 private:
-  double mass;
+  double mass, wmass;
 
-  TH1F *h_mass;
+  TH1F *h_mass, *h_wmass;
   TH1F *events, *events_weight;
 };
 

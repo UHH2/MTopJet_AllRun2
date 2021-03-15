@@ -1459,14 +1459,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_XCone_jec->fill(event);
     h_XCone_cor->fill(event);
     h_XCone_puppi->fill(event);
-    if(isMC){
-      // cout << "isMC\n";
-      h_XCone_JMS->fill_mass(event, mass_jms);
-    }
-    else{
-      // cout << "isNotMC\n";
-      h_XCone_JMS->fill_mass(event, mass_rec);
-    }
+    if(isMC) h_XCone_JMS->fill_mass(event, mass_jms, mass_wjms);
+    else     h_XCone_JMS->fill_mass(event, mass_rec, mass_wjet_rec);
     h_leptonictop->fill(event);
     h_XCone_raw_subjets->fill(event);
     h_XCone_jec_subjets->fill(event);

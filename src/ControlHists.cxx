@@ -138,6 +138,7 @@ void GenWeightRangeHists::fill(const Event & event){
 JetMassScaleHists::JetMassScaleHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx, dirname){
   // book all histograms here
   h_mass = book<TH1F>("hadjet_jms_mass", "m_{jet} [GeV]", 50, 0, 500);
+  h_wmass = book<TH1F>("wjet_jms_mass", "m_{W} [GeV]", 50, 0, 300);
 
   events = book<TH1F>("events", "events", 1, 0, 1);
   events_weight = book<TH1F>("events_weights", "events with gen weights", 1, 0, 1);
@@ -148,11 +149,12 @@ void JetMassScaleHists::fill(const Event & event){// dummy
   weight +=0;                   // avoid warning
 }
 
-void JetMassScaleHists::fill_mass(const Event & event, const double mass){
+void JetMassScaleHists::fill_mass(const Event & event, const double mass, const double wmass){
   double weight = event.weight;
   h_mass->Fill(mass, weight);
-  events->Fill(1, weight);
-  events_weight->Fill(1, 1);
+  h_wmass->Fill(wmass, weight);
+  events->Fill(0.5, weight);
+  events_weight->Fill(0.5, 1);
 }
 
 // ###########################################################################################################################
