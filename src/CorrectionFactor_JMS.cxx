@@ -375,7 +375,7 @@ double CorrectionFactor_JMS::get_wmass_BestFit(uhh2::Event & event, const vector
   JER_Smearer->apply_JER_smearing(newsubjets, gen_subjets, 0.4, event.rho);
 
   LorentzVector Wjet_v4_match = newsubjets[WSubIndices[0]].v4() + newsubjets[WSubIndices[1]].v4();
-  cout << "mw: " << Wjet_v4_match.M() << endl;
+  // cout << "mw: " << Wjet_v4_match.M() << endl;
   return Wjet_v4_match.M();
 
   // // Creat new hadjet ----------------------------------------------------------------------------------------------

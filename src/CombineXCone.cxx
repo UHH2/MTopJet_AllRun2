@@ -224,6 +224,7 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
   CombineXCone* combine = new CombineXCone();
   bool lepton_in_event = combine->FindLepton(event);
   TopJet fathadjet, fatlepjet;
+  if(fatjets.size()<2) return {0,1};
   if(lepton_in_event){
     Particle lepton = combine->GetLepton(event);
     float dR1 = deltaR(lepton, fatjets.at(0));
@@ -305,13 +306,14 @@ TopJet CombineXCone33::GetHadronicWJet(uhh2::Event & event, const vector<int>& I
   CombineXCone* combine = new CombineXCone();
   TopJet fathadjet = combine->FindHadjet(event, fatjets);
 
+  TLorentzVector jet_v4;
+  TopJet WJet;
   std::vector<Jet> xcone_had_subjets = fathadjet.subjets();
+  if(xcone_had_subjets.size() < 3) return WJet;
   Jet WSubjet1 = xcone_had_subjets[Indices[0]];
   Jet WSubjet2 = xcone_had_subjets[Indices[1]];
   vector<Jet> WSubjets = {WSubjet1, WSubjet2};
 
-  TLorentzVector jet_v4;
-  TopJet WJet;
 
   // first store subjets
   if(debug) cout << "GetHadronicWJet: Creat WJet from Subjets" << endl;
