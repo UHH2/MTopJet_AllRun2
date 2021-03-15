@@ -327,8 +327,7 @@ protected:
   std::unique_ptr<JER_Smearer_xcone> JERSmearing;
   std::unique_ptr<uhh2::AnalysisModule> Correction;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
-  std::unique_ptr<uhh2::AnalysisModule> jetprod_reco_corrected;
-  std::unique_ptr<CombineXCone33> wmass_indices;
+  std::unique_ptr<CombineXCone33> jetprod_reco_corrected;
   ////
 
   string BTag_variation ="central";
@@ -820,8 +819,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
   jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
 
-  wmass_indices.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
-
   // get handles
   if(debug) cout << "\nHandels\n";
   h_weight = ctx.get_handle<double>("weight");
@@ -976,8 +973,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   vector<double> points;
   double mass_jms =0;
   double mass_wjms = 0;
-  vector<int> WSubjetIndex = wmass_indices->GetWSubjetsIndices(event);
-  TopJet wjet = wmass_indices->GetHadronicWJet(event, WSubjetIndex);
+  vector<int> WSubjetIndex = jetprod_reco_corrected->GetWSubjetsIndices(event);
+  TopJet wjet = jetprod_reco_corrected->GetHadronicWJet(event, WSubjetIndex);
   double mass_wjet_rec = wjet.v4().M();
 
   if(isMC){
