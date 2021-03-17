@@ -339,6 +339,22 @@ TH1F* AddHists(TH1F* h1, TH1F* h2, int factor){
 }
 
 // -------------------------------------------------------------------------------------------------------
+vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, int factor){
+  vector<TH1F*> hists;
+  if(h1.size()!=h2.size()) throw runtime_error("Hists have not the same size!");
+  for(unsigned int i=0; i<h1.size(); i++) hists.push_back(AddHists(h1[i], h2[i], factor));
+  return hists;
+}
+
+// -------------------------------------------------------------------------------------------------------
+vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, vector<TH1F*> h3, int factor){
+  vector<TH1F*> dummy = AddHists(h1, h2, factor);
+  if(h1.size()!=h3.size()) throw runtime_error("Hists have not the same size! (h2 and h3)");
+  vector<TH1F*> hists = AddHists(dummy, h3, factor);
+  return hists;
+}
+
+// -------------------------------------------------------------------------------------------------------
 TH1F* add_second_year(TString year, TH1F* hist, TString dir, TString path, TString hist_name){
   TFile* file = new TFile(dir+year+"/muon/"+path);
   TH1F* new_hist = (TH1F*) file->Get(hist_name);
@@ -367,6 +383,30 @@ TH1F* add_second_year(TString year, TH1F* hist, TString dir, vector<TString> pat
 
 // -------------------------------------------------------------------------------------------------------
 void plot_single_histogram(TH1F* hist, TString title, TString xAxis, int x_max, int color, TString save_path){
+  hist->SetTitle(title);
+  hist->GetXaxis()->SetRangeUser(0, x_max);
+  hist->GetYaxis()->SetRangeUser(0, hist->GetMaximum()*1.2);
+  hist->GetXaxis()->SetNdivisions(505);
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->GetXaxis()->SetTitleSize(0.05);
+  hist->GetYaxis()->SetTitleSize(0.04);
+  hist->GetXaxis()->SetTitleOffset(0.9);
+  hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetXaxis()->SetTitle(xAxis);
+  hist->GetYaxis()->SetTitle("");
+  hist->SetLineWidth(2);
+  hist->SetLineColor(color);
+
+  TCanvas *A = new TCanvas("A", "A", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.12);
+  hist->Draw("HIST");
+  A->SaveAs(save_path);
+  delete A;
+}
+
+// -------------------------------------------------------------------------------------------------------
+void plot_settings(TH1F* hist, TString title, TString xAxis, int x_max, int color, TString save_path){
   hist->SetTitle(title);
   hist->GetXaxis()->SetRangeUser(0, x_max);
   hist->GetYaxis()->SetRangeUser(0, hist->GetMaximum()*1.2);

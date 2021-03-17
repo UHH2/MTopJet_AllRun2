@@ -10,7 +10,121 @@
 // #include <io.h>
 using namespace std;
 
-int main(int argc, char* argv[]){
+// -------------------------------------------------------------------------------------------------------
+void main_plot_settings(TH1F* hist, int x_max, int color, TString title, TString xAxis, TString yAxis, TString save_path)
+{
+  hist->SetTitle(title);
+  hist->GetXaxis()->SetRangeUser(100, x_max);
+  hist->GetYaxis()->SetRangeUser(0, hist->GetMaximum()*1.2);
+  hist->GetXaxis()->SetNdivisions(505);
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->GetXaxis()->SetTitleSize(0.05);
+  hist->GetYaxis()->SetTitleSize(0.05);
+  hist->GetXaxis()->SetTitleOffset(0.9);
+  hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetXaxis()->SetTitle(xAxis);
+  hist->GetYaxis()->SetTitle(yAxis);
+  hist->SetLineWidth(2);
+  hist->SetLineColor(color);
+}
+
+// -------------------------------------------------------------------------------------------------------
+void add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
+{
+  hist->SetLineWidth(width);
+  hist->SetLineStyle(style);
+  hist->SetLineColor(color);
+}
+
+// -------------------------------------------------------------------------------------------------------
+void data_plot_settings(TH1F* hist)
+{
+  hist->SetMarkerStyle(8);  // data hist style
+  hist->SetMarkerColor(kBlack);
+  hist->SetLineColor(kBlack);
+}
+
+// -------------------------------------------------------------------------------------------------------
+void draw_plot_jms(TH1F* h1, TH1F* h2, TH1F* h3, const TString path, const TString year, vector<double> mean, TString norm="")
+{
+  TLegend *leg = new TLegend(0.55,0.65,0.8,0.85);
+  TCanvas *A = new TCanvas(path+year+norm, "A", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.12);
+  h1->Draw("HIST");
+  h2->Draw("SAME HIST");
+  h3->Draw("SAME HIST");
+
+  TString best = "Best fit; mean="+dtos(mean[0], 2)+" GeV";
+  TString uu   = "JMS uu; mean="+dtos(mean[1], 2)+" GeV";
+  TString dd   = "JMS dd; mean="+dtos(mean[2], 2)+" GeV";
+
+  leg->AddEntry(h1,best,"l");
+  leg->AddEntry(h2,uu,"l");
+  leg->AddEntry(h3,dd,"l");
+
+  leg->SetTextSize(0.02);
+  leg->Draw();
+
+  gPad->RedrawAxis();
+  A->SaveAs(path+"/jms_"+year+norm+".pdf");
+
+}
+
+// -------------------------------------------------------------------------------------------------------
+void draw_plot_comparison(TH1F* h1, TH1F* h2, TH1F* data, const TString path, const TString year, vector<double> mean={0, 0})
+{
+  TLegend *leg = new TLegend(0.5,0.65,0.75,0.85);
+
+  TCanvas *A = new TCanvas("A"+path+year, "A", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.12);
+  h1->Draw("HIST");
+  h2->Draw("SAME HIST");
+
+  TString jms = "JMS; mean="+dtos(mean[0], 2)+" GeV";
+  TString old = "Old; mean="+dtos(mean[1], 2)+" GeV";
+
+  leg->AddEntry(h1,jms,"l");
+  leg->AddEntry(h2,old,"l");
+
+  leg->SetTextSize(0.03);
+  leg->Draw();
+
+  gPad->RedrawAxis();
+  A->SaveAs(path+"/comparison_jms_old_"+year+".pdf");
+
+  data->Draw("SAME P");
+  leg->AddEntry(data,"Data","pl");
+  A->SaveAs(path+"/comparison_jms_old_data_"+year+".pdf");
+
+  delete A;
+  leg->Clear();
+}
+
+// -------------------------------------------------------------------------------------------------------
+double trunc_mean(TH1F* hist)
+{
+  TH1F* hist_trunc = (TH1F*) hist->Clone();
+  // cout << setw(10) << "old" << "   " << setw(10) << "new" << endl;
+  for(int bin=1; bin<hist->GetNbinsX()+1; bin++)
+  {
+    bool bin_ = (hist->GetBinCenter(bin)<120||hist->GetBinCenter(bin)>240);
+    if(bin_) hist_trunc->SetBinContent(bin, 0);
+    else     hist_trunc->SetBinContent(bin, hist->GetBinContent(bin));
+    // cout << setw(10) << hist->GetBinContent(bin) << "   " << setw(10) << hist_trunc->GetBinContent(bin) << endl;
+  }
+  double mean_trunc = hist_trunc->GetMean();
+  double mean_old   = hist->GetMean();
+  // cout << setw(10) << mean_old << "   " << setw(10) << mean_trunc << endl;
+  return mean_trunc;
+}
+
+// -------------------------------------------------------------------------------------------------------
+// ------------------------------------------ MAIN -------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------
+int main(int argc, char* argv[])
+{
   /*
   Show the behaviour af the different mass scale variations uu, ud, du an dd.
   Show the difference between the old Mass Jet distribution and the new one
@@ -21,386 +135,339 @@ int main(int argc, char* argv[]){
 
   print_seperater();
 
-  if(argc != 4){
-    cout << "\n" << "Usage: ./JEC_SYS <year> <rebin> <channel>\n";
+  if(argc != 1){
+    cout << "\n" << "Usage: ./JEC_Mass_comparison\n";
+    cout << "All years and channels are created simultanously." << endl;
     return 0;
   }
 
-  // #################################################################################################
-  // Only one fit for all bins #######################################################################
-  if(debug) cout << "String into bool" << endl;
-
-  // Default -------------------------------------------------------------------
-  Int_t   oldLevel     = gErrorIgnoreLevel; // Set by: gErrorIgnoreLevel = ... - functions_explain
-  gErrorIgnoreLevel    = kWarning;          // suppress TCanvas output
-
-  // Input ---------------------------------------------------------------------
-  int     bin_width   = stoi(argv[2]);
-  TString year        = argv[1];
-  TString channel     = argv[3];
-
-  // Year --------------------------------------------------------------------------------------------
-  if(debug) cout << "Getting Input Year" << endl;
-
-  bool is16=false; bool is17=false; bool is18=false; bool isAll=false;
-  if     (strcmp(year, "2016")==0)     is16   = true;
-  else if(strcmp(year, "2017")==0)     is17   = true;
-  else if(strcmp(year, "2018")==0)     is18   = true;
-  else if(strcmp(year,  "combine")==0) isAll  = true;
-  else throw runtime_error("Give me the correct year please (2016, 2017, 2018 or combine)");
-
-  // Channel -----------------------------------------------------------------------------------------
-  if(debug) cout << "Getting Input Year" << endl;
-
-  bool isMuon=false; bool isElec=false; bool isCombine=false;
-  if     (strcmp(channel, "muon")==0)     isMuon    = true;
-  else if(strcmp(channel, "elec")==0)     isElec    = true;
-  else if(strcmp(channel,  "combine")==0) isCombine = true;
-  else throw runtime_error("Give me the correct channel please (muon, elec or combine)");
-
-  // Rebin -------------------------------------------------------------------------------------------
-  if(debug) cout << "Set Number Bins" << endl;
-  int     number_bins     = 180/bin_width;
-  TString str_number_bins = to_string(number_bins); // For creating folders
-
-
-  /*
-  ██████  ██ ██████  ███████  ██████ ████████  ██████  ██████  ██ ███████ ███████
-  ██   ██ ██ ██   ██ ██      ██         ██    ██    ██ ██   ██ ██ ██      ██
-  ██   ██ ██ ██████  █████   ██         ██    ██    ██ ██████  ██ █████   ███████
-  ██   ██ ██ ██   ██ ██      ██         ██    ██    ██ ██   ██ ██ ██           ██
-  ██████  ██ ██   ██ ███████  ██████    ██     ██████  ██   ██ ██ ███████ ███████
-  */
-
-  // #################################################################################################
-  // creating subdirectories. Necessary, because different binning examined ##########################
-  /*
-  Explanation for mkdir(char **, mode_t mode) and mode_t: https://jameshfisher.com/2017/02/24/what-is-mode_t/
-  example:    0002 is -------w-
-  .           0003 is -------wx
-  .           0004 is ------r--
-  .           0005 is ------r-x
-  .           0006 is ------rw-
-  .           0007 is ------rwx
-  positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
-  */
-
   TString save_path_general = save_path+"/Plots"; // CHANGE_PT
   save_path_general = creat_folder_and_path(save_path_general, "JMS");
+  creat_folder(save_path_general+"/muon");
+  creat_folder(save_path_general+"/elec");
+  creat_folder(save_path_general+"/combine");
 
+  vector<int> index_year   = {0,1,2,3};
+  vector<TString> years    = {"2016","2017","2018","combine"};
+  vector<TString> channels = {"muon","elec","combine"};
 
-  /*
-  .██████  ███████ ████████     ██   ██ ██ ███████ ████████ ███████
-  ██       ██         ██        ██   ██ ██ ██         ██    ██
-  ██   ███ █████      ██        ███████ ██ ███████    ██    ███████
-  ██    ██ ██         ██        ██   ██ ██      ██    ██         ██
-  .██████  ███████    ██        ██   ██ ██ ███████    ██    ███████
-  */
-
-  cout << '\n'; // CHANGE_PT
+  // -------------------------------------------------------------------------------------------------------
+  // ------------------------------------------ MAIN -------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------
+  cout << '\n';
   TString hist; TString hist_class = "JetMassScaleHists/";
   hist = hist_class+"hadjet_jms_mass";
 
   TString hist_old; TString hist_class_old = "XCone_cor/";
   hist_old = hist_class_old+"M_jet1";
 
-  vector<TString> year_file;
-  if(is16)      year_index = 0;
-  else if(is17) year_index = 1;
-  else if(is18) year_index = 2;
-  else          year_index = 3;
-
-  // #################################################################################################
-  // Get Background ##################################################################################
-  if(debug) cout << "Background" << endl;
-
-  vector<TFile*> file_bkg_v;
-  vector<TH1F*> hists_bkg_v, hists_bkg_old_v;
-  vector<TString> path_bkg_v = {"uhh2.AnalysisModuleRunner.MC.other", "uhh2.AnalysisModuleRunner.MC.SingleTop", "uhh2.AnalysisModuleRunner.MC.WJets"};
-  for(TString bkg_: path_bkg_v){
-    for(TString channel_: channel_v){
-      for(TString year_: year_file){
-        file_bkg_v.push_back(new TFile(dir+channel_+"/"+bkg_+year_+".root"));
-      }
-    }
-  }
-
-  for(unsigned int i=0; i<file_bkg_v.size(); i++){
-    hists_bkg_v.push_back((TH1F*)file_bkg_v[i]->Get(hist));
-    hists_bkg_old_v.push_back((TH1F*)file_bkg_v[i]->Get(hist_old));
-  }
-
-  TH1F *bkg = AddHists(hists_bkg_v, 1);
-  TH1F *bkg_old = AddHists(hists_bkg_old_v, 1);
-
   // #################################################################################################
   // Get Hists #######################################################################################
   if(debug) cout << "Get Hists" << endl;
 
-  vector<TH1F*> data_muon_hists      = get_hists(data_muon, hist);
-  vector<TH1F*> data_muon_hists_old  = get_hists(data_muon, hist_old);
-  vector<TH1F*> data_elec_hists      = get_hists(data_elec, hist);
-  vector<TH1F*> data_elec_hists_old  = get_hists(data_elec, hist_old);
+  vector<TH1F*> h_data_muon          = get_all_hists(data_muon, hist);
+  vector<TH1F*> h_data_muon_old      = get_all_hists(data_muon, hist_old);
+  vector<TH1F*> h_data_elec          = get_all_hists(data_elec, hist);
+  vector<TH1F*> h_data_elec_old      = get_all_hists(data_elec, hist_old);
+  vector<TH1F*> h_data_combine       = combine_channels(h_data_muon, h_data_elec);
+  vector<TH1F*> h_data_combine_old   = combine_channels(h_data_muon_old, h_data_elec_old);
 
-  vector<TH1F*> ttbar_muon_hists     = get_hists(ttbar_muon, hist);
-  vector<TH1F*> ttbar_muon_hists_old = get_hists(ttbar_muon, hist_old);
-  vector<TH1F*> ttbar_elec_hists     = get_hists(ttbar_elec, hist);
-  vector<TH1F*> ttbar_elec_hists_old = get_hists(ttbar_elec, hist_old);
+  vector<TH1F*> h_ttbar_muon         = get_all_hists(ttbar_muon, hist);
+  vector<TH1F*> h_ttbar_muon_old     = get_all_hists(ttbar_muon, hist_old);
+  vector<TH1F*> h_ttbar_elec         = get_all_hists(ttbar_elec, hist);
+  vector<TH1F*> h_ttbar_elec_old     = get_all_hists(ttbar_elec, hist_old);
+  vector<TH1F*> h_ttbar_combine      = combine_channels(h_ttbar_muon, h_ttbar_elec);
+  vector<TH1F*> h_ttbar_combine_old  = combine_channels(h_ttbar_muon_old, h_ttbar_elec_old);
 
-  vector<TH1F*> st_muon_hists        = get_hists(st_muon, hist);
-  vector<TH1F*> st_muon_hists_old    = get_hists(st_muon, hist_old);
-  vector<TH1F*> st_elec_hists        = get_hists(st_elec, hist);
-  vector<TH1F*> st_elec_hists_old    = get_hists(st_elec, hist_old);
+  vector<TH1F*> h_st_muon            = get_all_hists(st_muon, hist);
+  vector<TH1F*> h_st_muon_old        = get_all_hists(st_muon, hist_old);
+  vector<TH1F*> h_st_elec            = get_all_hists(st_elec, hist);
+  vector<TH1F*> h_st_elec_old        = get_all_hists(st_elec, hist_old);
+  vector<TH1F*> h_st_combine         = combine_channels(h_st_muon, h_st_elec);
+  vector<TH1F*> h_st_combine_old     = combine_channels(h_st_muon_old, h_st_elec_old);
 
-  vector<TH1F*> wjets_muon_hists     = get_hists(wjets_muon, hist);
-  vector<TH1F*> wjets_muon_hists_old = get_hists(wjets_muon, hist_old);
-  vector<TH1F*> wjets_elec_hists     = get_hists(wjets_elec, hist);
-  vector<TH1F*> wjets_elec_hists_old = get_hists(wjets_elec, hist_old);
+  vector<TH1F*> h_wjets_muon         = get_all_hists(wjets_muon, hist);
+  vector<TH1F*> h_wjets_muon_old     = get_all_hists(wjets_muon, hist_old);
+  vector<TH1F*> h_wjets_elec         = get_all_hists(wjets_elec, hist);
+  vector<TH1F*> h_wjets_elec_old     = get_all_hists(wjets_elec, hist_old);
+  vector<TH1F*> h_wjets_combine      = combine_channels(h_wjets_muon, h_wjets_elec);
+  vector<TH1F*> h_wjets_combine_old  = combine_channels(h_wjets_muon_old, h_wjets_elec_old);
 
-  vector<TH1F*> other_muon_hists     = get_hists(other_muon, hist);
-  vector<TH1F*> other_muon_hists_old = get_hists(other_muon, hist_old);
-  vector<TH1F*> other_elec_hists     = get_hists(other_elec, hist);
-  vector<TH1F*> other_elec_hists_old = get_hists(other_elec, hist_old);
+  vector<TH1F*> h_other_muon         = get_all_hists(other_muon, hist);
+  vector<TH1F*> h_other_muon_old     = get_all_hists(other_muon, hist_old);
+  vector<TH1F*> h_other_elec         = get_all_hists(other_elec, hist);
+  vector<TH1F*> h_other_elec_old     = get_all_hists(other_elec, hist_old);
+  vector<TH1F*> h_other_combine      = combine_channels(h_other_muon, h_other_elec);
+  vector<TH1F*> h_other_combine_old  = combine_channels(h_other_muon_old, h_other_elec_old);
+
+  // JMS -----------------------------------------------------------------------
+  // if(debug) cout << "Get Hists- JMS_uu" << endl; // WORKS
+  vector<TH1F*> h_jms_uu_muon        = get_all_hists(jms_uu_muon, hist);
+  vector<TH1F*> h_jms_uu_elec        = get_all_hists(jms_uu_elec, hist);
+  vector<TH1F*> h_jms_uu_combine     = combine_channels(h_jms_uu_muon, h_jms_uu_elec);
+
+  // if(debug) cout << "Get Hists- JMS_ud" << endl;
+  vector<TH1F*> h_jms_ud_muon        = get_all_hists(jms_ud_muon, hist);
+  vector<TH1F*> h_jms_ud_elec        = get_all_hists(jms_ud_elec, hist);
+  vector<TH1F*> h_jms_ud_combine     = combine_channels(h_jms_ud_muon, h_jms_ud_elec);
+
+  // if(debug) cout << "Get Hists- JMS_du" << endl; // WORKS
+  vector<TH1F*> h_jms_du_muon        = get_all_hists(jms_du_muon, hist);
+  vector<TH1F*> h_jms_du_elec        = get_all_hists(jms_du_elec, hist);
+  vector<TH1F*> h_jms_du_combine     = combine_channels(h_jms_du_muon, h_jms_du_elec);
+
+  // if(debug) cout << "Get Hists- JMS_dd" << endl;
+  vector<TH1F*> h_jms_dd_muon        = get_all_hists(jms_dd_muon, hist);
+  vector<TH1F*> h_jms_dd_elec        = get_all_hists(jms_dd_elec, hist);
+  vector<TH1F*> h_jms_dd_combine     = combine_channels(h_jms_dd_muon, h_jms_dd_elec);
 
   // #################################################################################################
-  // Get Data ########################################################################################
-  if(debug) cout << "Data" << endl;
+  // Combine Hists ###################################################################################
+  if(debug) cout << "Combine Hists" << endl;
 
+  // Data ----------------------------------------------------------------------
 
-  TH1F  *data           = (TH1F*)data_file->Get(hist);
-  TH1F  *data_old       = (TH1F*)data_file->Get(hist_old);
+  // dummy: in order to keep code clean and faster to write
 
-  TH1F  *data_norm       = normalize(data);
-  TH1F  *data_rebin      = rebin(data, bin_width);
-  TH1F  *data_rebin_norm = normalize(data_rebin);
+  vector<TH1F*> all_data_muon             = h_data_muon;        // dummy
+  vector<TH1F*> all_data_elec             = h_data_elec;        // dummy
+  vector<TH1F*> all_data_combine          = h_data_combine;     // dummy
 
+  vector<TH1F*> all_data_muon_old         = h_data_muon_old;    // dummy
+  vector<TH1F*> all_data_elec_old         = h_data_elec_old;    // dummy
+  vector<TH1F*> all_data_combine_old      = h_data_combine_old; // dummy
 
-  // #################################################################################################
-  // Get TTbar #######################################################################################
+  vector<TH1F*> all_data_muon_norm        = normalize(all_data_muon);
+  vector<TH1F*> all_data_elec_norm        = normalize(all_data_elec);
+  vector<TH1F*> all_data_combine_norm     = normalize(all_data_combine);
+
+  vector<TH1F*> all_data_muon_norm_old    = normalize(all_data_muon_old);
+  vector<TH1F*> all_data_elec_norm_old    = normalize(all_data_elec_old);
+  vector<TH1F*> all_data_combine_norm_old = normalize(all_data_combine_old);
+
+  // Bkg -----------------------------------------------------------------------
+
+  vector<TH1F*> h_bkg_muon        = AddHists(h_st_muon, h_wjets_muon, h_other_muon, 1);
+  vector<TH1F*> h_bkg_elec        = AddHists(h_st_elec, h_wjets_elec, h_other_elec, 1);
+  vector<TH1F*> h_bkg_combine     = AddHists(h_st_combine, h_wjets_combine, h_other_combine, 1);
+
+  vector<TH1F*> h_bkg_muon_old    = AddHists(h_st_muon_old, h_wjets_muon_old, h_other_muon_old, 1);
+  vector<TH1F*> h_bkg_elec_old    = AddHists(h_st_elec_old, h_wjets_elec_old, h_other_elec_old, 1);
+  vector<TH1F*> h_bkg_combine_old = AddHists(h_st_combine_old, h_wjets_combine_old, h_other_combine_old, 1);
+
+  // TTbar ---------------------------------------------------------------------
   if(debug) cout << "TTbar" << endl;
 
-  TH1F  *ttbar       = (TH1F*)ttbar_file->Get(hist);
-  TH1F  *ttbar_old   = (TH1F*)ttbar_file->Get(hist_old);
+  vector<TH1F*> all_ttbar_muon             = AddHists(h_bkg_muon, h_ttbar_muon, 1);
+  vector<TH1F*> all_ttbar_elec             = AddHists(h_bkg_elec, h_ttbar_elec, 1);
+  vector<TH1F*> all_ttbar_combine          = AddHists(h_bkg_combine, h_ttbar_combine, 1);
+  vector<TH1F*> all_ttbar_muon_old         = AddHists(h_bkg_muon_old, h_ttbar_muon_old, 1);
+  vector<TH1F*> all_ttbar_elec_old         = AddHists(h_bkg_elec_old, h_ttbar_elec_old, 1);
+  vector<TH1F*> all_ttbar_combine_old      = AddHists(h_bkg_combine_old, h_ttbar_combine_old, 1);
 
-  ttbar->Add(bkg, 1);
-  ttbar_old->Add(bkg_old, 1);
+  vector<TH1F*> all_ttbar_muon_norm        = normalize(all_ttbar_muon);
+  vector<TH1F*> all_ttbar_elec_norm        = normalize(all_ttbar_elec);
+  vector<TH1F*> all_ttbar_combine_norm     = normalize(all_ttbar_combine);
+  vector<TH1F*> all_ttbar_muon_norm_old    = normalize(all_ttbar_muon_old);
+  vector<TH1F*> all_ttbar_elec_norm_old    = normalize(all_ttbar_elec_old);
+  vector<TH1F*> all_ttbar_combine_norm_old = normalize(all_ttbar_combine_old);
 
-  TH1F* ttbar_norm              = normalize(ttbar);
-  TH1F* ttbar_norm_old          = normalize(ttbar_old);
-  TH1F* ttbar_rebin             = rebin(ttbar, bin_width);
-  TH1F* ttbar_rebin_old         = rebin(ttbar_old, bin_width);
-  TH1F* ttbar_rebin_norm        = normalize(ttbar_rebin);
-  TH1F* ttbar_rebin_norm_old    = normalize(ttbar_rebin_old);
-
-
-  // #################################################################################################
-  // Get SYS #########################################################################################
+  // JMS -----------------------------------------------------------------------
   if(debug) cout << "JMS" << endl;
 
-  TFile *JECuu_file   = new TFile(dir+year+"/muon/JMS_upup/"+ttbar_path);
-  TFile *JECdd_file   = new TFile(dir+year+"/muon/JMS_downdown/"+ttbar_path);
-  TFile *JECdu_file   = new TFile(dir+year+"/muon/JMS_downup/"+ttbar_path);
-  TFile *JECud_file   = new TFile(dir+year+"/muon/JMS_updown/"+ttbar_path);
-  TH1F  *JMSuu        = (TH1F*)JECuu_file->Get(hist);
-  TH1F  *JMSdd        = (TH1F*)JECdd_file->Get(hist);
-  TH1F  *JMSud        = (TH1F*)JECud_file->Get(hist);
-  TH1F  *JMSdu        = (TH1F*)JECdu_file->Get(hist);
+  vector<TH1F*> all_jms_uu_muon         = AddHists(h_bkg_muon, h_jms_uu_muon, 1);
+  vector<TH1F*> all_jms_uu_elec         = AddHists(h_bkg_elec, h_jms_uu_elec, 1);
+  vector<TH1F*> all_jms_uu_combine      = AddHists(h_bkg_combine, h_jms_uu_combine, 1);
 
-  // Add hists from JEC and background -----------------------------------------
-  if(debug) cout << "JEC+Background" << endl;
+  vector<TH1F*> all_jms_ud_muon         = AddHists(h_bkg_muon, h_jms_ud_muon, 1);
+  vector<TH1F*> all_jms_ud_elec         = AddHists(h_bkg_elec, h_jms_ud_elec, 1);
+  vector<TH1F*> all_jms_ud_combine      = AddHists(h_bkg_combine, h_jms_ud_combine, 1);
 
-  JMSuu->Add(bkg, 1);
-  JMSdd->Add(bkg, 1);
-  JMSud->Add(bkg, 1);
-  JMSdu->Add(bkg, 1);
+  vector<TH1F*> all_jms_du_muon         = AddHists(h_bkg_muon, h_jms_du_muon, 1);
+  vector<TH1F*> all_jms_du_elec         = AddHists(h_bkg_elec, h_jms_du_elec, 1);
+  vector<TH1F*> all_jms_du_combine      = AddHists(h_bkg_combine, h_jms_du_combine, 1);
 
-  TH1F* JMSuu_norm       = normalize(JMSuu);
-  TH1F* JMSdd_norm       = normalize(JMSdd);
-  TH1F* JMSud_norm       = normalize(JMSud);
-  TH1F* JMSdu_norm       = normalize(JMSdu);
+  vector<TH1F*> all_jms_dd_muon         = AddHists(h_bkg_muon, h_jms_dd_muon, 1);
+  vector<TH1F*> all_jms_dd_elec         = AddHists(h_bkg_elec, h_jms_dd_elec, 1);
+  vector<TH1F*> all_jms_dd_combine      = AddHists(h_bkg_combine, h_jms_dd_combine, 1);
 
+  vector<TH1F*> all_jms_uu_muon_norm    = normalize(all_jms_uu_muon);
+  vector<TH1F*> all_jms_uu_elec_norm    = normalize(all_jms_uu_elec);
+  vector<TH1F*> all_jms_uu_combine_norm = normalize(all_jms_uu_combine);
 
-  /*
-  ██████  ██       ██████  ████████ ███████
-  ██   ██ ██      ██    ██    ██    ██
-  ██████  ██      ██    ██    ██    ███████
-  ██      ██      ██    ██    ██         ██
-  ██      ███████  ██████     ██    ███████
-  */
+  vector<TH1F*> all_jms_ud_muon_norm    = normalize(all_jms_ud_muon);
+  vector<TH1F*> all_jms_ud_elec_norm    = normalize(all_jms_ud_elec);
+  vector<TH1F*> all_jms_ud_combine_norm = normalize(all_jms_ud_combine);
+
+  vector<TH1F*> all_jms_du_muon_norm    = normalize(all_jms_du_muon);
+  vector<TH1F*> all_jms_du_elec_norm    = normalize(all_jms_du_elec);
+  vector<TH1F*> all_jms_du_combine_norm = normalize(all_jms_du_combine);
+
+  vector<TH1F*> all_jms_dd_muon_norm    = normalize(all_jms_dd_muon);
+  vector<TH1F*> all_jms_dd_elec_norm    = normalize(all_jms_dd_elec);
+  vector<TH1F*> all_jms_dd_combine_norm = normalize(all_jms_dd_combine);
+
+  // -------------------------------------------------------------------------------------------------------
+  // ------------------------------------------ Plots ------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------
 
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
   gStyle->SetOptStat(kFALSE);
   gStyle->SetLegendBorderSize(0);
 
-  if(debug) cout << "Plots Sensitivity" << endl;
+  for(int year=0; year<4; year++){
+    string sYear = (string) years[year];
+    if(debug) cout << setw(12) << "\n|------------ " << setw(8) << centered(sYear) << " --------------|\n" << endl;
 
-  // #################################################################################################
-  // Settings ########################################################################################
+    // #################################################################################################
+    // Settings ########################################################################################
 
-  ttbar->SetTitle("");
-  ttbar->GetXaxis()->SetRangeUser(100, 300);
-  ttbar->GetYaxis()->SetRangeUser(0, ttbar->GetMaximum()*1.1);
-  ttbar->GetXaxis()->SetNdivisions(505);
-  ttbar->GetYaxis()->SetNdivisions(505);
-  ttbar->GetXaxis()->SetTitleSize(0.05);
-  ttbar->GetYaxis()->SetTitleSize(0.04);
-  ttbar->GetXaxis()->SetTitleOffset(0.9);
-  ttbar->GetYaxis()->SetTitleOffset(0.9);
-  ttbar->GetXaxis()->SetTitle("m_{jet} [GeV]");
-  ttbar->GetYaxis()->SetTitle("Events");
-  ttbar->GetYaxis()->SetTitleOffset(1.5);
-  ttbar->SetLineWidth(2);  // ttbar hist style
-  ttbar->SetLineColor(kRed);
+    // ttbar -------------------------------------------------------------------
 
-  ttbar_norm->SetTitle("");
-  ttbar_norm->GetXaxis()->SetRangeUser(100, 300);
-  ttbar_norm->GetYaxis()->SetRangeUser(0, ttbar_norm->GetMaximum()*1.1);
-  ttbar_norm->GetXaxis()->SetNdivisions(505);
-  ttbar_norm->GetYaxis()->SetNdivisions(505);
-  ttbar_norm->GetXaxis()->SetTitleSize(0.05);
-  ttbar_norm->GetYaxis()->SetTitleSize(0.04);
-  ttbar_norm->GetXaxis()->SetTitleOffset(0.9);
-  ttbar_norm->GetYaxis()->SetTitleOffset(0.9);
-  ttbar_norm->GetXaxis()->SetTitle("m_{jet} [GeV]");
-  ttbar_norm->GetYaxis()->SetTitle("#Delta N/N");
-  ttbar_norm->GetYaxis()->SetTitleOffset(1.5);
-  ttbar_norm->SetLineWidth(2);  // ttbar hist style
-  ttbar_norm->SetLineColor(kRed);
+    // void main_plot_settings(TH1F* hist, int x_max, int color, TString title, TString xAxis, TString yAxis, TString save_path)
+    TString xAxis      = "m_{jet} [GeV]";
+    TString yAxis_norm = "#Delta N/N";
+    main_plot_settings(all_ttbar_muon[year], 300, kRed, "", xAxis, "Events", save_path_general);
+    main_plot_settings(all_ttbar_elec[year], 300, kRed, "", xAxis, "Events", save_path_general);
+    main_plot_settings(all_ttbar_combine[year], 300, kRed, "", xAxis, "Events", save_path_general);
+    main_plot_settings(all_ttbar_muon_norm[year], 300, kRed, "", xAxis, "a.u.", save_path_general);
+    main_plot_settings(all_ttbar_elec_norm[year], 300, kRed, "", xAxis, "a.u.", save_path_general);
+    main_plot_settings(all_ttbar_combine_norm[year], 300, kRed, "", xAxis, "a.u.", save_path_general);
 
-  // Data --------------------------------------------------------------------------------------------
-  data->SetMarkerStyle(8);  // data hist style
-  data->SetMarkerColor(kBlack);
-  data->SetLineColor(kBlack);
-  data_norm->SetMarkerStyle(8);  // data hist style
-  data_norm->SetMarkerColor(kBlack);
-  data_norm->SetLineColor(kBlack);
-  // upup --------------------------------------------------------------------------------------------
-  JMSuu->SetLineWidth(2);
-  JMSuu->SetLineColor(kBlue);
-  JMSuu_norm->SetLineWidth(2);
-  JMSuu_norm->SetLineColor(kBlue);
-  // downdown ----------------------------------------------------------------------------------------
-  JMSdd->SetLineWidth(2);
-  JMSdd->SetLineColor(kGreen+2);
-  JMSdd_norm->SetLineWidth(2);
-  JMSdd_norm->SetLineColor(kGreen+2);
-  // updown ------------------------------------------------------------------------------------------
-  JMSud->SetLineWidth(2);
-  JMSud->SetLineStyle(7);
-  JMSud->SetLineColor(kGray+2);
-  JMSud_norm->SetLineWidth(2);
-  JMSud_norm->SetLineStyle(7);
-  JMSud_norm->SetLineColor(kYellow+1);
-  // downup ------------------------------------------------------------------------------------------
-  JMSdu->SetLineWidth(2);
-  JMSdu->SetLineStyle(7);
-  JMSdu->SetLineColor(kMagenta+2);
-  JMSdu_norm->SetLineWidth(2);
-  JMSdu_norm->SetLineStyle(7);
-  JMSdu_norm->SetLineColor(kMagenta+2);
+    add_plot_settings(all_ttbar_muon_old[year], kBlue);
+    add_plot_settings(all_ttbar_elec_old[year], kBlue);
+    add_plot_settings(all_ttbar_combine_old[year], kBlue);
+    add_plot_settings(all_ttbar_muon_norm_old[year], kBlue);
+    add_plot_settings(all_ttbar_elec_norm_old[year], kBlue);
+    add_plot_settings(all_ttbar_combine_norm_old[year], kBlue);
 
-  // Legend ------------------------------------------------------------------------------------------
-  TLegend *leg;
+    // data --------------------------------------------------------------------
 
+    // data_plot_settings(TH1F* hist)
+    data_plot_settings(all_data_muon[year]);
+    data_plot_settings(all_data_elec[year]);
+    data_plot_settings(all_data_combine[year]);
+    data_plot_settings(all_data_muon_norm[year]);
+    data_plot_settings(all_data_elec_norm[year]);
+    data_plot_settings(all_data_combine_norm[year]);
 
-  /*
-  ███    ███  █████  ███████ ███████     ██████  ██       ██████  ████████ ███████
-  ████  ████ ██   ██ ██      ██          ██   ██ ██      ██    ██    ██    ██
-  ██ ████ ██ ███████ ███████ ███████     ██████  ██      ██    ██    ██    ███████
-  ██  ██  ██ ██   ██      ██      ██     ██      ██      ██    ██    ██         ██
-  ██      ██ ██   ██ ███████ ███████     ██      ███████  ██████     ██    ███████
-  */
-  if(debug) cout << "Mass Plots" << endl;
+    data_plot_settings(all_data_muon_old[year]);
+    data_plot_settings(all_data_elec_old[year]);
+    data_plot_settings(all_data_combine_old[year]);
+    data_plot_settings(all_data_muon_norm_old[year]);
+    data_plot_settings(all_data_elec_norm_old[year]);
+    data_plot_settings(all_data_combine_norm_old[year]);
 
-  TCanvas *A = new TCanvas("A", "A", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  ttbar->Draw("HIST");
-  JMSuu->Draw("SAME HIST");
-  JMSdd->Draw("SAME HIST");
-  // data->Draw("SAME P");
-  leg = new TLegend(0.55,0.55,0.85,0.85);
-  leg->AddEntry(ttbar,"Best fit","l");
-  leg->AddEntry(JMSuu ,"JMS upup","l");
-  leg->AddEntry(JMSdd ,"JMS downdown","l");
-  leg->SetTextSize(0.03);
-  leg->Draw();
-  gPad->RedrawAxis();
-  A->SaveAs(save_path_general+"/mass_comparison_jms_"+year+".pdf");
+    // jms ---------------------------------------------------------------------
 
-  JMSud->Draw("SAME HIST");
-  JMSdu->Draw("SAME HIST");
-  leg->AddEntry(JMSud ,"JMS updown","l");
-  leg->AddEntry(JMSdu ,"JMS downup","l");
-  A->SaveAs(save_path_general+"/mass_comparison_jms_add_"+year+".pdf");
-  delete A;
-  leg->Clear();
+    // add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
+    add_plot_settings(all_jms_uu_muon[year], kBlue);
+    add_plot_settings(all_jms_uu_elec[year], kBlue);
+    add_plot_settings(all_jms_uu_combine[year], kBlue);
+    add_plot_settings(all_jms_uu_muon_norm[year], kBlue);
+    add_plot_settings(all_jms_uu_elec_norm[year], kBlue);
+    add_plot_settings(all_jms_uu_combine_norm[year], kBlue);
 
-  // #################################################################################################
-  // Norm ############################################################################################
-  if(debug) cout << "Mass Plots Norm" << endl;
+    add_plot_settings(all_jms_dd_muon[year], kGreen+2);
+    add_plot_settings(all_jms_dd_elec[year], kGreen+2);
+    add_plot_settings(all_jms_dd_combine[year], kGreen+2);
+    add_plot_settings(all_jms_dd_muon_norm[year], kGreen+2);
+    add_plot_settings(all_jms_dd_elec_norm[year], kGreen+2);
+    add_plot_settings(all_jms_dd_combine_norm[year], kGreen+2);
 
-  A = new TCanvas("A", "A", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  ttbar_norm->Draw("HIST");
-  // data_norm->Draw("SAME P");
-  JMSuu_norm->Draw("SAME HIST");
-  JMSdd_norm->Draw("SAME HIST");
-  leg = new TLegend(0.55,0.55,0.85,0.85);
-  leg->AddEntry(ttbar_norm,"Best fit","l");
-  leg->AddEntry(data_norm,"Data","pl");
-  leg->AddEntry(JMSuu_norm ,"JMS up","l");
-  leg->AddEntry(JMSdd_norm ,"JMS down","l");
-  leg->SetTextSize(0.03);
-  leg->Draw();
-  gPad->RedrawAxis();
-  A->SaveAs(save_path_general+"/mass_comparison_jms_norm_"+year+".pdf");
+    add_plot_settings(all_jms_ud_muon[year], kYellow+2, 7);
+    add_plot_settings(all_jms_ud_elec[year], kYellow+2, 7);
+    add_plot_settings(all_jms_ud_combine[year], kYellow+2, 7);
+    add_plot_settings(all_jms_ud_muon_norm[year], kYellow+2, 7);
+    add_plot_settings(all_jms_ud_elec_norm[year], kYellow+2, 7);
+    add_plot_settings(all_jms_ud_combine_norm[year], kYellow+2, 7);
 
-  JMSud_norm->Draw("SAME HIST");
-  JMSdu_norm->Draw("SAME HIST");
-  leg->AddEntry(JMSud_norm ,"JMS updown","l");
-  leg->AddEntry(JMSdu_norm ,"JMS downup","l");
-  A->SaveAs(save_path_general+"/mass_comparison_jms_add_norm_"+year+".pdf");
-  delete A;
-  leg->Clear();
+    add_plot_settings(all_jms_du_muon[year], kGray+2, 7);
+    add_plot_settings(all_jms_du_elec[year], kGray+2, 7);
+    add_plot_settings(all_jms_du_combine[year], kGray+2, 7);
+    add_plot_settings(all_jms_du_muon_norm[year], kGray+2, 7);
+    add_plot_settings(all_jms_du_elec_norm[year], kGray+2, 7);
+    add_plot_settings(all_jms_du_combine_norm[year], kGray+2, 7);
 
-  /*
-  .██████  ██████  ███    ███ ██████   █████  ██████  ███████     ██████  ██       ██████  ████████ ███████
-  ██      ██    ██ ████  ████ ██   ██ ██   ██ ██   ██ ██          ██   ██ ██      ██    ██    ██    ██
-  ██      ██    ██ ██ ████ ██ ██████  ███████ ██████  █████       ██████  ██      ██    ██    ██    ███████
-  ██      ██    ██ ██  ██  ██ ██      ██   ██ ██   ██ ██          ██      ██      ██    ██    ██         ██
-  .██████  ██████  ██      ██ ██      ██   ██ ██   ██ ███████     ██      ███████  ██████     ██    ███████
-  */
-  if(debug) cout << "\nCompare Plots" << endl;
+    // #################################################################################################
+    // Plots ###########################################################################################
+    if(debug) cout << "Mass Plots" << endl;
 
-  // Old ttbar ---------------------------------------------------------------------------------------
-  ttbar_old->SetLineWidth(2);
-  ttbar_old->SetLineColor(kBlue);
+    TString path_muon    = save_path_general+"/muon";
+    TString path_elec    = save_path_general+"/elec";
+    TString path_combine = save_path_general+"/combine";
 
-  A = new TCanvas("A", "A", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  ttbar->Draw("HIST");
-  ttbar_old->Draw("SAME HIST");
-  leg = new TLegend(0.60,0.65,0.75,0.85);
-  leg->AddEntry(ttbar,"Best fit","l");
-  leg->AddEntry(ttbar_old ,"Old","l");
-  leg->SetTextSize(0.04);
-  leg->Draw();
-  gPad->RedrawAxis();
-  A->SaveAs(save_path_general+"/method_comparison_jms_old_"+year+".pdf");
-  data->Draw("SAME P");
-  leg->AddEntry(data,"Data","pl");
-  A->SaveAs(save_path_general+"/method_comparison_jms_old_data_"+year+".pdf");
-  delete A;
-  leg->Clear();
+    // mean --------------------------------------------------------------------
 
-  cout << "\nIntegral New: " << ttbar->Integral()<<endl;
-  cout << "Integral Old: "   << ttbar_old->Integral()<<endl;
+    double mean_data_muon           = trunc_mean(all_data_muon[year]); // all_data_muon[year]->GetMean();
+    double mean_ttbar_muon          = trunc_mean(all_ttbar_muon[year]); // all_ttbar_muon[year]->GetMean();
+    double mean_uu_muon             = trunc_mean(all_jms_uu_muon[year]); // all_jms_uu_muon[year]->GetMean();
+    double mean_dd_muon             = trunc_mean(all_jms_dd_muon[year]); // all_jms_dd_muon[year]->GetMean();
+    double mean_ud_muon             = trunc_mean(all_jms_ud_muon[year]); // all_jms_ud_muon[year]->GetMean();
+    double mean_du_muon             = trunc_mean(all_jms_du_muon[year]); // all_jms_du_muon[year]->GetMean();
 
-  // Calculate mean
-  cout << ttbar->GetMean() << endl;
+    double mean_data_elec           = trunc_mean(all_data_elec[year]); // all_data_elec[year]->GetMean();
+    double mean_ttbar_elec          = trunc_mean(all_ttbar_elec[year]); // all_ttbar_elec[year]->GetMean();
+    double mean_uu_elec             = trunc_mean(all_jms_uu_elec[year]); // all_jms_uu_elec[year]->GetMean();
+    double mean_dd_elec             = trunc_mean(all_jms_dd_elec[year]); // all_jms_dd_elec[year]->GetMean();
+    double mean_ud_elec             = trunc_mean(all_jms_ud_elec[year]); // all_jms_ud_elec[year]->GetMean();
+    double mean_du_elec             = trunc_mean(all_jms_du_elec[year]); // all_jms_du_elec[year]->GetMean();
+
+    double mean_data_combine        = trunc_mean(all_data_combine[year]); // all_data_combine[year]->GetMean();
+    double mean_ttbar_combine       = trunc_mean(all_ttbar_combine[year]); // all_ttbar_combine[year]->GetMean();
+    double mean_uu_combine          = trunc_mean(all_jms_uu_combine[year]); // all_jms_uu_combine[year]->GetMean();
+    double mean_dd_combine          = trunc_mean(all_jms_dd_combine[year]); // all_jms_dd_combine[year]->GetMean();
+    double mean_ud_combine          = trunc_mean(all_jms_ud_combine[year]); // all_jms_ud_combine[year]->GetMean();
+    double mean_du_combine          = trunc_mean(all_jms_du_combine[year]); // all_jms_du_combine[year]->GetMean();
+
+    vector<double> mean_muon        = {mean_ttbar_muon, mean_uu_muon, mean_dd_muon};
+    vector<double> mean_elec        = {mean_ttbar_elec, mean_uu_elec, mean_dd_elec};
+    vector<double> mean_combine     = {mean_ttbar_combine, mean_uu_combine, mean_dd_combine};
+
+    double mean_ttbar_muon_old      = trunc_mean(all_ttbar_muon_old[year]); // all_ttbar_muon_old[year]->GetMean();
+    double mean_ttbar_elec_old      = trunc_mean(all_ttbar_elec_old[year]); // all_ttbar_elec_old[year]->GetMean();
+    double mean_ttbar_combine_old   = trunc_mean(all_ttbar_combine_old[year]); // all_ttbar_combine_old[year]->GetMean();
+
+    vector<double> mean_muon_old    = {mean_ttbar_muon, mean_ttbar_muon_old};
+    vector<double> mean_elec_old    = {mean_ttbar_elec, mean_ttbar_elec_old};
+    vector<double> mean_combine_old = {mean_ttbar_combine, mean_ttbar_combine_old};
+
+    cout << "data  - " << years[year] << " - muon:    " << mean_data_muon  << endl;
+    cout << "jmsuu - " << years[year] << " - muon:    " << mean_uu_muon    << endl;
+    cout << "ttbar - " << years[year] << " - muon:    " << mean_ttbar_muon;
+    cout << " | (old: " << mean_ttbar_muon_old << ")" << endl;
+    cout << "jmsdd - " << years[year] << " - muon:    " << mean_dd_muon    << endl;
+    cout << endl;
+    cout << "data  - " << years[year] << " - elec:    " << mean_data_elec  << endl;
+    cout << "jmsuu - " << years[year] << " - elec:    " << mean_uu_elec    << endl;
+    cout << "ttbar - " << years[year] << " - elec:    " << mean_ttbar_elec;
+    cout << " | (old: " << mean_ttbar_elec_old << ")" << endl;
+    cout << "jmsdd - " << years[year] << " - elec:    " << mean_dd_elec    << endl;
+    cout << endl;
+    cout << "data  - " << years[year] << " - combine: " << mean_data_combine  << endl;
+    cout << "jmsuu - " << years[year] << " - combine: " << mean_uu_combine    << endl;
+    cout << "ttbar - " << years[year] << " - combine: " << mean_ttbar_combine;
+    cout << " | (old: " << mean_ttbar_combine_old << ")" << endl;
+    cout << "jmsdd - " << years[year] << " - combine: " << mean_dd_combine    << endl;
+    cout << endl;
+
+    // draw --------------------------------------------------------------------
+
+    // draw_plot_jms(TH1F* h1, TH1F* h2, TH1F* h3, const TString path, const TString year, vector<double> mean, TString norm="")
+    draw_plot_jms(all_ttbar_muon[year], all_jms_uu_muon[year], all_jms_dd_muon[year], path_muon, years[year], mean_muon);
+    draw_plot_jms(all_ttbar_elec[year], all_jms_uu_elec[year], all_jms_dd_elec[year], path_elec, years[year], mean_elec);
+    draw_plot_jms(all_ttbar_combine[year], all_jms_uu_combine[year], all_jms_dd_combine[year], path_combine, years[year], mean_combine);
+
+    draw_plot_jms(all_ttbar_muon_norm[year], all_jms_uu_muon_norm[year], all_jms_dd_muon_norm[year], path_muon, years[year], mean_muon, "_norm");
+    draw_plot_jms(all_ttbar_elec_norm[year], all_jms_uu_elec_norm[year], all_jms_dd_elec_norm[year], path_elec, years[year], mean_elec, "_norm");
+    draw_plot_jms(all_ttbar_combine_norm[year], all_jms_uu_combine_norm[year], all_jms_dd_combine_norm[year], path_combine, years[year], mean_combine, "_norm");
+
+    // draw_plot_comparison(TH1F* h1, TH1F* h2, TH1F* data, const TString path, const TString year, vector<double> mean={0, 0})
+    draw_plot_comparison(all_ttbar_muon[year], all_ttbar_muon_old[year], all_data_muon[year], path_muon, years[year], mean_muon_old);
+    draw_plot_comparison(all_ttbar_elec[year], all_ttbar_elec_old[year], all_data_elec[year], path_elec, years[year], mean_elec_old);
+    draw_plot_comparison(all_ttbar_combine[year], all_ttbar_combine_old[year], all_data_combine[year], path_combine, years[year], mean_combine_old);
+
+  }
 
 }
