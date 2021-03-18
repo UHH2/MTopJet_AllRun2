@@ -1,4 +1,5 @@
 #include "CentralInclude.h"
+#include "HistogramUtils.h"
 
 using namespace std;
 
@@ -43,16 +44,22 @@ TString y17 = "_2017v2";
 TString y18 = "_2018";
 
 // Hist files
-TString data_f  = "uhh2.AnalysisModuleRunner.DATA.DATA";
-TString ttbar_f = "uhh2.AnalysisModuleRunner.MC.TTbar";
-TString wjets_f = "uhh2.AnalysisModuleRunner.MC.WJets";
-TString st_f    = "uhh2.AnalysisModuleRunner.MC.SingleTop";
-TString other_f = "uhh2.AnalysisModuleRunner.MC.other";
+TString data_f   = "uhh2.AnalysisModuleRunner.DATA.DATA";
+TString ttbar_f  = "uhh2.AnalysisModuleRunner.MC.TTbar";
+TString wjets_f  = "uhh2.AnalysisModuleRunner.MC.WJets";
+TString st_f     = "uhh2.AnalysisModuleRunner.MC.SingleTop";
+TString other_f  = "uhh2.AnalysisModuleRunner.MC.other";
 
-TString jms_uu  = "JMS_upup";
-TString jms_ud  = "JMS_updown";
-TString jms_du  = "JMS_downup";
-TString jms_dd  = "JMS_downdown";
+TString jms_uu   = "JMS_upup";
+TString jms_ud   = "JMS_updown";
+TString jms_du   = "JMS_downup";
+TString jms_dd   = "JMS_downdown";
+
+TString jec_up   = "JEC_up";
+TString jec_down = "JEC_down";
+
+TString cor_up   = "COR_up";
+TString cor_down = "COR_down";
 
 // Hist paths
 TString data_muon_16 = dir+muon+"/"+data_f+y16+".root";
@@ -137,3 +144,43 @@ TString jms_dd_elec_17 = dir+elec+"/"+jms_dd+"/"+ttbar_f+y17+".root";
 TString jms_dd_elec_18 = dir+elec+"/"+jms_dd+"/"+ttbar_f+y18+".root";
 vector<TString> jms_dd_muon = {jms_dd_muon_16, jms_dd_muon_17, jms_dd_muon_18};
 vector<TString> jms_dd_elec = {jms_dd_elec_16, jms_dd_elec_17, jms_dd_elec_18};
+
+// ----------------------------------------------------------------------------- JEC
+
+TString jec_up_muon_16 = dir+muon+"/"+jec_up+"/"+ttbar_f+y16+".root";
+TString jec_up_muon_17 = dir+muon+"/"+jec_up+"/"+ttbar_f+y17+".root";
+TString jec_up_muon_18 = dir+muon+"/"+jec_up+"/"+ttbar_f+y18+".root";
+TString jec_up_elec_16 = dir+elec+"/"+jec_up+"/"+ttbar_f+y16+".root";
+TString jec_up_elec_17 = dir+elec+"/"+jec_up+"/"+ttbar_f+y17+".root";
+TString jec_up_elec_18 = dir+elec+"/"+jec_up+"/"+ttbar_f+y18+".root";
+vector<TString> jec_up_muon = {jec_up_muon_16, jec_up_muon_17, jec_up_muon_18};
+vector<TString> jec_up_elec = {jec_up_elec_16, jec_up_elec_17, jec_up_elec_18};
+
+TString jec_down_muon_16 = dir+muon+"/"+jec_down+"/"+ttbar_f+y16+".root";
+TString jec_down_muon_17 = dir+muon+"/"+jec_down+"/"+ttbar_f+y17+".root";
+TString jec_down_muon_18 = dir+muon+"/"+jec_down+"/"+ttbar_f+y18+".root";
+TString jec_down_elec_16 = dir+elec+"/"+jec_down+"/"+ttbar_f+y16+".root";
+TString jec_down_elec_17 = dir+elec+"/"+jec_down+"/"+ttbar_f+y17+".root";
+TString jec_down_elec_18 = dir+elec+"/"+jec_down+"/"+ttbar_f+y18+".root";
+vector<TString> jec_down_muon = {jec_down_muon_16, jec_down_muon_17, jec_down_muon_18};
+vector<TString> jec_down_elec = {jec_down_elec_16, jec_down_elec_17, jec_down_elec_18};
+
+// ----------------------------------------------------------------------------- COR
+
+TString cor_up_muon_16 = dir+muon+"/"+cor_up+"/"+ttbar_f+y16+".root";
+TString cor_up_muon_17 = dir+muon+"/"+cor_up+"/"+ttbar_f+y17+".root";
+TString cor_up_muon_18 = dir+muon+"/"+cor_up+"/"+ttbar_f+y18+".root";
+TString cor_up_elec_16 = dir+elec+"/"+cor_up+"/"+ttbar_f+y16+".root";
+TString cor_up_elec_17 = dir+elec+"/"+cor_up+"/"+ttbar_f+y17+".root";
+TString cor_up_elec_18 = dir+elec+"/"+cor_up+"/"+ttbar_f+y18+".root";
+vector<TString> cor_up_muon = {cor_up_muon_16, cor_up_muon_17, cor_up_muon_18};
+vector<TString> cor_up_elec = {cor_up_elec_16, cor_up_elec_17, cor_up_elec_18};
+
+TString cor_down_muon_16 = dir+muon+"/"+cor_down+"/"+ttbar_f+y16+".root";
+TString cor_down_muon_17 = dir+muon+"/"+cor_down+"/"+ttbar_f+y17+".root";
+TString cor_down_muon_18 = dir+muon+"/"+cor_down+"/"+ttbar_f+y18+".root";
+TString cor_down_elec_16 = dir+elec+"/"+cor_down+"/"+ttbar_f+y16+".root";
+TString cor_down_elec_17 = dir+elec+"/"+cor_down+"/"+ttbar_f+y17+".root";
+TString cor_down_elec_18 = dir+elec+"/"+cor_down+"/"+ttbar_f+y18+".root";
+vector<TString> cor_down_muon = {cor_down_muon_16, cor_down_muon_17, cor_down_muon_18};
+vector<TString> cor_down_elec = {cor_down_elec_16, cor_down_elec_17, cor_down_elec_18};

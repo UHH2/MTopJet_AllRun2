@@ -84,6 +84,18 @@ vector<int> bins_upper_limit(TH1F* hist, double limit){
 }
 
 // -------------------------------------------------------------------------------------------
+vector<double> bin_center_upper_limit(TH1F* hist, vector<int> bins_above_limit, int bin_width){
+  int lower_bin = bins_above_limit[0];
+  int upper_bin = bins_above_limit[bins_above_limit.size()-1];
+
+  // bin_width/2 just a saftey. Boundaries must be greater than actual bin content for </> operator
+  double down_center = hist->GetBinCenter(lower_bin)-bin_width/2;
+  double up_center   = hist->GetBinCenter(upper_bin)+bin_width/2;
+
+  return {down_center, up_center};
+}
+
+// -------------------------------------------------------------------------------------------
 vector<int> bins_empty(TH1F* hist){
   vector<int> bin_empty_v;
   for(int bin=0; bin < hist->GetNbinsX(); bin++){
@@ -406,25 +418,59 @@ void plot_single_histogram(TH1F* hist, TString title, TString xAxis, int x_max, 
 }
 
 // -------------------------------------------------------------------------------------------------------
-void plot_settings(TH1F* hist, TString title, TString xAxis, int x_max, int color, TString save_path){
-  hist->SetTitle(title);
-  hist->GetXaxis()->SetRangeUser(0, x_max);
-  hist->GetYaxis()->SetRangeUser(0, hist->GetMaximum()*1.2);
-  hist->GetXaxis()->SetNdivisions(505);
-  hist->GetYaxis()->SetNdivisions(505);
-  hist->GetXaxis()->SetTitleSize(0.05);
-  hist->GetYaxis()->SetTitleSize(0.04);
-  hist->GetXaxis()->SetTitleOffset(0.9);
-  hist->GetYaxis()->SetTitleOffset(1.5);
-  hist->GetXaxis()->SetTitle(xAxis);
-  hist->GetYaxis()->SetTitle("");
-  hist->SetLineWidth(2);
+void add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
+{
+  hist->SetLineWidth(width);
+  hist->SetLineStyle(style);
   hist->SetLineColor(color);
+}
 
-  TCanvas *A = new TCanvas("A", "A", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  hist->Draw("HIST");
-  A->SaveAs(save_path);
-  delete A;
+// -------------------------------------------------------------------------------------------------------
+void data_plot_settings(TH1F* hist)
+{
+  hist->SetMarkerStyle(8);  // data hist style
+  hist->SetMarkerColor(kBlack);
+  hist->SetLineColor(kBlack);
+}
+
+/*
+███    ███ ███████  █████  ███    ██
+████  ████ ██      ██   ██ ████   ██
+██ ████ ██ █████   ███████ ██ ██  ██
+██  ██  ██ ██      ██   ██ ██  ██ ██
+██      ██ ███████ ██   ██ ██   ████
+*/
+
+// -------------------------------------------------------------------------------------------------------
+double trunc_mean(TH1F* hist, int cut_down, int cut_up)
+{
+  TH1F* hist_trunc = (TH1F*) hist->Clone();
+
+  for(int bin=1; bin<hist->GetNbinsX()+1; bin++)
+  {
+    bool bin_ = (hist->GetBinCenter(bin)<cut_down||hist->GetBinCenter(bin)>cut_up);
+    if(bin_) hist_trunc->SetBinContent(bin, 0);
+    else     hist_trunc->SetBinContent(bin, hist->GetBinContent(bin));
+  }
+
+  double mean_trunc = hist_trunc->GetMean();
+  double mean_old   = hist->GetMean();
+  return mean_trunc;
+}
+
+// -------------------------------------------------------------------------------------------------------
+double trunc_mean_bin(TH1F* hist, int bin_down, int bin_up)
+{
+  TH1F* hist_trunc = (TH1F*) hist->Clone();
+
+  for(int bin=1; bin<hist->GetNbinsX()+1; bin++)
+  {
+    bool bin_ = (bin<bin_down||bin>bin_up);
+    if(bin_) hist_trunc->SetBinContent(bin, 0);
+    else     hist_trunc->SetBinContent(bin, hist->GetBinContent(bin));
+  }
+
+  double mean_trunc = hist_trunc->GetMean();
+  double mean_old   = hist->GetMean();
+  return mean_trunc;
 }
