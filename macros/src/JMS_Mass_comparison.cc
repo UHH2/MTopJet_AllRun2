@@ -11,6 +11,10 @@
 using namespace std;
 
 // -------------------------------------------------------------------------------------------------------
+// ---------------------------------------- FUNCTIONS ----------------------------------------------------
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
 void main_plot_settings(TH1F* hist, int x_max, int color, TString title, TString xAxis, TString yAxis, TString save_path)
 {
   hist->SetTitle(title);
@@ -29,22 +33,6 @@ void main_plot_settings(TH1F* hist, int x_max, int color, TString title, TString
 }
 
 // -------------------------------------------------------------------------------------------------------
-void add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
-{
-  hist->SetLineWidth(width);
-  hist->SetLineStyle(style);
-  hist->SetLineColor(color);
-}
-
-// -------------------------------------------------------------------------------------------------------
-void data_plot_settings(TH1F* hist)
-{
-  hist->SetMarkerStyle(8);  // data hist style
-  hist->SetMarkerColor(kBlack);
-  hist->SetLineColor(kBlack);
-}
-
-// -------------------------------------------------------------------------------------------------------
 void draw_plot_jms(TH1F* h1, TH1F* h2, TH1F* h3, const TString path, const TString year, vector<double> mean, TString norm="")
 {
   TLegend *leg = new TLegend(0.55,0.65,0.8,0.85);
@@ -55,9 +43,9 @@ void draw_plot_jms(TH1F* h1, TH1F* h2, TH1F* h3, const TString path, const TStri
   h2->Draw("SAME HIST");
   h3->Draw("SAME HIST");
 
-  TString best = "Best fit; mean="+dtos(mean[0], 2)+" GeV";
-  TString uu   = "JMS uu; mean="+dtos(mean[1], 2)+" GeV";
-  TString dd   = "JMS dd; mean="+dtos(mean[2], 2)+" GeV";
+  TString best = "Best fit; <m_{jet}>="+dtos(mean[0], 2)+" GeV";
+  TString uu   = "JMS uu; <m_{jet}>="+dtos(mean[1], 2)+" GeV";
+  TString dd   = "JMS dd; <m_{jet}>="+dtos(mean[2], 2)+" GeV";
 
   leg->AddEntry(h1,best,"l");
   leg->AddEntry(h2,uu,"l");
@@ -82,8 +70,8 @@ void draw_plot_comparison(TH1F* h1, TH1F* h2, TH1F* data, const TString path, co
   h1->Draw("HIST");
   h2->Draw("SAME HIST");
 
-  TString jms = "JMS; mean="+dtos(mean[0], 2)+" GeV";
-  TString old = "Old; mean="+dtos(mean[1], 2)+" GeV";
+  TString jms = "JMS; <m_{jet}>="+dtos(mean[0], 2)+" GeV";
+  TString old = "Old; <m_{jet}>="+dtos(mean[1], 2)+" GeV";
 
   leg->AddEntry(h1,jms,"l");
   leg->AddEntry(h2,old,"l");
@@ -100,24 +88,6 @@ void draw_plot_comparison(TH1F* h1, TH1F* h2, TH1F* data, const TString path, co
 
   delete A;
   leg->Clear();
-}
-
-// -------------------------------------------------------------------------------------------------------
-double trunc_mean(TH1F* hist)
-{
-  TH1F* hist_trunc = (TH1F*) hist->Clone();
-  // cout << setw(10) << "old" << "   " << setw(10) << "new" << endl;
-  for(int bin=1; bin<hist->GetNbinsX()+1; bin++)
-  {
-    bool bin_ = (hist->GetBinCenter(bin)<120||hist->GetBinCenter(bin)>240);
-    if(bin_) hist_trunc->SetBinContent(bin, 0);
-    else     hist_trunc->SetBinContent(bin, hist->GetBinContent(bin));
-    // cout << setw(10) << hist->GetBinContent(bin) << "   " << setw(10) << hist_trunc->GetBinContent(bin) << endl;
-  }
-  double mean_trunc = hist_trunc->GetMean();
-  double mean_old   = hist->GetMean();
-  // cout << setw(10) << mean_old << "   " << setw(10) << mean_trunc << endl;
-  return mean_trunc;
 }
 
 // -------------------------------------------------------------------------------------------------------
@@ -400,56 +370,57 @@ int main(int argc, char* argv[])
 
     // mean --------------------------------------------------------------------
 
-    double mean_data_muon           = trunc_mean(all_data_muon[year]); // all_data_muon[year]->GetMean();
-    double mean_ttbar_muon          = trunc_mean(all_ttbar_muon[year]); // all_ttbar_muon[year]->GetMean();
-    double mean_uu_muon             = trunc_mean(all_jms_uu_muon[year]); // all_jms_uu_muon[year]->GetMean();
-    double mean_dd_muon             = trunc_mean(all_jms_dd_muon[year]); // all_jms_dd_muon[year]->GetMean();
-    double mean_ud_muon             = trunc_mean(all_jms_ud_muon[year]); // all_jms_ud_muon[year]->GetMean();
-    double mean_du_muon             = trunc_mean(all_jms_du_muon[year]); // all_jms_du_muon[year]->GetMean();
+    double mean_data_muon           = trunc_mean(all_data_muon[year], 120, 240); // all_data_muon[year]->GetMean();
+    double mean_ttbar_muon          = trunc_mean(all_ttbar_muon[year], 120, 240); // all_ttbar_muon[year]->GetMean();
+    double mean_uu_muon             = trunc_mean(all_jms_uu_muon[year], 120, 240); // all_jms_uu_muon[year]->GetMean();
+    double mean_dd_muon             = trunc_mean(all_jms_dd_muon[year], 120, 240); // all_jms_dd_muon[year]->GetMean();
+    double mean_ud_muon             = trunc_mean(all_jms_ud_muon[year], 120, 240); // all_jms_ud_muon[year]->GetMean();
+    double mean_du_muon             = trunc_mean(all_jms_du_muon[year], 120, 240); // all_jms_du_muon[year]->GetMean();
 
-    double mean_data_elec           = trunc_mean(all_data_elec[year]); // all_data_elec[year]->GetMean();
-    double mean_ttbar_elec          = trunc_mean(all_ttbar_elec[year]); // all_ttbar_elec[year]->GetMean();
-    double mean_uu_elec             = trunc_mean(all_jms_uu_elec[year]); // all_jms_uu_elec[year]->GetMean();
-    double mean_dd_elec             = trunc_mean(all_jms_dd_elec[year]); // all_jms_dd_elec[year]->GetMean();
-    double mean_ud_elec             = trunc_mean(all_jms_ud_elec[year]); // all_jms_ud_elec[year]->GetMean();
-    double mean_du_elec             = trunc_mean(all_jms_du_elec[year]); // all_jms_du_elec[year]->GetMean();
+    double mean_data_elec           = trunc_mean(all_data_elec[year], 120, 240); // all_data_elec[year]->GetMean();
+    double mean_ttbar_elec          = trunc_mean(all_ttbar_elec[year], 120, 240); // all_ttbar_elec[year]->GetMean();
+    double mean_uu_elec             = trunc_mean(all_jms_uu_elec[year], 120, 240); // all_jms_uu_elec[year]->GetMean();
+    double mean_dd_elec             = trunc_mean(all_jms_dd_elec[year], 120, 240); // all_jms_dd_elec[year]->GetMean();
+    double mean_ud_elec             = trunc_mean(all_jms_ud_elec[year], 120, 240); // all_jms_ud_elec[year]->GetMean();
+    double mean_du_elec             = trunc_mean(all_jms_du_elec[year], 120, 240); // all_jms_du_elec[year]->GetMean();
 
-    double mean_data_combine        = trunc_mean(all_data_combine[year]); // all_data_combine[year]->GetMean();
-    double mean_ttbar_combine       = trunc_mean(all_ttbar_combine[year]); // all_ttbar_combine[year]->GetMean();
-    double mean_uu_combine          = trunc_mean(all_jms_uu_combine[year]); // all_jms_uu_combine[year]->GetMean();
-    double mean_dd_combine          = trunc_mean(all_jms_dd_combine[year]); // all_jms_dd_combine[year]->GetMean();
-    double mean_ud_combine          = trunc_mean(all_jms_ud_combine[year]); // all_jms_ud_combine[year]->GetMean();
-    double mean_du_combine          = trunc_mean(all_jms_du_combine[year]); // all_jms_du_combine[year]->GetMean();
+    double mean_data_combine        = trunc_mean(all_data_combine[year], 120, 240); // all_data_combine[year]->GetMean();
+    double mean_ttbar_combine       = trunc_mean(all_ttbar_combine[year], 120, 240); // all_ttbar_combine[year]->GetMean();
+    double mean_uu_combine          = trunc_mean(all_jms_uu_combine[year], 120, 240); // all_jms_uu_combine[year]->GetMean();
+    double mean_dd_combine          = trunc_mean(all_jms_dd_combine[year], 120, 240); // all_jms_dd_combine[year]->GetMean();
+    double mean_ud_combine          = trunc_mean(all_jms_ud_combine[year], 120, 240); // all_jms_ud_combine[year]->GetMean();
+    double mean_du_combine          = trunc_mean(all_jms_du_combine[year], 120, 240); // all_jms_du_combine[year]->GetMean();
 
     vector<double> mean_muon        = {mean_ttbar_muon, mean_uu_muon, mean_dd_muon};
     vector<double> mean_elec        = {mean_ttbar_elec, mean_uu_elec, mean_dd_elec};
     vector<double> mean_combine     = {mean_ttbar_combine, mean_uu_combine, mean_dd_combine};
 
-    double mean_ttbar_muon_old      = trunc_mean(all_ttbar_muon_old[year]); // all_ttbar_muon_old[year]->GetMean();
-    double mean_ttbar_elec_old      = trunc_mean(all_ttbar_elec_old[year]); // all_ttbar_elec_old[year]->GetMean();
-    double mean_ttbar_combine_old   = trunc_mean(all_ttbar_combine_old[year]); // all_ttbar_combine_old[year]->GetMean();
+    double mean_ttbar_muon_old      = trunc_mean(all_ttbar_muon_old[year], 120, 240); // all_ttbar_muon_old[year]->GetMean();
+    double mean_ttbar_elec_old      = trunc_mean(all_ttbar_elec_old[year], 120, 240); // all_ttbar_elec_old[year]->GetMean();
+    double mean_ttbar_combine_old   = trunc_mean(all_ttbar_combine_old[year], 120, 240); // all_ttbar_combine_old[year]->GetMean();
 
     vector<double> mean_muon_old    = {mean_ttbar_muon, mean_ttbar_muon_old};
     vector<double> mean_elec_old    = {mean_ttbar_elec, mean_ttbar_elec_old};
     vector<double> mean_combine_old = {mean_ttbar_combine, mean_ttbar_combine_old};
 
-    cout << "data  - " << years[year] << " - muon:    " << mean_data_muon  << endl;
-    cout << "jmsuu - " << years[year] << " - muon:    " << mean_uu_muon    << endl;
-    cout << "ttbar - " << years[year] << " - muon:    " << mean_ttbar_muon;
+    cout << left; // for setw()
+    cout << "data  - " << years[year] << setw(12) << " - muon: " << setw(8) << mean_data_muon  << endl;
+    cout << "jmsuu - " << years[year] << setw(12) << " - muon: " << setw(8) << mean_uu_muon    << endl;
+    cout << "ttbar - " << years[year] << setw(12) << " - muon: " << setw(8) << mean_ttbar_muon;
     cout << " | (old: " << mean_ttbar_muon_old << ")" << endl;
-    cout << "jmsdd - " << years[year] << " - muon:    " << mean_dd_muon    << endl;
+    cout << "jmsdd - " << years[year] << setw(12) << " - muon: " << setw(8) << mean_dd_muon    << endl;
     cout << endl;
-    cout << "data  - " << years[year] << " - elec:    " << mean_data_elec  << endl;
-    cout << "jmsuu - " << years[year] << " - elec:    " << mean_uu_elec    << endl;
-    cout << "ttbar - " << years[year] << " - elec:    " << mean_ttbar_elec;
+    cout << "data  - " << years[year] << setw(12) << " - elec: " << setw(8) << mean_data_elec  << endl;
+    cout << "jmsuu - " << years[year] << setw(12) << " - elec: " << setw(8) << mean_uu_elec    << endl;
+    cout << "ttbar - " << years[year] << setw(12) << " - elec: " << setw(8) << mean_ttbar_elec;
     cout << " | (old: " << mean_ttbar_elec_old << ")" << endl;
-    cout << "jmsdd - " << years[year] << " - elec:    " << mean_dd_elec    << endl;
+    cout << "jmsdd - " << years[year] << setw(12) << " - elec: " << setw(8) << mean_dd_elec    << endl;
     cout << endl;
-    cout << "data  - " << years[year] << " - combine: " << mean_data_combine  << endl;
-    cout << "jmsuu - " << years[year] << " - combine: " << mean_uu_combine    << endl;
-    cout << "ttbar - " << years[year] << " - combine: " << mean_ttbar_combine;
+    cout << "data  - " << years[year] << setw(12) << " - combine: " << setw(8) << mean_data_combine  << endl;
+    cout << "jmsuu - " << years[year] << setw(12) << " - combine: " << setw(8) << mean_uu_combine    << endl;
+    cout << "ttbar - " << years[year] << setw(12) << " - combine: " << setw(8) << mean_ttbar_combine;
     cout << " | (old: " << mean_ttbar_combine_old << ")" << endl;
-    cout << "jmsdd - " << years[year] << " - combine: " << mean_dd_combine    << endl;
+    cout << "jmsdd - " << years[year] << setw(12) << " - combine: " << setw(8) << mean_dd_combine    << endl;
     cout << endl;
 
     // draw --------------------------------------------------------------------

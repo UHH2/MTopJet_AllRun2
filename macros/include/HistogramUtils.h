@@ -104,6 +104,26 @@ vector<int> bins_empty(TH1F* hist){
   return bin_empty_v;
 }
 
+// -------------------------------------------------------------------------------------------------------
+TH1F* copy_bin_content(TH1F* h1, int MinBin, int MaxBin)
+{
+  TH1F* new_hist = new TH1F("new", "new", h1->GetNbinsX(), MinBin, MaxBin);
+
+  for(int i=1; i<=h1->GetNbinsX(); i++)
+  {
+    new_hist->SetBinContent(i, h1->GetBinContent(i));
+  }
+
+  return new_hist;
+}
+
+// -------------------------------------------------------------------------------------------------------
+void set_new_bin_error(TH1F* h1, vector<double> err)
+{
+  if(h1->GetNbinsX() != err.size()) throw runtime_error("Vector with errors has not the same size as the histogram");
+  for(int bin=1; bin<=h1->GetNbinsX(); bin++) h1->SetBinError(bin, err[bin-1]);
+}
+
 /*
 ██████  ███████ ██████  ██ ███    ██
 ██   ██ ██      ██   ██ ██ ████   ██
