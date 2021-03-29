@@ -38,7 +38,8 @@ protected:
   TH1F *h_HadJetPt, *h_HadJetMass, *h_HadJetEta, *h_HadJetPhi;
   TH1F *h_XCone_HadJetEta, *h_XCone_HadJetPhi;
   TH1F *h_distance_hadx_hadak;
-  TH1F *h_HadJetTau1, *h_HadJetTau2, *h_HadJetTau3, *h_HadJetTau32, *h_HadJetTau23;
+  TH1F *h_HadJetTau1, *h_HadJetTau2, *h_HadJetTau3, *h_HadJetTau4;
+  TH1F *h_HadJetTau32, *h_HadJetTau43,*h_HadJetTau23;
 
   TH1F *h_number_ak8_jets, *h_number_xcone_had_jet, *h_number_ak8_had_jets, *h_number_ak8_not_matched;
 
