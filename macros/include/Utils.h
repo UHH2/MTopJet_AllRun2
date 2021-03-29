@@ -72,17 +72,21 @@ using namespace std;
 */
 
 // -------------------------------------------------------------------------------------------------------
-vector<double> square_vector(vector<double> v){
+vector<double> square_vector(vector<double> v)
+{
   vector<double> vector_square;
   for(unsigned int i=0; i<v.size(); i++) vector_square.push_back(pow(v[i], 2.));
   return vector_square;
 }
 
 // -------------------------------------------------------------------------------------------------------
-double GetMaxValue(vector<double> v){
+double GetMaxValue(vector<double> v)
+{
   return *max_element(v.begin(), v.end());
 }
-double GetMinValue(vector<double> v){
+
+double GetMinValue(vector<double> v)
+{
   return *min_element(v.begin(), v.end());
 }
 
@@ -97,7 +101,8 @@ double GetMinValue(vector<double> v){
 .██████  ██████   ██████     ██
 */
 
-void print_seperater(){
+void print_seperater()
+{
   cout << "" << endl;
   cout << "*************************************************************************************************" << endl;
   cout << "" << endl;
@@ -111,21 +116,47 @@ void print_seperater(){
 .██████  ██████  ██   ████   ████   ███████ ██   ██    ██
 */
 
-bool stob(std::string s, bool throw_on_error = true){
+// -------------------------------------------------------------------------------------------------------
+bool stob(std::string s, bool throw_on_error = true)
+{
   auto result = false;    // failure to assert is false
   std::istringstream is(s);
   // first try simple integer conversion
   is >> result;
-  if (is.fail()){
+  if (is.fail())
+  {
     // simple integer failed; try boolean
     is.clear();
     is >> std::boolalpha >> result;
   }
 
-  if (is.fail() && throw_on_error){
+  if (is.fail() && throw_on_error)
+  {
     throw std::invalid_argument(s.append(" is not convertable to bool"));
   }
   return result;
+}
+
+// -------------------------------------------------------------------------------------------------------
+TString dtos(double number, int precision)
+{
+  stringstream stream;
+  TString s;
+
+  stream << std::fixed << std::setprecision(precision) << number;
+  s = stream.str();
+
+  return s;
+}
+
+// -------------------------------------------------------------------------------------------------------
+void reset(stringstream& stream)
+{
+  const static std::stringstream initial;
+
+  stream.str(std::string());
+  stream.clear();
+  stream.copyfmt(initial);
 }
 
 /*
@@ -147,17 +178,20 @@ public:
 };
 
 template<typename charT, typename traits = std::char_traits<charT> >
-center_helper<charT, traits> centered(std::basic_string<charT, traits> str) {
+center_helper<charT, traits> centered(std::basic_string<charT, traits> str)
+{
     return center_helper<charT, traits>(str);
 }
 
 // redeclare for std::string directly so we can support anything that implicitly converts to std::string
-center_helper<std::string::value_type, std::string::traits_type> centered(const std::string& str) {
+center_helper<std::string::value_type, std::string::traits_type> centered(const std::string& str)
+{
     return center_helper<std::string::value_type, std::string::traits_type>(str);
 }
 
 template<typename charT, typename traits>
-std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& s, const center_helper<charT, traits>& c) {
+std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>& s, const center_helper<charT, traits>& c)
+{
     std::streamsize w = s.width();
     if (w > c.str_.length()) {
         std::streamsize left = (w + c.str_.length()) / 2;
@@ -179,15 +213,30 @@ std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, traits>&
 ██       ██████  ███████ ██████  ███████ ██   ██
 */
 
+// #################################################################################################
+// creating subdirectories. Necessary, because different binning examined ##########################
+/*
+Explanation for mkdir(char **, mode_t mode) and mode_t: https://jameshfisher.com/2017/02/24/what-is-mode_t/
+example:    0002 is -------w-
+.           0003 is -------wx
+.           0004 is ------r--
+.           0005 is ------r-x
+.           0006 is ------rw-
+.           0007 is ------rwx
+positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
+*/
+
 void creat_folder(TString path, TString name){mkdir(path+"/"+name,0777);}
 void creat_folder(TString path){mkdir(path,0777);}
 
-TString creat_folder_and_path(TString path, TString name){
+TString creat_folder_and_path(TString path, TString name)
+{
   mkdir(path+"/"+name,0777);
   return path += "/"+name;
 }
 
-TString creat_folder_and_path(TString path){
+TString creat_folder_and_path(TString path)
+{
   mkdir(path,0777);
   return path;
 }
@@ -200,7 +249,8 @@ TString creat_folder_and_path(TString path){
 .██████  ██████  ██      ██ ██      ██   ██ ██   ██ ███████
 */
 
-double choose_greater_number(double x1, double x2){
+double choose_greater_number(double x1, double x2)
+{
   double x;
   if(x1<x2) x=x2;
   else      x=x1;

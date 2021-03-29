@@ -84,12 +84,44 @@ vector<int> bins_upper_limit(TH1F* hist, double limit){
 }
 
 // -------------------------------------------------------------------------------------------
+vector<double> bin_center_upper_limit(TH1F* hist, vector<int> bins_above_limit, int bin_width){
+  int lower_bin = bins_above_limit[0];
+  int upper_bin = bins_above_limit[bins_above_limit.size()-1];
+
+  // bin_width/2 just a saftey. Boundaries must be greater than actual bin content for </> operator
+  double down_center = hist->GetBinCenter(lower_bin)-bin_width/2;
+  double up_center   = hist->GetBinCenter(upper_bin)+bin_width/2;
+
+  return {down_center, up_center};
+}
+
+// -------------------------------------------------------------------------------------------
 vector<int> bins_empty(TH1F* hist){
   vector<int> bin_empty_v;
   for(int bin=0; bin < hist->GetNbinsX(); bin++){
     if(!(abs(hist->GetBinContent(bin+1))>0)) bin_empty_v.push_back(bin+1);
   }
   return bin_empty_v;
+}
+
+// -------------------------------------------------------------------------------------------------------
+TH1F* copy_bin_content(TH1F* h1, int MinBin, int MaxBin)
+{
+  TH1F* new_hist = new TH1F("new", "new", h1->GetNbinsX(), MinBin, MaxBin);
+
+  for(int i=1; i<=h1->GetNbinsX(); i++)
+  {
+    new_hist->SetBinContent(i, h1->GetBinContent(i));
+  }
+
+  return new_hist;
+}
+
+// -------------------------------------------------------------------------------------------------------
+void set_new_bin_error(TH1F* h1, vector<double> err)
+{
+  if(h1->GetNbinsX() != err.size()) throw runtime_error("Vector with errors has not the same size as the histogram");
+  for(int bin=1; bin<=h1->GetNbinsX(); bin++) h1->SetBinError(bin, err[bin-1]);
 }
 
 /*
@@ -339,6 +371,22 @@ TH1F* AddHists(TH1F* h1, TH1F* h2, int factor){
 }
 
 // -------------------------------------------------------------------------------------------------------
+vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, int factor){
+  vector<TH1F*> hists;
+  if(h1.size()!=h2.size()) throw runtime_error("Hists have not the same size!");
+  for(unsigned int i=0; i<h1.size(); i++) hists.push_back(AddHists(h1[i], h2[i], factor));
+  return hists;
+}
+
+// -------------------------------------------------------------------------------------------------------
+vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, vector<TH1F*> h3, int factor){
+  vector<TH1F*> dummy = AddHists(h1, h2, factor);
+  if(h1.size()!=h3.size()) throw runtime_error("Hists have not the same size! (h2 and h3)");
+  vector<TH1F*> hists = AddHists(dummy, h3, factor);
+  return hists;
+}
+
+// -------------------------------------------------------------------------------------------------------
 TH1F* add_second_year(TString year, TH1F* hist, TString dir, TString path, TString hist_name){
   TFile* file = new TFile(dir+year+"/muon/"+path);
   TH1F* new_hist = (TH1F*) file->Get(hist_name);
@@ -387,4 +435,62 @@ void plot_single_histogram(TH1F* hist, TString title, TString xAxis, int x_max, 
   hist->Draw("HIST");
   A->SaveAs(save_path);
   delete A;
+}
+
+// -------------------------------------------------------------------------------------------------------
+void add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
+{
+  hist->SetLineWidth(width);
+  hist->SetLineStyle(style);
+  hist->SetLineColor(color);
+}
+
+// -------------------------------------------------------------------------------------------------------
+void data_plot_settings(TH1F* hist)
+{
+  hist->SetMarkerStyle(8);  // data hist style
+  hist->SetMarkerColor(kBlack);
+  hist->SetLineColor(kBlack);
+}
+
+/*
+███    ███ ███████  █████  ███    ██
+████  ████ ██      ██   ██ ████   ██
+██ ████ ██ █████   ███████ ██ ██  ██
+██  ██  ██ ██      ██   ██ ██  ██ ██
+██      ██ ███████ ██   ██ ██   ████
+*/
+
+// -------------------------------------------------------------------------------------------------------
+double trunc_mean(TH1F* hist, int cut_down, int cut_up)
+{
+  TH1F* hist_trunc = (TH1F*) hist->Clone();
+
+  for(int bin=1; bin<hist->GetNbinsX()+1; bin++)
+  {
+    bool bin_ = (hist->GetBinCenter(bin)<cut_down||hist->GetBinCenter(bin)>cut_up);
+    if(bin_) hist_trunc->SetBinContent(bin, 0);
+    else     hist_trunc->SetBinContent(bin, hist->GetBinContent(bin));
+  }
+
+  double mean_trunc = hist_trunc->GetMean();
+  double mean_old   = hist->GetMean();
+  return mean_trunc;
+}
+
+// -------------------------------------------------------------------------------------------------------
+double trunc_mean_bin(TH1F* hist, int bin_down, int bin_up)
+{
+  TH1F* hist_trunc = (TH1F*) hist->Clone();
+
+  for(int bin=1; bin<hist->GetNbinsX()+1; bin++)
+  {
+    bool bin_ = (bin<bin_down||bin>bin_up);
+    if(bin_) hist_trunc->SetBinContent(bin, 0);
+    else     hist_trunc->SetBinContent(bin, hist->GetBinContent(bin));
+  }
+
+  double mean_trunc = hist_trunc->GetMean();
+  double mean_old   = hist->GetMean();
+  return mean_trunc;
 }

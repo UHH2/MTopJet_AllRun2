@@ -1,6 +1,38 @@
 #include "CentralInclude.h"
+#include "HistogramUtils.h"
 
 using namespace std;
+
+// ----------------------------------------------------------------------------- Functions
+
+TH1F* combine_years(vector<TH1F*> hists){
+  TH1F* new_hist = AddHists(hists, 1);
+  return new_hist;
+}
+vector<TH1F*> combine_channels(vector<TH1F*> h_muon, vector<TH1F*> h_elec){
+  vector<TH1F*> new_hists = AddHists(h_muon, h_elec, 1);
+  return new_hists;
+}
+
+// Creating Hists
+vector<TH1F*> get_all_hists(vector<TString> names, TString hist){
+  vector<TFile*> files;
+  vector<TH1F*> hists;
+  for(TString file: names){files.push_back(new TFile(file));}
+  for(TFile* file: files){hists.push_back((TH1F*)file->Get(hist));}
+  TH1F* h_combined = combine_years(hists);
+  hists.push_back(h_combined);
+  return hists;
+}
+
+TH1F* get_single_hists(vector<TString> names, TString hist_name, int index){
+  TFile* file = new TFile(names[index]);
+  TH1F* hist = (TH1F*)file->Get(hist_name);
+  return hist;
+}
+
+// ----------------------------------------------------------------------------- Nominal
+// dir = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/"; in CentralInclude.h
 
 // channels
 TString muon = "muon";
@@ -12,11 +44,22 @@ TString y17 = "_2017v2";
 TString y18 = "_2018";
 
 // Hist files
-TString data_f  = "uhh2.AnalysisModuleRunner.DATA.DATA";
-TString ttbar_f = "uhh2.AnalysisModuleRunner.MC.TTbar";
-TString wjets_f = "uhh2.AnalysisModuleRunner.MC.WJets";
-TString st_f    = "uhh2.AnalysisModuleRunner.MC.SingleTop";
-TString other_f = "uhh2.AnalysisModuleRunner.MC.other";
+TString data_f   = "uhh2.AnalysisModuleRunner.DATA.DATA";
+TString ttbar_f  = "uhh2.AnalysisModuleRunner.MC.TTbar";
+TString wjets_f  = "uhh2.AnalysisModuleRunner.MC.WJets";
+TString st_f     = "uhh2.AnalysisModuleRunner.MC.SingleTop";
+TString other_f  = "uhh2.AnalysisModuleRunner.MC.other";
+
+TString jms_uu   = "JMS_upup";
+TString jms_ud   = "JMS_updown";
+TString jms_du   = "JMS_downup";
+TString jms_dd   = "JMS_downdown";
+
+TString jec_up   = "JEC_up";
+TString jec_down = "JEC_down";
+
+TString cor_up   = "COR_up";
+TString cor_down = "COR_down";
 
 // Hist paths
 TString data_muon_16 = dir+muon+"/"+data_f+y16+".root";
@@ -64,12 +107,80 @@ TString other_elec_18 = dir+elec+"/"+other_f+y18+".root";
 vector<TString> other_muon = {other_muon_16, other_muon_17, other_muon_18};
 vector<TString> other_elec = {other_elec_16, other_elec_17, other_elec_18};
 
-// Creating Hists
-vector<TH1F*> get_hists(vector<TString> names, TString hist){
-  vector<TFile*> files;
-  vector<TH1F*> hists;
-  for(TString file: names){files.push_back(new TFile(file));}
-  for(TFile* file: files){hists.push_back((TH1F*)file->Get(hist));}
-  hists.push_back(AddHists(hists, 1)); // Add combine (HistogramUtils)
-  return(hists);
-}
+// ----------------------------------------------------------------------------- JMS
+
+TString jms_uu_muon_16 = dir+muon+"/"+jms_uu+"/"+ttbar_f+y16+".root";
+TString jms_uu_muon_17 = dir+muon+"/"+jms_uu+"/"+ttbar_f+y17+".root";
+TString jms_uu_muon_18 = dir+muon+"/"+jms_uu+"/"+ttbar_f+y18+".root";
+TString jms_uu_elec_16 = dir+elec+"/"+jms_uu+"/"+ttbar_f+y16+".root";
+TString jms_uu_elec_17 = dir+elec+"/"+jms_uu+"/"+ttbar_f+y17+".root";
+TString jms_uu_elec_18 = dir+elec+"/"+jms_uu+"/"+ttbar_f+y18+".root";
+vector<TString> jms_uu_muon = {jms_uu_muon_16, jms_uu_muon_17, jms_uu_muon_18};
+vector<TString> jms_uu_elec = {jms_uu_elec_16, jms_uu_elec_17, jms_uu_elec_18};
+
+TString jms_ud_muon_16 = dir+muon+"/"+jms_ud+"/"+ttbar_f+y16+".root";
+TString jms_ud_muon_17 = dir+muon+"/"+jms_ud+"/"+ttbar_f+y17+".root";
+TString jms_ud_muon_18 = dir+muon+"/"+jms_ud+"/"+ttbar_f+y18+".root";
+TString jms_ud_elec_16 = dir+elec+"/"+jms_ud+"/"+ttbar_f+y16+".root";
+TString jms_ud_elec_17 = dir+elec+"/"+jms_ud+"/"+ttbar_f+y17+".root";
+TString jms_ud_elec_18 = dir+elec+"/"+jms_ud+"/"+ttbar_f+y18+".root";
+vector<TString> jms_ud_muon = {jms_ud_muon_16, jms_ud_muon_17, jms_ud_muon_18};
+vector<TString> jms_ud_elec = {jms_ud_elec_16, jms_ud_elec_17, jms_ud_elec_18};
+
+TString jms_du_muon_16 = dir+muon+"/"+jms_du+"/"+ttbar_f+y16+".root";
+TString jms_du_muon_17 = dir+muon+"/"+jms_du+"/"+ttbar_f+y17+".root";
+TString jms_du_muon_18 = dir+muon+"/"+jms_du+"/"+ttbar_f+y18+".root";
+TString jms_du_elec_16 = dir+elec+"/"+jms_du+"/"+ttbar_f+y16+".root";
+TString jms_du_elec_17 = dir+elec+"/"+jms_du+"/"+ttbar_f+y17+".root";
+TString jms_du_elec_18 = dir+elec+"/"+jms_du+"/"+ttbar_f+y18+".root";
+vector<TString> jms_du_muon = {jms_du_muon_16, jms_du_muon_17, jms_du_muon_18};
+vector<TString> jms_du_elec = {jms_du_elec_16, jms_du_elec_17, jms_du_elec_18};
+
+TString jms_dd_muon_16 = dir+muon+"/"+jms_dd+"/"+ttbar_f+y16+".root";
+TString jms_dd_muon_17 = dir+muon+"/"+jms_dd+"/"+ttbar_f+y17+".root";
+TString jms_dd_muon_18 = dir+muon+"/"+jms_dd+"/"+ttbar_f+y18+".root";
+TString jms_dd_elec_16 = dir+elec+"/"+jms_dd+"/"+ttbar_f+y16+".root";
+TString jms_dd_elec_17 = dir+elec+"/"+jms_dd+"/"+ttbar_f+y17+".root";
+TString jms_dd_elec_18 = dir+elec+"/"+jms_dd+"/"+ttbar_f+y18+".root";
+vector<TString> jms_dd_muon = {jms_dd_muon_16, jms_dd_muon_17, jms_dd_muon_18};
+vector<TString> jms_dd_elec = {jms_dd_elec_16, jms_dd_elec_17, jms_dd_elec_18};
+
+// ----------------------------------------------------------------------------- JEC
+
+TString jec_up_muon_16 = dir+muon+"/"+jec_up+"/"+ttbar_f+y16+".root";
+TString jec_up_muon_17 = dir+muon+"/"+jec_up+"/"+ttbar_f+y17+".root";
+TString jec_up_muon_18 = dir+muon+"/"+jec_up+"/"+ttbar_f+y18+".root";
+TString jec_up_elec_16 = dir+elec+"/"+jec_up+"/"+ttbar_f+y16+".root";
+TString jec_up_elec_17 = dir+elec+"/"+jec_up+"/"+ttbar_f+y17+".root";
+TString jec_up_elec_18 = dir+elec+"/"+jec_up+"/"+ttbar_f+y18+".root";
+vector<TString> jec_up_muon = {jec_up_muon_16, jec_up_muon_17, jec_up_muon_18};
+vector<TString> jec_up_elec = {jec_up_elec_16, jec_up_elec_17, jec_up_elec_18};
+
+TString jec_down_muon_16 = dir+muon+"/"+jec_down+"/"+ttbar_f+y16+".root";
+TString jec_down_muon_17 = dir+muon+"/"+jec_down+"/"+ttbar_f+y17+".root";
+TString jec_down_muon_18 = dir+muon+"/"+jec_down+"/"+ttbar_f+y18+".root";
+TString jec_down_elec_16 = dir+elec+"/"+jec_down+"/"+ttbar_f+y16+".root";
+TString jec_down_elec_17 = dir+elec+"/"+jec_down+"/"+ttbar_f+y17+".root";
+TString jec_down_elec_18 = dir+elec+"/"+jec_down+"/"+ttbar_f+y18+".root";
+vector<TString> jec_down_muon = {jec_down_muon_16, jec_down_muon_17, jec_down_muon_18};
+vector<TString> jec_down_elec = {jec_down_elec_16, jec_down_elec_17, jec_down_elec_18};
+
+// ----------------------------------------------------------------------------- COR
+
+TString cor_up_muon_16 = dir+muon+"/"+cor_up+"/"+ttbar_f+y16+".root";
+TString cor_up_muon_17 = dir+muon+"/"+cor_up+"/"+ttbar_f+y17+".root";
+TString cor_up_muon_18 = dir+muon+"/"+cor_up+"/"+ttbar_f+y18+".root";
+TString cor_up_elec_16 = dir+elec+"/"+cor_up+"/"+ttbar_f+y16+".root";
+TString cor_up_elec_17 = dir+elec+"/"+cor_up+"/"+ttbar_f+y17+".root";
+TString cor_up_elec_18 = dir+elec+"/"+cor_up+"/"+ttbar_f+y18+".root";
+vector<TString> cor_up_muon = {cor_up_muon_16, cor_up_muon_17, cor_up_muon_18};
+vector<TString> cor_up_elec = {cor_up_elec_16, cor_up_elec_17, cor_up_elec_18};
+
+TString cor_down_muon_16 = dir+muon+"/"+cor_down+"/"+ttbar_f+y16+".root";
+TString cor_down_muon_17 = dir+muon+"/"+cor_down+"/"+ttbar_f+y17+".root";
+TString cor_down_muon_18 = dir+muon+"/"+cor_down+"/"+ttbar_f+y18+".root";
+TString cor_down_elec_16 = dir+elec+"/"+cor_down+"/"+ttbar_f+y16+".root";
+TString cor_down_elec_17 = dir+elec+"/"+cor_down+"/"+ttbar_f+y17+".root";
+TString cor_down_elec_18 = dir+elec+"/"+cor_down+"/"+ttbar_f+y18+".root";
+vector<TString> cor_down_muon = {cor_down_muon_16, cor_down_muon_17, cor_down_muon_18};
+vector<TString> cor_down_elec = {cor_down_elec_16, cor_down_elec_17, cor_down_elec_18};
