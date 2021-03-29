@@ -14,7 +14,7 @@ vector<TH1F*> get_hists(TFile* file, vector<TH1F*> dummy, vector<TString> obs_na
 
 int main(int argc, char* argv[]){
 
-  vector<TString> obsnames = {"Mass_Rec", "Pt_Rec", "mW", "ptsub1", "ptsub2", "ptsub3"};
+  vector<TString> obsnames = {"Mass_Rec", "Pt_Rec", "mW", "ptsub1", "ptsub2", "ptsub3", "ptsub3_subpt"};
   vector<TH1F*> dummyhists;
   dummyhists.push_back(new TH1F("mjet", "mjet", 25, 0, 500));
   dummyhists.push_back(new TH1F("pt", "pt", 30, 400, 1000));
@@ -22,6 +22,7 @@ int main(int argc, char* argv[]){
   dummyhists.push_back(new TH1F("ptsub1", "ptsub1", 35, 0, 700));
   dummyhists.push_back(new TH1F("ptsub2", "ptsub2", 25, 0, 500));
   dummyhists.push_back(new TH1F("ptsub3", "ptsub3", 30, 0, 300));
+  dummyhists.push_back(new TH1F("ptsub3_subpt", "ptsub3_subpt", 30, 0, 60));
 
   TString directory = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/";
   TString prefix_mc = "uhh2.AnalysisModuleRunner.MC.";
@@ -39,6 +40,8 @@ int main(int argc, char* argv[]){
   TFile * outfile = new TFile("RecoLevelPlots.root","RECREATE");
   // Fill nominal hists
   cout << "Fill nominal hists" << endl;
+  vector<TH1F*> h_tt, h_st, h_wj, h_ot;
+  bool firstbkg=true;
   for(auto process: processes){
     vector<vector<TH1F*>> h_all_years;
     for(auto year: years){
@@ -71,8 +74,34 @@ int main(int argc, char* argv[]){
       hist->Add(h_18);
       outfile->cd();
       hist->Write(obsnames[i]+"__"+process);
+      if(process == "TTbar")          h_tt.push_back((TH1F*) hist->Clone());
+      else if(process == "SingleTop") h_st.push_back((TH1F*) hist->Clone());
+      else if(process == "WJets")     h_wj.push_back((TH1F*) hist->Clone());
+      else if(process == "other")     h_ot.push_back((TH1F*) hist->Clone());
     }
   }
+  cout << "Calculate BKG rate uncerts" << endl;
+  for(unsigned int i=0; i<obsnames.size();i++){
+    TH1F* h_st_plus = (TH1F*) h_tt[i]->Clone();
+    TH1F* h_st_minus = (TH1F*) h_tt[i]->Clone();
+    TH1F* h_wj_plus = (TH1F*) h_tt[i]->Clone();
+    TH1F* h_wj_minus = (TH1F*) h_tt[i]->Clone();
+    TH1F* h_ot_plus = (TH1F*) h_tt[i]->Clone();
+    TH1F* h_ot_minus = (TH1F*) h_tt[i]->Clone();
+    h_st_plus ->Add(h_st[i],  0.23);
+    h_st_minus->Add(h_st[i], -0.23);
+    h_wj_plus ->Add(h_wj[i],  0.19);
+    h_wj_minus->Add(h_wj[i], -0.19);
+    h_ot_plus ->Add(h_ot[i],  1.0);
+    h_ot_minus->Add(h_ot[i], -1.0);
+    h_st_plus->Write(obsnames[i]+"__"+"TTbar"+"__SingleTopRate__plus");
+    h_st_minus->Write(obsnames[i]+"__"+"TTbar"+"__SingleTopRate__minus");
+    h_wj_plus->Write(obsnames[i]+"__"+"TTbar"+"__WJetsRate__plus");
+    h_wj_minus->Write(obsnames[i]+"__"+"TTbar"+"__WJetsRate__minus");
+    h_ot_plus->Write(obsnames[i]+"__"+"TTbar"+"__OtherRate__plus");
+    h_ot_minus->Write(obsnames[i]+"__"+"TTbar"+"__OtherRate__minus");
+  }
+
 
   cout << "Fill systematics" << endl;
   for(auto sys: systematics){
@@ -141,15 +170,23 @@ vector<TH1F*> get_hists(TFile* file, vector<TH1F*> dummys, vector<TString> obs_n
   vector<Double_t> obs;
   for(unsigned int i=0; i<obs_name.size(); i++) obs.push_back(-1);
 
-  Bool_t passed_measurement_rec;
+  Bool_t passed_measurement_rec, passed_subpt_rec;
   Double_t weight, rec_weight, gen_weight;
   Float_t additional_factor;
+  int index_pt3=-1;
+  int index_ptsub=-1;
 
   tree->ResetBranchAddresses();
   tree->SetBranchAddress(sel_name, &passed_measurement_rec);
+  tree->SetBranchAddress("passed_subptmigration_rec", &passed_subpt_rec);
+
   tree->SetBranchAddress("rec_weight",&rec_weight);
   tree->SetBranchAddress("gen_weight",&gen_weight);
-  for(unsigned int i=0; i<obs_name.size(); i++) tree->SetBranchAddress(obs_name[i], &obs[i]);
+  for(unsigned int i=0; i<obs_name.size(); i++){
+    if(obs_name[i]=="ptsub3") index_pt3 = i;
+    if(obs_name[i]=="ptsub3_subpt") index_ptsub = i;
+    else tree->SetBranchAddress(obs_name[i], &obs[i]);
+  }
 
   if(weightname != "none"){
     cout << "  - using weight" << endl;
@@ -163,8 +200,11 @@ vector<TH1F*> get_hists(TFile* file, vector<TH1F*> dummys, vector<TString> obs_n
     if(weightname != "none") rec_weight *= additional_factor;
     weight = rec_weight * gen_weight;
     if(passed_measurement_rec){
-      for(unsigned int i=0; i<obs_name.size(); i++) hists[i]->Fill(obs[i], weight);
+      for(unsigned int i=0; i<obs_name.size(); i++){
+        if(obs_name[i]!="ptsub3_subpt") hists[i]->Fill(obs[i], weight);
+      }
     }
+    if(passed_subpt_rec && index_ptsub!=-1 && index_pt3!=-1) hists[index_ptsub]->Fill(obs[index_pt3], weight);
   }
   return hists;
 }

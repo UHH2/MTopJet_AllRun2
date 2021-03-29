@@ -244,6 +244,10 @@ int main(int argc, char* argv[]){
     }
     double min = 0.01;
     double max = 100.;
+    if(year == "2016"){
+      min = 0.25;
+      max = 4;
+    }
     TF1* chi2function = new TF1("chi2", chi2formula, min, max);
     vector<double> Values = ExtractFSRValues(chi2function);
     f_fsr.push_back(Values);
@@ -350,17 +354,32 @@ void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* b
 }
 
 void PlotChi2(TF1* chi2function, vector<double> FSRvalues){
+  double chimin = FSRvalues[5];
   TCanvas* c = new TCanvas("", "", 600, 600);
   gPad->SetLeftMargin(0.2);
   gPad->SetBottomMargin(0.2);
   // gPad->SetLogx();
   chi2function->SetTitle(" ");
-  chi2function->GetXaxis()->SetRangeUser(0.1, 25);
-  chi2function->GetYaxis()->SetRangeUser(0, 100);
+  if(year=="2016"){
+    chi2function->GetXaxis()->SetRangeUser(0.25, 4);
+  }
+  else{
+    chi2function->GetXaxis()->SetRangeUser(0.1, 25);
+  }
+  chi2function->GetYaxis()->SetRangeUser(chimin-1, chimin+9);
   chi2function->GetXaxis()->SetTitle("(f^{FSR})^{2}");
   chi2function->GetYaxis()->SetTitle("#chi^{2}");
   chi2function->GetYaxis()->SetTitleOffset(1.2);
   chi2function->Draw();
+  double xmin = pow(FSRvalues[0]-FSRvalues[2], 2);
+  double xmax = pow(FSRvalues[0]+FSRvalues[1], 2);
+
+  TLine * l1 = new TLine(xmin, chimin-1.5, xmin, chi2function->Eval(xmin));
+  TLine * l2 = new TLine(xmax, chimin-1.5, xmax, chi2function->Eval(xmax));
+  l1->SetLineStyle(2);
+  l2->SetLineStyle(2);
+  l1->Draw("SAME");
+  l2->Draw("SAME");
 
   if(forTalk){
     TString cmstext = "CMS";
