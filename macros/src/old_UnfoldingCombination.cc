@@ -71,31 +71,37 @@ int main(int argc, char* argv[]){
   TFile* file16 = new TFile("/nfs/dust/cms/user/schwarzd/TUnfold/Results_"+mode+"_2016_combine.root");
   TFile* file17 = new TFile("/nfs/dust/cms/user/schwarzd/TUnfold/Results_"+mode+"_2017_combine.root");
   TFile* file18 = new TFile("/nfs/dust/cms/user/schwarzd/TUnfold/Results_"+mode+"_2018_combine.root");
-  TFile* file_run2 = new TFile("/nfs/dust/cms/user/schwarzd/TUnfold/Results_"+mode+"_FullRun2_combine.root");
 
-  TH1F * h_data = (TH1F*)file_run2->Get("Unfold_events");
+  TH1F * h_data16 = (TH1F*)file16->Get("Unfold_events");
+  TH1F * h_data17 = (TH1F*)file17->Get("Unfold_events");
+  TH1F * h_data18 = (TH1F*)file18->Get("Unfold_events");
+  TH1F * h_data = (TH1F*) h_data16->Clone();
+  h_data->Add(h_data17);
+  h_data->Add(h_data18);
   TH1F * h_data_XS = ConvertToCrossSection(h_data);
 
-  TH1F * h_truth = (TH1F*)file_run2->Get("Truth_error");
+  TH1F * h_truth16 = (TH1F*)file16->Get("Truth_error");
+  TH1F * h_truth17 = (TH1F*)file17->Get("Truth_error");
+  TH1F * h_truth18 = (TH1F*)file18->Get("Truth_error");
+  TH1F * h_truth = (TH1F*) h_truth16->Clone();
+  h_truth->Add(h_truth17);
+  h_truth->Add(h_truth18);
   TH1F * h_truth_XS = ConvertToCrossSection(h_truth);
 
-  // Get Total COV
-  TH2F * cov_tot = (TH2F*) file_run2->Get("CovTotal");
-
-  // Add FSR COVs
-  TH2F * cov_fsr16 = (TH2F*)file16->Get("COV_FSR");
-  TH2F * cov_fsr17 = (TH2F*)file17->Get("COV_FSR");
-  TH2F * cov_fsr18 = (TH2F*)file18->Get("COV_FSR");
-  TH2F * cov_fsr = (TH2F*) cov_fsr16->Clone();
-  cov_fsr->Add(cov_fsr17);
-  cov_fsr->Add(cov_fsr18);
-  cov_tot->Add(cov_fsr);
-
-  // Convert Total COV
+  TH2F * cov_tot16 = (TH2F*)file16->Get("CovTotal");
+  TH2F * cov_tot17 = (TH2F*)file17->Get("CovTotal");
+  TH2F * cov_tot18 = (TH2F*)file18->Get("CovTotal");
+  TH2F * cov_tot = (TH2F*) cov_tot16->Clone();
+  cov_tot->Add(cov_tot17);
+  cov_tot->Add(cov_tot18);
   TH2F * cov_tot_XS = ConvertToCrossSection(h_data_XS, cov_tot);
 
-  // Get Theo COV
-  TH2F * cov_theo = (TH2F*) file_run2->Get("CovTheo");
+  TH2F * cov_theo16 = (TH2F*)file16->Get("CovTheo");
+  TH2F * cov_theo17 = (TH2F*)file17->Get("CovTheo");
+  TH2F * cov_theo18 = (TH2F*)file18->Get("CovTheo");
+  TH2F * cov_theo = (TH2F*) cov_theo16->Clone();
+  cov_theo->Add(cov_theo17);
+  cov_theo->Add(cov_theo18);
   TH2F * cov_theo_XS = ConvertToCrossSection(h_data_XS, cov_theo);
   TH2F * cov_theo_norm = NormalizeMatrix(cov_theo,h_data);
 
@@ -104,8 +110,13 @@ int main(int argc, char* argv[]){
   cov_total_theo->Add(cov_theo);
   TH2F * cov_total_theo_norm = NormalizeMatrix(cov_total_theo, h_data);
 
-  // Get Stat COV
-  TH2F * cov_stat = (TH2F*)file_run2->Get("CovStat");
+
+  TH2F * cov_stat16 = (TH2F*)file16->Get("CovStat");
+  TH2F * cov_stat17 = (TH2F*)file17->Get("CovStat");
+  TH2F * cov_stat18 = (TH2F*)file18->Get("CovStat");
+  TH2F * cov_stat = (TH2F*) cov_stat16->Clone();
+  cov_stat->Add(cov_stat17);
+  cov_stat->Add(cov_stat18);
   TH2F * cov_stat_XS = ConvertToCrossSection(h_data_XS, cov_stat);
 
   TH1F* h_data_XS_tot = SetError(h_data_XS, cov_tot_XS);

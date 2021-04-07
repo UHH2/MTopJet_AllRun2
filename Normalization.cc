@@ -1,7 +1,7 @@
 void Normalization(){
 
-  // vector<TString> years = {"2016v3", "2017v2", "2018"};
-  vector<TString> years = {"2016v3"};
+  vector<TString> years = {"2016v3", "2017v2", "2018"};
+  // vector<TString> years = {"2016v3"};
 
   vector<TString> bkg = {"WJets", "SingleTop", "other"};
 
