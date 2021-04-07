@@ -105,9 +105,9 @@ vector<int> bins_empty(TH1F* hist){
 }
 
 // -------------------------------------------------------------------------------------------------------
-TH1F* copy_bin_content(TH1F* h1, int MinBin, int MaxBin)
+TH1F* copy_bin_content(TH1F* h1, int MinBin, int MaxBin, TString name)
 {
-  TH1F* new_hist = new TH1F("new", "new", h1->GetNbinsX(), MinBin, MaxBin);
+  TH1F* new_hist = new TH1F(name, name, h1->GetNbinsX(), MinBin, MaxBin);
 
   for(int i=1; i<=h1->GetNbinsX(); i++)
   {
