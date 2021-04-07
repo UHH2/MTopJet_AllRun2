@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 
 bool forTalk = true;
+bool debug   = false;
 
 using namespace std;
 TH1F* GetRatio(TH1F* h1, TH1F* h2, bool isData);
@@ -95,8 +96,10 @@ void draw_plot(vector<TH1F*> hists, vector<TString> path, vector<double> mean)
   // hists   = {nom, up, down, data}
   // rations = {nom/data, up/data, down/data, data/data}
 
+  TString unique_path = path[0]+"/"+path[1]+"/Wjet_mass_"+path[2]+path[3]+"_"+path[4]+path[5]+".pdf";
+
   TLegend *leg = new TLegend(0.4,0.15,0.6,0.35);
-  TCanvas *A = new TCanvas("A"+path[0]+path[4], "A", 600, 600);
+  TCanvas *A = new TCanvas(unique_path, unique_path, 600, 600);
 
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.12);
@@ -120,7 +123,7 @@ void draw_plot(vector<TH1F*> hists, vector<TString> path, vector<double> mean)
 
   gPad->RedrawAxis();
 
-  A->SaveAs(path[0]+"/"+path[1]+"/Wjet_mass_"+path[2]+"_"+path[3]+"_"+path[4]+path[5]+".pdf");
+  A->SaveAs(unique_path);
 
   delete A;
   leg->Clear();
@@ -129,12 +132,30 @@ void draw_plot(vector<TH1F*> hists, vector<TString> path, vector<double> mean)
 // -------------------------------------------------------------------------------------------------------
 void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> path, vector<double> mean)
 {
-  // path    = {save_path, channel, var, addition, year, norm}
-  // hists   = {nom, up, down, data}
-  // rations = {nom/data, up/data, down/data, data/data}
+  //          path    = {save_path, channel, var, addition, year, norm}
+  //          hists   = {nom, up, down, data}
+  // plotAll; hists   = {nom, jup, jdown, xup, xdown, data}
+  //          rations = {nom/data, up/data, down/data, data/data}
+
+  // for TCanvas name; Also used as save_path
+  TString unique_path = path[0]+"/"+path[1]+"/Wjet_mass_"+path[2]+path[3]+"_"+path[4]+path[5]+".pdf";
+  bool diffLeg = false;
+  bool plotAll = false;
+  double nHists = hists.size();
+  if(nHists==6) plotAll = true;
+  if(nHists!=ratios.size()) throw runtime_error("Not the same amount of histograms and ratios in 'draw_plot_ratio'");
+
+  if(debug) cout << path[1] << " " << path[2]  << " " << path[3] << " " << path[4] << endl;
+  if(strcmp(path[1], "combine")==0&&
+  strcmp(path[3], "_ll")==0) diffLeg = true; // &&strcmp(path[5], "_norm")==0
+  if(debug) cout << "Different Legend (combine, ll, norm): " << diffLeg << endl;
 
   TLegend *leg = new TLegend(0.40,0.15,0.65,0.35);
-  TCanvas *A = new TCanvas("A"+path[0]+path[4], "A", 600, 600);
+  if(plotAll)          leg = new TLegend(0.40,0.10,0.65,0.37);
+  if(diffLeg)          leg = new TLegend(0.25,0.6,0.5,0.8);
+  if(diffLeg&&plotAll) leg = new TLegend(0.25,0.55,0.5,0.82);
+
+  TCanvas *A = new TCanvas(unique_path, unique_path, 600, 600);
 
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.12);
@@ -148,18 +169,35 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
   hists[0]->GetXaxis()->SetLabelSize(0);
 
   hists[0]->Draw("HIST");
-  hists[1]->Draw("SAME HIST");
-  hists[2]->Draw("SAME HIST");
-  hists[3]->Draw("SAME P");
+  for(unsigned int i=1; i<nHists-1; i++) hists[i]->Draw("SAME HIST");
+  hists[nHists-1]->Draw("SAME P");
 
-  TString nom  = "Nominal  <m_{jet}>="+dtos(mean[0], 2)+" GeV";
+  TString jup, jdown, xup, xdown;
+  TString nom   = "t#bar{t} <m_{jet}>="+dtos(mean[0], 2)+" GeV";
   TString up   = path[2]+" up   <m_{jet}>="+dtos(mean[1], 2)+" GeV";
   TString down = path[2]+" down <m_{jet}>="+dtos(mean[2], 2)+" GeV";
+  if(plotAll){
+    jup   = "t#bar{t} f^{JEC}=+1  <m_{jet}>="+dtos(mean[1], 2)+" GeV";
+    jdown = "t#bar{t} f^{JEC}=-1  <m_{jet}>="+dtos(mean[2], 2)+" GeV";
+    xup   = "t#bar{t} f^{XCone}=+1  <m_{jet}>="+dtos(mean[3], 2)+" GeV";
+    xdown = "t#bar{t} f^{XCone}=-1  <m_{jet}>="+dtos(mean[4], 2)+" GeV";
+    if(debug) cout << jup << " " << jdown << " " << xup << " " << endl;
+  }
+  TString data  = "data <m_{jet}>="+dtos(mean[nHists-1], 2)+" GeV";
+  if(debug) cout << nom << " " << up << " " << down << " " << endl;
 
   leg->AddEntry(hists[0],nom ,"l");
-  leg->AddEntry(hists[1],up  ,"l");
-  leg->AddEntry(hists[2],down,"l");
-  leg->AddEntry(hists[3],"Data","pl");
+  if(plotAll){
+    leg->AddEntry(hists[1],jup  ,"l");
+    leg->AddEntry(hists[2],jdown,"l");
+    leg->AddEntry(hists[3],xup  ,"l");
+    leg->AddEntry(hists[4],xdown,"l");
+  }
+  else{
+    leg->AddEntry(hists[1],up  ,"l");
+    leg->AddEntry(hists[2],down,"l");
+  }
+  leg->AddEntry(hists[nHists-1],data,"pl");
 
   leg->SetTextSize(0.03);
   leg->Draw();
@@ -173,19 +211,46 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
   pad2->Draw();
   pad2->cd();
 
+  // Normally the settings are performed in the main code -> Problem ??; No still not working
   // add_plot_settings(ratios[0], kRed,  1, 1);
-  // add_plot_settings(ratios[1], kBlue, 1, 1);
-  // add_plot_settings(ratios[2], kBlue, 2, 1);
+  // if(plotAll){
+  //   for(unsigned int i=1; i<nHists-1; i++){
+  //     add_plot_settings(ratios[1], kBlue, 1, 1);
+  //     add_plot_settings(ratios[2], kBlue, 2, 1);
+  //     add_plot_settings(ratios[3], kGreen+2, 1, 1);
+  //     add_plot_settings(ratios[4], kGreen+2, 2, 1);
+  //   }
+  // }
+  // else
+  // {
+  //   if(strcmp(path[2], "COR")==0){
+  //     add_plot_settings(ratios[1], kGreen+2, 1, 1);
+  //     add_plot_settings(ratios[2], kGreen+2, 2, 1);
+  //   }
+  //   else{
+  //     add_plot_settings(ratios[1], kBlue, 1, 1);
+  //     add_plot_settings(ratios[2], kBlue, 2, 1);
+  //   }
+  // }
 
-  ratios[3]->Draw("PE");
+  ratios[nHists-1]->Draw("PE");
   ratios[0]->Draw("HIST SAME");
-  ratios[1]->Draw("HIST SAME");
-  ratios[2]->Draw("HIST SAME");
-
+  // for(unsigned int i=1; i<nHists-1; i++) hists[i]->Draw("SAME HIST");
+  if(plotAll){
+      hists[1]->Draw("HIST SAME");
+      hists[2]->Draw("HIST SAME");
+      hists[3]->Draw("HIST SAME");
+      hists[4]->Draw("HIST SAME");
+  }
+  else
+  {
+    hists[1]->Draw("SAME HIST");
+    hists[2]->Draw("SAME HIST");
+  }
 
   gPad->RedrawAxis();
 
-  A->SaveAs(path[0]+"/"+path[1]+"/Wjet_mass_"+path[2]+path[3]+"_"+path[4]+path[5]+".pdf");
+  A->SaveAs(unique_path);
 
   delete A;
   leg->Clear();
@@ -196,7 +261,6 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
 // -------------------------------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]){
-  bool debug = true;
   TString mTop_ = "mtop1695";           // CHANGE_MTOP
 
   // #################################################################################################
@@ -274,10 +338,6 @@ int main(int argc, char* argv[]){
     // #################################################################################################
     // Get Hists #######################################################################################
     if(debug) cout << "Get Hists" << endl;
-
-    vector<TH1F*> allyears_bkg,  allyears_data,  allyears_ttbar;
-    vector<TH1F*> allyears_JECup, allyears_JECdown, allyears_XCup, allyears_XCdown;
-
 
     vector<TH1F*> h_data_muon          = get_all_hists(data_muon, w_mass);
     vector<TH1F*> h_data_elec          = get_all_hists(data_elec, w_mass);
@@ -438,10 +498,12 @@ int main(int argc, char* argv[]){
       vector<int> peak_bins_muon, peak_bins_elec, peak_bins_combine;
       peak_bins_muon    = bins_upper_limit(all_data_muon_rebin[year], 75);
       peak_bins_elec    = bins_upper_limit(all_data_elec_rebin[year], 75);
-      peak_bins_combine = bins_upper_limit(all_data_combine_rebin[year], 75);
+      peak_bins_combine = bins_upper_limit(all_data_combine_rebin[year], 100);
 
       // Bin Center
-      vector<double> bin_centers_muon = bin_center_upper_limit(all_data_muon_rebin[year], peak_bins_muon, bin_width);
+      vector<double> bin_centers_muon    = bin_center_upper_limit(all_data_muon_rebin[year],    peak_bins_muon,    bin_width);
+      vector<double> bin_centers_elec    = bin_center_upper_limit(all_data_elec_rebin[year],    peak_bins_elec,    bin_width);
+      vector<double> bin_centers_combine = bin_center_upper_limit(all_data_combine_rebin[year], peak_bins_combine, bin_width);
 
       // Path
       vector<TString> path_muon_jec         = {save_path, "muon",    "JEC", addition, years[year], ""};
@@ -457,6 +519,13 @@ int main(int argc, char* argv[]){
       vector<TString> path_muon_cor_norm    = {save_path, "muon",    "COR", addition, years[year], "_norm"};
       vector<TString> path_elec_cor_norm    = {save_path, "elec",    "COR", addition, years[year], "_norm"};
       vector<TString> path_combine_cor_norm = {save_path, "combine", "COR", addition, years[year], "_norm"};
+
+      vector<TString> path_muon_all         = {save_path, "muon",    "all", addition, years[year], ""};
+      vector<TString> path_elec_all         = {save_path, "elec",    "all", addition, years[year], ""};
+      vector<TString> path_combine_all      = {save_path, "combine", "all", addition, years[year], ""};
+      vector<TString> path_muon_all_norm    = {save_path, "muon",    "all", addition, years[year], "_norm"};
+      vector<TString> path_elec_all_norm    = {save_path, "elec",    "all", addition, years[year], "_norm"};
+      vector<TString> path_combine_all_norm = {save_path, "combine", "all", addition, years[year], "_norm"};
 
       // ttbar -----------------------------------------------------------------
 
@@ -498,19 +567,19 @@ int main(int argc, char* argv[]){
       add_plot_settings(all_jec_down_elec_norm[year], kBlue, 7);
       add_plot_settings(all_jec_down_combine_norm[year], kBlue, 7);
 
-      add_plot_settings(all_cor_up_muon_rebin[year], kBlue);
-      add_plot_settings(all_cor_up_elec_rebin[year], kBlue);
-      add_plot_settings(all_cor_up_combine_rebin[year], kBlue);
-      add_plot_settings(all_cor_up_muon_norm[year], kBlue);
-      add_plot_settings(all_cor_up_elec_norm[year], kBlue);
-      add_plot_settings(all_cor_up_combine_norm[year], kBlue);
+      add_plot_settings(all_cor_up_muon_rebin[year], kGreen+2);
+      add_plot_settings(all_cor_up_elec_rebin[year], kGreen+2);
+      add_plot_settings(all_cor_up_combine_rebin[year], kGreen+2);
+      add_plot_settings(all_cor_up_muon_norm[year], kGreen+2);
+      add_plot_settings(all_cor_up_elec_norm[year], kGreen+2);
+      add_plot_settings(all_cor_up_combine_norm[year], kGreen+2);
 
-      add_plot_settings(all_cor_down_muon[year], kBlue, 7);
-      add_plot_settings(all_cor_down_elec[year], kBlue, 7);
-      add_plot_settings(all_cor_down_combine[year], kBlue, 7);
-      add_plot_settings(all_cor_down_muon_norm[year], kBlue, 7);
-      add_plot_settings(all_cor_down_elec_norm[year], kBlue, 7);
-      add_plot_settings(all_cor_down_combine_norm[year], kBlue, 7);
+      add_plot_settings(all_cor_down_muon[year], kGreen+2, 7);
+      add_plot_settings(all_cor_down_elec[year], kGreen+2, 7);
+      add_plot_settings(all_cor_down_combine[year], kGreen+2, 7);
+      add_plot_settings(all_cor_down_muon_norm[year], kGreen+2, 7);
+      add_plot_settings(all_cor_down_elec_norm[year], kGreen+2, 7);
+      add_plot_settings(all_cor_down_combine_norm[year], kGreen+2, 7);
 
       // #################################################################################################
       // Mass Plots ######################################################################################
@@ -519,120 +588,192 @@ int main(int argc, char* argv[]){
       // Mean ------------------------------------------------------------------
 
       double mean_ttbar_muon    = trunc_mean(all_ttbar_muon_norm[year],    bin_centers_muon[0], bin_centers_muon[1]);
+      double mean_data_muon     = trunc_mean(all_data_muon_norm[year],     bin_centers_muon[0], bin_centers_muon[1]);
       double mean_jec_up_muon   = trunc_mean(all_jec_up_muon_norm[year],   bin_centers_muon[0], bin_centers_muon[1]);
       double mean_jec_down_muon = trunc_mean(all_jec_down_muon_norm[year], bin_centers_muon[0], bin_centers_muon[1]);
       double mean_cor_up_muon   = trunc_mean(all_cor_up_muon_norm[year],   bin_centers_muon[0], bin_centers_muon[1]);
       double mean_cor_down_muon = trunc_mean(all_cor_down_muon_norm[year], bin_centers_muon[0], bin_centers_muon[1]);
-      vector<double> means_jec  = {mean_ttbar_muon, mean_jec_up_muon, mean_jec_down_muon};
-      vector<double> means_cor  = {mean_ttbar_muon, mean_cor_up_muon, mean_cor_down_muon};
+      vector<double> means_jec_muon  = {mean_ttbar_muon, mean_jec_up_muon, mean_jec_down_muon};
+      vector<double> means_cor_muon  = {mean_ttbar_muon, mean_cor_up_muon, mean_cor_down_muon};
+      vector<double> means_all_muon  = {mean_ttbar_muon, mean_jec_up_muon, mean_jec_down_muon, mean_cor_up_muon, mean_cor_down_muon, mean_data_muon};
+
+      double mean_ttbar_elec    = trunc_mean(all_ttbar_elec_norm[year],    bin_centers_elec[0], bin_centers_elec[1]);
+      double mean_data_elec     = trunc_mean(all_data_elec_norm[year],     bin_centers_elec[0], bin_centers_elec[1]);
+      double mean_jec_up_elec   = trunc_mean(all_jec_up_elec_norm[year],   bin_centers_elec[0], bin_centers_elec[1]);
+      double mean_jec_down_elec = trunc_mean(all_jec_down_elec_norm[year], bin_centers_elec[0], bin_centers_elec[1]);
+      double mean_cor_up_elec   = trunc_mean(all_cor_up_elec_norm[year],   bin_centers_elec[0], bin_centers_elec[1]);
+      double mean_cor_down_elec = trunc_mean(all_cor_down_elec_norm[year], bin_centers_elec[0], bin_centers_elec[1]);
+      vector<double> means_jec_elec  = {mean_ttbar_elec, mean_jec_up_elec, mean_jec_down_elec};
+      vector<double> means_cor_elec  = {mean_ttbar_elec, mean_cor_up_elec, mean_cor_down_elec};
+      vector<double> means_all_elec  = {mean_ttbar_elec, mean_jec_up_elec, mean_jec_down_elec, mean_cor_up_elec, mean_cor_down_elec, mean_data_elec};
+
+      double mean_ttbar_combine    = trunc_mean(all_ttbar_combine_norm[year],    bin_centers_combine[0], bin_centers_combine[1]);
+      double mean_data_combine     = trunc_mean(all_data_combine_norm[year] ,    bin_centers_combine[0], bin_centers_combine[1]);
+      double mean_jec_up_combine   = trunc_mean(all_jec_up_combine_norm[year],   bin_centers_combine[0], bin_centers_combine[1]);
+      double mean_jec_down_combine = trunc_mean(all_jec_down_combine_norm[year], bin_centers_combine[0], bin_centers_combine[1]);
+      double mean_cor_up_combine   = trunc_mean(all_cor_up_combine_norm[year],   bin_centers_combine[0], bin_centers_combine[1]);
+      double mean_cor_down_combine = trunc_mean(all_cor_down_combine_norm[year], bin_centers_combine[0], bin_centers_combine[1]);
+      vector<double> means_jec_combine  = {mean_ttbar_combine, mean_jec_up_combine, mean_jec_down_combine, mean_data_combine};
+      vector<double> means_cor_combine  = {mean_ttbar_combine, mean_cor_up_combine, mean_cor_down_combine, mean_data_combine};
+      vector<double> means_all_combine  = {mean_ttbar_combine, mean_jec_up_combine, mean_jec_down_combine, mean_cor_up_combine, mean_cor_down_combine, mean_data_combine};
 
       cout << left; // for setw()
-      cout << "ttbar    - " << years[year] << setw(12) << " - muon: " << setw(4) << mean_ttbar_muon    << " GeV" << endl;
-      cout << "jec up   - " << years[year] << setw(12) << " - muon: " << setw(4) << mean_jec_up_muon   << " GeV" << endl;
-      cout << "jec down - " << years[year] << setw(12) << " - muon: " << setw(4) << mean_jec_down_muon << " GeV" << endl;
-      cout << "cor up   - " << years[year] << setw(12) << " - muon: " << setw(4) << mean_cor_up_muon   << " GeV" << endl;
-      cout << "cor down - " << years[year] << setw(12) << " - muon: " << setw(4) << mean_cor_down_muon << " GeV" << endl;
+      cout << "ttbar    - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_ttbar_muon       << " GeV" << endl;
+      cout << "data     - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_data_muon        << " GeV" << endl;
+      cout << "jec up   - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_jec_up_muon      << " GeV" << endl;
+      cout << "jec down - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_jec_down_muon    << " GeV" << endl;
+      cout << "cor up   - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_cor_up_muon      << " GeV" << endl;
+      cout << "cor down - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_cor_down_muon    << " GeV" << endl;
+      cout << "ttbar    - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_ttbar_elec       << " GeV" << endl;
+      cout << "data     - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_data_elec        << " GeV" << endl;
+      cout << "jec up   - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_jec_up_elec      << " GeV" << endl;
+      cout << "jec down - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_jec_down_elec    << " GeV" << endl;
+      cout << "cor up   - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_cor_up_elec      << " GeV" << endl;
+      cout << "cor down - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_cor_down_elec    << " GeV" << endl;
+      cout << "ttbar    - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_ttbar_combine    << " GeV" << endl;
+      cout << "data     - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_data_combine     << " GeV" << endl;
+      cout << "jec up   - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_jec_up_combine   << " GeV" << endl;
+      cout << "jec down - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_jec_down_combine << " GeV" << endl;
+      cout << "cor up   - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_cor_up_combine   << " GeV" << endl;
+      cout << "cor down - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_cor_down_combine << " GeV" << endl;
       cout << endl;
       cout << right;
 
       // Plot ------------------------------------------------------------------
 
-      vector<TH1F*> jec_muon = {all_ttbar_muon_norm[year], all_jec_up_muon_norm[year], all_jec_down_muon_norm[year], all_data_muon_norm[year]};
-      vector<TH1F*> cor_muon = {all_ttbar_muon_norm[year], all_cor_up_muon_norm[year], all_cor_down_muon_norm[year], all_data_muon_norm[year]};
+      vector<TH1F*> jec_muon    = {all_ttbar_muon_norm[year],    all_jec_up_muon_norm[year],    all_jec_down_muon_norm[year],    all_data_muon_norm[year]};
+      vector<TH1F*> cor_muon    = {all_ttbar_muon_norm[year],    all_cor_up_muon_norm[year],    all_cor_down_muon_norm[year],    all_data_muon_norm[year]};
+      vector<TH1F*> all_muon    = {all_ttbar_muon_norm[year],    all_jec_up_muon_norm[year],    all_jec_down_muon_norm[year],    all_cor_up_muon_norm[year],    all_cor_down_muon_norm[year],    all_data_muon_norm[year]};
+
+      vector<TH1F*> jec_elec    = {all_ttbar_elec_norm[year],    all_jec_up_elec_norm[year],    all_jec_down_elec_norm[year],    all_data_elec_norm[year]};
+      vector<TH1F*> cor_elec    = {all_ttbar_elec_norm[year],    all_cor_up_elec_norm[year],    all_cor_down_elec_norm[year],    all_data_elec_norm[year]};
+      vector<TH1F*> all_celec   = {all_ttbar_elec_norm[year],    all_jec_up_elec_norm[year],    all_jec_down_elec_norm[year],    all_cor_up_elec_norm[year],    all_cor_down_elec_norm[year],    all_data_elec_norm[year]};
+
+      vector<TH1F*> jec_combine = {all_ttbar_combine_norm[year], all_jec_up_combine_norm[year], all_jec_down_combine_norm[year], all_data_combine_norm[year]};
+      vector<TH1F*> cor_combine = {all_ttbar_combine_norm[year], all_cor_up_combine_norm[year], all_cor_down_combine_norm[year], all_data_combine_norm[year]};
+      vector<TH1F*> all_combine = {all_ttbar_combine_norm[year], all_jec_up_combine_norm[year], all_jec_down_combine_norm[year], all_cor_up_combine_norm[year], all_cor_down_combine_norm[year], all_data_combine_norm[year]};
 
       // draw_plot(vec<Hists> {t, up, do, d}, path, channel, year, mean={0,0,0}, norm="", addition)
       // draw_plot_cor(vec<Hists> {t, up, do, d}, path, channel, year, mean={0,0,0}, norm="", addition)
 
-      // draw_plot(jec_muon, path_muon_jec, means_jec);
+      // draw_plot(jec_muon, path_muon_jec, means_jec_muon);
 
       // Peak ------------------------------------------------------------------
 
-      vector<double> norm_err = normalize_error(all_data_muon_rebin[year]);
-      set_new_bin_error(all_data_muon_norm[year], norm_err);
+      // muon ------------------------------------------------------------------
+      vector<double> norm_err_muon = normalize_error(all_data_muon_rebin[year]);
+      set_new_bin_error(all_data_muon_norm[year], norm_err_muon);
 
       vector<TH1F*> ratios_jec_muon;
-      ratios_jec_muon.push_back(GetRatio(all_ttbar_muon_norm[year], all_data_muon_norm[year], norm_err, false));
-      ratios_jec_muon.push_back(GetRatio(all_jec_up_muon_norm[year], all_data_muon_norm[year], norm_err, false));
-      ratios_jec_muon.push_back(GetRatio(all_jec_down_muon_norm[year], all_data_muon_norm[year], norm_err, false));
-      ratios_jec_muon.push_back(GetRatio(all_data_muon_norm[year], all_data_muon_norm[year], norm_err, true));
+      ratios_jec_muon.push_back(GetRatio(all_ttbar_muon_norm[year], all_data_muon_norm[year], norm_err_muon, false));
+      ratios_jec_muon.push_back(GetRatio(all_jec_up_muon_norm[year], all_data_muon_norm[year], norm_err_muon, false));
+      ratios_jec_muon.push_back(GetRatio(all_jec_down_muon_norm[year], all_data_muon_norm[year], norm_err_muon, false));
+      ratios_jec_muon.push_back(GetRatio(all_data_muon_norm[year], all_data_muon_norm[year], norm_err_muon, true));
 
       // Ratio of ttbar had some errors. Copy the bin content solved those. Check again later !!!
-      TH1F* saftey_hist  = copy_bin_content(ratios_jec_muon[0], 0, 180);
-      ratios_jec_muon[0] = saftey_hist;
+      TH1F* saftey_hist_muon  = copy_bin_content(ratios_jec_muon[0], 0, 180, "copy_muon");
+      ratios_jec_muon[0] = saftey_hist_muon;
 
       main_plot_settings(all_ttbar_muon_norm[year],  bin_centers_muon[0], bin_centers_muon[1], kRed, "", xAxis,   "a.u.");
       data_ratio_settings(ratios_jec_muon[3], bin_centers_muon[0], bin_centers_muon[1]);
-      add_plot_settings(ratios_jec_muon
-        [0], kRed,  1, 1);
-      add_plot_settings(ratios_jec_muon
-        [1], kBlue, 1, 1);
-      add_plot_settings(ratios_jec_muon
-        [2], kBlue, 2, 1);
+      add_plot_settings(ratios_jec_muon[0], kRed,  1, 1);
+      add_plot_settings(ratios_jec_muon[1], kBlue, 1, 1);
+      add_plot_settings(ratios_jec_muon[2], kBlue, 2, 1);
 
-      draw_plot_ratio(jec_muon, ratios_jec_muon, path_muon_jec, means_jec);
+      // draw_plot_ratio(jec_muon, ratios_jec_muon, path_muon_jec_norm, means_jec_muon);
 
-      // TString norm_str="";
-      // for(unsigned int norm=0; norm<ttbar_.size(); norm++){
-      //   if(norm==1) norm_str="_norm";
-      //   for(int correction=0; correction<2; correction++){
+      // elec ------------------------------------------------------------------
+      vector<double> norm_err_elec = normalize_error(all_data_elec_rebin[year]);
+      set_new_bin_error(all_data_elec_norm[year], norm_err_elec);
+
+      vector<TH1F*> ratios_jec_elec;
+      ratios_jec_elec.push_back(GetRatio(all_ttbar_elec_norm[year], all_data_elec_norm[year], norm_err_elec, false));
+      ratios_jec_elec.push_back(GetRatio(all_jec_up_elec_norm[year], all_data_elec_norm[year], norm_err_elec, false));
+      ratios_jec_elec.push_back(GetRatio(all_jec_down_elec_norm[year], all_data_elec_norm[year], norm_err_elec, false));
+      ratios_jec_elec.push_back(GetRatio(all_data_elec_norm[year], all_data_elec_norm[year], norm_err_elec, true));
+
+      // Ratio of ttbar had some errors. Copy the bin content solved those. Check again later !!!
+      TH1F* saftey_hist_elec  = copy_bin_content(ratios_jec_elec[0], 0, 180, "copy_elec");
+      ratios_jec_elec[0] = saftey_hist_elec;
+
+      main_plot_settings(all_ttbar_elec_norm[year],  bin_centers_elec[0], bin_centers_elec[1], kRed, "", xAxis,   "a.u.");
+      data_ratio_settings(ratios_jec_elec[3], bin_centers_elec[0], bin_centers_elec[1]);
+      add_plot_settings(ratios_jec_elec[0], kRed,  1, 1);
+      add_plot_settings(ratios_jec_elec[1], kBlue, 1, 1);
+      add_plot_settings(ratios_jec_elec[2], kBlue, 2, 1);
+
+      // draw_plot_ratio(jec_elec, ratios_jec_elec, path_elec_jec_norm, means_jec_elec);
+
+      // combine ------------------------------------------------------------------
+      vector<double> norm_err_combine = normalize_error(all_data_combine_rebin[year]);
+      set_new_bin_error(all_data_combine_norm[year], norm_err_combine);
+
+      TH1F* ratio_ttbar_combine    = GetRatio(all_ttbar_combine_norm[year],    all_data_combine_norm[year], norm_err_combine, false);
+      TH1F* ratio_jec_up_combine   = GetRatio(all_jec_up_combine_norm[year],   all_data_combine_norm[year], norm_err_combine, false);
+      TH1F* ratio_jec_down_combine = GetRatio(all_jec_down_combine_norm[year], all_data_combine_norm[year], norm_err_combine, false);
+      TH1F* ratio_cor_up_combine   = GetRatio(all_cor_up_combine_norm[year],   all_data_combine_norm[year], norm_err_combine, false);
+      TH1F* ratio_cor_down_combine = GetRatio(all_cor_down_combine_norm[year], all_data_combine_norm[year], norm_err_combine, false);
+      TH1F* ratio_data_combine     = GetRatio(all_data_combine_norm[year],     all_data_combine_norm[year], norm_err_combine, true);
+
+      // Ratio of ttbar had some errors and was not plotted. Copy the bin content solved this problem. Check again later !!!
+      // First only ttbar made problems, now the others. Apply same procedure on these, as well. ---------------------------
+      TH1F* saftey_hist_combine  = copy_bin_content(ratio_ttbar_combine, 0, 180, "copy_combine");
+      ratio_ttbar_combine = saftey_hist_combine;
+
+      TH1F* a_saftey_hist_combine  = copy_bin_content(ratio_jec_up_combine, 0, 180, "11"); // last argument is for Canvas name to avoid warning
+      ratio_jec_up_combine = a_saftey_hist_combine;
+
+      TH1F* b_saftey_hist_combine  = copy_bin_content(ratio_jec_down_combine, 0, 180, "111");
+      ratio_jec_down_combine = b_saftey_hist_combine;
+
+      TH1F* c_saftey_hist_combine  = copy_bin_content(ratio_cor_up_combine, 0, 180, "1111");
+      ratio_cor_up_combine = c_saftey_hist_combine;
+
+      TH1F* d_saftey_hist_combine  = copy_bin_content(ratio_cor_down_combine, 0, 180, "11111");
+      ratio_cor_down_combine = d_saftey_hist_combine;
+
+      main_plot_settings(all_ttbar_combine_norm[year],  bin_centers_combine[0], bin_centers_combine[1], kRed, "", xAxis,   "a.u.");
+      data_ratio_settings(ratio_data_combine,   bin_centers_combine[0], bin_centers_combine[1]);
+      add_plot_settings(ratio_ttbar_combine,    kRed,     1, 1);
+      add_plot_settings(ratio_jec_up_combine,   kBlue,    1, 1);
+      add_plot_settings(ratio_jec_down_combine, kBlue,    2, 1);
+      add_plot_settings(ratio_cor_up_combine,   kGreen+2, 1, 1);
+      add_plot_settings(ratio_cor_down_combine, kGreen+2, 2, 1);
+
+      vector<TH1F*> ratios_jec_combine = {ratio_ttbar_combine, ratio_jec_up_combine, ratio_jec_down_combine, ratio_data_combine};
+      vector<TH1F*> ratios_cor_combine = {ratio_ttbar_combine, ratio_cor_up_combine, ratio_cor_down_combine, ratio_data_combine};
+      vector<TH1F*> ratios_all_combine = {ratio_ttbar_combine, ratio_jec_up_combine, ratio_jec_down_combine, ratio_cor_up_combine, ratio_cor_down_combine, ratio_data_combine};
+
+      // Check if there is a problem with overwritting the plots -----------------------------
+      // add_plot_settings(ratio_ttbar_combine,    kRed,     1, 1);
+      // add_plot_settings(a_saftey_hist_combine,   kBlue,    1, 1);
+      // add_plot_settings(b_saftey_hist_combine, kBlue,    2, 1);
+      // add_plot_settings(c_saftey_hist_combine,   kGreen+2, 1, 1);
+      // add_plot_settings(d_saftey_hist_combine, kGreen+2, 2, 1);
       //
-      //     corrections_up_[norm][correction]->SetLineWidth(2);
-      //     corrections_up_[norm][correction]->SetLineColor(kBlue);
-      //
-      //     corrections_down_[norm][correction]->SetLineStyle(2);
-      //     corrections_down_[norm][correction]->SetLineWidth(2);
-      //     corrections_down_[norm][correction]->SetLineColor(kBlue);
-      //
-      //     ttbar_[norm]->GetYaxis()->SetTitleOffset(1.3);
-      //
-      //     TCanvas *A = new TCanvas("A", "A", 600, 600);
-      //     gPad->SetLeftMargin(0.15);
-      //     gPad->SetBottomMargin(0.12);
-      //     ttbar_[norm]->Draw("HIST");
-      //     corrections_down_[norm][correction]->Draw("SAME HIST");
-      //     corrections_up_[norm][correction]->Draw("SAME HIST");
-      //     data_[norm]->Draw("SAME P");
-      //     // if(norm==0 && bin_width==1 && isAll) line->Draw("SAME");
-      //     leg = new TLegend(0.15,0.65,0.35,0.85);
-      //     if(bin_width==1) leg = new TLegend(0.45,0.15,0.6,0.35);;
-      //     leg->AddEntry(ttbar_[norm],"Nominal","l");
-      //     if(correction==0){
-      //       leg->AddEntry(corrections_up_[norm][correction],"JEC up","l");
-      //       leg->AddEntry(corrections_down_[norm][correction],"JEC down","l");
-      //     }
-      //     if(correction==1){
-      //       leg->AddEntry(corrections_up_[norm][correction],"XCone up","l");
-      //       leg->AddEntry(corrections_down_[norm][correction],"XCone down","l");
-      //     }
-      //     leg->AddEntry(data_[norm],"Data","pl");
-      //     leg->SetTextSize(0.02);
-      //     leg->Draw();
-      //     gPad->RedrawAxis();
-      //
-      //
-      //
-      //     if(correction==0) A->SaveAs(save_path+"/Wjet_mass_sensitivity_JEC"+addition+norm_str+".pdf");
-      //     if(correction==1) A->SaveAs(save_path+"/Wjet_mass_sensitivity_XCone"+addition+norm_str+".pdf");
-      //     delete A;
-      //     leg->Clear();
-      //   }
+      // vector<TH1F*> ratios_jec_combine = {ratio_ttbar_combine, a_saftey_hist_combine, b_saftey_hist_combine, ratio_data_combine};
+      // vector<TH1F*> ratios_cor_combine = {ratio_ttbar_combine, c_saftey_hist_combine, d_saftey_hist_combine, ratio_data_combine};
+      // vector<TH1F*> ratios_all_combine = {ratio_ttbar_combine, a_saftey_hist_combine, b_saftey_hist_combine, c_saftey_hist_combine, d_saftey_hist_combine, ratio_data_combine};
+
+      // Do the plots have Bin content?; Yes, at least jec down -----------------------------
+      // for(unsigned int i=1; i<ratios_jec_combine[1]->GetNbinsX(); i++)
+      // {
+      //   cout << setw(3) << i << "   " << setw(10) << ratios_jec_combine[1]->GetBinContent(i) << setw(10) << ratio_jec_up_combine->GetBinContent(i) << endl;
       // }
+
+      plot_single_histogram(ratios_all_combine[2], "jecdown", "", 180, kRed, path_combine_all_norm[0]+"/"+path_combine_all_norm[1]+"/test1.pdf");
+      plot_single_histogram(ratio_jec_down_combine, "jecdown", "", 180, kRed, path_combine_all_norm[0]+"/"+path_combine_all_norm[1]+"/test2.pdf");
+
+      draw_plot_ratio(jec_combine, ratios_jec_combine, path_combine_jec_norm, means_jec_combine);
+      draw_plot_ratio(cor_combine, ratios_cor_combine, path_combine_cor_norm, means_cor_combine);
+      draw_plot_ratio(all_combine, ratios_all_combine, path_combine_all_norm, means_all_combine);
+
 
     } // year
   } // pt bin
 } // main
 
 
-
-
-// ttbar_[norm]->SetTitle("");
-// if     (ptbin==1&&bin_width==5) ttbar_[norm]->GetXaxis()->SetRangeUser(20, 180);
-// else if(ptbin==1&&bin_width==6) ttbar_[norm]->GetXaxis()->SetRangeUser(20, 180);
-// else                            ttbar_[norm]->GetXaxis()->SetRangeUser(0, 180);
-
-// TLine *line = new TLine(0, Limit, 180, Limit);
-// line->SetLineColor(kGray);
-// line->SetLineWidth(1);
 
 
 

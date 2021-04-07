@@ -24,8 +24,10 @@ Hists(ctx, dirname), isTTbar_(isTTbar), masscut_(masscut){
   h_HadJetTau1 = book<TH1F>("ak8_hadjet_tau1", "#tau_{1}", 50, 0, 1);
   h_HadJetTau2 = book<TH1F>("ak8_hadjet_tau2", "#tau_{2}", 50, 0, 1);
   h_HadJetTau3 = book<TH1F>("ak8_hadjet_tau3", "#tau_{3}", 50, 0, 1);
+  h_HadJetTau4 = book<TH1F>("ak8_hadjet_tau4", "#tau_{4}", 50, 0, 1);
 
   h_HadJetTau32 = book<TH1F>("ak8_hadjet_tau32", "#tau_{3}/#tau_{2}", 50, 0, 1);
+  h_HadJetTau43 = book<TH1F>("ak8_hadjet_tau43", "#tau_{4}/#tau_{3}", 50, 0, 1);
   h_HadJetTau23 = book<TH1F>("ak8_hadjet_tau23", "#tau_{2}/#tau_{3}", 100, 0, 2);
 
   h_number_ak8_jets        = book<TH1F>("ak8_number_matched_hadjets", "number matched AK8 jets", 10, 0, 10);
@@ -267,6 +269,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
 
   // N-subjettiness -----------------------------------------------------------------------
   double tau_32_ak  = ak8_had.tau3()/ak8_had.tau2();
+  double tau_43_ak  = ak8_had.tau4()/ak8_had.tau3();
   mass = ak8_had_v4.M();
   tau32 = tau_32_ak;
 
@@ -297,7 +300,9 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
     h_HadJetTau1->Fill(ak8_had.tau1(), weight);
     h_HadJetTau2->Fill(ak8_had.tau2(), weight);
     h_HadJetTau3->Fill(ak8_had.tau3(), weight);
+    h_HadJetTau4->Fill(ak8_had.tau4(), weight);
     h_HadJetTau32->Fill(tau_32_ak, weight);
+    h_HadJetTau43->Fill(tau_43_ak, weight);
     h_HadJetTau23->Fill(1/tau_32_ak, weight);
 
     h_distance_hadx_hadak->Fill(deltaR(xcone_had_jet.at(0), ak8_had), weight);
