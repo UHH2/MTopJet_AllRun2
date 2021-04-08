@@ -37,7 +37,7 @@ int main(int argc, char* argv[]){
 
   vector<TString> systematics = {"muid_up", "muid_down", "mutr_up", "mutr_down", "elid_up", "elid_down", "eltr_up", "eltr_down", "elreco_up", "elreco_down", "pu_up", "pu_down", "btag_up", "btag_down", "JEC_up", "JEC_down", "JER_up", "JER_down", "COR_up", "COR_down", "JMS_up", "JMS_down"};
 
-  TFile * outfile = new TFile("RecoLevelPlots.root","RECREATE");
+  TFile * outfile = new TFile("RecoLevelPlots_SYSBKG.root","RECREATE");
   // Fill nominal hists
   cout << "Fill nominal hists" << endl;
   vector<TH1F*> h_tt, h_st, h_wj, h_ot;
@@ -105,51 +105,55 @@ int main(int argc, char* argv[]){
 
   cout << "Fill systematics" << endl;
   for(auto sys: systematics){
-    vector<vector<TH1F*>> h_all_years;
-    for(auto year: years){
-      double sf;
-      if(year == "2016v3")      sf = sf16;
-      else if(year == "2017v2") sf = sf17;
-      else if(year == "2018")   sf = sf18;
-      TFile *file_mu, *file_el;
-      TString weightname = "sf_"+sys;
-      if(sys.Contains("JEC") || sys.Contains("JER")  || sys.Contains("COR")  || sys.Contains("JMS")){
-        TString subdir = sys;
-        if(subdir == "JMS_up") subdir = "JMS_upup";
-        if(subdir == "JMS_down") subdir = "JMS_downdown";
-        file_el = new TFile(dir+"/elec/"+subdir+"/"+prefix_mc+"TTbar"+"_"+year+".root");
-        file_mu = new TFile(dir+"/muon/"+subdir+"/"+prefix_mc+"TTbar"+"_"+year+".root");
-        weightname = "none";
+    for(auto process: processes){
+      if(process == "DATA") continue;
+      vector<vector<TH1F*>> h_all_years;
+      for(auto year: years){
+        double sf;
+        if(year == "2016v3")      sf = sf16;
+        else if(year == "2017v2") sf = sf17;
+        else if(year == "2018")   sf = sf18;
+        TFile *file_mu, *file_el;
+        TString weightname = "sf_"+sys;
+        if(sys.Contains("JEC") || sys.Contains("JER")  || sys.Contains("COR")  || sys.Contains("JMS")){
+          TString subdir = sys;
+          if(subdir == "JMS_up") subdir = "JMS_upup";
+          if(subdir == "JMS_down") subdir = "JMS_downdown";
+          file_el = new TFile(dir+"/elec/"+subdir+"/"+prefix_mc+process+"_"+year+".root");
+          file_mu = new TFile(dir+"/muon/"+subdir+"/"+prefix_mc+process+"_"+year+".root");
+          weightname = "none";
+        }
+        else{
+          file_el = new TFile(dir+"/elec/"+prefix_mc+process+"_"+year+".root");
+          file_mu = new TFile(dir+"/muon/"+prefix_mc+process+"_"+year+".root");
+        }
+        cout << " - fill " << sys << " " << process << " "<< year << endl;
+        vector<TH1F*> hists_el = get_hists(file_el, dummyhists, obsnames, "passed_measurement_rec", weightname);
+        vector<TH1F*> hists_mu = get_hists(file_mu, dummyhists, obsnames, "passed_measurement_rec", weightname);
+        vector<TH1F*> hists_combined;
+        for(unsigned int i=0; i<hists_el.size(); i++){
+          TH1F * hcombime = (TH1F*) hists_el[i]->Clone();
+          hcombime->Add(hists_mu[i]);
+          if(process == "TTbar") hcombime->Scale(sf);
+          hists_combined.push_back(hcombime);
+        }
+        h_all_years.push_back(hists_combined);
       }
-      else{
-        file_el = new TFile(dir+"/elec/"+prefix_mc+"TTbar"+"_"+year+".root");
-        file_mu = new TFile(dir+"/muon/"+prefix_mc+"TTbar"+"_"+year+".root");
+      for(unsigned int i=0; i<obsnames.size();i++){
+        TH1F * h_16 = h_all_years[0][i];
+        TH1F * h_17 = h_all_years[1][i];
+        TH1F * h_18 = h_all_years[2][i];
+        TH1F * hist = (TH1F*) h_16->Clone();
+        hist->Add(h_17);
+        hist->Add(h_18);
+        TString sysstring;
+        TString sysdummy = sys;
+        if     (sysdummy.Contains("up"))   sysstring = sysdummy.ReplaceAll("_up", "__plus");
+        else if(sysdummy.Contains("down")) sysstring = sysdummy.ReplaceAll("_down", "__minus");
+        // cout << sysstring << endl;
+        outfile->cd();
+        hist->Write(obsnames[i]+"__"+process+"__"+sysstring);
       }
-      cout << " - fill " << sys << " " << year << endl;
-      vector<TH1F*> hists_el = get_hists(file_el, dummyhists, obsnames, "passed_measurement_rec", weightname);
-      vector<TH1F*> hists_mu = get_hists(file_mu, dummyhists, obsnames, "passed_measurement_rec", weightname);
-      vector<TH1F*> hists_combined;
-      for(unsigned int i=0; i<hists_el.size(); i++){
-        TH1F * hcombime = (TH1F*) hists_el[i]->Clone();
-        hcombime->Add(hists_mu[i]);
-        hcombime->Scale(sf);
-        hists_combined.push_back(hcombime);
-      }
-      h_all_years.push_back(hists_combined);
-    }
-    for(unsigned int i=0; i<obsnames.size();i++){
-      TH1F * h_16 = h_all_years[0][i];
-      TH1F * h_17 = h_all_years[1][i];
-      TH1F * h_18 = h_all_years[2][i];
-      TH1F * hist = (TH1F*) h_16->Clone();
-      hist->Add(h_17);
-      hist->Add(h_18);
-      TString sysstring;
-      if     (sys.Contains("up"))   sysstring = sys.ReplaceAll("_up", "__plus");
-      else if(sys.Contains("down")) sysstring = sys.ReplaceAll("_down", "__minus");
-      // cout << sysstring << endl;
-      outfile->cd();
-      hist->Write(obsnames[i]+"__"+"TTbar"+"__"+sysstring);
     }
   }
 

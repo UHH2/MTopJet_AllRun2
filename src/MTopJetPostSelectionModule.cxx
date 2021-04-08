@@ -95,6 +95,7 @@ protected:
   std::unique_ptr<uhh2::Selection> matched_sub;
   std::unique_ptr<uhh2::Selection> matched_fat;
   std::unique_ptr<uhh2::Selection> subjet_quality;
+  std::unique_ptr<uhh2::Selection> subjet_quality10;
   std::unique_ptr<uhh2::Selection> subjet_quality_gen;
   std::unique_ptr<uhh2::Selection> lepton_sel;
   std::unique_ptr<uhh2::Selection> muon_highpt_sel;
@@ -164,6 +165,7 @@ protected:
   Event::Handle<bool>h_pt350_rec;
   Event::Handle<bool>h_nobtag_rec;
   Event::Handle<bool>h_ttbar;
+  Event::Handle<int>h_npv;
   Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen33;
   Event::Handle<double>h_mass_rec;
@@ -494,6 +496,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
 
   subjet_quality.reset(new SubjetQuality(ctx, jet_label_had, 30, 2.5));
+  subjet_quality10.reset(new SubjetQuality(ctx, jet_label_had, 10, 2.5));
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
   pt450_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 450));
   pt530_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 530));
@@ -851,6 +854,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_ptlepton_rec = ctx.declare_event_output<bool>("passed_leptonptmigration_rec");
   h_ptlepton_gen = ctx.declare_event_output<bool>("passed_leptonptmigration_gen");;
   h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
+  h_npv = ctx.declare_event_output<int>("NPV");
   h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
   h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
   h_mass_rec = ctx.declare_event_output<double>("Mass_Rec_old");
@@ -967,6 +971,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_ptsub1_rec, subjets.at(0).v4().Pt());
   event.set(h_ptsub2_rec, subjets.at(1).v4().Pt());
   event.set(h_ptsub3_rec, subjets.at(2).v4().Pt());
+  event.set(h_npv, event.pvs->size());
 
   // JetMassScale --------------------------------------------------------------
   if(debug) cout << "JMS\n";
@@ -1318,7 +1323,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event)  && eta_sel->passes(event) && !passed_btag_loose && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_WJets_sel = true;
   else pass_WJets_sel = false;
 
-  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && !subjet_quality->passes(event) && lepton_sel->passes(event)) pass_subptmigration_rec = true;
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && !subjet_quality->passes(event) && subjet_quality10->passes(event) && lepton_sel->passes(event)) pass_subptmigration_rec = true;
   else pass_subptmigration_rec = false;
 
   if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && !lepton_sel->passes(event)) pass_leptonptmigration_rec = true;
