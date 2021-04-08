@@ -56,7 +56,7 @@ int main(int argc, char* argv[]){
   TString reconst      = "btag";            // match btag_cut btag_sel compare min_mass
   int     bin_width    = 1;                 // functions_explain
   bool    usePeak_in   = true;
-  bool    into_latex   = true;
+  bool    into_latex   = false;
   bool    print_table  = false;
   bool    onlyData     = false;
   bool    useOnly_lin  = false;      // functions_explain
@@ -191,7 +191,6 @@ int main(int argc, char* argv[]){
     if(reconst=="btag"&&ptbin==2) w_mass = hist_class+"wmass_match_ptdiv_lh";
     if(reconst=="btag"&&ptbin==3) w_mass = hist_class+"wmass_match_ptdiv_ll";
     if(reconst=="btag"&&ptbin==4) w_mass = hist_class+"wmass_match";
-
 
     // #################################################################################################
     // Get Background ##################################################################################
@@ -757,7 +756,6 @@ int main(int argc, char* argv[]){
       yax->SetLineWidth(1);
 
       // -----------------------------------------------------------------------
-      // -----------------------------------------------------------------------
 
       TCanvas *B = new TCanvas(number_bin[bin]+"B"+ptbin_str, "B", 800, 800); // name used to avoid Warning
       bin_fit->GetHistogram()->GetXaxis()->SetRangeUser(-2, 2);
@@ -783,11 +781,49 @@ int main(int argc, char* argv[]){
       used_fit->SetRange(-2, -2, -1, 2, 2, 1);
       used_fit->Draw("surf4");
       B->SaveAs(save_path_general+"/single_bins/"+addition+"/Bin"+number_bin[bin]+"_Fit.pdf");
+
       B->Clear();
 
       // Remove Additional Points for fit --------------------------------------
       bin_fit->RemovePoint(6); // order is on purpose
       bin_fit->RemovePoint(5);
+
+      // -----------------------------------------------------------------------
+      // -----------------------------------------------------------------------
+      if(debug) cout << "HeatMap" << endl;
+
+      TH2F* heat_map = new TH2F("", "", 3, -1.5, 1.5, 3, -1.5, 1.5);
+      heat_map->SetBinContent(1,1,0);
+      heat_map->SetBinContent(1,2,XConeup_rebin_norm->GetBinContent(bin));
+      heat_map->SetBinContent(1,3,0);
+      heat_map->SetBinContent(2,1,JECup_rebin_norm->GetBinContent(bin));
+      heat_map->SetBinContent(2,2,ttbar_rebin_norm->GetBinContent(bin));
+      heat_map->SetBinContent(2,3,JECdown_rebin_norm->GetBinContent(bin));
+      heat_map->SetBinContent(3,1,0);
+      heat_map->SetBinContent(3,2,XConeup_rebin_norm->GetBinContent(bin));
+      heat_map->SetBinContent(3,3,0);
+
+      TCanvas *B1 = new TCanvas("B1", "", 800, 800); // name used to avoid Warning
+      bin_fit->GetHistogram()->GetXaxis()->SetRangeUser(-2, 2);
+      bin_fit->GetHistogram()->GetYaxis()->SetRangeUser(-2, 2);
+      bin_fit->GetHistogram()->GetZaxis()->SetRangeUser(min_bin_content*0.8, max_bin_content*1.2);
+
+      B1->SetRightMargin(0.09);
+      B1->SetLeftMargin(0.15);
+      B1->SetRightMargin(0.20);
+
+      double tt_bin = ttbar_rebin_norm->GetBinContent(bin);
+      heat_map->GetZaxis()->SetRangeUser(tt_bin-tt_bin*0.15, tt_bin+tt_bin*0.15);
+
+      gStyle->SetPalette(kCoffee);
+      heat_map->Draw("COLZ TEXT ERROR");
+
+      B1->SaveAs(save_path_general+"/single_bins/"+addition+"/HeatMap_"+number_bin[bin]+".pdf");
+      B1->Clear();
+      gStyle->SetPalette(kDeepSea);
+
+      // delete to avoid same name
+      delete heat_map;
 
       // #################################################################################################
       // Fill Fit Parameters #############################################################################
@@ -1216,7 +1252,7 @@ int main(int argc, char* argv[]){
   // Get Points --------------------------------------------------------------------------------------
   vector<vector<double>> points;
   auto start = high_resolution_clock::now(); // Calculation time - start
-  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 30000, 0.001, true);
+  points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 1000, 0.1, true);
   auto stop = high_resolution_clock::now();  // Calculation time - stop
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;
@@ -1251,6 +1287,7 @@ int main(int argc, char* argv[]){
 
   full_chi2_function->SetContour(60);   // Contours
   gStyle->SetPalette(kDeepSea);         // kDeepSea kGreyScale kRust
+  TColor::InvertPalette(); // CHANGE_PT
 
   TCanvas *Z = new TCanvas("Z","Z", 600, 600);
   Z->SetRightMargin(0.12);
