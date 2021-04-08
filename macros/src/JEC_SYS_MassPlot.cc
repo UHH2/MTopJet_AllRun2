@@ -26,9 +26,11 @@ void main_plot_settings(TH1F* hist, int x_min, int x_max, int color, TString tit
   hist->GetXaxis()->SetNdivisions(505);
   hist->GetYaxis()->SetNdivisions(505);
   hist->GetXaxis()->SetTitleSize(0.05);
-  hist->GetYaxis()->SetTitleSize(0.05);
+  hist->GetYaxis()->SetTitleSize(0.07);
   hist->GetXaxis()->SetTitleOffset(0.9);
   hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetYaxis()->SetLabelFont(43);
+  hist->GetYaxis()->SetLabelSize(19);
   hist->GetXaxis()->SetTitle(xAxis);
   hist->GetYaxis()->SetTitle(yAxis);
   hist->SetLineWidth(2);
@@ -109,14 +111,14 @@ void draw_plot(vector<TH1F*> hists, vector<TString> path, vector<double> mean)
   hists[2]->Draw("SAME HIST");
   hists[3]->Draw("SAME P");
 
-  TString nom  = "Nominal  <m_{jet}>="+dtos(mean[0], 2)+" GeV";
-  TString up   = path[2]+" up   <m_{jet}>="+dtos(mean[1], 2)+" GeV";
-  TString down = path[2]+" down <m_{jet}>="+dtos(mean[2], 2)+" GeV";
+  TString nom  = "Nominal  <#it{m}_{W}^{reco}>="+dtos(mean[0], 2)+" GeV";
+  TString up   = path[2]+" up   <#it{m}_{W}^{reco}>="+dtos(mean[1], 2)+" GeV";
+  TString down = path[2]+" down <#it{m}_{W}^{reco}>="+dtos(mean[2], 2)+" GeV";
 
+  leg->AddEntry(hists[3],"Data","pl");
   leg->AddEntry(hists[0],nom ,"l");
   leg->AddEntry(hists[1],up  ,"l");
   leg->AddEntry(hists[2],down,"l");
-  leg->AddEntry(hists[3],"Data","pl");
 
   leg->SetTextSize(0.03);
   leg->Draw();
@@ -193,30 +195,30 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
     xup   = "t#bar{t} f^{XCone}=+1 ";
     xdown = "t#bar{t} f^{XCone}=-1  ";
   }
-  TString data  = "data    ";
+  TString data  = "Data    ";
 
   leg->SetNColumns(2);
 
+  leg->AddEntry(hists[nHists-1],data,"pl");
+  leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[nHists-1], 2)+" GeV", "");
   leg->AddEntry(hists[0],nom ,"l");
-  leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[0], 2)+" GeV", "");
+  leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[0], 2)+" GeV", "");
   if(plotAll){
     leg->AddEntry(hists[1],jup  ,"l");
-    leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[1], 2)+" GeV", "");
+    leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[1], 2)+" GeV", "");
     leg->AddEntry(hists[2],jdown,"l");
-    leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[2], 2)+" GeV", "");
+    leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[2], 2)+" GeV", "");
     leg->AddEntry(hists[3],xup  ,"l");
-    leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[3], 2)+" GeV", "");
+    leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[3], 2)+" GeV", "");
     leg->AddEntry(hists[4],xdown,"l");
-    leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[4], 2)+" GeV", "");
+    leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[4], 2)+" GeV", "");
   }
   else{
     leg->AddEntry(hists[1],up  ,"l");
-    leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[1], 2)+" GeV", "");
+    leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[1], 2)+" GeV", "");
     leg->AddEntry(hists[2],down,"l");
-    leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[2], 2)+" GeV", "");
+    leg->AddEntry((TObject*)0, "<#it{m}_{W}^{reco}>="+dtos(mean[2], 2)+" GeV", "");
   }
-  leg->AddEntry(hists[nHists-1],data,"pl");
-  leg->AddEntry((TObject*)0, "<m_{jet}>="+dtos(mean[nHists-1], 2)+" GeV", "");
 
   leg->SetTextSize(0.03);
   leg->Draw();
@@ -230,7 +232,7 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
   pad2->Draw();
   pad2->cd();
 
-  ratios[nHists-1]->GetXaxis()->SetTitle("m_{jet} [GeV]");
+  ratios[nHists-1]->GetXaxis()->SetTitle("#it{m}_{W}^{reco} [GeV]");
   // ratios[nHists-1]->GetXaxis()->SetTitleOffset(4);
 
   ratios[nHists-1]->Draw("PE");
@@ -469,7 +471,7 @@ int main(int argc, char* argv[]){
     gStyle->SetOptStat(kFALSE);
     gStyle->SetLegendBorderSize(0);
 
-    TString xAxis      = "m_{jet} [GeV]";
+    TString xAxis      = "#it{m}_{W}^{reco} [GeV]";
     TString yAxis_norm = "#Delta N/N";
 
     for(int year=0; year<4; year++){
