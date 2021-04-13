@@ -19,6 +19,8 @@ sys_uncerts = {
      'JMS_updown'               : {'JetMassScale_direction':'updown'},
      'JMS_downup'               : {'JetMassScale_direction':'downup'},
      'JMS_downdown'             : {'JetMassScale_direction':'downdown'},
+     'JMS_up'               : {'JetMassScale_direction':'up'},
+     'JMS_down'             : {'JetMassScale_direction':'down'},
 }
 start_all_parallel = True
 

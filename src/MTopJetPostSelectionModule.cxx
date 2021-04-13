@@ -981,19 +981,35 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   vector<int> WSubjetIndex = jetprod_reco_corrected->GetWSubjetsIndices(event);
   TopJet wjet = jetprod_reco_corrected->GetHadronicWJet(event, WSubjetIndex);
   double mass_wjet_rec = wjet.v4().M();
+  vector<Jet> newsubjets;
 
+  int PoU = 0;
   if(isMC){
     // Data+MC
-    if     (jms_direction == "nominal")  points = {0.7495, -0.3392}; // BestFit point
-    else if(jms_direction == "upup")     points = {0.887884, -0.291257}; // clostest point, right
+    // if     (jms_direction == "nominal")  points = {0.7495, -0.3392}; // BestFit point
+    if     (jms_direction == "nominal")  points = {0.655998, -0.116777}; // BestFit point
+    else if(jms_direction == "upup")     points = {0.790998, -0.0717812}; // clostest point, right
+    // else if(jms_direction == "upup")     points = {0.887884, -0.291257}; // clostest point, right
     else if(jms_direction == "updown")   points = {0.953384, -0.923157}; // furthest point, down
     else if(jms_direction == "downup")   points = {0.533584,  0.256443}; // furthest point, up
-    else if(jms_direction == "downdown") points = {0.610384, -0.389157}; // clostest point, left
-    else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown)");
+    else if(jms_direction == "downdown") points = {0.520998, -0.161781}; // clostest point, left
+    // else if(jms_direction == "downdown") points = {0.610384, -0.389157}; // clostest point, left
+    // else if(jms_direction == "up")    points = {0.7495, -0.3392}; // Annual Note: Propergation of uncertainty
+    // else if(jms_direction == "down")  points = {0.7495, -0.3392}; // Annual Note: Propergation of uncertainty
+    else if(jms_direction == "up")       points = {0.655998, -0.116777}; // Annual Note: Propergation of uncertainty
+    else if(jms_direction == "down")     points = {0.655998, -0.116777}; // Annual Note: Propergation of uncertainty
+    else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+    // else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown)");
+
     if(debug) cout << "JMS - get_mass_BestFit\n";
-    mass_jms = BestFit->get_mass_BestFit(event, points);
+    if(jms_direction.EqualTo("up"))   PoU = 1;
+    if(jms_direction.EqualTo("down")) PoU = 2;
+    newsubjets = BestFit->GetSubjetsJMS(event, points, PoU);
+    mass_jms = BestFit->get_mass_BestFit(newsubjets);
+    // mass_jms = BestFit->get_mass_BestFit(event, points);
     event.set(h_mass_jms, mass_jms);
-    mass_wjms = BestFit->get_wmass_BestFit(event, points, WSubjetIndex);
+    mass_wjms = BestFit->get_wmass_BestFit(newsubjets, WSubjetIndex);
+    // mass_wjms = BestFit->get_wmass_BestFit(event, points, WSubjetIndex);
     event.set(h_mW_rec, mass_wjms);
   }
   else{

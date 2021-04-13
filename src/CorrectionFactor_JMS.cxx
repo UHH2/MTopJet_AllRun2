@@ -8,6 +8,15 @@ using namespace std;
 
 std::unique_ptr<FactorizedJetCorrector> build_corrector(const std::vector<std::string> & filenames);
 JetCorrectionUncertainty* corrector_uncertainty(const std::vector<std::string> & filenames);
+
+double eta_bins[13] = {0, 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.930, 2.322, 2.65, 3.139, 5.191};
+std::vector<TF1*> CentralCorrectionFunctions;
+std::vector<TGraph*> UpDownCorrectionGraphs;
+bool debug = false;
+
+double x_cor_err = 0.26344;
+double x_jec_err = 0.100036; // average
+
 /*
 Here only the Up Variation is used for both coreections. The points/factors for the BestFit method
 is calculated seperatly and have to be inserted by hand. The up an down factors are symmetric around the nominal value.
@@ -15,114 +24,6 @@ Therefore only the differences of f_nominal and f_up is used to calculate the ne
 
 JMS = JetMassScale
 */
-
-/*
-.██   ██  ██████  ██████  ███    ██ ███████
-. ██ ██  ██      ██    ██ ████   ██ ██
-.  ███   ██      ██    ██ ██ ██  ██ █████
-. ██ ██  ██      ██    ██ ██  ██ ██ ██
-.██   ██  ██████  ██████  ██   ████ ███████
-*/
-
-/* Copy frome CorrectionFactor.cc */
-
-double CorrectionFactor_JMS::get_factor_XCone(double pt, double eta, const double point_x){
-
-  // first transform eta to absolute value
-  if(eta < 0) eta *= -1;
-
-  // make sure that there is not jet with eta > 2.5
-  // (this should not happen because in CombineXCone this should be sorted out)
-  if(eta > 2.5) eta = 2.5;
-
-  // get eta bin
-  int etabin = 0;
-  int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
-  for(int i = 0; i < N_eta_bins; i++){
-    if(eta > eta_bins[i]) etabin = i;
-  }
-
-  // get factor from function
-  if(pt > 430) pt = 430;
-  if(pt < 30)  pt = 30;
-
-  // if(CorUp || CorDown){
-  // first get central factor
-  double f_c = CentralCorrectionFunctions[etabin]->Eval(pt);
-  // get up/down factor
-  double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);
-  // get difference
-  double df = f_ud - f_c;
-  // get additional sys (this already is a difference)
-  double dg = AdditionalSys->Eval(pt);
-  // to get the total factor one has to:
-  // 1. add df and dg in quadrature (this gives the total diff to central factor)
-  // 2. add this to central factor
-  // Dont need CorUp or CorDown.
-  // Variations are calculated the same way just with another point_x
-  double f_sys = f_c + sqrt(df*df + dg*dg);
-  // get calculated factor from chi2 best fit for xcone corrections (point_x)
-  double factor = f_c + point_x*fabs(f_c-f_sys);
-
-
-  return factor;
-}
-
-
-void CorrectionFactor_JMS::get_function(TString & year){
-
-  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
-  TString filename;
-  filename = dir + "Correction_allHad_"+year+".root";
-  TFile *file = new TFile(filename);
-
-  TString histname_updown;
-  TString histname_central;
-  int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
-  for(int i = 0; i < N_eta_bins; i++){
-    stringstream BinString;
-    BinString << i;
-    histname_updown = BinString.str();
-    histname_central = BinString.str();
-
-    histname_updown += "/Up";
-    UpDownCorrectionGraphs.push_back((TGraph*)file->Get(histname_updown));
-
-    histname_central += "/Central";
-    CentralCorrectionFunctions.push_back((TF1*)file->Get(histname_central));
-  }
-}
-
-void CorrectionFactor_JMS::get_additionalSYS(){
-
-  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
-  TString filename;
-  filename = dir + "Correction_SysFromResolution_"+str_year+".root";
-  TFile *file = new TFile(filename);
-
-  TString histname = "Up";
-  AdditionalSys = (TGraph*)file->Get(histname);
-
-  return;
-}
-
-// #################################################################################################################
-// #################################################################################################################
-
-/*
-.     ██ ███████  ██████
-.     ██ ██      ██
-.     ██ █████   ██
-.██   ██ ██      ██
-. █████  ███████  ██████
-*/
-
-/*
-Implemented in UHH2/common/src/JetCorrections.cxx due to the corrector.
-Additional Code is implemented in YearRunSwitchers (access the get_factor_JEC function in JetCorrection)
-and AnalysisModule (dummy function).
-*/
-
 
 // #################################################################################################################
 // #################################################################################################################
@@ -213,19 +114,15 @@ bool CorrectionFactor_JMS::process(uhh2::Event & event){ // Dummy
   return false;
 }
 
-// #################################################################################################################
-// #################################################################################################################
-
 /*
-██   ██  █████  ██████       ██ ███████ ████████
-██   ██ ██   ██ ██   ██      ██ ██         ██
-███████ ███████ ██   ██      ██ █████      ██
-██   ██ ██   ██ ██   ██ ██   ██ ██         ██
-██   ██ ██   ██ ██████   █████  ███████    ██
+███    ██ ███████ ██     ██ ███████ ██    ██ ██████       ██ ███████ ████████ ███████
+████   ██ ██      ██     ██ ██      ██    ██ ██   ██      ██ ██         ██    ██
+██ ██  ██ █████   ██  █  ██ ███████ ██    ██ ██████       ██ █████      ██    ███████
+██  ██ ██ ██      ██ ███ ██      ██ ██    ██ ██   ██ ██   ██ ██         ██         ██
+██   ████ ███████  ███ ███  ███████  ██████  ██████   █████  ███████    ██    ███████
 */
 
-double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<double>& points){
-  double debug = false;
+vector<Jet> CorrectionFactor_JMS::GetSubjetsJMS(uhh2::Event & event, const VecD& points, const int &PoU){
   if(debug) std::cout << "\nBestFit: Start Get_Mass_BestFit";
   std::vector<TopJet> oldjets = event.get(h_oldjets);
 
@@ -239,18 +136,24 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
   std::vector<Jet> oldsubjets = oldjets.at(0).subjets();
   if(debug) std::cout << "\nBestFit: number oldsubjets " << oldsubjets.size() << endl;
   // first get JEC factors
-  vector<double> factor_J;
+  VecDD corrections_JEC;
   if(debug) std::cout << "\nBestFit: Get J_factor";
-  if(year == Year::is2016v3) factor_J = get_factor_JEC(*corrector_MC_2016, oldsubjets, event, uncertainty_MC_2016, point_J);
-  else if(year == Year::is2017v2) factor_J = get_factor_JEC(*corrector_MC_2017, oldsubjets, event, uncertainty_MC_2017, point_J);
-  else if(year == Year::is2018) factor_J = get_factor_JEC(*corrector_MC_2018, oldsubjets, event, uncertainty_MC_2018, point_J);
+  if(year == Year::is2016v3) corrections_JEC = get_corrections_JEC(*corrector_MC_2016, oldsubjets, event, uncertainty_MC_2016);
+  else if(year == Year::is2017v2) corrections_JEC = get_corrections_JEC(*corrector_MC_2017, oldsubjets, event, uncertainty_MC_2017);
+  else if(year == Year::is2018) corrections_JEC = get_corrections_JEC(*corrector_MC_2018, oldsubjets, event, uncertainty_MC_2018);
+
+  VecD factor_J = get_factor_JEC(corrections_JEC, point_J);
+
   // Now get XCone factor using corrected jet
-  vector<double> factor_X;
+  VecD factor_X;
+  VecDD corrections_XCone;
   if(debug) std::cout << "\nBestFit: Get X_factor";
   for (unsigned int i=0; i<oldsubjets.size(); i++){
     double pt = oldsubjets[i].pt()*factor_J[i];
     double eta = oldsubjets[i].eta();
-    factor_X.push_back(get_factor_XCone(pt, eta, point_X));
+    VecD single_corrections = get_corrections_XCone(pt, eta);
+    corrections_XCone.push_back(single_corrections);
+    factor_X.push_back(get_factor_XCone(pt, single_corrections[0], single_corrections[1], point_X));
   }
 
   // Apply new correction factors for each subjet ------------------------------------------------------------------
@@ -258,6 +161,7 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
   std::vector<TLorentzVector> newsubjets_v4;
   std::vector<Jet> newsubjets;
   LorentzVector xcone_had_jms_noJER_v4;
+  VecD sigma_JMS = error_JMS(factor_J, factor_X, corrections_JEC, corrections_XCone);
 
   for(unsigned int subjet=0; subjet<factor_J.size(); subjet++)
   {
@@ -265,7 +169,12 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
     if(debug) cout << "Factor XCone = " << factor_X[subjet] << endl;
 
     newsubjets_v4.push_back(jet_to_tlorentz(oldsubjets[subjet]));
-    newsubjets_v4[subjet] *= factor_J[subjet]*factor_X[subjet];
+    double f_JMS = factor_J[subjet]*factor_X[subjet];
+    if(debug) cout << "factor JMS: " << f_JMS << endl;
+    if(debug) cout << "error JMS:  " << sigma_JMS[subjet] << endl;
+    if(PoU==1)      f_JMS += sigma_JMS[subjet];
+    else if(PoU==2) f_JMS -= sigma_JMS[subjet];
+    newsubjets_v4[subjet] *= f_JMS;
 
     // Set Jets for JER
     LorentzVector newsubjets_lorentz = tlorentz_to_lorentz(newsubjets_v4[subjet]); // .set_v4 does not take TLorentzVector!
@@ -288,109 +197,115 @@ double CorrectionFactor_JMS::get_mass_BestFit(uhh2::Event & event, const vector<
   std::vector<GenJet> gen_subjets = gen_topjets->at(index_gen).subjets();
   JER_Smearer->apply_JER_smearing(newsubjets, gen_subjets, 0.4, event.rho);
 
-  // Creat new hadjet ----------------------------------------------------------------------------------------------
-  if(debug) std::cout << "\nBestFit: Set new fatjet";
-  if(newsubjets.size() < 3) return -1.0;
-  LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
-  if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
-  // return mass ---------------------------------------------------------------------------------------------------
-  return xcone_had_jms_JER_v4.M();
-  if(debug) std::cout << "\n\n";
+  return newsubjets;
 }
-
-
-// #################################################################################################################
-// #################################################################################################################
 
 /*
-██     ██      ██ ███████ ████████
-██     ██      ██ ██         ██
-██  █  ██      ██ █████      ██
-██ ███ ██ ██   ██ ██         ██
- ███ ███   █████  ███████    ██
+.██   ██  ██████  ██████  ███    ██ ███████
+. ██ ██  ██      ██    ██ ████   ██ ██
+.  ███   ██      ██    ██ ██ ██  ██ █████
+. ██ ██  ██      ██    ██ ██  ██ ██ ██
+.██   ██  ██████  ██████  ██   ████ ███████
 */
 
-double CorrectionFactor_JMS::get_wmass_BestFit(uhh2::Event & event, const vector<double>& points, const std::vector<int>& WSubIndices){
-  double debug = false;
-  if(debug) std::cout << "\nBestFitW: Start Get_Mass_BestFit";
-  std::vector<TopJet> oldjets = event.get(h_oldjets);
+/* Copy frome CorrectionFactor.cc */
 
-  // Get points from input vector ----------------------------------------------------------------------------------
-  double point_J = points[0];
-  double point_X = points[1];
-  vector<float> factors_had, factors_X, factors_J;
-  if(debug) cout << point_J  << "     " << point_X << endl;
-  // Get new correction factors for XCone and JEC ------------------------------------------------------------------
-  if(debug) std::cout << "\nBestFitW: Get oldsubjets";
-  std::vector<Jet> oldsubjets = oldjets.at(0).subjets();
-  if(debug) std::cout << "\nBestFitW: number oldsubjets " << oldsubjets.size() << endl;
-  // first get JEC factors
-  vector<double> factor_J;
-  if(debug) std::cout << "\nBestFitW: Get J_factor";
-  if(year == Year::is2016v3) factor_J = get_factor_JEC(*corrector_MC_2016, oldsubjets, event, uncertainty_MC_2016, point_J);
-  else if(year == Year::is2017v2) factor_J = get_factor_JEC(*corrector_MC_2017, oldsubjets, event, uncertainty_MC_2017, point_J);
-  else if(year == Year::is2018) factor_J = get_factor_JEC(*corrector_MC_2018, oldsubjets, event, uncertainty_MC_2018, point_J);
-  // Now get XCone factor using corrected jet
-  vector<double> factor_X;
-  if(debug) std::cout << "\nBestFitW: Get X_factor";
-  for (unsigned int i=0; i<oldsubjets.size(); i++){
-    double pt = oldsubjets[i].pt()*factor_J[i];
-    double eta = oldsubjets[i].eta();
-    factor_X.push_back(get_factor_XCone(pt, eta, point_X));
+VecD CorrectionFactor_JMS::get_corrections_XCone(double pt, double eta){
+  // first transform eta to absolute value
+  if(eta < 0) eta *= -1;
+
+  // make sure that there is not jet with eta > 2.5
+  // (this should not happen because in CombineXCone this should be sorted out)
+  if(eta > 2.5) eta = 2.5;
+
+  // get eta bin
+  int etabin = 0;
+  int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
+  for(int i = 0; i < N_eta_bins; i++){
+    if(eta > eta_bins[i]) etabin = i;
   }
 
-  // Apply new correction factors for each subjet ------------------------------------------------------------------
-  if(debug) std::cout << "\nBestFitW: Set newsubjets";
-  std::vector<TLorentzVector> newsubjets_v4;
-  std::vector<Jet> newsubjets;
-  LorentzVector xcone_had_jms_noJER_v4;
+  // get factor from function
+  if(pt > 430) pt = 430;
+  if(pt < 30)  pt = 30;
 
-  for(unsigned int subjet=0; subjet<factor_J.size(); subjet++)
-  {
-    if(debug) cout << "Factor JEC   = " << factor_J[subjet] << endl;
-    if(debug) cout << "Factor XCone = " << factor_X[subjet] << endl;
+  // if(CorUp || CorDown){
+  // first get central factor
+  double f_c = CentralCorrectionFunctions[etabin]->Eval(pt);
+  // get up/down factor
+  double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);
+  // VecD corrections_XCone = {f_c, f_ud};
+  return {f_c, f_ud};
+}
 
-    newsubjets_v4.push_back(jet_to_tlorentz(oldsubjets[subjet]));
-    newsubjets_v4[subjet] *= factor_J[subjet]*factor_X[subjet];
+double CorrectionFactor_JMS::get_factor_XCone(double pt, double f_c, double f_ud, double point_x){
+  double df = f_ud - f_c;
+  // get additional sys (this already is a difference)
+  double dg = AdditionalSys->Eval(pt);
+  // to get the total factor one has to:
+  // 1. add df and dg in quadrature (this gives the total diff to central factor)
+  // 2. add this to central factor
+  // Dont need CorUp or CorDown.
+  // Variations are calculated the same way just with another point_x
+  double f_sys = f_c + sqrt(df*df + dg*dg);
+  // get calculated factor from chi2 best fit for xcone corrections (point_x)
+  double factor = f_c + point_x*fabs(f_c-f_sys);
 
-    // Set Jets for JER
-    LorentzVector newsubjets_lorentz = tlorentz_to_lorentz(newsubjets_v4[subjet]); // .set_v4 does not take TLorentzVector!
-    Jet newsubjet;
-    newsubjets.push_back(newsubjet);
-    newsubjets[subjet].set_v4(newsubjets_lorentz);
-    xcone_had_jms_noJER_v4 +=  newsubjets_lorentz;
-  }
-
-  if(debug) cout << "\nNo JER Wmass: " << xcone_had_jms_noJER_v4.M();
-  // Apply JER for each subjet -------------------------------------------------------------------------------------
-  if(debug) std::cout << "\nBestFitW: JER";
-  std::vector<GenTopJet>* gen_topjets = &event.get(h_genjets);
-  // match gentopjet to rectopjet
-  double dR0 = deltaR(oldjets.at(0), gen_topjets->at(0));
-  double dR1 = deltaR(oldjets.at(0), gen_topjets->at(1));
-  unsigned int index_gen=0;
-  if(dR0 > dR1) index_gen=1;
-
-  std::vector<GenJet> gen_subjets = gen_topjets->at(index_gen).subjets();
-  JER_Smearer->apply_JER_smearing(newsubjets, gen_subjets, 0.4, event.rho);
-
-  LorentzVector Wjet_v4_match = newsubjets[WSubIndices[0]].v4() + newsubjets[WSubIndices[1]].v4();
-  // cout << "mw: " << Wjet_v4_match.M() << endl;
-  return Wjet_v4_match.M();
-
-  // // Creat new hadjet ----------------------------------------------------------------------------------------------
-  // if(debug) std::cout << "\nBestFit: Set new fatjet";
-  // if(newsubjets.size() < 3) return -1.0;
-  // LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
-  // if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
-  // // return mass _--------------------------------------------------------------------------------------------------
-  // return xcone_had_jms_JER_v4.M();
-  // if(debug) std::cout << "\n\n";
+  return factor;
 }
 
 
+void CorrectionFactor_JMS::get_function(TString & year){
 
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
+  TString filename;
+  filename = dir + "Correction_allHad_"+year+".root";
+  TFile *file = new TFile(filename);
 
+  TString histname_updown;
+  TString histname_central;
+  int N_eta_bins = sizeof(eta_bins)/sizeof(eta_bins[0]) - 1;
+  for(int i = 0; i < N_eta_bins; i++){
+    stringstream BinString;
+    BinString << i;
+    histname_updown = BinString.str();
+    histname_central = BinString.str();
+
+    histname_updown += "/Up";
+    UpDownCorrectionGraphs.push_back((TGraph*)file->Get(histname_updown));
+
+    histname_central += "/Central";
+    CentralCorrectionFunctions.push_back((TF1*)file->Get(histname_central));
+  }
+}
+
+void CorrectionFactor_JMS::get_additionalSYS(){
+
+  TString dir = "/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/CorrectionFile/";
+  TString filename;
+  filename = dir + "Correction_SysFromResolution_"+str_year+".root";
+  TFile *file = new TFile(filename);
+
+  TString histname = "Up";
+  AdditionalSys = (TGraph*)file->Get(histname);
+
+  return;
+}
+
+/*
+.     ██ ███████  ██████
+.     ██ ██      ██
+.     ██ █████   ██
+.██   ██ ██      ██
+. █████  ███████  ██████
+*/
+
+/*
+Implemented in UHH2/common/src/JetCorrections.cxx due to the corrector.
+Additional Code is implemented in YearRunSwitchers (access the get_factor_JEC function in JetCorrection)
+and AnalysisModule (dummy function).
+==============> Check if all deleted!!!!!
+*/
 
 std::unique_ptr<FactorizedJetCorrector> build_corrector(const std::vector<std::string> & filenames){
   std::vector<JetCorrectorParameters> pars;
@@ -400,9 +315,11 @@ std::unique_ptr<FactorizedJetCorrector> build_corrector(const std::vector<std::s
   return uhh2::make_unique<FactorizedJetCorrector>(pars);
 }
 
-vector<double> CorrectionFactor_JMS::get_factor_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc, double point_J){
-  vector<double> JEC_factors;
+VecDD CorrectionFactor_JMS::get_corrections_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc){
+  cout << " ------------------ " << endl;
+  VecDD JEC_corrections;
   for(unsigned int i=0; i<subjets.size(); i++){
+
     auto factor_raw = subjets[i].JEC_factor_raw();
     corrector.setJetPt(subjets[i].pt() * factor_raw);
     corrector.setJetEta(subjets[i].eta());
@@ -420,7 +337,7 @@ vector<double> CorrectionFactor_JMS::get_factor_JEC(FactorizedJetCorrector & cor
     double pt = jet_v4_corrected.Pt();
     double eta = jet_v4_corrected.Eta();
     if(pt<5. || fabs(eta)>5.){
-      JEC_factors.push_back(0);
+      JEC_corrections.push_back({0.,0.});
     }
     else{
       jec_unc->setJetEta(eta);
@@ -429,11 +346,18 @@ vector<double> CorrectionFactor_JMS::get_factor_JEC(FactorizedJetCorrector & cor
       double unc = 0.;
       unc = jec_unc->getUncertainty(true);
       double correctionfactor_up = correctionfactor * (1 + fabs(unc));
-
-      // now calculate old factor
-      double correctionfactor_jms = correctionfactor + point_J * fabs(correctionfactor_up-correctionfactor);
-      JEC_factors.push_back(correctionfactor_jms);
+      JEC_corrections.push_back({correctionfactor, correctionfactor_up});
+      cout << correctionfactor << " " << correctionfactor_up << endl;
     }
+  }
+  return JEC_corrections;
+}
+
+VecD CorrectionFactor_JMS::get_factor_JEC(VecDD JEC_corrections, double point_J){
+  VecD JEC_factors;
+  for(unsigned int i=0; i<JEC_corrections.size(); i++){
+    double correctionfactor_jms = JEC_corrections[i][0] + point_J * fabs(JEC_corrections[i][1]-JEC_corrections[i][0]);
+    JEC_factors.push_back(correctionfactor_jms);
   }
   return JEC_factors;
 }
@@ -452,4 +376,39 @@ JetCorrectionUncertainty* corrector_uncertainty(const std::vector<std::string> &
   }
   JetCorrectionUncertainty* jec_uncertainty = new JetCorrectionUncertainty(*(new JetCorrectorParameters(unc_file.Data(), "Total")));
   return jec_uncertainty;
+}
+
+/*
+.     ██ ███    ███ ███████
+.     ██ ████  ████ ██
+.     ██ ██ ████ ██ ███████
+.██   ██ ██  ██  ██      ██
+. █████  ██      ██ ███████
+*/
+
+VecD CorrectionFactor_JMS::error_JMS(VecD factor_J, VecD factor_X, VecDD corrections_J, VecDD corrections_X){
+  VecD errors;
+  for(unsigned int i=0; i<factor_J.size(); i++){
+    double PoU_jec = x_jec_err*fabs(corrections_J[i][0]-corrections_J[i][1])*(corrections_X[i][0]+factor_X[i]*fabs(corrections_X[i][0]-corrections_X[i][1]));
+    double PoU_cor = x_cor_err*fabs(corrections_X[i][0]-corrections_X[i][1])*(corrections_J[i][0]+factor_J[i]*fabs(corrections_J[i][0]-corrections_J[i][1]));
+    double error = sqrt(PoU_jec*PoU_jec+PoU_cor*PoU_cor);
+    errors.push_back(error);
+  }
+  return errors;
+}
+
+double CorrectionFactor_JMS::get_wmass_BestFit(vector<Jet> newsubjets, const std::vector<int>& WSubIndices){
+  LorentzVector Wjet_v4_match = newsubjets[WSubIndices[0]].v4() + newsubjets[WSubIndices[1]].v4();
+  if(debug) cout << "mw: " << Wjet_v4_match.M() << endl;
+  return Wjet_v4_match.M();
+}
+
+double CorrectionFactor_JMS::get_mass_BestFit(vector<Jet> newsubjets){
+  // Creat new hadjet ----------------------------------------------------------------------------------------------
+  if(debug) std::cout << "\nBestFit: Set new fatjet";
+  if(newsubjets.size() < 3) return -1.0;
+  LorentzVector xcone_had_jms_JER_v4 = newsubjets[0].v4() + newsubjets[1].v4() + newsubjets[2].v4();
+  if(debug) cout << "\nJER JMS mass: " << xcone_had_jms_JER_v4.M() << endl;
+  // return mass ---------------------------------------------------------------------------------------------------
+  return xcone_had_jms_JER_v4.M();
 }
