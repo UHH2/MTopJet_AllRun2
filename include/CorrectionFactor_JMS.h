@@ -25,6 +25,12 @@
 using namespace std;
 using namespace uhh2;
 
+typedef vector<double> VecD;
+typedef vector<VecD> VecDD;
+
+typedef std::map<TString, double> MapD;
+typedef std::map<TString, VecD> MapVD;
+
 class FactorizedJetCorrector;
 
 class CorrectionFactor_JMS: public uhh2::AnalysisModule{
@@ -32,8 +38,9 @@ public:
 
   explicit CorrectionFactor_JMS(uhh2::Context &,  const std::string &, const std::string &, Year year_);
   virtual bool process(uhh2::Event & event) override;
-  double get_mass_BestFit(uhh2::Event &, const vector<double>&);
-  double get_wmass_BestFit(uhh2::Event &, const vector<double>&, const std::vector<int>&);
+  vector<Jet> GetSubjetsJMS(uhh2::Event &, const VecD&, const int &);
+  double get_mass_BestFit(vector<Jet>);
+  double get_wmass_BestFit(vector<Jet>, const std::vector<int>&);
 
 private:
 
@@ -41,7 +48,7 @@ private:
   uhh2::Event::Handle<std::vector<GenTopJet>> h_genjets;
   TString str_year;
   Year year;
-  vector<double> points;
+  VecD points;
   bool isMC;
   std::unique_ptr<YearSwitcher> jet_corrector_MC, jet_corrector_data;
   std::shared_ptr<RunSwitcher> jec_switcher_16, jec_switcher_17, jec_switcher_18;
@@ -50,21 +57,26 @@ private:
   // XCone ---------------------------------------------------------------------
   void get_function(TString &);
   void get_additionalSYS();
-  double get_factor_XCone(double, double, double);
+  double get_factor_XCone(double, double, double, double);
+  VecD get_corrections_XCone(double, double);
 
   //double arr[6][12]; // values from table
   //double par[12][3]; // values with function parameters in 12 eta bins
-  double eta_bins[13] = {0, 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.930, 2.322, 2.65, 3.139, 5.191};
-  std::vector<TF1*> CentralCorrectionFunctions;
-  std::vector<TGraph*> UpDownCorrectionGraphs;
+  //double eta_bins[13] = {0, 0.261, 0.522, 0.783, 1.044, 1.305, 1.479, 1.653, 1.930, 2.322, 2.65, 3.139, 5.191};
+  // std::vector<TF1*> CentralCorrectionFunctions;
+  // std::vector<TGraph*> UpDownCorrectionGraphs;
   TGraph *AdditionalSys;
 
   // JEC -----------------------------------------------------------------------
-  vector<double> get_factor_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc, double point_J);
+  VecD get_factor_JEC(VecDD, double);
+  VecDD get_corrections_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc);
   JetCorrectionUncertainty* jec_uncertainty;
   int direction =0; // -1 = down, +1 = up, 0 = nominal
   std::unique_ptr<FactorizedJetCorrector> corrector;
   std::unique_ptr<FactorizedJetCorrector> corrector_MC_2016, corrector_MC_2017, corrector_MC_2018;
   JetCorrectionUncertainty *uncertainty_MC_2016, *uncertainty_MC_2017, *uncertainty_MC_2018;
+
+  // JMS -----------------------------------------------------------------------
+  VecD error_JMS(VecD, VecD, VecDD, VecDD);
 
 };

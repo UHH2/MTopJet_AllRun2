@@ -7,9 +7,22 @@
 #include <sys/stat.h>
 #include <chrono>
 
+typedef std::vector<double> VecD;
+typedef std::vector<vector<double>> VecDD;
+
+typedef std::map<TString, double> MapD;
+typedef std::map<TString, VecD> MapVD;
+
 Double_t plane(Double_t *x, Double_t *par){
   return 0.;
 }
+
+VecD ExtractJMSValues(TF1* chi2function);
+void SetFunctionParameters(TF1* chi2function, VecDD paramters);
+void drawChi2Projection(TF1* chi2function, TString xaxis, VecD xRange, VecD yRange, TString save_path);
+void JMSinTXT(double nom, double up, double down, TString variation, TString save);
+void printVector(VecD vector);
+
 
 // #include <io.h>
 using namespace std;
@@ -17,18 +30,6 @@ using namespace std;
 int main(int argc, char* argv[]){
   bool debug = false;
   TString save_path = get_save_path();
-
-  /*
-  storage: PlaceToKeep/storage_JEC_SYS.txt
-  functions_explain:
-  - atoi()              - c-string representing integer into int
-  - stob(argv[4])       - string to bool (Utils.h)
-  - gErrorIgnoreLevel   - Print options of for TCanvas
-  - normalize_error()   - Propagation of Uncertainties (HistogramUtils.h)
-  - AddHists()          - HistogramUtils.h
-  - bins_empty          - HistogramUtils.h
-  - bins_upper_limit    - HistogramUtils.h
-  */
 
   // Modification ####################################################################################
   // #################################################################################################
@@ -41,8 +42,8 @@ int main(int argc, char* argv[]){
   print_seperater();
   cout.precision(6);
 
-  if(argc != 3){
-    cout << "\n" << "Usage: ./JEC_SYS <year> <pt_bins>\n";
+  if(argc != 2){
+    cout << "\n" << "Usage: ./JEC_SYS <year>\n";
     return 0;
   }
 
@@ -54,15 +55,15 @@ int main(int argc, char* argv[]){
   Int_t   oldLevel     = gErrorIgnoreLevel; // Set by: gErrorIgnoreLevel = ... - functions_explain
   gErrorIgnoreLevel    = kWarning;          // suppress TCanvas output
   TString reconst      = "btag";            // match btag_cut btag_sel compare min_mass
-  int     bin_width    = 1;                 // functions_explain
+  int     bin_width    = 1;
   bool    usePeak_in   = true;
   bool    into_latex   = false;
   bool    print_table  = false;
   bool    onlyData     = false;
-  bool    useOnly_lin  = false;      // functions_explain
+  bool    useOnly_lin  = false;
+  bool    pt_bins      = true;
 
   // Input ---------------------------------------------------------------------
-  bool    pt_bins      = stob(argv[2]);
   TString year         = argv[1];
 
   // #################################################################################################
@@ -111,21 +112,10 @@ int main(int argc, char* argv[]){
   ██████  ██ ██   ██ ███████  ██████    ██     ██████  ██   ██ ██ ███████ ███████
   */
   if(debug) cout << "Directiories" << endl;
-  // #################################################################################################
-  // creating subdirectories. Necessary, because different binning examined ##########################
-  /*
-  Explanation for mkdir(char **, mode_t mode) and mode_t: https://jameshfisher.com/2017/02/24/what-is-mode_t/
-  example:    0002 is -------w-
-  .           0003 is -------wx
-  .           0004 is ------r--
-  .           0005 is ------r-x
-  .           0006 is ------rw-
-  .           0007 is ------rwx
-  positions:  xyzw - x: type (folder, etc.) not necessary here;- y: owner;- z: group;- w: other;
-  */
+
   TString save_path_general = save_path+"/Plots/JEC_SYS";
   save_path_general = creat_folder_and_path(save_path_general, "chi2");
-  if(pt_bins) save_path_general = creat_folder_and_path(save_path_general, "pt_bins");               // CHANGE_PT
+  if(pt_bins) save_path_general = creat_folder_and_path(save_path_general, "pt_bins"); // CHANGE_PT
   else        save_path_general = creat_folder_and_path(save_path_general, "no_bins");
 
   // #################################################################################################
@@ -152,7 +142,7 @@ int main(int argc, char* argv[]){
 
   TString addition="";
   TString chi2_str_hh, chi2_str_hl, chi2_str_lh, chi2_str_ll;
-  vector<double> chi2_parameters_hh, chi2_parameters_hl, chi2_parameters_lh, chi2_parameters_ll;
+  VecD chi2_parameters_hh, chi2_parameters_hl, chi2_parameters_lh, chi2_parameters_ll;
 
   double number_bins_total = 0;
   double number_not_lin    = 0;
@@ -235,7 +225,7 @@ int main(int argc, char* argv[]){
     TH1F   *data_norm        = normalize(data);
     TH1F   *data_rebin_norm  = normalize(data_rebin);
 
-    vector<double> data_rebin_norm_err = normalize_error(data_rebin);
+    VecD data_rebin_norm_err = normalize_error(data_rebin);
     for(int ipar=0; ipar<data_rebin_norm->GetNbinsX(); ipar++)
     {
       data_rebin_norm->SetBinError(ipar+1, data_rebin_norm_err[ipar]);
@@ -293,11 +283,11 @@ int main(int argc, char* argv[]){
     TH1F* XConeup_rebin_norm   = rebin(XConeup_norm, bin_width);
     TH1F* XConedown_rebin_norm = rebin(XConedown_norm, bin_width);
 
-    vector<double> ttbar_rebin_norm_err     = normalize_error(ttbar_rebin);
-    vector<double> JECup_rebin_norm_err     = normalize_error(JECup_rebin);
-    vector<double> JECdown_rebin_norm_err   = normalize_error(JECdown_rebin);
-    vector<double> XConeup_rebin_norm_err   = normalize_error(XConeup_rebin);
-    vector<double> XConedown_rebin_norm_err = normalize_error(XConedown_rebin);
+    VecD ttbar_rebin_norm_err     = normalize_error(ttbar_rebin);
+    VecD JECup_rebin_norm_err     = normalize_error(JECup_rebin);
+    VecD JECdown_rebin_norm_err   = normalize_error(JECdown_rebin);
+    VecD XConeup_rebin_norm_err   = normalize_error(XConeup_rebin);
+    VecD XConedown_rebin_norm_err = normalize_error(XConedown_rebin);
 
     /*
     .██    ██ ███████ ███████ ██████      ██████  ██ ███    ██ ███████
@@ -319,7 +309,7 @@ int main(int argc, char* argv[]){
     if(debug) cout << "Masspeak Bins" << endl;
 
     bool usePeak =false;
-    vector<double> PeakLimit;
+    VecD PeakLimit;
     if(isAll&&usePeak_in) usePeak = true;
 
     double Limit;
@@ -496,7 +486,7 @@ int main(int argc, char* argv[]){
     // Bin Error one sigma estimation ##################################################################
     if(debug) cout << "Define BinError" << endl;
 
-    vector<double> bin_error_one_sigma_avg, bin_error_one_sigma_central;
+    VecD bin_error_one_sigma_avg, bin_error_one_sigma_central;
     for(int bin=0; bin<number_bins; bin++){
       bin_error_one_sigma_central.push_back(ttbar_rebin_norm_err[bin]);
       bin_error_one_sigma_avg.push_back((XConedown_rebin_norm_err[bin]+ttbar_rebin_norm_err[bin]+XConeup_rebin_norm_err[bin])/3);
@@ -532,21 +522,21 @@ int main(int argc, char* argv[]){
     vector<int> all_n_para;                     // Fill later - Declare befor loop
     vector<TF2*> all_fits;                      // Fill later - Declare befor loop
     vector<TString> str_all_fits;               // Fill later - Declare befor loop
-    vector<double> chi2_parameters;             // Fill later - Declare befor loop
-    vector<vector<double>> fits_parameters;     // Fill later - Declare befor loop - Debug purpose only
+    VecD chi2_parameters;             // Fill later - Declare befor loop
+    VecDD fits_parameters;     // Fill later - Declare befor loop - Debug purpose only
 
     double npar=0;
     int n_factors = 5; // JECdown, XConedown, ttbar, XConeup,JECup
 
     // Order important! - Used for TGraph2DErrors in Loop ----------------------
     vector<TH1F*> hists              = {ttbar_rebin_norm, JECdown_rebin_norm, JECup_rebin_norm, XConedown_rebin_norm, XConeup_rebin_norm};
-    vector<vector<double>> hists_err = {ttbar_rebin_norm_err, JECdown_rebin_norm_err, JECup_rebin_norm_err, XConedown_rebin_norm_err, XConeup_rebin_norm_err};
-    vector<vector<double>> hists_cont, hists_cont_err; // Used in Projection, Filled in Loop
+    VecDD hists_err = {ttbar_rebin_norm_err, JECdown_rebin_norm_err, JECup_rebin_norm_err, XConedown_rebin_norm_err, XConeup_rebin_norm_err};
+    VecDD hists_cont, hists_cont_err; // Used in Projection, Filled in Loop
 
-    vector<double> factor_x          = {0.0, -1.0,  1.0,  0.0,  0.0};
-    vector<double> factor_y          = {0.0,  0.0,  0.0, -1.0,  1.0};
-    vector<double> error_x           = {0.0,  0.0,  0.0,  0.0,  0.0};
-    vector<double> error_y           = {0.0,  0.0,  0.0,  0.0,  0.0};
+    VecD factor_x          = {0.0, -1.0,  1.0,  0.0,  0.0};
+    VecD factor_y          = {0.0,  0.0,  0.0, -1.0,  1.0};
+    VecD error_x           = {0.0,  0.0,  0.0,  0.0,  0.0};
+    VecD error_y           = {0.0,  0.0,  0.0,  0.0,  0.0};
 
     // #################################################################################################
     // Hists for Fits ##################################################################################
@@ -579,7 +569,7 @@ int main(int argc, char* argv[]){
       // Fill Vectors ####################################################################################
       if(debug) cout << "Get Bin Content" << endl;
 
-      vector<double> bin_content, bin_content_err;
+      VecD bin_content, bin_content_err;
       for(int factor=0; factor<n_factors; factor++){
         bin_content.push_back(hists[factor]->GetBinContent(bin+1));
         bin_content_err.push_back(hists_err[factor][bin]);
@@ -831,7 +821,7 @@ int main(int argc, char* argv[]){
 
       // Data Bin Content in Vector ############################################
       if(debug) cout << "Data Bin Content in Vector" << endl;
-      vector<double> data_rebin_norm_bin_content;
+      VecD data_rebin_norm_bin_content;
       for(int bin=1; bin < number_bins+1; bin++) data_rebin_norm_bin_content.push_back(data_rebin_norm->GetBinContent(bin));
 
       /*
@@ -843,7 +833,7 @@ int main(int argc, char* argv[]){
       */
 
       // Fill Parameter for Chi2 ###############################################
-      vector<double> fit_para; // Ablage - Cannot use chi2_para, since it contains ALL parameters
+      VecD fit_para; // Ablage - Cannot use chi2_para, since it contains ALL parameters
       double sigma_tot_square;
       if(onlyData) sigma_tot_square = pow(data_rebin_norm_err[bin], 2);
       else         sigma_tot_square = pow(data_rebin_norm_err[bin], 2)+pow(ttbar_rebin_norm_err[bin],2);
@@ -1030,7 +1020,7 @@ int main(int argc, char* argv[]){
 
     // Get Points --------------------------------------------------------------
     auto start = high_resolution_clock::now(); // Calculation time - start
-    vector<vector<double>> points = FindXY(chi2_function, twoD_minZ+2.3, twoD_minX-2, twoD_minX+2, twoD_minY-2, twoD_minY+2, 1000, 0.001);
+    VecDD points = FindXY(chi2_function, twoD_minZ+2.3, twoD_minX-2, twoD_minX+2, twoD_minY-2, twoD_minY+2, 1000, 0.001);
     auto stop  = high_resolution_clock::now();  // Calculation time - stop
     auto duration = duration_cast<milliseconds>(stop - start);
     cout << "Numeric solution for 1\u03C3 estimation took " << GREEN << duration.count()/1000 << "s" << RESET << endl;
@@ -1100,8 +1090,8 @@ int main(int argc, char* argv[]){
     // Which correction ################################################################################
     for(int factor=0; factor<2; factor++){
       if(debug) cout << "------------------------------------------------------- " << factor_name[factor] << endl;
-      vector<double> oneD_factor     = {-1,0,1};
-      vector<double> oneD_factor_err = { 0,0,0};
+      VecD oneD_factor     = {-1,0,1};
+      VecD oneD_factor_err = { 0,0,0};
 
       // #################################################################################################
       // Bins ############################################################################################
@@ -1118,7 +1108,7 @@ int main(int argc, char* argv[]){
         }
 
         int used_bin = bin-empty_bins;
-        vector<double> oneD_events, oneD_events_err;
+        VecD oneD_events, oneD_events_err;
         if(factor==0){
           oneD_events     = {hists_cont[used_bin][1], hists_cont[used_bin][0], hists_cont[used_bin][2]};
           oneD_events_err = {hists_cont_err[used_bin][1], hists_cont_err[used_bin][0], hists_cont_err[used_bin][2]};
@@ -1126,9 +1116,6 @@ int main(int argc, char* argv[]){
           oneD_events     = {hists_cont[used_bin][3], hists_cont[used_bin][0], hists_cont[used_bin][4]};
           oneD_events_err = {hists_cont_err[used_bin][3], hists_cont_err[used_bin][0], hists_cont_err[used_bin][4]};
         }
-        // if(debug) cout << setw(8) << oneD_events[0] << "   " << setw(8) << oneD_events[1] << "   " << setw(8) << oneD_events[2] << "   \n";
-        // if(debug) cout << setw(8) << oneD_events_err[0] << "   " << setw(8) << oneD_events_err[1] << "   " << setw(8) << oneD_events_err[2] << "   \n";
-
         // XCone -----------------------------------------------------------------------------------------
         TString str_fit = str_all_fits[used_bin];
         if(factor==0) str_fit.ReplaceAll("y", "0");
@@ -1195,7 +1182,7 @@ int main(int argc, char* argv[]){
   cout << endl;
 
   vector<TString>        all_string     = {chi2_str_hh, chi2_str_hl, chi2_str_lh, chi2_str_ll};
-  vector<vector<double>> all_parameters = {chi2_parameters_hh, chi2_parameters_hl, chi2_parameters_lh, chi2_parameters_ll};
+  VecDD all_parameters = {chi2_parameters_hh, chi2_parameters_hl, chi2_parameters_lh, chi2_parameters_ll};
 
   // #################################################################################################
   // Get String ######################################################################################
@@ -1250,7 +1237,7 @@ int main(int argc, char* argv[]){
   if(debug) cout<< "\nAll 2D Chi2 - Ellipse\n";
 
   // Get Points --------------------------------------------------------------------------------------
-  vector<vector<double>> points;
+  VecDD points;
   auto start = high_resolution_clock::now(); // Calculation time - start
   points = FindXY(full_chi2_function, twoD_minZ+2.3, twoD_minX-1.5, twoD_minX+1.5, twoD_minY-1.5, twoD_minY+1.5, 1000, 0.1, true);
   auto stop = high_resolution_clock::now();  // Calculation time - stop
@@ -1304,6 +1291,58 @@ int main(int argc, char* argv[]){
   Z->Clear();
 
   /*
+  ██████  ██████   ██████       ██ ███████  ██████ ████████ ██  ██████  ███    ██
+  ██   ██ ██   ██ ██    ██      ██ ██      ██         ██    ██ ██    ██ ████   ██
+  ██████  ██████  ██    ██      ██ █████   ██         ██    ██ ██    ██ ██ ██  ██
+  ██      ██   ██ ██    ██ ██   ██ ██      ██         ██    ██ ██    ██ ██  ██ ██
+  ██      ██   ██  ██████   █████  ███████  ██████    ██    ██  ██████  ██   ████
+  */
+
+  TString full_chi2_jec = full_chi2;
+  TString full_chi2_nan = full_chi2;
+  TString full_chi2_cor = full_chi2;
+
+  full_chi2_jec.ReplaceAll("y", "("+to_string(twoD_minY)+")");
+
+  full_chi2_cor.ReplaceAll("x", to_string(twoD_minX));
+  full_chi2_cor.ReplaceAll("y", "x");
+
+
+  TF1 *full_chi2_function_jec = new TF1("chi2_function_jec", full_chi2_jec, -3, 3);
+  TF1 *full_chi2_function_cor = new TF1("chi2_function_cor", full_chi2_cor, -3, 3);
+
+  double ipar_jec = 0;
+  for(unsigned int function=0; function<all_parameters.size(); function++){
+    for(unsigned int parameter=0; parameter<all_parameters[function].size(); parameter++){
+      full_chi2_function_jec->SetParameter(ipar_jec, all_parameters[function][parameter]);
+      ipar_jec++;
+    }
+  }
+
+  SetFunctionParameters(full_chi2_function_jec, all_parameters);
+  SetFunctionParameters(full_chi2_function_cor, all_parameters);
+
+  VecD JMS_JEC = ExtractJMSValues(full_chi2_function_jec);
+  VecD JMS_COR = ExtractJMSValues(full_chi2_function_cor);
+
+  // printVector(JMS_JEC);
+  // printVector(JMS_COR);
+
+  drawChi2Projection(full_chi2_function_jec, "JEC", {twoD_minX-0.4, twoD_minX+0.4}, {215, 235}, save_path_general);
+  drawChi2Projection(full_chi2_function_cor, "COR", {twoD_minY-1, twoD_minY+1}, {215, 235}, save_path_general);
+
+  JMSinTXT(JMS_JEC[0], JMS_JEC[1], JMS_JEC[2], "JEC", save_path_general);
+  JMSinTXT(JMS_COR[0], JMS_COR[1], JMS_COR[2], "COR", save_path_general);
+
+  double sigma_jec = (JMS_JEC[1]+JMS_JEC[2])/2;
+  double sigma_cor = (JMS_COR[1]+JMS_COR[2])/2;
+  double sigma_jms = sqrt(pow(sigma_jec/JMS_JEC[0],2)+pow(sigma_cor/JMS_COR[0],2));
+
+  cout << pow(sigma_cor/JMS_COR[0],2) << endl;
+  cout << pow(sigma_cor/JMS_JEC[0],2) << endl;
+  cout << "Error f_{JMS}: " << sigma_jms << endl;
+
+  /*
   ███████ ██      ██      ██ ██████  ███████ ███████
   ██      ██      ██      ██ ██   ██ ██      ██
   █████   ██      ██      ██ ██████  ███████ █████
@@ -1316,15 +1355,18 @@ int main(int argc, char* argv[]){
   if(debug) cout<< "\nFind extrme points of ellipse";
 
   double dmax1, dmax2, dmin1, dmin2;
-  vector<vector<double>> Ps_max, Ps_min;
+  VecDD Ps_max, Ps_min;
   unsigned int n_points = points.size();
   cout << "Looking at " << n_points << " points" << endl;
 
-  vector<double> dist_right, dist_left, dist_all, xValues, yValues;
+  VecD xValues, yValues, dist_right, dist_left, dist_all;
+  // MapVD dist_right, dist_left, dist_all;
   for(unsigned int point=0; point<n_points; point++){
     double x=points[point][0];
     double y=points[point][1];
     dist_all.push_back(sqrt(pow(twoD_minX-x, 2)+pow(twoD_minY-y, 2)));
+    // dist_all["x"].push_back(x);
+    // dist_all["y"].push_back(y);
     if(x>twoD_minX) dist_right.push_back(sqrt(pow(twoD_minX-x, 2)+pow(twoD_minY-y, 2)));
     if(x<twoD_minX) dist_left.push_back(sqrt(pow(twoD_minX-x, 2)+pow(twoD_minY-y, 2)));
     xValues.push_back(x);
@@ -1340,14 +1382,16 @@ int main(int argc, char* argv[]){
   int index_min_l_s = ReturnIndex_Low(dist_left);
   int index_min_r_s = ReturnIndex_Low(dist_right);
 
+  cout << setw(10) << dist_left[index_max_l_s] << setw(10) << dist_left[index_min_l_s] << setw(10) << dist_right[index_max_r_s] << setw(10) << dist_right[index_min_r_s] << endl;
+
   int index_max_l, index_max_r, index_min_l, index_min_r;
 
   // Compare ------------------------------------------------------------------------------------------
   for(unsigned int i=0; i<dist_all.size(); i++){
-    if(dist_left[index_max_l_s]==dist_all[i])  index_max_l = i;
-    if(dist_right[index_max_r_s]==dist_all[i]) index_max_r = i;
-    if(dist_left[index_min_l_s]==dist_all[i])  index_min_l = i;
-    if(dist_right[index_min_r_s]==dist_all[i]) index_min_r = i;
+    if(dist_left[index_max_l_s]==dist_all[i]) { index_max_l = i; cout << i << xValues[i] << " " << yValues[i] << " max l" << endl;}
+    if(dist_right[index_max_r_s]==dist_all[i]){ index_max_r = i; cout << i << xValues[i] << " " << yValues[i] << " max r" << endl;}
+    if(dist_left[index_min_l_s]==dist_all[i]) { index_min_l = i; cout << i << xValues[i] << " " << yValues[i] << " min l" << endl;}
+    if(dist_right[index_min_r_s]==dist_all[i]){ index_min_r = i; cout << i << xValues[i] << " " << yValues[i] << " min r" << endl;}
   }
   if(debug) cout << "l-max: " << index_max_l << " | r-max: " << index_max_r << " | l-min: " << index_min_l << " | r_min: " << index_min_r << endl;
 
@@ -1365,9 +1409,9 @@ int main(int argc, char* argv[]){
 
   jec_txt.open(save_path_general+"/jec_factor_all.txt", ios::out | ios::app);
   jec_txt << setw(4) << "\nuu: " << "(" << setw(7) << Round(Ps_max[3][0], 4) << ", " << setw(7) << Round(Ps_max[3][1], 4) << ")" <<  endl;
-  jec_txt << setw(4) << "dd: " << "(" << setw(7) << Round(Ps_max[2][0], 4) << ", " << setw(7) << Round(Ps_max[2][1], 4) << ")" <<  endl;
-  jec_txt << setw(4) << "ud: " << "(" << setw(7) << Round(Ps_max[1][0], 4) << ", " << setw(7) << Round(Ps_max[1][1], 4) << ")" <<  endl;
-  jec_txt << setw(4) << "du: " << "(" << setw(7) << Round(Ps_max[0][0], 4) << ", " << setw(7) << Round(Ps_max[0][1], 4) << ")" <<  endl;
+  jec_txt << setw(4) << "dd: "   << "(" << setw(7) << Round(Ps_max[2][0], 4) << ", " << setw(7) << Round(Ps_max[2][1], 4) << ")" <<  endl;
+  jec_txt << setw(4) << "ud: "   << "(" << setw(7) << Round(Ps_max[1][0], 4) << ", " << setw(7) << Round(Ps_max[1][1], 4) << ")" <<  endl;
+  jec_txt << setw(4) << "du: "   << "(" << setw(7) << Round(Ps_max[0][0], 4) << ", " << setw(7) << Round(Ps_max[0][1], 4) << ")" <<  endl;
   jec_txt.close();
 
   // #################################################################################################
@@ -1399,4 +1443,67 @@ int main(int argc, char* argv[]){
   extreme_points->Draw("SAME P");
   Z1->SaveAs(save_path_general+"/chi2_all_extreme_points.pdf");
   Z1->Clear();
+}
+
+
+
+
+
+// #################################################################################################
+// #################################################################################################
+// #################################################################################################
+
+VecD ExtractJMSValues(TF1* chi2function){
+  double minChi2   = chi2function->GetMinimum();
+  double f_JMS     = chi2function->GetX(minChi2, -3, 3);
+  double f_up      = chi2function->GetX(minChi2+1, f_JMS, 3);
+  double f_down    = chi2function->GetX(minChi2+1, -3, f_JMS);
+
+  double sigmaup   = f_up - f_JMS;
+  double sigmadown = f_JMS - f_down;
+
+  VecD values      = {f_JMS, sigmaup, sigmadown, f_up, f_down, minChi2};
+  return values;
+}
+
+// ------------------------------------------------------------------------------------
+void SetFunctionParameters(TF1* chi2function, VecDD parameters){
+  double ipar = 0;
+  for(unsigned int function=0; function<parameters.size(); function++){
+    for(unsigned int parameter=0; parameter<parameters[function].size(); parameter++){
+      chi2function->SetParameter(ipar, parameters[function][parameter]);
+      ipar++;
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------------
+void drawChi2Projection(TF1* chi2function, TString xaxis, VecD xRange, VecD yRange, TString save_path){
+  TCanvas* ccor = new TCanvas(xaxis, xaxis, 600, 600);
+  chi2function->SetTitle("");
+  chi2function->GetXaxis()->SetRangeUser(xRange[0], xRange[1]);
+  chi2function->GetYaxis()->SetRangeUser(yRange[0], yRange[1]);
+  chi2function->GetXaxis()->SetTitle("f^{JMS}_{"+xaxis+"}");
+  chi2function->GetYaxis()->SetTitle("#chi^{2}");
+  chi2function->GetYaxis()->SetTitleOffset(1.2);
+  chi2function->Draw();
+  ccor->SaveAs(save_path+"/Chi2_projection_"+xaxis+".pdf");
+}
+
+// ------------------------------------------------------------------------------------
+void JMSinTXT(double nom, double up, double down, TString variation, TString save){
+  ofstream textfile;
+  textfile.open(save+"/factor_projection_"+variation+".txt");
+  textfile << right;
+  textfile << setw(10) << "nom" << setw(10) << "up" << setw(10) << "down" << "\n";
+  textfile << setw(10) <<  nom  << setw(10) <<  up  << setw(10) <<  down;
+  textfile << "\n";
+  textfile.close();
+}
+
+// ------------------------------------------------------------------------------------
+void printVector(VecD vector){
+  cout << endl;
+  for(auto value: vector) cout << setw(10) << value << " ";
+  cout << endl;
 }
