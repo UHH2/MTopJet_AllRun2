@@ -8,7 +8,6 @@
 
 using namespace std;
 
-TH1F* Normalize(TH1F* hist);
 void PlotTau32(TH1F* data, TH1F* ttbar, vector<TH1F*> FSRup, vector<TH1F*> FSRdown);
 void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* band2, int bin, int firstbin, int lastbin);
 void PlotChi2(TF1* chi2function, vector<double> FSRvalues);
@@ -18,86 +17,105 @@ TH1F* SubtractBackgrounds(TH1F* data, vector<TH1F*> bgr, vector<double> syssize)
 TH1F* GetSYS(TH1F* hist, TH1F* up, TH1F* down, TString sysname);
 void PlotError(TH1F* hist, TString sysname);
 
-TString year;
+TString year, channel;
 TString save_path;
 
+bool debug = false;
 bool forTalk = true;
 
 int main(int argc, char* argv[]){
 
-  bool debug = false;
-  if(argc != 2){
-    cout << "Usage: ./FSRuncertainty <year>" << endl;
+  if(argc != 3){
+    cout << "Usage: ./FSRuncertainty <year> <channel>" << endl;
     cout << "  year = 2016/2017/2018/combine" << endl;
+    cout << "  channel = muon/elec/combine" << endl;
     return 0;
   }
   year = argv[1];
+  TString ichannel = argv[2];
+  if(ichannel.EqualTo("muon")) channel = "_muon";
+  if(ichannel.EqualTo("elec")) channel = "_elec";
+  if(ichannel.EqualTo("combine")) channel = "";
+
+  gErrorIgnoreLevel = kWarning;
   SetupGlobalStyle();
 
-  vector<TString> masswindows = {"140toInf", "140to160", "160to170", "170to180", "180to190", "190to200", "200toInf"};
-  // vector<TString> masswindows = {"140to200"};
+  cout << "\n-------------" << endl;
+  cout << "year:    " << year << endl;
+  cout << "channel: " << ichannel << endl;
+  cout << "-------------" << endl;
+
+  // vector<TString> masswindows = {"140toInf", "140to160", "160to170", "170to180", "180to190", "190to200", "200toInf"};
+  vector<TString> masswindows = {"140toInf"};
   vector<vector<double>> f_fsr;
 
   for(auto mass_string: masswindows){
-
+    cout << "Start with mass " << mass_string << " ... " << endl;
+    if(debug) cout << "\t ... Create save_path" << endl;
     save_path = get_save_path()+"/Plots/FSRuncertainty/";
     save_path = creat_folder_and_path(save_path, year);
+    save_path = creat_folder_and_path(save_path, ichannel);
     save_path = creat_folder_and_path(save_path, mass_string);
 
     TFile* infile = new TFile("FSR_hists_mjet"+mass_string+".root");
 
     // #################################################################################################
     // Get Hists #######################################################################################
-    TH1F *data = (TH1F*) infile->Get("data_"+year);
-    TH1F *ttbar = (TH1F*) infile->Get("nominal_"+year);
+    if(debug) cout << "\t ... Get Hists" << endl;
+    TH1F *data = (TH1F*) infile->Get("data"+channel+"_"+year);
+    TH1F *ttbar = (TH1F*) infile->Get("nominal"+channel+"_"+year);
     vector<TH1F*> bkg;
-    bkg.push_back((TH1F*) infile->Get("bgr_st_"+year));
-    bkg.push_back((TH1F*) infile->Get("bgr_wj_"+year));
-    bkg.push_back((TH1F*) infile->Get("bgr_ot_"+year));
+    bkg.push_back((TH1F*) infile->Get("bgr_st"+channel+"_"+year));
+    bkg.push_back((TH1F*) infile->Get("bgr_wj"+channel+"_"+year));
+    bkg.push_back((TH1F*) infile->Get("bgr_ot"+channel+"_"+year));
     vector<double> bkgsys = {0.23, 0.19, 1.0};
 
-    TH1F *jecup = (TH1F*) infile->Get("jecup_"+year);
-    TH1F *jecdown = (TH1F*) infile->Get("jecdown_"+year);
-    TH1F *corup = (TH1F*) infile->Get("corup_"+year);
-    TH1F *cordown = (TH1F*) infile->Get("cordown_"+year);
-    TH1F *jmsup = (TH1F*) infile->Get("jmsup_"+year);
-    TH1F *jmsdown = (TH1F*) infile->Get("jmsdown_"+year);
+    if(debug) cout << "\t ... Get Hists for Jet" << endl;
+    // TH1F *jecup = (TH1F*) infile->Get("jecup"+channel+"_"+year);
+    // TH1F *jecdown = (TH1F*) infile->Get("jecdown"+channel+"_"+year);
+    // TH1F *corup = (TH1F*) infile->Get("corup"+channel+"_"+year);
+    // TH1F *cordown = (TH1F*) infile->Get("cordown"+channel+"_"+year);
+    // TH1F *jmsup = (TH1F*) infile->Get("jmsup"+channel+"_"+year);
+    // TH1F *jmsdown = (TH1F*) infile->Get("jmsdown"+channel+"_"+year);
 
+    if(debug) cout << "\t ... Get Hists for FSR" << endl;
     vector<TH1F*> FSRup, FSRdown;
     vector<double> FSRvalues;
     if(year == "2016"){
       // FSRvalues = {1./2, 1., 2.};
       FSRvalues = {0.25, 1., 4.}; // squared
-      FSRdown.push_back((TH1F*) infile->Get("fsrdown2_"+year));
-      FSRup.push_back((TH1F*) infile->Get("fsrup2_"+year));
+      FSRdown.push_back((TH1F*) infile->Get("fsrdown2"+channel+"_"+year));
+      FSRup.push_back((TH1F*) infile->Get("fsrup2"+channel+"_"+year));
     }
     else{
       // FSRvalues = {1./4, 1./2, 1./sqrt(2), 1., sqrt(2), 2., 4.};
       FSRvalues = {0.0625, 0.25, 0.5, 1., 2., 4., 16.}; // squared
-      FSRdown.push_back((TH1F*) infile->Get("fsrdown4_"+year));
-      FSRdown.push_back((TH1F*) infile->Get("fsrdown2_"+year));
-      FSRdown.push_back((TH1F*) infile->Get("fsrdownsqrt2_"+year));
-      FSRup.push_back((TH1F*) infile->Get("fsrupsqrt2_"+year));
-      FSRup.push_back((TH1F*) infile->Get("fsrup2_"+year));
-      FSRup.push_back((TH1F*) infile->Get("fsrup4_"+year));
+      FSRdown.push_back((TH1F*) infile->Get("fsrdown4"+channel+"_"+year));
+      FSRdown.push_back((TH1F*) infile->Get("fsrdown2"+channel+"_"+year));
+      FSRdown.push_back((TH1F*) infile->Get("fsrdownsqrt2"+channel+"_"+year));
+      FSRup.push_back((TH1F*) infile->Get("fsrupsqrt2"+channel+"_"+year));
+      FSRup.push_back((TH1F*) infile->Get("fsrup2"+channel+"_"+year));
+      FSRup.push_back((TH1F*) infile->Get("fsrup4"+channel+"_"+year));
     }
 
     // #################################################################################################
     // Subtract backgournd #############################################################################
+    if(debug) cout << "\t ... Subtract Bkg" << endl;
     TH1F* data_sub = SubtractBackgrounds(data, bkg, bkgsys);
 
     // #################################################################################################
     // Rebin ###########################################################################################
+    if(debug) cout << "\t ... Rebin" << endl;
     int rebin = 5;
     if(rebin > 1){
       data_sub->Rebin(rebin);
       ttbar->Rebin(rebin);
-      jecup->Rebin(rebin);
-      jecdown->Rebin(rebin);
-      corup->Rebin(rebin);
-      cordown->Rebin(rebin);
-      jmsup->Rebin(rebin);
-      jmsdown->Rebin(rebin);
+      // jecup->Rebin(rebin);
+      // jecdown->Rebin(rebin);
+      // corup->Rebin(rebin);
+      // cordown->Rebin(rebin);
+      // jmsup->Rebin(rebin);
+      // jmsdown->Rebin(rebin);
       for(auto fsr: FSRup) fsr->Rebin(rebin);
       for(auto fsr: FSRdown) fsr->Rebin(rebin);
       cout << "Rebin with a factor of " << rebin << " - resulting in a bin width of " <<  data_sub->GetBinWidth(1) << endl;
@@ -105,14 +123,15 @@ int main(int argc, char* argv[]){
 
     // #################################################################################################
     // Normalize #######################################################################################
+    if(debug) cout << "\t ... Normalize" << endl;
     TH1F *data_norm = Normalize(data_sub);
     TH1F *ttbar_norm = Normalize(ttbar);
-    TH1F *jecup_norm = Normalize(jecup);
-    TH1F *jecdown_norm = Normalize(jecdown);
-    TH1F *corup_norm = Normalize(corup);
-    TH1F *cordown_norm = Normalize(cordown);
-    TH1F *jmsup_norm = Normalize(jmsup);
-    TH1F *jmsdown_norm = Normalize(jmsdown);
+    // TH1F *jecup_norm = Normalize(jecup);
+    // TH1F *jecdown_norm = Normalize(jecdown);
+    // TH1F *corup_norm = Normalize(corup);
+    // TH1F *cordown_norm = Normalize(cordown);
+    // TH1F *jmsup_norm = Normalize(jmsup);
+    // TH1F *jmsdown_norm = Normalize(jmsdown);
     vector<TH1F*> FSRup_norm, FSRdown_norm;
     for(auto fsr: FSRup) FSRup_norm.push_back(Normalize(fsr));
     for(auto fsr: FSRdown) FSRdown_norm.push_back(Normalize(fsr));
@@ -121,14 +140,16 @@ int main(int argc, char* argv[]){
     PlotError(ttbar_norm, "TTbar");
     // #################################################################################################
     // Get additional uncertainties ####################################################################
+    if(debug) cout << "\t ... Plot systematics (jec,cor,jms)" << endl;
     vector<TH1F*> sys;
-    sys.push_back(GetSYS(ttbar_norm, jecup_norm, jecdown_norm, "jec"));
-    sys.push_back(GetSYS(ttbar_norm, corup_norm, cordown_norm, "cor"));
-    sys.push_back(GetSYS(ttbar_norm, jmsup_norm, jmsdown_norm, "jms"));
+    // sys.push_back(GetSYS(ttbar_norm, jecup_norm, jecdown_norm, "jec"));
+    // sys.push_back(GetSYS(ttbar_norm, corup_norm, cordown_norm, "cor"));
+    // sys.push_back(GetSYS(ttbar_norm, jmsup_norm, jmsdown_norm, "jms"));
 
 
     // #################################################################################################
     // Fit per bin #####################################################################################
+    if(debug) cout << "\t ... Fit" << endl;
     vector<vector<double>> fitparameters;
     vector<int> validbins;
     int nbins = ttbar_norm->GetXaxis()->GetNbins();
@@ -211,6 +232,7 @@ int main(int argc, char* argv[]){
 
     // #################################################################################################
     // Now calculate the Chi2 ##########################################################################
+    if(debug) cout << "\t ... Chi2" << endl;
     TString chi2formula;
     for(int i=0; i<validbins.size();i++){
       double dataentry = data_norm->GetBinContent(validbins[i]);
@@ -259,7 +281,7 @@ int main(int argc, char* argv[]){
 
 
     fstream fsr_txt;
-    fsr_txt.open(save_path+"/fsr_factor.txt", ios::out);
+    fsr_txt.open(save_path+"/fsr_factor"+channel+".txt", ios::out);
     fsr_txt << "f_FSR  = " << Values[0] << " + " << Values[1] << " - " << Values[2] << endl;
     fsr_txt << "f_up   = " << Values[3] << endl;
     fsr_txt << "f_down = " << Values[4] << endl;
@@ -275,30 +297,6 @@ int main(int argc, char* argv[]){
 // #################################################################################################
 // #################################################################################################
 // #################################################################################################
-TH1F* Normalize(TH1F* hist){
-  TH1F* norm = (TH1F*) hist->Clone();
-  int nbins = hist->GetXaxis()->GetNbins();
-  double integral = hist->Integral();
-  norm->Scale(1/integral);
-  // Now do error propagation:
-  // Bin content of norm hist: b_i = N_i / (N_1 + N_2 + N_3 + ...)
-  // Two derivations:
-  // 1. db_i / dN_i = (N_2 + N_3 + ...) / (N_1 + N_2 + N_3 + ...)^2 = (Integral - N_i) / Integral^2
-  // 2. db_i / dN_j = - N_1 / (N_1 + N_2 + N_3 + ...)^2
-
-  for(int i=1; i<=nbins; i++){
-    double error2 = 0;
-    for(int j=1; j<=nbins; j++){
-      double additionalterm;
-      if(i==j) additionalterm = (integral - hist->GetBinContent(j)) / (integral * integral);
-      else     additionalterm = - hist->GetBinContent(j) / (integral * integral);
-      error2 += additionalterm*additionalterm * hist->GetBinError(j)*hist->GetBinError(j);
-    }
-    double error = sqrt(error2);
-    norm->SetBinError(i, error);
-  }
-  return norm;
-}
 
 
 void PlotFit(TGraphErrors* graph, TF1* fit, TGraphErrors* band1, TGraphErrors* band2, int bin, int firstbin, int lastbin){
@@ -473,7 +471,7 @@ void PlotResults(vector<vector<double>> f_fsr, vector<TString> masswindows){
     x += 1.0;
   }
 
-  c->SaveAs(save_path+"/Plots/FSRuncertainty/Results_"+year+".pdf");
+  c->SaveAs(save_path+"/Results_"+year+".pdf");
   delete c;
 }
 

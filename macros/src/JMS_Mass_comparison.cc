@@ -10,6 +10,9 @@
 // #include <io.h>
 using namespace std;
 
+bool debug = true;
+TString save_path;
+
 // -------------------------------------------------------------------------------------------------------
 // ---------------------------------------- FUNCTIONS ----------------------------------------------------
 // -------------------------------------------------------------------------------------------------------
@@ -100,8 +103,9 @@ int main(int argc, char* argv[])
   Show the difference between the old Mass Jet distribution and the new one
   using the BestFit method.
   */
-  bool debug = true;
-  TString save_path = get_save_path();
+
+  SetupGlobalStyle();
+  gErrorIgnoreLevel = kWarning;
 
   print_seperater();
 
@@ -111,6 +115,7 @@ int main(int argc, char* argv[])
     return 0;
   }
 
+  save_path = get_save_path();
   TString save_path_general = save_path+"/Plots"; // CHANGE_PT
   save_path_general = creat_folder_and_path(save_path_general, "JMS");
   creat_folder(save_path_general+"/muon");
@@ -207,13 +212,13 @@ int main(int argc, char* argv[])
   vector<TH1F*> all_data_elec_old         = h_data_elec_old;    // dummy
   vector<TH1F*> all_data_combine_old      = h_data_combine_old; // dummy
 
-  vector<TH1F*> all_data_muon_norm        = normalize(all_data_muon);
-  vector<TH1F*> all_data_elec_norm        = normalize(all_data_elec);
-  vector<TH1F*> all_data_combine_norm     = normalize(all_data_combine);
+  vector<TH1F*> all_data_muon_norm        = VectorNormalize(all_data_muon);
+  vector<TH1F*> all_data_elec_norm        = VectorNormalize(all_data_elec);
+  vector<TH1F*> all_data_combine_norm     = VectorNormalize(all_data_combine);
 
-  vector<TH1F*> all_data_muon_norm_old    = normalize(all_data_muon_old);
-  vector<TH1F*> all_data_elec_norm_old    = normalize(all_data_elec_old);
-  vector<TH1F*> all_data_combine_norm_old = normalize(all_data_combine_old);
+  vector<TH1F*> all_data_muon_norm_old    = VectorNormalize(all_data_muon_old);
+  vector<TH1F*> all_data_elec_norm_old    = VectorNormalize(all_data_elec_old);
+  vector<TH1F*> all_data_combine_norm_old = VectorNormalize(all_data_combine_old);
 
   // Bkg -----------------------------------------------------------------------
 
@@ -235,12 +240,12 @@ int main(int argc, char* argv[])
   vector<TH1F*> all_ttbar_elec_old         = AddHists(h_bkg_elec_old, h_ttbar_elec_old, 1);
   vector<TH1F*> all_ttbar_combine_old      = AddHists(h_bkg_combine_old, h_ttbar_combine_old, 1);
 
-  vector<TH1F*> all_ttbar_muon_norm        = normalize(all_ttbar_muon);
-  vector<TH1F*> all_ttbar_elec_norm        = normalize(all_ttbar_elec);
-  vector<TH1F*> all_ttbar_combine_norm     = normalize(all_ttbar_combine);
-  vector<TH1F*> all_ttbar_muon_norm_old    = normalize(all_ttbar_muon_old);
-  vector<TH1F*> all_ttbar_elec_norm_old    = normalize(all_ttbar_elec_old);
-  vector<TH1F*> all_ttbar_combine_norm_old = normalize(all_ttbar_combine_old);
+  vector<TH1F*> all_ttbar_muon_norm        = VectorNormalize(all_ttbar_muon);
+  vector<TH1F*> all_ttbar_elec_norm        = VectorNormalize(all_ttbar_elec);
+  vector<TH1F*> all_ttbar_combine_norm     = VectorNormalize(all_ttbar_combine);
+  vector<TH1F*> all_ttbar_muon_norm_old    = VectorNormalize(all_ttbar_muon_old);
+  vector<TH1F*> all_ttbar_elec_norm_old    = VectorNormalize(all_ttbar_elec_old);
+  vector<TH1F*> all_ttbar_combine_norm_old = VectorNormalize(all_ttbar_combine_old);
 
   // JMS -----------------------------------------------------------------------
   if(debug) cout << "JMS" << endl;
@@ -261,21 +266,21 @@ int main(int argc, char* argv[])
   vector<TH1F*> all_jms_dd_elec         = AddHists(h_bkg_elec, h_jms_dd_elec, 1);
   vector<TH1F*> all_jms_dd_combine      = AddHists(h_bkg_combine, h_jms_dd_combine, 1);
 
-  vector<TH1F*> all_jms_uu_muon_norm    = normalize(all_jms_uu_muon);
-  vector<TH1F*> all_jms_uu_elec_norm    = normalize(all_jms_uu_elec);
-  vector<TH1F*> all_jms_uu_combine_norm = normalize(all_jms_uu_combine);
+  vector<TH1F*> all_jms_uu_muon_norm    = VectorNormalize(all_jms_uu_muon);
+  vector<TH1F*> all_jms_uu_elec_norm    = VectorNormalize(all_jms_uu_elec);
+  vector<TH1F*> all_jms_uu_combine_norm = VectorNormalize(all_jms_uu_combine);
 
-  vector<TH1F*> all_jms_ud_muon_norm    = normalize(all_jms_ud_muon);
-  vector<TH1F*> all_jms_ud_elec_norm    = normalize(all_jms_ud_elec);
-  vector<TH1F*> all_jms_ud_combine_norm = normalize(all_jms_ud_combine);
+  vector<TH1F*> all_jms_ud_muon_norm    = VectorNormalize(all_jms_ud_muon);
+  vector<TH1F*> all_jms_ud_elec_norm    = VectorNormalize(all_jms_ud_elec);
+  vector<TH1F*> all_jms_ud_combine_norm = VectorNormalize(all_jms_ud_combine);
 
-  vector<TH1F*> all_jms_du_muon_norm    = normalize(all_jms_du_muon);
-  vector<TH1F*> all_jms_du_elec_norm    = normalize(all_jms_du_elec);
-  vector<TH1F*> all_jms_du_combine_norm = normalize(all_jms_du_combine);
+  vector<TH1F*> all_jms_du_muon_norm    = VectorNormalize(all_jms_du_muon);
+  vector<TH1F*> all_jms_du_elec_norm    = VectorNormalize(all_jms_du_elec);
+  vector<TH1F*> all_jms_du_combine_norm = VectorNormalize(all_jms_du_combine);
 
-  vector<TH1F*> all_jms_dd_muon_norm    = normalize(all_jms_dd_muon);
-  vector<TH1F*> all_jms_dd_elec_norm    = normalize(all_jms_dd_elec);
-  vector<TH1F*> all_jms_dd_combine_norm = normalize(all_jms_dd_combine);
+  vector<TH1F*> all_jms_dd_muon_norm    = VectorNormalize(all_jms_dd_muon);
+  vector<TH1F*> all_jms_dd_elec_norm    = VectorNormalize(all_jms_dd_elec);
+  vector<TH1F*> all_jms_dd_combine_norm = VectorNormalize(all_jms_dd_combine);
 
   // -------------------------------------------------------------------------------------------------------
   // ------------------------------------------ Plots ------------------------------------------------------
