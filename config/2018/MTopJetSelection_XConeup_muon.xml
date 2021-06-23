@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
+<!ENTITY NEVT "-1">
+
+<!ENTITY channel "muon">
+
+<!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/PreSel/2018">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2018/muon/XCone_up">
+
+<!-- =============================================== ttbar =========================================================================== -->
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_1      "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2018_1.root">
+<!ENTITY TTbar_Mtt0000to0700_2L2Nu_2      "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_2L2Nu_2018_2.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_1    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2018_1.root">
+<!ENTITY TTbar_Mtt0000to0700_SemiLep_2    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_SemiLep_2018_2.root">
+<!ENTITY TTbar_Mtt0000to0700_Hadronic     "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_Hadronic_2018.root">
+
+<!ENTITY TTbar_mtop1665_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_2L2Nu_2018.root">
+<!ENTITY TTbar_mtop1665_SemiLeptonic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_SemiLeptonic_2018.root">
+<!ENTITY TTbar_mtop1665_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1665_Hadronic_2018.root">
+
+<!ENTITY TTbar_mtop1695_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_2L2Nu_2018.root">
+<!ENTITY TTbar_mtop1695_SemiLeptonic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_SemiLeptonic_2018.root">
+<!ENTITY TTbar_mtop1695_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1695_Hadronic_2018.root">
+
+<!ENTITY TTbar_mtop1715_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715_2L2Nu_2018.root">
+<!ENTITY TTbar_mtop1715_SemiLeptonic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715_SemiLeptonic_2018.root">
+<!ENTITY TTbar_mtop1715_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1715_Hadronic_2018.root">
+
+<!ENTITY TTbar_mtop1735_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735_2L2Nu_2018.root">
+<!ENTITY TTbar_mtop1735_SemiLeptonic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735_SemiLeptonic_2018.root">
+<!ENTITY TTbar_mtop1735_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1735_Hadronic_2018.root">
+
+<!ENTITY TTbar_mtop1755_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_2L2Nu_2018.root">
+<!ENTITY TTbar_mtop1755_SemiLeptonic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_SemiLeptonic_2018.root">
+<!ENTITY TTbar_mtop1755_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1755_Hadronic_2018.root">
+
+<!ENTITY TTbar_mtop1785_2L2Nu   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785_2L2Nu_2018.root">
+<!ENTITY TTbar_mtop1785_SemiLeptonic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785_SemiLeptonic_2018.root">
+<!ENTITY TTbar_mtop1785_Hadronic   "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_mtop1785_Hadronic_2018.root">
+
+]>
+
+<!--
+<ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_SelMu_XConeup_2018"/>
+-->
+
+<JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
+  <Library Name="libSUHH2MTopJet"/>
+  <Package Name="SUHH2MTopJet.par"/>
+
+
+  <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="59740">
+    <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
+
+
+
+<!--
+████████ ████████
+.  ██       ██
+.  ██       ██
+.  ██       ██
+.  ██       ██
+-->
+
+<!-- <InputData Version="TTbar_Mtt0000to0700_2L2Nu_2018_1" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_2L2Nu_2018_2" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_2L2Nu_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_2018_1" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_Mtt0000to0700_SemiLep_2018_2" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_SemiLep_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_Mtt0000to0700_Hadronic_2018" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_Mtt0000to0700_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+
+<InputData Version="TTbar_mtop1665_2L2Nu_2018" Lumi="2436727.731" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1665_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1665_SemiLeptonic_2018" Lumi="9523908.321" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1665_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1665_Hadronic_2018" Lumi="9442631.308" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1665_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_mtop1695_2L2Nu_2018" Lumi="10791998.49" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_SemiLeptonic_2018" Lumi="25739676.77" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1695_Hadronic_2018" Lumi="17238591.53" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1695_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_mtop1715_2L2Nu_2018" Lumi="5001544.591" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1715_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1715_SemiLeptonic_2018" Lumi="21200732.42" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1715_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1715_Hadronic_2018" Lumi="21010783.08" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1715_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_mtop1735_2L2Nu_2018" Lumi="4525075.189" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1735_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1735_SemiLeptonic_2018" Lumi="19184468.77" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1735_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1735_Hadronic_2018" Lumi="19966493.42" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1735_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_mtop1755_2L2Nu_2018" Lumi="11079134.61" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_SemiLeptonic_2018" Lumi="22375040.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1755_Hadronic_2018" Lumi="13911225.63" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1755_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<InputData Version="TTbar_mtop1785_2L2Nu_2018" Lumi="406702.5747" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1785_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1785_SemiLeptonic_2018" Lumi="6857386.192" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1785_SemiLeptonic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<InputData Version="TTbar_mtop1785_Hadronic_2018" Lumi="6870630.933" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<In FileName="&TTbar_mtop1785_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+<!-- ================================================================================================================================== -->
+<!-- ====================================================== User Config =============================================================== -->
+<!-- ================================================================================================================================== -->
+
+<UserConfig>
+  <Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+  <Item Name="GenParticleCollection"   Value="GenParticles"/>
+  <Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+  <Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+
+  <Item Name="JetCollection"           Value="jetsAk4CHS"/>
+  <Item Name="GenJetCollection"        Value="slimmedGenJets"/>
+  <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/>
+  <Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop" />
+
+  <Item Name="additionalBranches" Value="xconePuppi xconeCHS genXCone33TopJets genXCone33TopJets_softdrop passed_gensel passed_recsel genjetsAk8Substructure"/>
+
+  <Item Name="METName"                 Value="slimmedMETs"/>
+
+  <!-- if use_sframe_weight is set to 'false' the weight is changed according to the lumi -->
+  <!-- also, common modules have to becalled to apply the correct weight -->
+  <Item Name="use_sframe_weight" Value="false"/>
+  <Item Name="dometfilters" Value="true" />
+  <Item Name="dopvfilter" Value="true" />
+  <Item Name="lumi_file" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.root"/>
+
+  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/MyDataPileupHistogram2018.root" />
+  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/MyMCPileupHistogram.root" />
+  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/MyDataPileupHistogram2018_72383.root" />
+  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_16/src/UHH2/common/data/2018/MyDataPileupHistogram2018_66017.root" />
+  <Item Name="channel" Value="&channel;"/>
+
+  <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+  <Item Name="jersmear_direction" Value="nominal" />         <!-- has to be: nominal, up or down! -->
+  <Item Name="JetCorrection_direction" Value="up" />  <!-- has to be: nominal, up or down! -->
+  <Item Name="NonClosureUncertainty" Value="false" />  <!-- has to be: true or false! -->
+
+
+  <Item Name="AnalysisModule" Value="MTopJetSelectionModule"/>
+</UserConfig>
+
+</Cycle>
+</JobConfiguration>
