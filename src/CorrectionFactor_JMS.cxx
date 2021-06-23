@@ -27,14 +27,7 @@ JMS = JetMassScale
 
 // #################################################################################################################
 // #################################################################################################################
-
-/*
-.██████  ██████  ███    ███ ██████  ██ ███    ██ ███████ ██████
-██      ██    ██ ████  ████ ██   ██ ██ ████   ██ ██      ██   ██
-██      ██    ██ ██ ████ ██ ██████  ██ ██ ██  ██ █████   ██   ██
-██      ██    ██ ██  ██  ██ ██   ██ ██ ██  ██ ██ ██      ██   ██
-.██████  ██████  ██      ██ ██████  ██ ██   ████ ███████ ██████
-*/
+// #################################################################################################################
 
 CorrectionFactor_JMS::CorrectionFactor_JMS(uhh2::Context & ctx, const std::string& jet_collection_rec, const std::string& jet_collection_gen, Year year_):
 h_oldjets(ctx.get_handle<std::vector<TopJet>>(jet_collection_rec)),
@@ -43,7 +36,6 @@ year(year_)
 {
   // const Year & year = extract_year(ctx);
   // JEC -----------------------------------------------------------------------------------------------------------
-  // setup JEC for XCone -------------------------------------------------------------------------------------------
   isMC = (ctx.get("dataset_type") == "MC");
 
   string jec_tag_2016 = "Summer16_07Aug2017";
@@ -76,7 +68,6 @@ year(year_)
     throw runtime_error("JMS should not be applied to data!");
   }
 
-  // ---------------------------------------------------------------------------------------------------------------
   // JER -----------------------------------------------------------------------------------------------------------
   JERSmearing::SFtype1 JER_sf;
 
@@ -96,7 +87,6 @@ year(year_)
 
   JER_Smearer.reset(new GenericJetResolutionSmearer(ctx,  jet_collection_rec, jet_collection_gen, JERFiles::JERPathStringMC(jer_tag,jetCollection,"SF"), JERFiles::JERPathStringMC(jer_tag,jetCollection,"PtResolution")));
 
-  // ---------------------------------------------------------------------------------------------------------------
   // XCone ---------------------------------------------------------------------------------------------------------
   if(year == Year::is2016v3)      str_year = "2016";
   else if(year == Year::is2017v2) str_year = "2017";
@@ -108,19 +98,13 @@ year(year_)
 
 // #################################################################################################################
 // #################################################################################################################
+// #################################################################################################################
+
 bool CorrectionFactor_JMS::process(uhh2::Event & event){ // Dummy
   double weight = event.weight; // avoid warning
   weight += 0;                  // avoid warning
   return false;
 }
-
-/*
-███    ██ ███████ ██     ██ ███████ ██    ██ ██████       ██ ███████ ████████ ███████
-████   ██ ██      ██     ██ ██      ██    ██ ██   ██      ██ ██         ██    ██
-██ ██  ██ █████   ██  █  ██ ███████ ██    ██ ██████       ██ █████      ██    ███████
-██  ██ ██ ██      ██ ███ ██      ██ ██    ██ ██   ██ ██   ██ ██         ██         ██
-██   ████ ███████  ███ ███  ███████  ██████  ██████   █████  ███████    ██    ███████
-*/
 
 vector<Jet> CorrectionFactor_JMS::GetSubjetsJMS(uhh2::Event & event, const VecD& points, const int &PoU){
   if(debug) std::cout << "\nBestFit: Start Get_Mass_BestFit";
@@ -200,13 +184,9 @@ vector<Jet> CorrectionFactor_JMS::GetSubjetsJMS(uhh2::Event & event, const VecD&
   return newsubjets;
 }
 
-/*
-.██   ██  ██████  ██████  ███    ██ ███████
-. ██ ██  ██      ██    ██ ████   ██ ██
-.  ███   ██      ██    ██ ██ ██  ██ █████
-. ██ ██  ██      ██    ██ ██  ██ ██ ██
-.██   ██  ██████  ██████  ██   ████ ███████
-*/
+// #################################################################################################################
+// #################################################################################################################
+// #################################################################################################################
 
 /* Copy frome CorrectionFactor.cc */
 
@@ -229,12 +209,8 @@ VecD CorrectionFactor_JMS::get_corrections_XCone(double pt, double eta){
   if(pt > 430) pt = 430;
   if(pt < 30)  pt = 30;
 
-  // if(CorUp || CorDown){
-  // first get central factor
-  double f_c = CentralCorrectionFunctions[etabin]->Eval(pt);
-  // get up/down factor
-  double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);
-  // VecD corrections_XCone = {f_c, f_ud};
+  double f_c  = CentralCorrectionFunctions[etabin]->Eval(pt); // first get central factor
+  double f_ud = UpDownCorrectionGraphs[etabin]->Eval(pt);     // get up/down factor
   return {f_c, f_ud};
 }
 
@@ -292,13 +268,9 @@ void CorrectionFactor_JMS::get_additionalSYS(){
   return;
 }
 
-/*
-.     ██ ███████  ██████
-.     ██ ██      ██
-.     ██ █████   ██
-.██   ██ ██      ██
-. █████  ███████  ██████
-*/
+// #################################################################################################################
+// #################################################################################################################
+// #################################################################################################################
 
 /*
 Implemented in UHH2/common/src/JetCorrections.cxx due to the corrector.
@@ -316,7 +288,6 @@ std::unique_ptr<FactorizedJetCorrector> build_corrector(const std::vector<std::s
 }
 
 VecDD CorrectionFactor_JMS::get_corrections_JEC(FactorizedJetCorrector & corrector, vector<Jet> subjets, const Event & event, JetCorrectionUncertainty* jec_unc){
-  cout << " ------------------ " << endl;
   VecDD JEC_corrections;
   for(unsigned int i=0; i<subjets.size(); i++){
 
@@ -347,7 +318,6 @@ VecDD CorrectionFactor_JMS::get_corrections_JEC(FactorizedJetCorrector & correct
       unc = jec_unc->getUncertainty(true);
       double correctionfactor_up = correctionfactor * (1 + fabs(unc));
       JEC_corrections.push_back({correctionfactor, correctionfactor_up});
-      cout << correctionfactor << " " << correctionfactor_up << endl;
     }
   }
   return JEC_corrections;
@@ -378,20 +348,19 @@ JetCorrectionUncertainty* corrector_uncertainty(const std::vector<std::string> &
   return jec_uncertainty;
 }
 
-/*
-.     ██ ███    ███ ███████
-.     ██ ████  ████ ██
-.     ██ ██ ████ ██ ███████
-.██   ██ ██  ██  ██      ██
-. █████  ██      ██ ███████
-*/
+// #################################################################################################################
+// #################################################################################################################
+// #################################################################################################################
 
 VecD CorrectionFactor_JMS::error_JMS(VecD factor_J, VecD factor_X, VecDD corrections_J, VecDD corrections_X){
   VecD errors;
+  double rho = -0.21;
   for(unsigned int i=0; i<factor_J.size(); i++){
-    double PoU_jec = x_jec_err*fabs(corrections_J[i][0]-corrections_J[i][1])*(corrections_X[i][0]+factor_X[i]*fabs(corrections_X[i][0]-corrections_X[i][1]));
-    double PoU_cor = x_cor_err*fabs(corrections_X[i][0]-corrections_X[i][1])*(corrections_J[i][0]+factor_J[i]*fabs(corrections_J[i][0]-corrections_J[i][1]));
-    double error = sqrt(PoU_jec*PoU_jec+PoU_cor*PoU_cor);
+    double delta_fJ = x_jec_err*fabs(corrections_J[i][0]-corrections_J[i][1]);
+    double delta_fX = x_cor_err*fabs(corrections_X[i][0]-corrections_X[i][1]);
+    double PoU_jec  = delta_fJ*factor_X[i];
+    double PoU_cor  = delta_fX*factor_J[i];
+    double error    = sqrt(PoU_jec*PoU_jec+PoU_cor*PoU_cor+2*rho*PoU_jec*PoU_cor);
     errors.push_back(error);
   }
   return errors;

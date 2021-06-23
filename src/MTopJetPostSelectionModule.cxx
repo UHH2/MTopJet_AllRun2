@@ -340,6 +340,7 @@ protected:
   string ElTrigger_variation ="nominal";
   string PU_variation ="nominal";
   TString jms_direction ="nominal";
+  TString jms_channel ="combine";
   string corvar ="nominal";
   Year year;
 
@@ -799,7 +800,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   // Best Fit
   if(isMC){
     if(debug) cout << "\nBestFit\n";
-    jms_direction =  ctx.get("JetMassScale_direction","nominal");
+    jms_direction = ctx.get("JetMassScale_direction","nominal");
+    jms_channel = ctx.get("JetMassScale_channel","combine");
     BestFit.reset(new CorrectionFactor_JMS(ctx, "XCone33_had_Combined_noJEC", "genXCone33TopJets", year));
   }
 
@@ -986,20 +988,36 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   int PoU = 0;
   if(isMC){
     // Data+MC
-    // if     (jms_direction == "nominal")  points = {0.7495, -0.3392}; // BestFit point
-    if     (jms_direction == "nominal")  points = {0.655998, -0.116777}; // BestFit point
-    else if(jms_direction == "upup")     points = {0.790998, -0.0717812}; // clostest point, right
-    // else if(jms_direction == "upup")     points = {0.887884, -0.291257}; // clostest point, right
-    else if(jms_direction == "updown")   points = {0.953384, -0.923157}; // furthest point, down
-    else if(jms_direction == "downup")   points = {0.533584,  0.256443}; // furthest point, up
-    else if(jms_direction == "downdown") points = {0.520998, -0.161781}; // clostest point, left
-    // else if(jms_direction == "downdown") points = {0.610384, -0.389157}; // clostest point, left
-    // else if(jms_direction == "up")    points = {0.7495, -0.3392}; // Annual Note: Propergation of uncertainty
-    // else if(jms_direction == "down")  points = {0.7495, -0.3392}; // Annual Note: Propergation of uncertainty
-    else if(jms_direction == "up")       points = {0.655998, -0.116777}; // Annual Note: Propergation of uncertainty
-    else if(jms_direction == "down")     points = {0.655998, -0.116777}; // Annual Note: Propergation of uncertainty
-    else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
-    // else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown)");
+    // calculated with combined channels
+    if(jms_channel == "combine"){
+      if     (jms_direction == "nominal")  points = {0.648896, -0.125134}; // BestFit point
+      else if(jms_direction == "upup")     points = {0.785696, -0.081034}; // clostest point, right
+      else if(jms_direction == "downdown") points = {0.512096, -0.169234}; // clostest point, left
+      else if(jms_direction == "downup")   points = {0.423896,  0.562466}; // furthest point, up
+      else if(jms_direction == "updown")   points = {0.857696, -0.788434}; // furthest point, down
+      else if(jms_direction == "up")       points = {0.648896, -0.125134}; // Annual Note: Propergation of uncertainty
+      else if(jms_direction == "down")     points = {0.648896, -0.125134}; // Annual Note: Propergation of uncertainty
+      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+    }
+    // calculated with muon channel
+    else if(jms_channel == "muon"){
+      if     (jms_direction == "nominal")  points = {0.742004, 0.232502}; // BestFit point
+      else if(jms_direction == "upup")     points = {0.994004, 0.312602}; // clostest point, right
+      else if(jms_direction == "downdown") points = {0.490904, 0.147902}; // clostest point, left
+      else if(jms_direction == "downup")   points = {0.450404, 1.081202}; // furthest point, up
+      else if(jms_direction == "updown")   points = {1.027304, -0.658498}; // furthest point, down
+      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+    }
+    // calculated with elec channel
+    else if(jms_channel == "elec"){
+      if     (jms_direction == "nominal")  points = {0.318239, 0.338609}; // BestFit point
+      else if(jms_direction == "upup")     points = {0.630539, 0.453809}; // clostest point, right
+      else if(jms_direction == "downdown") points = {0.005039, 0.226109}; // clostest point, left
+      else if(jms_direction == "downup")   points = {-0.201061, 1.751609}; // furthest point, up
+      else if(jms_direction == "updown")   points = {0.833039, -1.076191}; // furthest point, down
+      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+    }
+    else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (combine, muon, elec)");
 
     if(debug) cout << "JMS - get_mass_BestFit\n";
     if(jms_direction.EqualTo("up"))   PoU = 1;

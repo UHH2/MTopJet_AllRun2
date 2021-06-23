@@ -22,6 +22,7 @@ public:
 
   virtual void fill(const uhh2::Event & ev) override;
   double get_tau32();
+  double get_tau43();
   double get_mass();
 
 
@@ -83,6 +84,7 @@ protected:
   uhh2::Event::Handle<std::vector<TopJet>> h_recjets, h_hadjet, h_lepjet, h_fatjets;
   uhh2::Event::Handle<TTbarGen> h_ttbargen;
   double tau32 = -1;
+  double tau43 = -1;
   double mass = -1;
 
 
