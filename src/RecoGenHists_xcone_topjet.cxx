@@ -26,8 +26,8 @@ Hists(ctx, dirname), isTTbar_(isTTbar), masscut_(masscut){
   h_HadJetTau3 = book<TH1F>("ak8_hadjet_tau3", "#tau_{3}", 50, 0, 1);
   h_HadJetTau4 = book<TH1F>("ak8_hadjet_tau4", "#tau_{4}", 50, 0, 1);
 
-  h_HadJetTau32 = book<TH1F>("ak8_hadjet_tau32", "#tau_{3}/#tau_{2}", 50, 0, 1);
-  h_HadJetTau43 = book<TH1F>("ak8_hadjet_tau43", "#tau_{4}/#tau_{3}", 50, 0, 1);
+  h_HadJetTau32 = book<TH1F>("ak8_hadjet_tau32", "#tau_{3}/#tau_{2}", 100, 0, 1);
+  h_HadJetTau43 = book<TH1F>("ak8_hadjet_tau43", "#tau_{4}/#tau_{3}", 100, 0, 1);
   h_HadJetTau23 = book<TH1F>("ak8_hadjet_tau23", "#tau_{2}/#tau_{3}", 100, 0, 2);
 
   h_number_ak8_jets        = book<TH1F>("ak8_number_matched_hadjets", "number matched AK8 jets", 10, 0, 10);
