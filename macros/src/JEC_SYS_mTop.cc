@@ -187,8 +187,8 @@ int main(int argc, char* argv[]){
 
     TString data_path     = "uhh2.AnalysisModuleRunner.DATA.DATA.root";
     TFile *data_file      = new TFile(dir+year+"/muon/"+data_path);
-    TH1F  *data           = (TH1F*)data_file->Get(w_mass);
-    TH1F *data_rebin      = rebin(data, bin_width);
+    TH1F  *data           = (TH1F*) data_file->Get(w_mass);
+    TH1F *data_rebin      = (TH1F*) data->Rebin(bin_width);
     TH1F *data_norm       = normalize(data);
     TH1F *data_rebin_norm = normalize(data_rebin);
 
@@ -240,7 +240,7 @@ int main(int argc, char* argv[]){
     TFile *ttbar_nom_file  = new TFile(dir+year+"/muon/"+ttbar_nom_path);
     TH1F  *ttbar_nom       = (TH1F*)ttbar_nom_file->Get(w_mass);
     ttbar_nom->Add(bkg, 1);
-    TH1F* ttbar_nom_rebin      = rebin(ttbar_nom, bin_width);
+    TH1F* ttbar_nom_rebin      = (TH1F*) ttbar_nom->Rebin(bin_width);
     TH1F* ttbar_nom_norm       = normalize(ttbar_nom);
     TH1F* ttbar_nom_rebin_norm = normalize(ttbar_nom_rebin);
 
@@ -263,7 +263,7 @@ int main(int argc, char* argv[]){
     TFile *ttbar_file  = new TFile(dir+year+"/muon/"+ttbar_path);
     TH1F  *ttbar       = (TH1F*)ttbar_file->Get(w_mass);
     ttbar->Add(bkg, 1);
-    TH1F* ttbar_rebin      = rebin(ttbar, bin_width);
+    TH1F* ttbar_rebin      = (TH1F*) ttbar->Rebin(bin_width);
     TH1F* ttbar_norm       = normalize(ttbar);
     TH1F* ttbar_rebin_norm = normalize(ttbar_rebin);
 
@@ -286,10 +286,10 @@ int main(int argc, char* argv[]){
 
     TH1F* JECup_norm         = normalize(JECup);
     TH1F* JECdown_norm       = normalize(JECdown);
-    TH1F* JECup_rebin        = rebin(JECup, bin_width);
-    TH1F* JECdown_rebin      = rebin(JECdown, bin_width);
-    TH1F* JECup_rebin_norm   = rebin(JECup_norm, bin_width);
-    TH1F* JECdown_rebin_norm = rebin(JECdown_norm, bin_width);
+    TH1F* JECup_rebin        = (TH1F*) JECup->Rebin(bin_width);
+    TH1F* JECdown_rebin      = (TH1F*) JECdown->Rebin(bin_width);
+    TH1F* JECup_rebin_norm   = (TH1F*) JECup_norm->Rebin(bin_width);
+    TH1F* JECdown_rebin_norm = (TH1F*) JECdown_norm->Rebin(bin_width);
 
     vector<double> JECup_rebin_norm_err   = normalize_error(JECup_rebin);
     vector<double> JECdown_rebin_norm_err = normalize_error(JECdown_rebin);
@@ -310,10 +310,10 @@ int main(int argc, char* argv[]){
 
     TH1F* XConeup_norm         = normalize(XConeup);
     TH1F* XConedown_norm       = normalize(XConedown);
-    TH1F* XConeup_rebin        = rebin(XConeup, bin_width);
-    TH1F* XConedown_rebin      = rebin(XConedown, bin_width);
-    TH1F* XConeup_rebin_norm   = rebin(XConeup_norm, bin_width);
-    TH1F* XConedown_rebin_norm = rebin(XConedown_norm, bin_width);
+    TH1F* XConeup_rebin        = (TH1F*) XConeup->Rebin(bin_width);
+    TH1F* XConedown_rebin      = (TH1F*) XConedown->Rebin(bin_width);
+    TH1F* XConeup_rebin_norm   = (TH1F*) XConeup_norm->Rebin(bin_width);
+    TH1F* XConedown_rebin_norm = (TH1F*) XConedown_norm->Rebin(bin_width);
 
     vector<double> XConeup_rebin_norm_err   = normalize_error(XConeup_rebin);
     vector<double> XConedown_rebin_norm_err = normalize_error(XConedown_rebin);

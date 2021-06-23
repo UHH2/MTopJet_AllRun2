@@ -211,11 +211,12 @@ int main(int argc, char* argv[]){
 
     // Rebin 10 ----------------------------------------------------------------------------------------
     if(debug) cout << "Rebin 10" << endl;
-    TH1F *ttbar_rebin = rebin(ttbar, bin_width);
-    TH1F *data_rebin  = rebin(data,  bin_width);
+    TH1F *ttbar_rebin = (TH1F*) ttbar->Rebin(bin_width);
+    TH1F *data_rebin  = (TH1F*) data->Rebin( bin_width);
 
-    vector<TH1F*> FSRup_rebin   = rebin(FSRup, bin_width);
-    vector<TH1F*> FSRdown_rebin = rebin(FSRdown, bin_width);
+    vector<TH1F*> FSRup_rebin, FSRdown_rebin;
+    for(auto hist: FSRup) FSRup_rebin.push_back((TH1F*) hist->Rebin(bin_width));
+    for(auto hist: FSRdown) FSRdown_rebin.push_back((TH1F*) hist->Rebin(bin_width));
 
     // For tau bin dependency
     vector<TH1F*> FSRup_rebin_norm   = normalize(FSRup_rebin);
