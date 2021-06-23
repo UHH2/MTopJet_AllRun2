@@ -37,6 +37,8 @@
 #include <iomanip>
 #include <tuple>
 #include <cstdio>
+#include <chrono>
+#include <ctime>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -45,14 +47,42 @@
 #include <stdio.h>
 
 using namespace std;
+using namespace std::chrono;
+
+typedef vector<TString> VecTS;
+typedef vector<VecTS> VecTSS;
+typedef vector<int> VecI;
+typedef vector<VecI> VecII;
+typedef vector<double> VecD;
+typedef vector<vector<double>> VecDD;
+typedef vector<TH1F*> VecH;
+typedef vector<vector<TH1F*>> VecHH;
+
+typedef map<TString, int> MapI;
+typedef map<TString, VecI> MapVI;
+typedef map<TString, MapVI> MapVII;
+typedef map<TString, MapVII> MapVIII;
+
+typedef map<TString, double> MapD;
+typedef map<TString, VecD> MapVD;
+typedef map<TString, MapVD> MapVDD;
+typedef map<TString, MapVDD> MapVDDD;
+
+typedef map<TString, TH1F*> MapH;
+typedef map<TString, MapH> MapHH;
+typedef map<TString, MapHH> MapHHH;
+typedef map<TString, MapHHH> MapHHHH;
 
 // -------------------------------------------------------------------------------------------
 // Get path
 
-TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/";
+// TString dir = "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/PostSel/";
+TString dir = "/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/";
 
 TString get_save_path(){
   TString user = get_current_dir_name();
+  // user.ReplaceAll("/nfs/dust/cms/user/", "");
+  // // cout << user.First("/");
   TString save_dir = "/afs/desy.de/user/s/schwarzd";
   if(user.Contains("paaschal")){
     save_dir = "/afs/desy.de/user/p/paaschal/files";

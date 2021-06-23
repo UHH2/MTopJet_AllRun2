@@ -64,15 +64,16 @@ vector<double> get_bin_error(TH1F* hist, int skip_bins=0){
 }
 
 // -------------------------------------------------------------------------------------------
-tuple<vector<double>, vector<double>> get_bin_content_and_error(TH1F* hist){
-  vector<double> bin_error_v, bin_content_v;
-  for(unsigned int bin=1; bin<hist->GetNbinsX()+1; bin++){
-    bin_error_v.push_back(hist->GetBinError(bin));
-    bin_content_v.push_back(hist->GetBinContent(bin));
-  }
-
-  return {bin_content_v, bin_error_v};
-}
+// tuple<vector<double>, vector<double>> get_bin_content_and_error(TH1F* hist){
+//   vector<double> bin_error_v, bin_content_v;
+//   for(unsigned int bin=1; bin<hist->GetNbinsX()+1; bin++){
+//     bin_error_v.push_back(hist->GetBinError(bin));
+//     bin_content_v.push_back(hist->GetBinContent(bin));
+//   }
+//
+//   return {bin_content_v, bin_error_v};
+//   // return {{}, {}};
+// }
 
 // -------------------------------------------------------------------------------------------
 vector<int> bins_upper_limit(TH1F* hist, double limit){
@@ -132,26 +133,17 @@ void set_new_bin_error(TH1F* h1, vector<double> err)
 ██   ██ ███████ ██████  ██ ██   ████
 */
 
-
 // -------------------------------------------------------------------------------------------
-TH1F *rebin(TH1F *hist, int bin){
-  TH1F *hist_bin = (TH1F*) hist->Clone();
-  hist_bin->Rebin(bin);
-  return hist_bin;
+TH1F* RebinHist(TH1F* hist, int rebin){
+  TH1F* clone = (TH1F*) hist->Clone();
+  clone->Rebin(rebin);
+  return clone;
 }
 
-// -------------------------------------------------------------------------------------------
-vector<TH1F*> rebin(vector<TH1F*> hist, int bin){
-  vector<TH1F*> hist_bin_v;
-  for(unsigned int i=0; i<hist.size(); i++) hist_bin_v.push_back(rebin(hist[i], bin));
-  return hist_bin_v;
-}
-
-// -------------------------------------------------------------------------------------------
-vector<vector<TH1F*>> rebin(vector<vector<TH1F*>> hist, int bin){
-  vector<vector<TH1F*>> hist_bin_vv;
-  for(unsigned int i=0; i<hist.size(); i++) hist_bin_vv.push_back(rebin(hist[i], bin));
-  return hist_bin_vv;
+vector<TH1F*> RebinVector(vector<TH1F*> hists, int rebin){
+  vector<TH1F*> new_hist;
+  for(auto hist: hists) new_hist.push_back(RebinHist(hist, rebin));
+  return new_hist;
 }
 
 /*
@@ -161,6 +153,39 @@ vector<vector<TH1F*>> rebin(vector<vector<TH1F*>> hist, int bin){
 ██  ██ ██ ██    ██ ██   ██ ██  ██  ██ ██   ██ ██      ██  ███    ██
 ██   ████  ██████  ██   ██ ██      ██ ██   ██ ███████ ██ ███████ ███████
 */
+
+// -------------------------------------------------------------------------------------------
+TH1F* Normalize(TH1F* hist){
+  TH1F* norm = (TH1F*) hist->Clone();
+  int nbins = hist->GetXaxis()->GetNbins();
+  double integral = hist->Integral();
+  norm->Scale(1/integral);
+  // Now do error propagation:
+  // Bin content of norm hist: b_i = N_i / (N_1 + N_2 + N_3 + ...)
+  // Two derivations:
+  // 1. db_i / dN_i = (N_2 + N_3 + ...) / (N_1 + N_2 + N_3 + ...)^2 = (Integral - N_i) / Integral^2
+  // 2. db_i / dN_j = - N_1 / (N_1 + N_2 + N_3 + ...)^2
+
+  for(int i=1; i<=nbins; i++){
+    double error2 = 0;
+    for(int j=1; j<=nbins; j++){
+      double additionalterm;
+      if(i==j) additionalterm = (integral - hist->GetBinContent(i)) / (integral * integral);
+      else     additionalterm = - hist->GetBinContent(i) / (integral * integral);
+      error2 += additionalterm*additionalterm * hist->GetBinError(j)*hist->GetBinError(j);
+    }
+    double error = sqrt(error2);
+    norm->SetBinError(i, error);
+  }
+  return norm;
+}
+
+// -------------------------------------------------------------------------------------------
+vector<TH1F*> VectorNormalize(vector<TH1F*> hists){
+  vector<TH1F*> hists_norm;
+  for(auto hist: hists) hists_norm.push_back((TH1F*) Normalize(hist));
+  return hists_norm;
+}
 
 
 // -------------------------------------------------------------------------------------------
@@ -272,6 +297,14 @@ vector<double> normalize_error(TH1F* hist){
   return bin_error_norm;
 }
 
+TH1F* normalize_with_error(TH1F* hist){
+  VecD error = normalize_error(hist);
+  if(error.size()!=hist->GetNbinsX()) throw runtime_error("Error size does not fit Bins on x axis");
+  TH1F* hist_norm = normalize(hist);
+  for(unsigned int i=0; i<hist->GetNbinsX(); i++) hist_norm->SetBinError(i+1, error[i]);
+  return hist_norm;
+}
+
 
 vector<vector<double>> normalize_error(vector<TH1F*> hist_v){
   // error of each bin normalized and into vector
@@ -381,7 +414,7 @@ vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, int factor){
 // -------------------------------------------------------------------------------------------------------
 vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, vector<TH1F*> h3, int factor){
   vector<TH1F*> dummy = AddHists(h1, h2, factor);
-  if(h1.size()!=h3.size()) throw runtime_error("Hists have not the same size! (h2 and h3)");
+  if(h1.size()!=h3.size()) throw runtime_error("Hists have not the same size! (h1 and h3)");
   vector<TH1F*> hists = AddHists(dummy, h3, factor);
   return hists;
 }
