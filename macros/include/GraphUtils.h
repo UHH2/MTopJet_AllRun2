@@ -65,7 +65,7 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
   double dx = (xmax-xmin)/steps;
   double dy = (ymax-ymin)/steps;
   double x, y, z;
-  double n_wide = 100;
+  double n_wide = 10;
   double wide_steps = steps/n_wide;
 
   // First step is to decrease the area to increase the speed of the algorithm #######################
@@ -91,8 +91,8 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
           if(reached_x_limit_down && reached_x_limit_up && ypar==n_wide)    step_limit_x_up   = wide_steps*xpar;
         }
         else{
-          if(!reached_x_limit_down) reached_x_limit_down=true;
-          if(reached_x_limit_down)  reached_x_limit_up   = false;
+          if(!reached_x_limit_down) reached_x_limit_down = true;
+          if(reached_x_limit_down)  reached_x_limit_up = false;
           break;
         }
       }
@@ -145,16 +145,16 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
   }
 
   auto start = high_resolution_clock::now(); // Calculation time - start
-  for(int xpar=step_limit_x_down; xpar<step_limit_x_up; xpar++){
-    if(count&&(xpar%1000==0)){
+  for(int ypar=step_limit_y_down; ypar<step_limit_y_up; ypar++){
+    if(count&&(ypar%1000==0)){
       auto stop = high_resolution_clock::now();  // Calculation time - stop
       auto duration = duration_cast<milliseconds>(stop - start);
-      cout << "Passed x = " << xpar << " (" << duration.count()/1000 << "s)" << endl;
+      cout << "Passed y = " << ypar << " (" << duration.count()/1000 << "s)" << endl;
     }
     int count_zfix_reached=0;
-    x=xmin+xpar*dx;
-    for(int ypar=step_limit_y_down; ypar<step_limit_y_up; ypar++){
-      y=ymin+ypar*dy;
+    y=ymin+ypar*dy;
+    for(int xpar=step_limit_x_down; xpar<step_limit_x_up; xpar++){
+      x=xmin+xpar*dx;
       z=function->Eval(x, y);
       if(abs(z-zfix)<accuracy){
         count_zfix_reached++;
