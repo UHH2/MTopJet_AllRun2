@@ -453,6 +453,7 @@
   <Item Name="ElReco_variation" Value="nominal" />
   <Item Name="ElTrigger_variation" Value="nominal" />
 
+  <Item Name="JetMassScale_channel" Value="combine" />
   <Item Name="JetMassScale_direction" Value="nominal" />
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
