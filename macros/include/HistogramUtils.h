@@ -42,26 +42,12 @@
 using namespace std;
 
 /*
-██████  ██ ███    ██
-██   ██ ██ ████   ██
-██████  ██ ██ ██  ██
-██   ██ ██ ██  ██ ██
-██████  ██ ██   ████
+This header contains many outdated functions and should be reorganized.
 */
 
-// -------------------------------------------------------------------------------------------
-vector<double> get_bin_content(TH1F* hist, int skip_bins=0){
-  vector<double> bin_content_v;
-  for(unsigned int bin=1+skip_bins; bin<hist->GetNbinsX()+1; bin++) bin_content_v.push_back(hist->GetBinContent(bin));
-  return bin_content_v;
-}
-
-// -------------------------------------------------------------------------------------------
-vector<double> get_bin_error(TH1F* hist, int skip_bins=0){
-  vector<double> bin_error_v;
-  for(unsigned int bin=1+skip_bins; bin<hist->GetNbinsX()+1; bin++) bin_error_v.push_back(hist->GetBinError(bin));
-  return bin_error_v;
-}
+// =====================================================================================
+// ===                                                                               ===
+// =====================================================================================
 
 // -------------------------------------------------------------------------------------------
 // tuple<vector<double>, vector<double>> get_bin_content_and_error(TH1F* hist){
@@ -78,8 +64,8 @@ vector<double> get_bin_error(TH1F* hist, int skip_bins=0){
 // -------------------------------------------------------------------------------------------
 vector<int> bins_upper_limit(TH1F* hist, double limit){
   vector<int> bin_pass_v;
-  for(int bin=0; bin < hist->GetNbinsX(); bin++){
-    if((hist->GetBinContent(bin+1)>limit)) bin_pass_v.push_back(bin+1);
+  for(int bin=1; bin <= hist->GetNbinsX(); bin++){
+    if((hist->GetBinContent(bin)>limit)) bin_pass_v.push_back(bin);
   }
   return bin_pass_v;
 }
@@ -125,13 +111,9 @@ void set_new_bin_error(TH1F* h1, vector<double> err)
   for(int bin=1; bin<=h1->GetNbinsX(); bin++) h1->SetBinError(bin, err[bin-1]);
 }
 
-/*
-██████  ███████ ██████  ██ ███    ██
-██   ██ ██      ██   ██ ██ ████   ██
-██████  █████   ██████  ██ ██ ██  ██
-██   ██ ██      ██   ██ ██ ██  ██ ██
-██   ██ ███████ ██████  ██ ██   ████
-*/
+// =====================================================================================
+// ===                                                                               ===
+// =====================================================================================
 
 // -------------------------------------------------------------------------------------------
 TH1F* RebinHist(TH1F* hist, int rebin){
@@ -146,13 +128,9 @@ vector<TH1F*> RebinVector(vector<TH1F*> hists, int rebin){
   return new_hist;
 }
 
-/*
-███    ██  ██████  ██████  ███    ███  █████  ██      ██ ███████ ███████
-████   ██ ██    ██ ██   ██ ████  ████ ██   ██ ██      ██    ███  ██
-██ ██  ██ ██    ██ ██████  ██ ████ ██ ███████ ██      ██   ███   █████
-██  ██ ██ ██    ██ ██   ██ ██  ██  ██ ██   ██ ██      ██  ███    ██
-██   ████  ██████  ██   ██ ██      ██ ██   ██ ███████ ██ ███████ ███████
-*/
+// =====================================================================================
+// ===                                                                               ===
+// =====================================================================================
 
 // -------------------------------------------------------------------------------------------
 TH1F* Normalize(TH1F* hist){
@@ -210,46 +188,9 @@ vector<vector<TH1F*>> normalize(vector<vector<TH1F*>> hist){
 }
 
 
-/*
-███████ ██████  ██████   ██████  ██████
-██      ██   ██ ██   ██ ██    ██ ██   ██
-█████   ██████  ██████  ██    ██ ██████
-██      ██   ██ ██   ██ ██    ██ ██   ██
-███████ ██   ██ ██   ██  ██████  ██   ██
-*/
-
-/*
-**********************************************************************************************
-**************************** RELATIVE ERROR **************************************************
-**********************************************************************************************
-*/
-
-// -------------------------------------------------------------------------------------------
-vector<double> relative_error(TH1F* hist){
-  TH1F* hist_ = (TH1F*) hist->Clone();
-  int number_bins = hist_->GetNbinsX();
-
-  vector<double> bin_rel_error_v;
-  for(unsigned int bin=0; bin<number_bins; bin++) bin_rel_error_v.push_back(hist_->GetBinError(bin+1)/hist_->GetBinContent(bin+1));
-  return bin_rel_error_v;
-}
-
-// -------------------------------------------------------------------------------------------
-vector<double> relative_error(TH1F* hist, vector<double> error_v){
-  TH1F* hist_ = (TH1F*) hist->Clone();
-  int number_bins = hist_->GetNbinsX();
-
-  vector<double> bin_rel_error_v;
-  for(unsigned int bin=0; bin<number_bins; bin++) bin_rel_error_v.push_back(error_v[bin]/hist_->GetBinContent(bin+1));
-  return bin_rel_error_v;
-}
-
-// -------------------------------------------------------------------------------------------
-vector<double> relative_error(vector<double> content_v, vector<double> error_v){
-  vector<double> bin_rel_error_v;
-  for(unsigned int bin=0; bin<content_v.size(); bin++) bin_rel_error_v.push_back(error_v[bin]/content_v[bin]);
-  return bin_rel_error_v;
-}
+// =====================================================================================
+// ===                                                                               ===
+// =====================================================================================
 
 /*
 **********************************************************************************************
@@ -297,15 +238,6 @@ vector<double> normalize_error(TH1F* hist){
   return bin_error_norm;
 }
 
-TH1F* normalize_with_error(TH1F* hist){
-  VecD error = normalize_error(hist);
-  if(error.size()!=hist->GetNbinsX()) throw runtime_error("Error size does not fit Bins on x axis");
-  TH1F* hist_norm = normalize(hist);
-  for(unsigned int i=0; i<hist->GetNbinsX(); i++) hist_norm->SetBinError(i+1, error[i]);
-  return hist_norm;
-}
-
-
 vector<vector<double>> normalize_error(vector<TH1F*> hist_v){
   // error of each bin normalized and into vector
   vector<vector<double>> all_errors;
@@ -335,32 +267,9 @@ vector<vector<double>> normalize_error(vector<TH1F*> hist_v){
   return all_errors;
 }
 
-/*
-**********************************************************************************************
-********************* Error from Hist difference *********************************************
-**********************************************************************************************
-*/
-
-vector<double> bin_error_from_two_hists(TH1F *h1, TH1F *h2, int skip_first_bins=0){
-  // vector<double> bin_content_h1, bin_content_h2;
-  double bin_content_h1, bin_content_h2;
-  vector<double> bin_error_v;
-  int number_bins_h1 = h1->GetNbinsX();
-  int number_bins_h2 = h2->GetNbinsX();
-  if(number_bins_h1 != number_bins_h2) throw runtime_error("The two hists in bin_error_from_two_hists do not have the same binning");
-
-  for(int bin=1+skip_first_bins; bin<number_bins_h1; bin++) bin_error_v.push_back(abs(bin_content_h1-bin_content_h2));
-  return bin_error_v;
-}
-
-/*
-██   ██ ██  ██████  ██   ██ ███████ ███████ ████████     ██████  ███████  █████  ██   ██
-██   ██ ██ ██       ██   ██ ██      ██         ██        ██   ██ ██      ██   ██ ██  ██
-███████ ██ ██   ███ ███████ █████   ███████    ██        ██████  █████   ███████ █████
-██   ██ ██ ██    ██ ██   ██ ██           ██    ██        ██      ██      ██   ██ ██  ██
-██   ██ ██  ██████  ██   ██ ███████ ███████    ██        ██      ███████ ██   ██ ██   ██
-*/
-
+// ============================================================================================
+// ===                                                                                      ===
+// ============================================================================================
 
 // -------------------------------------------------------------------------------------------
 double get_highest_peak(vector<TH1F*> hists){
@@ -372,13 +281,9 @@ double get_highest_peak(vector<TH1F*> hists){
   return max[top_index];
 }
 
-/*
-.█████  ██████  ██████  ██   ██ ██ ███████ ████████
-██   ██ ██   ██ ██   ██ ██   ██ ██ ██         ██
-███████ ██   ██ ██   ██ ███████ ██ ███████    ██
-██   ██ ██   ██ ██   ██ ██   ██ ██      ██    ██
-██   ██ ██████  ██████  ██   ██ ██ ███████    ██
-*/
+// ============================================================================================
+// ===                                                                                      ===
+// ============================================================================================
 
 
 TH1F* AddHists(vector<TH1F*> hists_, int factor){
@@ -419,56 +324,9 @@ vector<TH1F*> AddHists(vector<TH1F*> h1, vector<TH1F*> h2, vector<TH1F*> h3, int
   return hists;
 }
 
-// -------------------------------------------------------------------------------------------------------
-TH1F* add_second_year(TString year, TH1F* hist, TString dir, TString path, TString hist_name){
-  TFile* file = new TFile(dir+year+"/muon/"+path);
-  TH1F* new_hist = (TH1F*) file->Get(hist_name);
-  new_hist->Add(hist, 1);
-  return new_hist;
-}
-
-// -------------------------------------------------------------------------------------------------------
-TH1F* add_second_year(TString year, TH1F* hist, TString dir, vector<TString> path_v, TString hist_name){
-  vector<TFile*> file_v;
-  vector<TH1F*> hist_v;
-  for(unsigned int i=0; i<path_v.size(); i++) file_v.push_back(new TFile(dir+year+"/muon/"+path_v[i]));
-  for(unsigned int i=0; i<file_v.size(); i++) hist_v.push_back((TH1F*)file_v[i]->Get(hist_name));
-  TH1F* new_hist = AddHists(hist_v, 1);
-  new_hist->Add(hist, 1);
-  return new_hist;
-}
-
-/*
-██████  ██       ██████  ████████
-██   ██ ██      ██    ██    ██
-██████  ██      ██    ██    ██
-██      ██      ██    ██    ██
-██      ███████  ██████     ██
-*/
-
-// -------------------------------------------------------------------------------------------------------
-void plot_single_histogram(TH1F* hist, TString title, TString xAxis, int x_max, int color, TString save_path){
-  hist->SetTitle(title);
-  hist->GetXaxis()->SetRangeUser(0, x_max);
-  hist->GetYaxis()->SetRangeUser(0, hist->GetMaximum()*1.2);
-  hist->GetXaxis()->SetNdivisions(505);
-  hist->GetYaxis()->SetNdivisions(505);
-  hist->GetXaxis()->SetTitleSize(0.05);
-  hist->GetYaxis()->SetTitleSize(0.04);
-  hist->GetXaxis()->SetTitleOffset(0.9);
-  hist->GetYaxis()->SetTitleOffset(1.5);
-  hist->GetXaxis()->SetTitle(xAxis);
-  hist->GetYaxis()->SetTitle("");
-  hist->SetLineWidth(2);
-  hist->SetLineColor(color);
-
-  TCanvas *A = new TCanvas("A", "A", 600, 600);
-  gPad->SetLeftMargin(0.15);
-  gPad->SetBottomMargin(0.12);
-  hist->Draw("HIST");
-  A->SaveAs(save_path);
-  delete A;
-}
+// ============================================================================================
+// ===                                                                                      ===
+// ============================================================================================
 
 // -------------------------------------------------------------------------------------------------------
 void add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
@@ -486,13 +344,9 @@ void data_plot_settings(TH1F* hist)
   hist->SetLineColor(kBlack);
 }
 
-/*
-███    ███ ███████  █████  ███    ██
-████  ████ ██      ██   ██ ████   ██
-██ ████ ██ █████   ███████ ██ ██  ██
-██  ██  ██ ██      ██   ██ ██  ██ ██
-██      ██ ███████ ██   ██ ██   ████
-*/
+// ============================================================================================
+// ===                                                                                      ===
+// ============================================================================================
 
 // -------------------------------------------------------------------------------------------------------
 double trunc_mean(TH1F* hist, int cut_down, int cut_up)
@@ -526,4 +380,46 @@ double trunc_mean_bin(TH1F* hist, int bin_down, int bin_up)
   double mean_trunc = hist_trunc->GetMean();
   double mean_old   = hist->GetMean();
   return mean_trunc;
+}
+
+// =====================================================================================
+// ===                                                                               ===
+// =====================================================================================
+
+// -------------------------------------------------------------------------------------------------------
+void CompareHistStructure(TH1F* h1, TH1F* h2){
+  // Check if histograms have the same structure
+  bool sameBins = h1->GetNbinsX() == h2->GetNbinsX();
+  bool sameCenter = true;
+  for(unsigned int i=1; i<h1->GetNbinsX(); i++){
+    sameCenter = h1->GetBinCenter(i) == h2->GetBinCenter(i);
+    if(!sameCenter) break;
+  }
+  if(!sameBins||!sameCenter) throw runtime_error("GetRatio: Histograms do not have the same structure!");
+}
+
+// -------------------------------------------------------------------------------------------------------
+TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal, bool isEffi){
+  CompareHistStructure(h1, h2);
+  TH1F* ratio = (TH1F*) h1->Clone();
+  int Nbins = h1->GetNbinsX();
+  for(int i=1; i<=Nbins;i++){
+    double N1 = h1->GetBinContent(i);
+    double N2 = h2->GetBinContent(i);
+    double E1 = h1->GetBinError(i);
+    double E2 = h2->GetBinError(i);
+    if(N1==0 || N2==0){
+      if(equal||isEffi) ratio->SetBinContent(i, 0);
+      else              ratio->SetBinContent(i, 1);
+
+      ratio->SetBinError(i, 0);
+    }
+    else{
+      double r = N1/N2;
+      double error = sqrt(E1/N2 * E1/N2 + N1*E2/(N2*N2) * N1*E2/(N2*N2));
+      ratio->SetBinContent(i, r);
+      ratio->SetBinError(i, error);
+    }
+  }
+  return ratio;
 }
