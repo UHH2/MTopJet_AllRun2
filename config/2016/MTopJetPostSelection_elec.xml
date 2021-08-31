@@ -164,9 +164,9 @@
 <In FileName="&ST_t-channel_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="ST_s-channel_2016v3" Lumi="9818810.853" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_s-channel;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="ST_tW_antitop_2016v3" Lumi="442297.3725" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="ST_tW_antitop_2016v3" Lumi="443521.8477" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_tW_antitop;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="ST_tW_top_2016v3" Lumi="442296.4019" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="ST_tW_top_2016v3" Lumi="443519.4977" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_tW_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <!--
@@ -207,7 +207,7 @@
 ██      ██    ██     ██████  ██
 -->
 
-<InputData Version="TTbar_mtop1665_2016v3" Lumi="22797.90084" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_mtop1665_2016v3" Lumi="22797.90084" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2016v3" Lumi="35296.28739" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -218,7 +218,7 @@
 <InputData Version="TTbar_mtop1755_2016v3" Lumi="71222.07368" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1755;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1785_2016v3" Lumi="19671.78513" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_mtop1785;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_mtop1785;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 <!--
@@ -229,7 +229,7 @@
 ██      ███████ ██   ██
 -->
 
-<InputData Version="TTbar_fsrup_2016v3" Lumi="71094.35053" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_fsrup_2016v3" Lumi="71094.35053" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_fsrup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_fsrdown_2016v3" Lumi="71114.47533" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_fsrdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -240,16 +240,16 @@
 <InputData Version="TTbar_hdampup_2016v3" Lumi="70531.1436" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_hdampup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_hdampdown_2016v3" Lumi="70098.79412" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
-<InputData Version="TTbar_GluonMove_2016v3" Lumi="71435.02934" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<!-- <InputData Version="TTbar_GluonMove_2016v3" Lumi="71435.02934" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_GluonMove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_QCDbased_2016v3" Lumi="34020.75118" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_QCDbased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_TuneUp_2016v3" Lumi="35074.66096" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_TuneUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_TuneDown_2016v3" Lumi="33930.56651" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_TuneDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+<In FileName="&TTbar_TuneDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 
 <!--
@@ -260,19 +260,19 @@
 .███ ███   █████  ███████    ██    ███████
 -->
 
-<InputData Version="WJetsToLNu_HT-0100to0200_2016v3" Lumi="24239.87096" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-0100to0200_2016v3" Lumi="29308.45319" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-0200to0400_2016v3" Lumi="43814.59297" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-0200to0400_2016v3" Lumi="52956.76756" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0200to0400;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-0400to0600_2016v3" Lumi="131117.8907" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-0400to0600_2016v3" Lumi="159010.2664" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0400to0600;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-0600to0800_2016v3" Lumi="1281676.211" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-0600to0800_2016v3" Lumi="1548258.492" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0600to0800;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-0800to1200_2016v3" Lumi="1176425.624" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-0800to1200_2016v3" Lumi="1423733.818" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0800to1200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-1200to2500_2016v3" Lumi="4273666.897" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-1200to2500_2016v3" Lumi="5171136.945" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-1200to2500;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="WJetsToLNu_HT-2500toInft_2016v3" Lumi="67786609.31" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="WJetsToLNu_HT-2500toInft_2016v3" Lumi="82200716.73" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 <!--
@@ -359,13 +359,13 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_elec.root"/>
-  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepJet_2016LegacySF_V1.csv" />
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_elec.root"/>
+  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepJet_2016LegacySF_V1.csv" />
 
-  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
-  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
-  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
-  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
+  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
+  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
+  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
+  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
 
   <Item Name="ScaleVariationMuR" Value="none"/>
   <Item Name="ScaleVariationMuF" Value="none"/>
@@ -376,6 +376,7 @@
   <Item Name="ElID_variation" Value="nominal" />
   <Item Name="ElReco_variation" Value="nominal" />
   <Item Name="ElTrigger_variation" Value="nominal" />
+  <Item Name="prefire_variation" Value="nominal" />
 
   <Item Name="JetMassScale_channel" Value="combine" />
   <Item Name="JetMassScale_direction" Value="nominal" />
