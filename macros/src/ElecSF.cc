@@ -1,5 +1,5 @@
 #include "../include/CentralInclude.h"
-
+#include "../include/tdrstyle_all.h"
 
 using namespace std;
 
@@ -15,24 +15,54 @@ Double_t weight_sfetaptDOWN;
 Int_t run;
 Int_t lumi;
 Int_t eventnr;
-bool passed;
+bool passed, passed_elec, passed_photon;
 bool debug = false;
 TString weighttag;
 TString year, year_v;
+TString study = "";
+// TString study = "Original/";
+// TString study = "additionMC/";
+TString fdir = "/nfs/dust/cms/user/paaschal/MTopJet_Run2/ElecSF/"+study;
+
+vector<double> pt_bins = {55, 75, 95, 115, 135, 155, 175, 200, 300, 1500};
+// vector<double> pt_bins = {55, 75, 95, 115, 120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 280, 300, 1500};
+// vector<double> pt_bins = {55, 65, 75, 85, 95, 105, 115, 120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 280, 300, 1500};
+// vector<double> pt_bins;
+// vector<double> eta_bins = {-2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5};
+vector<double> eta_bins = {-2.5, -2.0, -1.566, -1.444, -0.8, 0.0, 0.8, 1.444, 1.566, 2.0, 2.5};
 
 // filling hists
 void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta);
+void FillEGap(TH1F* h);
+TH1F* GetRatio(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData);
 // Calculate SF
 vector<TH1F*> GetSF(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TH1F* hist);
 // Plotter
 void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString xaxis, TString histname);
 void PlotHist(TH1F* h_data, TString xaxis, TString histname);
+void PlotHist(TH2F* h_data, TString xaxis, TString yaxis, TString histname);
 void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname);
+void CompareHists(TH1F* h_all, TH1F* h_pass, TString xaxis, TString histname);
 
 
 int main(int argc, char* argv[]){
 
-  for(auto s:argv) cout << s << endl;
+  // double start = 55;
+  // while(start < 200){
+  //   pt_bins.push_back(start);
+  //   start +=5;
+  // }
+  // while(start < 300){
+  //   pt_bins.push_back(start);
+  //   start +=10;
+  // }
+  // pt_bins.push_back(1500);
+  // while(start <= 1500){
+  //   pt_bins.push_back(start);
+  //   start +=1;
+  // }
+  // General settings
+  gErrorIgnoreLevel = kWarning;
 
   year = argv[1];
   if(year.EqualTo("2016")) year_v = "_2016v3";
@@ -71,12 +101,16 @@ int main(int argc, char* argv[]){
     }
   }
 
-  vector<double> pt_bins = {55, 75, 95, 115, 135, 155, 175, 200, 300, 1500};
+  // ===========================================================================
+  //                        Define Hists
+  // ===========================================================================
   vector<TH1F*> h_pt_data, h_pt_mc;
   h_pt_data.push_back(new TH1F("h_pt_all_data","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_data.push_back(new TH1F("h_pt_pass_data","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_data.push_back(new TH1F("h_pt_all_data_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_data.push_back(new TH1F("h_pt_pass_data_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
+  h_pt_data.push_back(new TH1F("h_pt_elec_data","pt", pt_bins.size()-1, &pt_bins[0]));
+  h_pt_data.push_back(new TH1F("h_pt_photon_data","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_data.push_back(new TH1F("h_pt_all_data_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_data.push_back(new TH1F("h_pt_pass_data_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_data.push_back(new TH1F("h_pt_all_data_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
@@ -85,12 +119,13 @@ int main(int argc, char* argv[]){
   h_pt_mc.push_back(new TH1F("h_pt_pass_mc","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_mc.push_back(new TH1F("h_pt_all_mc_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
   h_pt_mc.push_back(new TH1F("h_pt_pass_mc_weirdbin","pt", pt_bins.size()-1, &pt_bins[0]));
+  h_pt_mc.push_back(new TH1F("h_pt_elec_mc","pt", pt_bins.size()-1, &pt_bins[0]));
+  h_pt_mc.push_back(new TH1F("h_pt_photon_mc","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_mc.push_back(new TH1F("h_pt_all_mc_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_mc.push_back(new TH1F("h_pt_pass_mc_barrel","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_mc.push_back(new TH1F("h_pt_all_mc_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
   // h_pt_mc.push_back(new TH1F("h_pt_pass_mc_endcap","pt", pt_bins.size()-1, &pt_bins[0]));
 
-  vector<double> eta_bins = {-2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5};
   vector<TH1F*> h_eta_data, h_eta_mc;
   h_eta_data.push_back(new TH1F("h_eta_all_data","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_data.push_back(new TH1F("h_eta_pass_data","eta", eta_bins.size()-1, &eta_bins[0]));
@@ -111,16 +146,27 @@ int main(int argc, char* argv[]){
   h_eta_mc.push_back(new TH1F("h_eta_pass_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
   h_eta_mc.push_back(new TH1F("h_eta_fail_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
 
-  TFile *f_data=new TFile("/nfs/dust/cms/user/paaschal/MTopJet_Run2/ElecSF/uhh2.AnalysisModuleRunner.DATA.DATA"+year_v+".root");
+  // ===========================================================================
+  //                        Hists
+  // ===========================================================================
+
+  vector<vector<TH1F*>> h_pt_time, h_eta_time;
+  vector<TString> streams = {"_SingleMuonB", "_SingleMuonC", "_SingleMuonD", "_SingleMuonE", "_SingleMuonF"};
+  vector<TFile*> f_time;
+
+  TFile *f_data=new TFile(fdir+"uhh2.AnalysisModuleRunner.DATA.DATA"+year_v+".root");
   fill_pteta((TTree *) f_data->Get("AnalysisTree"), h_pt_data, h_eta_data);
 
-  TFile *f_tt=new TFile("/nfs/dust/cms/user/paaschal/MTopJet_Run2/ElecSF/uhh2.AnalysisModuleRunner.MC.TTbar"+year_v+".root");
+  // TFile *f_tt=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.WJets"+year_v+".root");
+  TFile *f_tt=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.TTbar"+year_v+".root");
   fill_pteta((TTree *) f_tt->Get("AnalysisTree"), h_pt_mc, h_eta_mc);
 
-  TFile *f_st=new TFile("/nfs/dust/cms/user/paaschal/MTopJet_Run2/ElecSF/uhh2.AnalysisModuleRunner.MC.SingleTop"+year_v+".root");
+  TFile *f_st=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.SingleTop"+year_v+".root");
   fill_pteta((TTree *) f_st->Get("AnalysisTree"), h_pt_mc, h_eta_mc);
 
-  cout << h_pt_mc[1]->GetEntries() << "\t" << h_pt_mc[0]->GetEntries() << endl;
+  // Because of negative weight, the bin content of the last pt bin ist about 0.04 bigger for passed events
+  // in comparison to all events. Hence the efficiency is set automatically to one.
+  if(year.EqualTo("2017")) h_pt_mc[0]->SetBinContent(9, h_pt_mc[1]->GetBinContent(9));
 
   if(debug) cout << "Plots Hists ... " << endl;
   if(debug) cout << "\n\t ... data" << endl;
@@ -128,6 +174,8 @@ int main(int argc, char* argv[]){
   PlotHist(h_pt_data[1], "p_{T}", "data_pt_pass");
   PlotHist(h_pt_data[2], "p_{T}", "data_pt_fail_highpt");
   PlotHist(h_pt_data[3], "p_{T}", "data_pt_pass_highpt");
+  PlotHist(h_pt_data[4], "p_{T}", "data_pt_elec");
+  PlotHist(h_pt_data[5], "p_{T}", "data_pt_photon");
   PlotHist(h_eta_data[0], "#eta", "data_eta_all");
   PlotHist(h_eta_data[1], "#eta", "data_eta_pass");
   PlotHist(h_eta_data[2], "#eta", "data_eta_lowpt_all");
@@ -143,6 +191,8 @@ int main(int argc, char* argv[]){
   PlotHist(h_pt_mc[1], "p_{T}", "mc_pt_pass");
   PlotHist(h_pt_mc[2], "p_{T}", "mc_pt_fail_highpt");
   PlotHist(h_pt_mc[3], "p_{T}", "mc_pt_pass_highpt");
+  PlotHist(h_pt_mc[4], "p_{T}", "mc_pt_elec");
+  PlotHist(h_pt_mc[5], "p_{T}", "mc_pt_photon");
   PlotHist(h_eta_mc[0], "#eta", "mc_eta_all");
   PlotHist(h_eta_mc[1], "#eta", "mc_eta_pass");
   PlotHist(h_eta_mc[2], "#eta", "mc_eta_lowpt_all");
@@ -153,57 +203,88 @@ int main(int argc, char* argv[]){
   PlotHist(h_eta_mc[7], "#eta", "mc_eta_highpt_pass");
   PlotHist(h_eta_mc[8], "#eta", "mc_eta_highpt_fail");
 
+  // ===========================================================================
+  //                        Efficiency
+  // ===========================================================================
+  // TGraphAsymmErrors divides bin content of the two input histograms
+
+  /*
+  Necessary for binning which consideres gap in ECAL.
+  The bins in data and mc are abs(eta) in [1444, 1.566] are zero.
+  This leads to problems in the construction of the TGraphs
+  With FillGap avoid division by zero.
+  */
+  // FillEGap(h_pt_data[0]); FillEGap(h_pt_mc[0]);
+  FillEGap(h_eta_data[0]); FillEGap(h_eta_mc[0]);
+  FillEGap(h_eta_data[2]); FillEGap(h_eta_mc[2]);
+  FillEGap(h_eta_data[4]); FillEGap(h_eta_mc[4]);
+  FillEGap(h_eta_data[6]); FillEGap(h_eta_mc[6]);
+
   if(debug) cout << "Create efficiency graphs ... " << endl;
   TGraphAsymmErrors* h_effi_pt_data = new TGraphAsymmErrors(h_pt_data[1], h_pt_data[0],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_pt_data_elec = new TGraphAsymmErrors(h_pt_data[4], h_pt_data[0],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_pt_data_photon = new TGraphAsymmErrors(h_pt_data[5], h_pt_data[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_data = new TGraphAsymmErrors(h_eta_data[1], h_eta_data[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_lowpt_data = new TGraphAsymmErrors(h_eta_data[3], h_eta_data[2],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_midpt_data = new TGraphAsymmErrors(h_eta_data[5], h_eta_data[4],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_highpt_data = new TGraphAsymmErrors(h_eta_data[7], h_eta_data[6],"cl=0.683 b(1,1) mode");
 
-  cout << h_pt_mc[1]->GetEntries() << "\t" << h_pt_mc[0]->GetEntries() << endl;
-  for(int i=1; i<=h_pt_mc[0]->GetNbinsX();i++) cout << "\t" << h_pt_mc[0]->GetBinContent(i);
-  cout << endl;
-  for(int i=1; i<=h_pt_mc[0]->GetNbinsX();i++) cout << "\t" << h_pt_mc[0]->GetBinCenter(i) << " (" << h_pt_mc[0]->GetBinWidth(i) << ")";
-  cout << endl;
-  cout << endl;
-  for(int i=1; i<=h_pt_mc[1]->GetNbinsX();i++) cout << "\t" << h_pt_mc[1]->GetBinContent(i);
-  cout << endl;
-  for(int i=1; i<=h_pt_mc[1]->GetNbinsX();i++) cout << "\t" << h_pt_mc[1]->GetBinCenter(i) << " (" << h_pt_mc[1]->GetBinWidth(i) << ")";
-  cout << endl;
-  TGraphAsymmErrors* h_effi_pt_mc = new TGraphAsymmErrors(h_pt_mc[1], h_pt_mc[0],"cl=0.683 b(1,1) mode");
+  // cout << h_pt_mc[1]->GetEntries() << "\t" << h_pt_mc[0]->GetEntries() << endl;
+  // for(int i=1; i<=h_pt_mc[0]->GetNbinsX();i++) cout << "\t" << h_pt_mc[0]->GetBinContent(i);
+  // cout << endl;
+  // for(int i=1; i<=h_pt_mc[1]->GetNbinsX();i++) cout << "\t" << h_pt_mc[1]->GetBinContent(i);
+  // cout << endl;
 
-  cout << h_eta_mc[1]->GetNbinsX() << "\t" << h_eta_mc[0]->GetNbinsX() << endl;
-  for(int i=1; i<=h_eta_mc[0]->GetNbinsX();i++) cout << h_eta_mc[1]->GetBinContent(i) << "\t" << h_eta_mc[0]->GetBinContent(i) << endl;
+  TGraphAsymmErrors* h_effi_pt_mc = new TGraphAsymmErrors(h_pt_mc[1], h_pt_mc[0],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_pt_mc_elec = new TGraphAsymmErrors(h_pt_mc[4], h_pt_mc[0],"cl=0.683 b(1,1) mode");
+  TGraphAsymmErrors* h_effi_pt_mc_photon = new TGraphAsymmErrors(h_pt_mc[5], h_pt_mc[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_mc = new TGraphAsymmErrors(h_eta_mc[1], h_eta_mc[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_lowpt_mc = new TGraphAsymmErrors(h_eta_mc[3], h_eta_mc[2],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_midpt_mc = new TGraphAsymmErrors(h_eta_mc[5], h_eta_mc[4],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_highpt_mc = new TGraphAsymmErrors(h_eta_mc[7], h_eta_mc[6],"cl=0.683 b(1,1) mode");
 
+  // cout << h_pt_mc[0]->GetNbinsX() << "\t" << h_pt_mc[1]->GetNbinsX() << endl;
+  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++){
+  //   cout << h_pt_mc[0]->GetBinContent(i) << "\t" << h_pt_mc[1]->GetBinContent(i) << "\t" << h_pt_mc[1]->GetBinContent(i)/h_pt_mc[0]->GetBinContent(i) << endl;
+  // }
+  // cout << endl << endl;
+  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++) cout << h_pt_mc[0]->GetBinCenter(i) << " ";
+  // cout << endl;
+  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++) cout << h_pt_mc[0]->GetBinCenter(i) << " ";
+  // cout << endl;
+
+  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++){
+  //   double center = h_pt_mc[0]->GetBinCenter(i);
+  //   double x,y;
+  //   h_effi_pt_mc->GetPoint(i, x, y);
+  //   cout << h_effi_pt_mc->Eval(center) << "\t" << x << "\t" << y << endl;
+  // }
+
+
   if(debug) cout << "Plot efficiency graphs ... " << endl;
   PlotEfficiency(h_effi_pt_data, h_effi_pt_mc, "p_{T}", "effi_pt");
+  PlotEfficiency(h_effi_pt_data_elec, h_effi_pt_mc_elec, "p_{T}", "effi_pt_elec");
+  PlotEfficiency(h_effi_pt_data_photon, h_effi_pt_mc_photon, "p_{T}", "effi_pt_photon");
   PlotEfficiency(h_effi_eta_data, h_effi_eta_mc, "#eta", "effi_eta");
   PlotEfficiency(h_effi_eta_lowpt_data, h_effi_eta_lowpt_mc, "#eta", "effi_eta_lowpt");
   PlotEfficiency(h_effi_eta_midpt_data, h_effi_eta_midpt_mc, "#eta", "effi_eta_midpt");
   PlotEfficiency(h_effi_eta_highpt_data, h_effi_eta_highpt_mc, "#eta", "effi_eta_highpt");
 
+  // ===========================================================================
+  //                        SF
+  // ===========================================================================
   if(debug) cout << "\t ... pt" << endl;
   vector<TH1F*> h_SF_pt = GetSF(h_effi_pt_data, h_effi_pt_mc, h_pt_data[0]);
-  if(debug) cout << "\t ... eta" << endl;
   vector<TH1F*> h_SF_eta = GetSF(h_effi_eta_data, h_effi_eta_mc, h_eta_data[0]);
-  if(debug) cout << "\t ... lowpt" << endl;
   vector<TH1F*> h_SF_eta_lowpt = GetSF(h_effi_eta_lowpt_data, h_effi_eta_lowpt_mc, h_eta_data[2]);
-  if(debug) cout << "\t ... midpt" << endl;
   vector<TH1F*> h_SF_eta_midpt = GetSF(h_effi_eta_midpt_data, h_effi_eta_midpt_mc, h_eta_data[4]);
-  if(debug) cout << "\t ... highpt" << endl;
   vector<TH1F*> h_SF_eta_highpt = GetSF(h_effi_eta_highpt_data, h_effi_eta_highpt_mc, h_eta_data[4]);
-
 
   if(debug) cout << "Get SF ... " << endl;
   int bin1 = h_SF_eta[0]->GetXaxis()->FindBin(0.25);
   int bin2 = h_SF_eta[0]->GetXaxis()->FindBin(0.1);
   cout <<h_SF_eta[0]->GetBinContent(bin1) << endl;
   cout <<h_SF_eta[0]->GetBinContent(bin2) << endl;
-
 
   if(debug) cout << "Plot SF ... " << endl;
   PlotSF(h_SF_pt, "p_{T}", "SF_pt");
@@ -212,6 +293,9 @@ int main(int argc, char* argv[]){
   PlotSF(h_SF_eta_midpt, "#eta", "SF_eta_midpt");
   PlotSF(h_SF_eta_highpt, "#eta", "SF_eta_highpt");
 
+  // ===========================================================================
+  //                        Ntuples
+  // ===========================================================================
   if(argc == 2){
     cout << "Creating file..." << endl;
     TFile * f_out = new TFile("files/ElecTriggerSF"+year+".root","RECREATE");;
@@ -233,20 +317,92 @@ int main(int argc, char* argv[]){
     f_out->Close();
   }
 
+  // ===========================================================================
+  //                        Additional Hists
+  // ===========================================================================
+  cout << "Additional hists for debugging..." << endl;
+  CompareHists(h_pt_mc[0], h_pt_mc[1], "p_{T}", "Compare_MC");
+
+  // ===========================================================================
+  //                        Correlation
+  // ===========================================================================
+
+  if(year.EqualTo("2016")){
+    TFile *f_tt_cor =new TFile(fdir+"Correlation/uhh2.AnalysisModuleRunner.MC.TTbar"+year_v+".root");
+    TFile *f_st_cor =new TFile(fdir+"Correlation/uhh2.AnalysisModuleRunner.MC.SingleTop"+year_v+".root");
+    std::vector<TH1F*> v_cor, v_tt_cor, v_st_cor;
+    std::vector<TString> v_hists = {"no_trigger", "muon_trigger", "elec_trigger", "both_trigger"};
+    for(TString s: v_hists){
+      TH1F* h_tt = (TH1F*) f_tt_cor->Get(s+"/Events_weight");
+      // cout << h_tt -> GetBinContent(2) << endl;
+      TH1F* h_st = (TH1F*) f_st_cor->Get(s+"/Events_weight");
+      // cout << h_st -> GetBinContent(2) << endl;
+      TH1F* h_cor = (TH1F*) h_tt->Clone();
+      h_cor->Add(h_st);
+      v_tt_cor.push_back(h_tt);
+      v_st_cor.push_back(h_st);
+      v_cor.push_back(h_cor);
+    }
+
+    v_cor[0]->SetBinContent(1,1);
+    v_cor[1]->SetBinContent(1,1);
+    v_cor[2]->SetBinContent(1,1);
+    v_cor[3]->SetBinContent(1,1);
+
+    TGraphAsymmErrors* h_effi_muon = new TGraphAsymmErrors(v_cor[1], v_cor[0],"cl=0.683 b(1,1) mode");
+    TGraphAsymmErrors* h_effi_elec = new TGraphAsymmErrors(v_cor[1], v_cor[0],"cl=0.683 b(1,1) mode");
+    TGraphAsymmErrors* h_effi_both = new TGraphAsymmErrors(v_cor[3], v_cor[0],"cl=0.683 b(1,1) mode");
+    double effi_muon = v_cor[1]->GetBinContent(2)/v_cor[0]->GetBinContent(2);
+    double effi_elec = v_cor[2]->GetBinContent(2)/v_cor[0]->GetBinContent(2);
+    double effi_both = v_cor[3]->GetBinContent(2)/v_cor[0]->GetBinContent(2);
+    double unc_up_muon = h_effi_muon->GetErrorYhigh(1); double unc_down_muon = h_effi_muon->GetErrorYlow(1);
+    double unc_up_elec = h_effi_elec->GetErrorYhigh(1); double unc_down_elec = h_effi_elec->GetErrorYlow(1);
+    double unc_up_both = h_effi_both->GetErrorYhigh(1); double unc_down_both = h_effi_both->GetErrorYlow(1);
+    cout << effi_muon << "\t" << h_effi_muon->Eval(1.5) << "\t" << h_effi_muon->GetErrorYlow(1) << "\t" << h_effi_muon->GetErrorYhigh(1) << endl;
+
+    double alpha = (effi_muon*effi_elec)/effi_both;
+    double term_up_m = ((effi_elec/effi_both)*unc_up_muon)/effi_muon;                    double term_down_m = ((effi_elec/effi_both)*unc_down_muon)/effi_muon;
+    double term_up_e = ((effi_muon/effi_both)*unc_up_elec)/effi_elec;                    double term_down_e = ((effi_muon/effi_both)*unc_down_elec)/effi_elec;
+    double term_up_b = (((effi_elec*effi_muon)/pow(effi_both,2))*unc_up_both)/effi_both; double term_down_b = (((effi_elec*effi_muon)/pow(effi_both,2))*unc_down_both)/effi_both;
+    double term_up_mb = 2*(effi_elec)/pow(effi_both,2) * unc_up_muon * unc_up_both;      double term_down_mb = 2*(effi_elec)/pow(effi_both,2) * unc_down_muon * unc_down_both;
+    double term_up_eb = 2*(effi_muon)/pow(effi_both,2) * unc_up_elec * unc_up_both;      double term_down_eb = 2*(effi_muon)/pow(effi_both,2) * unc_down_elec * unc_down_both;
+
+    double unc_up_alpha = sqrt( pow( term_up_m, 2) + pow( term_up_e, 2) + pow( term_up_b, 2) ) * alpha; //  * alpha
+    double unc_down_alpha = sqrt( pow( ((effi_elec/effi_both)*unc_down_muon)/effi_muon, 2) + pow( ((effi_muon/effi_both)*unc_down_elec)/effi_elec, 2) + pow( (((effi_elec*effi_muon)/pow(effi_both,2))*unc_down_both)/effi_both, 2) ) * alpha; //  * alpha
+    cout << "up: " << alpha << "\t" << term_up_m  << "\t -" << term_up_e  << "\t +" << term_up_b  << "\t -" << term_up_mb  << "\t -" << term_up_eb << endl;
+
+    double unc_up_cor_alpha = sqrt( pow( term_up_m, 2) + pow( term_up_e, 2) + pow( term_up_b, 2) + pow( term_up_mb, 2) + pow( term_up_eb, 2) )  * alpha; //  * alpha
+    double unc_down_cor_alpha = sqrt( pow( term_down_m, 2) + pow( term_down_e, 2) + pow( term_down_b, 2) + pow( term_down_mb, 2) + pow( term_down_eb, 2)  ) * alpha; //  * alpha
+    cout << "do: " << alpha << "\t" << term_down_m  << "\t -" << term_down_e  << "\t +" << term_down_b  << "\t -" << term_down_mb  << "\t -" << term_down_eb << endl;
+
+    cout << "alpha =  " << alpha << "\t +" << unc_up_alpha  << "\t -" << unc_down_alpha  << "\t +" << unc_up_cor_alpha  << "\t -" << unc_down_cor_alpha << endl;
+
+  }
+
   return 0;
 }
 
 
 
+// ==================================================================================================
+
 void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
   if(!tree) cout << "could not read tree\n";
   else      cout << "Filling Histograms...\n";
+
+  // For debugging pt efficiency in 2017
+  TH2F* h_eta_pt_all = new TH2F("h_eta_pt_all", "eta vs pt", eta_bins.size()-1, &eta_bins[0], pt_bins.size()-1, &pt_bins[0]);
+  TH2F* h_eta_pt_pass = new TH2F("h_eta_pt_pass", "eta vs pt", eta_bins.size()-1, &eta_bins[0], pt_bins.size()-1, &pt_bins[0]);
+  TH2F* h_eta_pt_all_lowpt = new TH2F("h_eta_pt_all_lowpt", "eta vs pt", eta_bins.size()-1, &eta_bins[0], pt_bins.size()-1, &pt_bins[0]);
+  TH2F* h_eta_pt_pass_lowpt = new TH2F("h_eta_pt_pass_lowpt", "eta vs pt", eta_bins.size()-1, &eta_bins[0], pt_bins.size()-1, &pt_bins[0]);
 
   // outputFile->cd();
   tree->ResetBranchAddresses();
   tree->SetBranchAddress("pt",&pt);
   tree->SetBranchAddress("eta",&eta);
   tree->SetBranchAddress("passed",&passed);
+  tree->SetBranchAddress("passed_elec",&passed_elec);
+  tree->SetBranchAddress("passed_photon",&passed_photon);
   tree->SetBranchAddress("weight_sfpt",&weight_sfpt);
   tree->SetBranchAddress("weight_sfeta",&weight_sfeta);
   tree->SetBranchAddress("weight_sfetapt",&weight_sfetapt);
@@ -259,10 +415,14 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
 
   tree->SetBranchStatus("*",1);
 
-  int ipass = 0; int ifull = 0;
+  int ipass = 0; int ifull = 0; int ineg = 0; int ineg_pass = 0;
   for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
     if(tree->GetEntry(ievent)<=0) break;
-    ifull++;
+
+    ifull++; // debugging
+    h_eta_pt_all->Fill(eta, pt, weight); // debugging
+    if(pt<300) h_eta_pt_all_lowpt->Fill(eta, pt, weight); // debugging
+    // if(eta<1.566 && 1.444<eta) cout << "INNNN " << eta << "\t" << pt << endl;
     h_pt[0]->Fill(pt, weight);
     h_eta[0]->Fill(eta, weight);
     if(pt < 120)             h_eta[2]->Fill(eta, weight);
@@ -280,8 +440,13 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
       }
     }
 
+    if(weight<0&&pt>300) ineg++;
+
     if(passed){
-      ipass++;
+      ipass++; // debugging
+      h_eta_pt_pass->Fill(eta, pt, weight); // debugging
+      if(pt<300) h_eta_pt_pass_lowpt->Fill(eta, pt, weight); // debugging
+
       // cout << pt << ", " << eta << endl;
       // cout  << weight << ", "<< weight_sfpt << ", " << weight_sfeta << ", " << weight_sfetapt << endl;
       double weight_pass = 0;
@@ -292,21 +457,36 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
       else if(weighttag == "weight_sfetaptDOWN") weight_pass = weight_sfetaptDOWN;
       else weight_pass = weight;
       // if(year=="2017"&&ievent==10) cout << "weight: " << weight << "\t" << "weight_pass: " << weight_pass << endl;
-      if(weight<weight_pass) cout << "UHHHHHHHH" << endl;
       h_pt[1]->Fill(pt, weight_pass);
       h_eta[1]->Fill(eta, weight_pass);
       if(pt < 120)             h_eta[3]->Fill(eta, weight_pass);
       else if(pt>120 && pt<200)h_eta[5]->Fill(eta, weight_pass);
       else if(pt>200)          h_eta[7]->Fill(eta, weight_pass);
 
+      if(weight<0&&pt>300) ineg_pass++;
       if(pt>200) h_pt[3]->Fill(pt, weight);
+
     }
+
+    /* Only checked one trigger for pT>120 GeV */
+    if( (pt<120 && passed) || passed_elec) h_pt[4]->Fill(pt, weight);
+    if( (pt<120 && passed) || passed_photon) h_pt[5]->Fill(pt, weight);
+
   }
-  cout << h_pt[1]->GetBinContent(9) << "\t" << h_pt[0]->GetBinContent(9) << endl;
-  cout << ifull << "\t" << ipass << endl;
+
+  // For debugging pt efficiency in 2017
+  PlotHist(h_eta_pt_all, "#eta", "p_{T}", "etaVSpt_all");
+  PlotHist(h_eta_pt_pass, "#eta", "p_{T}", "etaVSpt_pass");
+  PlotHist(h_eta_pt_all_lowpt, "#eta", "p_{T}", "etaVSpt_all_lowpt");
+  PlotHist(h_eta_pt_pass_lowpt, "#eta", "p_{T}", "etaVSpt_pass_lowpt");
+  // tdrDiCanvas2("etaVSpt_all", -2.5, 2.5, 55, 1500, 0.6, 1.6, "#eta", "p_{T}", "ratio");
+  // TCanvas* tdrDiCanvas2(const char* canvName, double x_min, double x_max, double y_min, double y_max, double y_min2, double y_max2,  const char* nameXaxis, const char* nameYaxis, const char* nameYaxis2, bool square = kRectangular, int iPeriod = 4, int iPos = 11) {
+  // GetRatio();
+
   return;
 }
 
+// ==================================================================================================
 // calculate central value and up/down variation of SF and return in vector
 // [0] - central
 // [1] - up
@@ -357,6 +537,8 @@ vector<TH1F*> GetSF(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TH1F* hi
 }
 
 
+// ==================================================================================================
+
 void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString xaxis, TString histname){
   // if(histname == "effi_pt") cout << h_data->Eval(25) << endl;
   // if(histname == "effi_pt") cout << h_mc->Eval(25) << endl;
@@ -368,28 +550,34 @@ void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString 
   h_data->GetXaxis()->SetTitleOffset(1.3);
   h_data->GetXaxis()->SetNdivisions(505);
   h_data->GetYaxis()->SetNdivisions(505);
-  h_data->GetYaxis()->SetRangeUser(0.0, 1.0);
+  if(xaxis.Contains("p_{T}")) h_data->GetXaxis()->SetRangeUser(0.0, 1500);
+  h_data->GetYaxis()->SetRangeUser(0.0, 1.1);
 
   h_data->SetLineColor(kBlack);
   h_data->SetMarkerColor(kBlack);
-  h_data->SetMarkerStyle(8);
-  h_data->SetMarkerSize(1);
+  h_data->SetMarkerStyle(2);
+  h_data->SetMarkerSize(0.2);
 
   h_mc->SetLineColor(kRed);
   h_mc->SetMarkerColor(kRed);
-  h_mc->SetMarkerStyle(8);
-  h_mc->SetMarkerSize(1);
+  h_mc->SetMarkerStyle(2);
+  h_mc->SetMarkerSize(0.2);
 
   gStyle->SetOptStat(kFALSE);
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
   gStyle->SetLegendBorderSize(0);
 
+  TLine* line = new TLine(120, 0, 120, 1.1);
+  line->SetLineWidth(1);
+  // GetRatio(h_data, h_mc, false);
+
   TCanvas *A = new TCanvas("A", "A", 600, 600);
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.1);
   h_data->Draw("AP");
   h_mc->Draw("P SAME");
+  // line->Draw("SAME");
   TLegend *leg = new TLegend(0.33,0.20,0.66,0.33);
   leg->AddEntry(h_data,"data","pl");
   leg->AddEntry(h_mc,"simulation","pl");
@@ -404,6 +592,8 @@ void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString 
   delete A;
   return;
 }
+
+// ==================================================================================================
 
 void PlotHist(TH1F* hist, TString xaxis, TString histname){
   hist->SetTitle(" ");
@@ -435,6 +625,37 @@ void PlotHist(TH1F* hist, TString xaxis, TString histname){
   delete A;
   return;
 }
+
+// ==================================================================================================
+
+void PlotHist(TH2F* hist, TString xaxis, TString yaxis, TString histname){
+  hist->SetTitle(" ");
+  hist->GetXaxis()->SetTitle(xaxis);
+  hist->GetYaxis()->SetTitle(yaxis);
+  hist->GetZaxis()->SetTitle("Events");
+  hist->GetYaxis()->SetTitleOffset(1.7);
+  hist->GetXaxis()->SetTitleOffset(1.3);
+  hist->GetZaxis()->SetTitleOffset(1.2);
+  hist->GetXaxis()->SetNdivisions(505);
+  hist->GetYaxis()->SetNdivisions(505);
+  hist->GetZaxis()->SetRangeUser(0, 80);
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetPadTickY(1);
+  gStyle->SetPadTickX(1);
+  gStyle->SetLegendBorderSize(0);
+
+  TCanvas *A = new TCanvas("A", "A", 600, 600);
+  gPad->SetLeftMargin(0.12);
+  gPad->SetRightMargin(0.15);
+  gPad->SetBottomMargin(0.1);
+  hist->Draw("COLZ");
+  gPad->RedrawAxis();
+  A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/"+histname+"_"+year+".pdf");
+  delete A;
+  return;
+}
+
+// ==================================================================================================
 
 void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname){
   if(h_SF.size() != 3) cout << "THERE ARE NOT EXACTLY 3 SF hists" << endl;
@@ -485,5 +706,78 @@ void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname){
   else if(weighttag == "weight_sfetaptDOWN") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_etaptDOWN/"+histname+"_"+year+".pdf");
   else A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/"+histname+"_"+year+".pdf");
   delete A;
+  return;
+}
+
+// ==================================================================================================
+
+void CompareHists(TH1F* h_all, TH1F* h_pass, TString xaxis, TString histname){
+  h_all->SetTitle(" ");
+  h_all->GetXaxis()->SetTitle(xaxis);
+  h_all->GetYaxis()->SetTitle("events");
+  h_all->GetYaxis()->SetTitleOffset(1.6);
+  h_all->GetXaxis()->SetTitleOffset(1.3);
+  h_all->GetXaxis()->SetNdivisions(505);
+  h_all->GetYaxis()->SetNdivisions(505);
+  h_all->GetYaxis()->SetRangeUser(0, h_all->GetMaximum()*1.1);
+  h_all->SetLineColor(kBlack);
+  h_all->SetFillColor(13);
+
+  h_pass->SetLineColor(kRed+1);
+  h_pass->SetLineWidth(1);
+
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetPadTickY(1);
+  gStyle->SetPadTickX(1);
+  gStyle->SetLegendBorderSize(0);
+
+  TCanvas *A = new TCanvas("A", "A", 600, 600);
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.1);
+  h_all->Draw("HIST");
+  h_pass->Draw("HIST SAME");
+  gPad->RedrawAxis();
+  if(weighttag == "weight") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/"+histname+"_"+year+".pdf");
+  delete A;
+  return;
+}
+
+// ==================================================================================================
+
+TH1F* GetRatio(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData){
+  TH1F* g1 = h1->GetHistogram();
+  TH1F* g2 = h2->GetHistogram();
+  TH1F* ratio = (TH1F*) g1->Clone();
+  int Nbins = g1->GetNbinsX();
+  cout << Nbins << endl;
+  for(int i=1; i<=Nbins;i++){
+    double N1 = g1->GetBinContent(i);
+    double N2 = g2->GetBinContent(i);
+    double E1 = g1->GetBinError(i);
+    double E2 = g2->GetBinError(i);
+    cout << "1: " << N1 << "\t 2: " << N2 << endl;
+    if(N1==0 || N2==0){
+      if(isData) ratio->SetBinContent(i, 0);
+      else       ratio->SetBinContent(i, 1);
+
+      ratio->SetBinError(i, 0);
+    }
+    else{
+      double r = N1/N2;
+      double error = sqrt(E1/N2 * E1/N2 + N1*E2/(N2*N2) * N1*E2/(N2*N2));
+      ratio->SetBinContent(i, r);
+      ratio->SetBinError(i, error);
+    }
+  }
+  return ratio;
+}
+
+// ==================================================================================================
+
+void FillEGap(TH1F* h){
+  for(unsigned int i=1; i<=h->GetNbinsX(); i++){
+    // high bin content to make error bars very small
+    if(abs(h->GetBinCenter(i))==1.505) h->SetBinContent(i, 1000000);
+  }
   return;
 }
