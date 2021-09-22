@@ -399,7 +399,7 @@ void CompareHistStructure(TH1F* h1, TH1F* h2){
 }
 
 // -------------------------------------------------------------------------------------------------------
-TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal, bool isEffi){
+TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal){
   CompareHistStructure(h1, h2);
   TH1F* ratio = (TH1F*) h1->Clone();
   int Nbins = h1->GetNbinsX();
@@ -409,8 +409,8 @@ TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal, bool isEffi){
     double E1 = h1->GetBinError(i);
     double E2 = h2->GetBinError(i);
     if(N1==0 || N2==0){
-      if(equal||isEffi) ratio->SetBinContent(i, 0);
-      else              ratio->SetBinContent(i, 1);
+      if(equal) ratio->SetBinContent(i, 0);
+      else      ratio->SetBinContent(i, 1);
 
       ratio->SetBinError(i, 0);
     }

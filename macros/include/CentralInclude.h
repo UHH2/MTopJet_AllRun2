@@ -21,6 +21,7 @@
 #include <TH1.h>
 #include "TH1D.h"
 #include <TH2.h>
+#include <THStack.h>
 #include <TLine.h>
 #include <TLatex.h>
 #include <TLegend.h>
@@ -71,6 +72,9 @@ typedef map<TString, VecI> MapVI;
 typedef map<TString, MapVI> MapVII;
 typedef map<TString, MapVII> MapVIII;
 
+typedef map<TString, TString> MapTS;
+typedef map<TString, VecTS> MapVecTS;
+
 typedef map<TString, double> MapD;
 typedef map<TString, VecD> MapVD;
 typedef map<TString, MapVD> MapVDD;
@@ -80,6 +84,15 @@ typedef map<TString, TH1F*> MapH;
 typedef map<TString, MapH> MapHH;
 typedef map<TString, MapHH> MapHHH;
 typedef map<TString, MapHHH> MapHHHH;
+
+typedef map<TString, THStack*> MapStack;
+typedef map<TString, MapStack> Map2Stack;
+typedef map<TString, Map2Stack> Map3Stack;
+typedef map<TString, Map3Stack> Map4Stack;
+
+typedef map<TString, TFile*> MapF;
+typedef map<TString, MapF> MapFF;
+
 
 // -------------------------------------------------------------------------------------------
 // Get path
@@ -139,7 +152,7 @@ void SetupGlobalStyle()
 }
 
 // -------------------------------------------------------------------------------------------
-void CMSLabel(bool prelim, double x=0.25, double y=0.83){
+void CMSLabel(double x=0.25, double y=0.83, TString extra = ""){
   TString cmstext = "CMS";
   TLatex *text = new TLatex(3.5, 24, cmstext);
   text->SetNDC();
@@ -150,17 +163,14 @@ void CMSLabel(bool prelim, double x=0.25, double y=0.83){
   text->SetY(y);
   text->Draw();
 
-  if(prelim){
-    TString simtext = "Work in Progress";
-    TLatex *text3 = new TLatex(3.5, 24, simtext);
-    text3->SetNDC();
-    text3->SetTextAlign(13);
-    text3->SetX(x);
-    text3->SetTextFont(52);
-    text3->SetTextSize(0.05);
-    text3->SetY(y-0.06);
-    text3->Draw();
-  }
+  TLatex *text3 = new TLatex(3.5, 24, extra);
+  text3->SetNDC();
+  text3->SetTextAlign(13);
+  text3->SetX(x);
+  text3->SetTextFont(52);
+  text3->SetTextSize(0.05);
+  text3->SetY(y-0.06);
+  text3->Draw();
 }
 
 // -------------------------------------------------------------------------------------------

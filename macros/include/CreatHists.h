@@ -49,6 +49,7 @@ TH1F* get_hist(TString name, TString hist){
 
 // channels
 TString muon = "muon";
+// TString muon = "muon/V20";
 TString elec = "elec";
 TString muon_elecJMS = "muon_elecJMS";
 TString elec_muonJMS = "elec_muonJMS";
@@ -60,7 +61,9 @@ TString y18      = "_2018";    int index_18  = 2;
 TString yCombine = "_combine"; int index_Com = 3;
 
 VecTS years = {"2016", "2017", "2018", "combine"};
+// VecTS years = {"2016"};
 VecTS channels = {"muon", "elec", "combine"};
+// VecTS channels = {"muon"};
 
 // Hist files
 TString data_f   = "uhh2.AnalysisModuleRunner.DATA.DATA";
