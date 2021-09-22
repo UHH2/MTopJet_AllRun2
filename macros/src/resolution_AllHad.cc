@@ -22,15 +22,15 @@ int main(int argc, char* argv[]){
   TFile *f_tt;
   if(argc > 1 && strcmp(argv[1], "2016") == 0) {
     year = "2016";
-    f_tt = new TFile(dir+"2016/muon/AllHad/uhh2.AnalysisModuleRunner.MC.TTbar_allHad_2016v3.root");
+    f_tt = new TFile(dir+"AllHad/uhh2.AnalysisModuleRunner.MC.TTbar_allHad_2016v3.root");
   }
   if(argc > 1 && strcmp(argv[1], "2017") == 0){
     year = "2017";
-    f_tt = new TFile(dir+"2017/muon/AllHad/uhh2.AnalysisModuleRunner.MC.TTbar_allHad_2017v2.root");
+    f_tt = new TFile(dir+"AllHad/uhh2.AnalysisModuleRunner.MC.TTbar_allHad_2017v2.root");
   }
   if(argc > 1 && strcmp(argv[1], "2018") == 0){
     year = "2018";
-    f_tt = new TFile(dir+"2018/muon/AllHad/uhh2.AnalysisModuleRunner.MC.TTbar_allHad_2018.root");
+    f_tt = new TFile(dir+"AllHad/uhh2.AnalysisModuleRunner.MC.TTbar_allHad_2018.root");
   }
 
   string year_s = (string) year;
@@ -210,12 +210,12 @@ int main(int argc, char* argv[]){
   text1.DrawLatex(.22,.2, "all hadronic t#bar{t}");
   gPad->RedrawAxis();
   // first save without additional correction
-  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_noAdditional_"+year+".pdf");
+  c1->SaveAs(save_path+"/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_noAdditional_"+year+".pdf");
   // and once again with the additional correction
   resolution_cor->Draw("SAME E1");
   leg1->AddEntry(resolution_cor,"AK4 + additional correction","le");
   // leg1->AddEntry((TObject*)0, "all hadronic t#bar{t}", "");
-  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_"+year+".pdf");
+  c1->SaveAs(save_path+"/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_"+year+".pdf");
 
 
   TCanvas *c2 = new TCanvas();
@@ -238,7 +238,7 @@ int main(int argc, char* argv[]){
   text2.SetTextSize(18);
   text2.DrawLatex(.2,.2, "all hadronic");
   gPad->RedrawAxis();
-  c2->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_seperateJets_"+year+".pdf");
+  c2->SaveAs(save_path+"/Resolution_Subjets/muon/AllHadronic/"+year+"/pt_"+mean_median+"_seperateJets_"+year+".pdf");
 
   TCanvas *c3 = new TCanvas();
   gPad->SetLeftMargin(0.15);
@@ -261,7 +261,7 @@ int main(int argc, char* argv[]){
   leg3->AddEntry(area_percent, "non-closure", "f");
   leg3->Draw();
   gPad->RedrawAxis();
-  c3->SaveAs(save_path+"/Plots/Resolution_Subjets/muon/AllHadronic/"+year+"/nonClosure"+mean_median+"_"+year+".pdf");
+  c3->SaveAs(save_path+"/Resolution_Subjets/muon/AllHadronic/"+year+"/nonClosure"+mean_median+"_"+year+".pdf");
 
   return 0;
 }

@@ -1,5 +1,8 @@
 #include "../include/CentralInclude.h"
 #include "../include/tdrstyle_all.h"
+#include "../include/HistogramUtils.h"
+
+
 
 using namespace std;
 
@@ -12,6 +15,7 @@ Double_t weight_sfeta;
 Double_t weight_sfetapt;
 Double_t weight_sfetaptUP;
 Double_t weight_sfetaptDOWN;
+Double_t lumi_plot;
 Int_t run;
 Int_t lumi;
 Int_t eventnr;
@@ -25,6 +29,7 @@ TString study = "";
 TString fdir = "/nfs/dust/cms/user/paaschal/MTopJet_Run2/ElecSF/"+study;
 
 vector<double> pt_bins = {55, 75, 95, 115, 135, 155, 175, 200, 300, 1500};
+vector<double> pt_bins_control;
 // vector<double> pt_bins = {55, 75, 95, 115, 120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 280, 300, 1500};
 // vector<double> pt_bins = {55, 65, 75, 85, 95, 105, 115, 120, 130, 140, 150, 160, 170, 180, 190, 200, 220, 240, 260, 280, 300, 1500};
 // vector<double> pt_bins;
@@ -34,40 +39,35 @@ vector<double> eta_bins = {-2.5, -2.0, -1.566, -1.444, -0.8, 0.0, 0.8, 1.444, 1.
 // filling hists
 void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta);
 void FillEGap(TH1F* h);
-TH1F* GetRatio(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData);
+TH1F* GetRatioGraph(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData);
 // Calculate SF
 vector<TH1F*> GetSF(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TH1F* hist);
 // Plotter
+void DrawText(TString name);
 void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString xaxis, TString histname);
 void PlotHist(TH1F* h_data, TString xaxis, TString histname);
 void PlotHist(TH2F* h_data, TString xaxis, TString yaxis, TString histname);
 void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname);
 void CompareHists(TH1F* h_all, TH1F* h_pass, TString xaxis, TString histname);
+void DrawControl(TString path, VecH hists, TH1F* rData, TH1F* rMC, VecI colors, VecTS names, TString xaxis);
+void fill_control(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta);
+void AdjustBinContent(TH1F* h_pass, TH1F* h_all, TString text);
 
 
 int main(int argc, char* argv[]){
+  cout << endl << "===================================================" << endl;
 
-  // double start = 55;
-  // while(start < 200){
-  //   pt_bins.push_back(start);
-  //   start +=5;
-  // }
-  // while(start < 300){
-  //   pt_bins.push_back(start);
-  //   start +=10;
-  // }
-  // pt_bins.push_back(1500);
-  // while(start <= 1500){
-  //   pt_bins.push_back(start);
-  //   start +=1;
-  // }
-  // General settings
+  double start = 55;
+  while(start < 1005){
+    pt_bins_control.push_back(start);
+    start +=25;
+  }
   gErrorIgnoreLevel = kWarning;
 
   year = argv[1];
-  if(year.EqualTo("2016")) year_v = "_2016v3";
-  else if(year.EqualTo("2017")) year_v = "_2017v2";
-  else if(year.EqualTo("2018")) year_v = "_2018";
+  if(year.EqualTo("2016")){year_v = "_2016v3"; lumi_plot = 35.9;}
+  else if(year.EqualTo("2017")){year_v = "_2017v2"; lumi_plot = 41.5;}
+  else if(year.EqualTo("2018")){year_v = "_2018"; lumi_plot = 59.74;}
   else throw runtime_error("I need the correct year; 2016, 2017 or 2018");
 
   if(argc == 2){
@@ -147,6 +147,42 @@ int main(int argc, char* argv[]){
   h_eta_mc.push_back(new TH1F("h_eta_fail_mc_highpt","eta", eta_bins.size()-1, &eta_bins[0]));
 
   // ===========================================================================
+  // Control Hists
+  vector<TH1F*> h_pt_tt, h_pt_st, h_eta_tt, h_eta_st;
+  vector<TH1F*> h_pt_wj, h_pt_di, h_pt_dy, h_eta_wj, h_eta_di, h_eta_dy;
+  vector<TH1F*> h_pt_data_control, h_eta_data_control;
+  vector<TH1F*> h_pt_mc_control, h_eta_mc_control;
+  h_eta_data_control.push_back(new TH1F("h_eta_all_data_control","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_data_control.push_back(new TH1F("h_eta_pass_data_control","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_mc_control.push_back(new TH1F("h_eta_all_mc_control","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_mc_control.push_back(new TH1F("h_eta_pass_mc_control","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_tt.push_back(new TH1F("h_eta_all_tt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_tt.push_back(new TH1F("h_eta_pass_tt","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_st.push_back(new TH1F("h_eta_all_st","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_st.push_back(new TH1F("h_eta_pass_st","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_wj.push_back(new TH1F("h_eta_all_wj","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_wj.push_back(new TH1F("h_eta_pass_wj","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_di.push_back(new TH1F("h_eta_all_di","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_di.push_back(new TH1F("h_eta_pass_di","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_dy.push_back(new TH1F("h_eta_all_dy","eta", eta_bins.size()-1, &eta_bins[0]));
+  h_eta_dy.push_back(new TH1F("h_eta_pass_dy","eta", eta_bins.size()-1, &eta_bins[0]));
+
+  h_pt_data_control.push_back(new TH1F("h_pt_all_data_control","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_data_control.push_back(new TH1F("h_pt_pass_data_control","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_mc_control.push_back(new TH1F("h_pt_all_mc_control","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_mc_control.push_back(new TH1F("h_pt_pass_mc_control","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_tt.push_back(new TH1F("h_pt_all_tt","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_tt.push_back(new TH1F("h_pt_pass_tt","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_st.push_back(new TH1F("h_pt_all_st","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_st.push_back(new TH1F("h_pt_pass_st","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_wj.push_back(new TH1F("h_pt_all_wj","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_wj.push_back(new TH1F("h_pt_pass_wj","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_di.push_back(new TH1F("h_pt_all_di","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_di.push_back(new TH1F("h_pt_pass_di","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_dy.push_back(new TH1F("h_pt_all_dy","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+  h_pt_dy.push_back(new TH1F("h_pt_pass_dy","eta", pt_bins_control.size()-1, &pt_bins_control[0]));
+
+  // ===========================================================================
   //                        Hists
   // ===========================================================================
 
@@ -156,17 +192,39 @@ int main(int argc, char* argv[]){
 
   TFile *f_data=new TFile(fdir+"uhh2.AnalysisModuleRunner.DATA.DATA"+year_v+".root");
   fill_pteta((TTree *) f_data->Get("AnalysisTree"), h_pt_data, h_eta_data);
+  fill_control((TTree *) f_data->Get("AnalysisTree"), h_pt_data_control, h_eta_data_control);
 
   // TFile *f_tt=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.WJets"+year_v+".root");
   TFile *f_tt=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.TTbar"+year_v+".root");
   fill_pteta((TTree *) f_tt->Get("AnalysisTree"), h_pt_mc, h_eta_mc);
+  fill_control((TTree *) f_tt->Get("AnalysisTree"), h_pt_tt, h_eta_tt);
+  fill_control((TTree *) f_tt->Get("AnalysisTree"), h_pt_mc_control, h_eta_mc_control);
 
   TFile *f_st=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.SingleTop"+year_v+".root");
   fill_pteta((TTree *) f_st->Get("AnalysisTree"), h_pt_mc, h_eta_mc);
+  fill_control((TTree *) f_st->Get("AnalysisTree"), h_pt_st, h_eta_st);
+  fill_control((TTree *) f_st->Get("AnalysisTree"), h_pt_mc_control, h_eta_mc_control);
 
-  // Because of negative weight, the bin content of the last pt bin ist about 0.04 bigger for passed events
+  /*************************** Only for ratio plots ***************************/
+  TFile *f_wj=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.WJets"+year_v+".root");
+  fill_control((TTree *) f_wj->Get("AnalysisTree"), h_pt_wj, h_eta_wj);
+  fill_control((TTree *) f_wj->Get("AnalysisTree"), h_pt_mc_control, h_eta_mc_control);
+
+  TFile *f_di=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.DiBoson"+year_v+".root");
+  fill_control((TTree *) f_di->Get("AnalysisTree"), h_pt_di, h_eta_di);
+  fill_control((TTree *) f_di->Get("AnalysisTree"), h_pt_mc_control, h_eta_mc_control);
+
+  TFile *f_dy=new TFile(fdir+"uhh2.AnalysisModuleRunner.MC.DYJets"+year_v+".root");
+  fill_control((TTree *) f_dy->Get("AnalysisTree"), h_pt_dy, h_eta_dy);
+  fill_control((TTree *) f_dy->Get("AnalysisTree"), h_pt_mc_control, h_eta_mc_control);
+  /****************************************************************************/
+
+  // Because of negative weight, the bin content of the last pt bin is about 0.04 bigger for passed events
   // in comparison to all events. Hence the efficiency is set automatically to one.
-  if(year.EqualTo("2017")) h_pt_mc[0]->SetBinContent(9, h_pt_mc[1]->GetBinContent(9));
+  if(year.EqualTo("2017")) AdjustBinContent(h_pt_mc[1], h_pt_mc[0], "pt - ");
+  if(year.EqualTo("2017")) AdjustBinContent(h_eta_mc[1], h_eta_mc[0], "eta - "); // h_pt_mc[0]->SetBinContent(9, h_pt_mc[1]->GetBinContent(9));
+  if(year.EqualTo("2017")) AdjustBinContent(h_eta_mc[7], h_eta_mc[6], "eta high_pt - ");
+  if(year.EqualTo("2016")) AdjustBinContent(h_eta_mc[7], h_eta_mc[6], "eta high_pt - ");
 
   if(debug) cout << "Plots Hists ... " << endl;
   if(debug) cout << "\n\t ... data" << endl;
@@ -174,8 +232,8 @@ int main(int argc, char* argv[]){
   PlotHist(h_pt_data[1], "p_{T}", "data_pt_pass");
   PlotHist(h_pt_data[2], "p_{T}", "data_pt_fail_highpt");
   PlotHist(h_pt_data[3], "p_{T}", "data_pt_pass_highpt");
-  PlotHist(h_pt_data[4], "p_{T}", "data_pt_elec");
-  PlotHist(h_pt_data[5], "p_{T}", "data_pt_photon");
+  // PlotHist(h_pt_data[4], "p_{T}", "data_pt_elec");
+  // PlotHist(h_pt_data[5], "p_{T}", "data_pt_photon");
   PlotHist(h_eta_data[0], "#eta", "data_eta_all");
   PlotHist(h_eta_data[1], "#eta", "data_eta_pass");
   PlotHist(h_eta_data[2], "#eta", "data_eta_lowpt_all");
@@ -191,8 +249,8 @@ int main(int argc, char* argv[]){
   PlotHist(h_pt_mc[1], "p_{T}", "mc_pt_pass");
   PlotHist(h_pt_mc[2], "p_{T}", "mc_pt_fail_highpt");
   PlotHist(h_pt_mc[3], "p_{T}", "mc_pt_pass_highpt");
-  PlotHist(h_pt_mc[4], "p_{T}", "mc_pt_elec");
-  PlotHist(h_pt_mc[5], "p_{T}", "mc_pt_photon");
+  // PlotHist(h_pt_mc[4], "p_{T}", "mc_pt_elec");
+  // PlotHist(h_pt_mc[5], "p_{T}", "mc_pt_photon");
   PlotHist(h_eta_mc[0], "#eta", "mc_eta_all");
   PlotHist(h_eta_mc[1], "#eta", "mc_eta_pass");
   PlotHist(h_eta_mc[2], "#eta", "mc_eta_lowpt_all");
@@ -202,6 +260,24 @@ int main(int argc, char* argv[]){
   PlotHist(h_eta_mc[6], "#eta", "mc_eta_highpt_all");
   PlotHist(h_eta_mc[7], "#eta", "mc_eta_highpt_pass");
   PlotHist(h_eta_mc[8], "#eta", "mc_eta_highpt_fail");
+
+  // ===========================================================================
+  // Control Plots
+  TH1F* ratio_eta_all_data = GetRatio(h_eta_data_control[0], h_eta_mc_control[0], false);
+  TH1F* ratio_eta_all_mc = GetRatio(h_eta_mc_control[0], h_eta_mc_control[0], true);
+  TH1F* ratio_eta_pass_data = GetRatio(h_eta_data_control[1], h_eta_mc_control[1], false);
+  TH1F* ratio_eta_pass_mc = GetRatio(h_eta_mc_control[1], h_eta_mc_control[1], true);
+
+  TH1F* ratio_pt_all_data = GetRatio(h_pt_data_control[0], h_pt_mc_control[0], false);
+  TH1F* ratio_pt_all_mc = GetRatio(h_pt_mc_control[0], h_pt_mc_control[0], true);
+  TH1F* ratio_pt_pass_data = GetRatio(h_pt_data_control[1], h_pt_mc_control[1], false);
+  TH1F* ratio_pt_pass_mc = GetRatio(h_pt_mc_control[1], h_pt_mc_control[1], true);
+
+  // void DrawControl(TString path, VecH hists, TH1F* rData, TH1F* rMC, VecI colors, VecTS names)
+  DrawControl("eta_all_"+year, {h_eta_data_control[0], h_eta_dy[0], h_eta_di[0], h_eta_wj[0], h_eta_st[0], h_eta_tt[0]}, ratio_eta_all_data, ratio_eta_all_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed+1}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "#eta_{e}");
+  DrawControl("eta_pass_"+year, {h_eta_data_control[1], h_eta_dy[1], h_eta_di[1], h_eta_wj[1], h_eta_st[1], h_eta_tt[1]}, ratio_eta_pass_data, ratio_eta_pass_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed+1}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "#eta_{e}");
+  DrawControl("pt_all_"+year, {h_pt_data_control[0], h_pt_dy[0], h_pt_di[0], h_pt_wj[0], h_pt_st[0], h_pt_tt[0]}, ratio_pt_all_data, ratio_pt_all_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "p_{T}");
+  DrawControl("pt_pass_"+year, {h_pt_data_control[1], h_pt_dy[1], h_pt_di[1], h_pt_wj[1], h_pt_st[1], h_pt_tt[1]}, ratio_pt_pass_data, ratio_pt_pass_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "p_{T}");
 
   // ===========================================================================
   //                        Efficiency
@@ -214,7 +290,7 @@ int main(int argc, char* argv[]){
   This leads to problems in the construction of the TGraphs
   With FillGap avoid division by zero.
   */
-  // FillEGap(h_pt_data[0]); FillEGap(h_pt_mc[0]);
+
   FillEGap(h_eta_data[0]); FillEGap(h_eta_mc[0]);
   FillEGap(h_eta_data[2]); FillEGap(h_eta_mc[2]);
   FillEGap(h_eta_data[4]); FillEGap(h_eta_mc[4]);
@@ -236,35 +312,17 @@ int main(int argc, char* argv[]){
   // cout << endl;
 
   TGraphAsymmErrors* h_effi_pt_mc = new TGraphAsymmErrors(h_pt_mc[1], h_pt_mc[0],"cl=0.683 b(1,1) mode");
-  TGraphAsymmErrors* h_effi_pt_mc_elec = new TGraphAsymmErrors(h_pt_mc[4], h_pt_mc[0],"cl=0.683 b(1,1) mode");
-  TGraphAsymmErrors* h_effi_pt_mc_photon = new TGraphAsymmErrors(h_pt_mc[5], h_pt_mc[0],"cl=0.683 b(1,1) mode");
+  // TGraphAsymmErrors* h_effi_pt_mc_elec = new TGraphAsymmErrors(h_pt_mc[4], h_pt_mc[0],"cl=0.683 b(1,1) mode");
+  // TGraphAsymmErrors* h_effi_pt_mc_photon = new TGraphAsymmErrors(h_pt_mc[5], h_pt_mc[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_mc = new TGraphAsymmErrors(h_eta_mc[1], h_eta_mc[0],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_lowpt_mc = new TGraphAsymmErrors(h_eta_mc[3], h_eta_mc[2],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_midpt_mc = new TGraphAsymmErrors(h_eta_mc[5], h_eta_mc[4],"cl=0.683 b(1,1) mode");
   TGraphAsymmErrors* h_effi_eta_highpt_mc = new TGraphAsymmErrors(h_eta_mc[7], h_eta_mc[6],"cl=0.683 b(1,1) mode");
 
-  // cout << h_pt_mc[0]->GetNbinsX() << "\t" << h_pt_mc[1]->GetNbinsX() << endl;
-  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++){
-  //   cout << h_pt_mc[0]->GetBinContent(i) << "\t" << h_pt_mc[1]->GetBinContent(i) << "\t" << h_pt_mc[1]->GetBinContent(i)/h_pt_mc[0]->GetBinContent(i) << endl;
-  // }
-  // cout << endl << endl;
-  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++) cout << h_pt_mc[0]->GetBinCenter(i) << " ";
-  // cout << endl;
-  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++) cout << h_pt_mc[0]->GetBinCenter(i) << " ";
-  // cout << endl;
-
-  // for(unsigned int i=1; i<=h_pt_mc[0]->GetNbinsX(); i++){
-  //   double center = h_pt_mc[0]->GetBinCenter(i);
-  //   double x,y;
-  //   h_effi_pt_mc->GetPoint(i, x, y);
-  //   cout << h_effi_pt_mc->Eval(center) << "\t" << x << "\t" << y << endl;
-  // }
-
-
   if(debug) cout << "Plot efficiency graphs ... " << endl;
   PlotEfficiency(h_effi_pt_data, h_effi_pt_mc, "p_{T}", "effi_pt");
-  PlotEfficiency(h_effi_pt_data_elec, h_effi_pt_mc_elec, "p_{T}", "effi_pt_elec");
-  PlotEfficiency(h_effi_pt_data_photon, h_effi_pt_mc_photon, "p_{T}", "effi_pt_photon");
+  // PlotEfficiency(h_effi_pt_data_elec, h_effi_pt_mc_elec, "p_{T}", "effi_pt_elec");
+  // PlotEfficiency(h_effi_pt_data_photon, h_effi_pt_mc_photon, "p_{T}", "effi_pt_photon");
   PlotEfficiency(h_effi_eta_data, h_effi_eta_mc, "#eta", "effi_eta");
   PlotEfficiency(h_effi_eta_lowpt_data, h_effi_eta_lowpt_mc, "#eta", "effi_eta_lowpt");
   PlotEfficiency(h_effi_eta_midpt_data, h_effi_eta_midpt_mc, "#eta", "effi_eta_midpt");
@@ -273,20 +331,14 @@ int main(int argc, char* argv[]){
   // ===========================================================================
   //                        SF
   // ===========================================================================
-  if(debug) cout << "\t ... pt" << endl;
+  if(debug) cout << "Scale Factors ... " << endl;
   vector<TH1F*> h_SF_pt = GetSF(h_effi_pt_data, h_effi_pt_mc, h_pt_data[0]);
   vector<TH1F*> h_SF_eta = GetSF(h_effi_eta_data, h_effi_eta_mc, h_eta_data[0]);
   vector<TH1F*> h_SF_eta_lowpt = GetSF(h_effi_eta_lowpt_data, h_effi_eta_lowpt_mc, h_eta_data[2]);
   vector<TH1F*> h_SF_eta_midpt = GetSF(h_effi_eta_midpt_data, h_effi_eta_midpt_mc, h_eta_data[4]);
   vector<TH1F*> h_SF_eta_highpt = GetSF(h_effi_eta_highpt_data, h_effi_eta_highpt_mc, h_eta_data[4]);
 
-  if(debug) cout << "Get SF ... " << endl;
-  int bin1 = h_SF_eta[0]->GetXaxis()->FindBin(0.25);
-  int bin2 = h_SF_eta[0]->GetXaxis()->FindBin(0.1);
-  cout <<h_SF_eta[0]->GetBinContent(bin1) << endl;
-  cout <<h_SF_eta[0]->GetBinContent(bin2) << endl;
-
-  if(debug) cout << "Plot SF ... " << endl;
+  if(debug) cout << "\t ... Plot SF" << endl;
   PlotSF(h_SF_pt, "p_{T}", "SF_pt");
   PlotSF(h_SF_eta, "#eta", "SF_eta");
   PlotSF(h_SF_eta_lowpt, "#eta", "SF_eta_lowpt");
@@ -320,8 +372,8 @@ int main(int argc, char* argv[]){
   // ===========================================================================
   //                        Additional Hists
   // ===========================================================================
-  cout << "Additional hists for debugging..." << endl;
-  CompareHists(h_pt_mc[0], h_pt_mc[1], "p_{T}", "Compare_MC");
+  // cout << "Additional hists for debugging..." << endl;
+  // CompareHists(h_pt_mc[0], h_pt_mc[1], "p_{T}", "Compare_MC");
 
   // ===========================================================================
   //                        Correlation
@@ -344,6 +396,7 @@ int main(int argc, char* argv[]){
       v_cor.push_back(h_cor);
     }
 
+    // Bin content is zero, therefore it will cause errors calculating the efficiency
     v_cor[0]->SetBinContent(1,1);
     v_cor[1]->SetBinContent(1,1);
     v_cor[2]->SetBinContent(1,1);
@@ -358,7 +411,6 @@ int main(int argc, char* argv[]){
     double unc_up_muon = h_effi_muon->GetErrorYhigh(1); double unc_down_muon = h_effi_muon->GetErrorYlow(1);
     double unc_up_elec = h_effi_elec->GetErrorYhigh(1); double unc_down_elec = h_effi_elec->GetErrorYlow(1);
     double unc_up_both = h_effi_both->GetErrorYhigh(1); double unc_down_both = h_effi_both->GetErrorYlow(1);
-    cout << effi_muon << "\t" << h_effi_muon->Eval(1.5) << "\t" << h_effi_muon->GetErrorYlow(1) << "\t" << h_effi_muon->GetErrorYhigh(1) << endl;
 
     double alpha = (effi_muon*effi_elec)/effi_both;
     double term_up_m = ((effi_elec/effi_both)*unc_up_muon)/effi_muon;                    double term_down_m = ((effi_elec/effi_both)*unc_down_muon)/effi_muon;
@@ -369,11 +421,11 @@ int main(int argc, char* argv[]){
 
     double unc_up_alpha = sqrt( pow( term_up_m, 2) + pow( term_up_e, 2) + pow( term_up_b, 2) ) * alpha; //  * alpha
     double unc_down_alpha = sqrt( pow( ((effi_elec/effi_both)*unc_down_muon)/effi_muon, 2) + pow( ((effi_muon/effi_both)*unc_down_elec)/effi_elec, 2) + pow( (((effi_elec*effi_muon)/pow(effi_both,2))*unc_down_both)/effi_both, 2) ) * alpha; //  * alpha
-    cout << "up: " << alpha << "\t" << term_up_m  << "\t -" << term_up_e  << "\t +" << term_up_b  << "\t -" << term_up_mb  << "\t -" << term_up_eb << endl;
+    // cout << "up: " << alpha << "\t" << term_up_m  << "\t -" << term_up_e  << "\t +" << term_up_b  << "\t -" << term_up_mb  << "\t -" << term_up_eb << endl;
 
     double unc_up_cor_alpha = sqrt( pow( term_up_m, 2) + pow( term_up_e, 2) + pow( term_up_b, 2) + pow( term_up_mb, 2) + pow( term_up_eb, 2) )  * alpha; //  * alpha
     double unc_down_cor_alpha = sqrt( pow( term_down_m, 2) + pow( term_down_e, 2) + pow( term_down_b, 2) + pow( term_down_mb, 2) + pow( term_down_eb, 2)  ) * alpha; //  * alpha
-    cout << "do: " << alpha << "\t" << term_down_m  << "\t -" << term_down_e  << "\t +" << term_down_b  << "\t -" << term_down_mb  << "\t -" << term_down_eb << endl;
+    // cout << "do: " << alpha << "\t" << term_down_m  << "\t -" << term_down_e  << "\t +" << term_down_b  << "\t -" << term_down_mb  << "\t -" << term_down_eb << endl;
 
     cout << "alpha =  " << alpha << "\t +" << unc_up_alpha  << "\t -" << unc_down_alpha  << "\t +" << unc_up_cor_alpha  << "\t -" << unc_down_cor_alpha << endl;
 
@@ -382,13 +434,45 @@ int main(int argc, char* argv[]){
   return 0;
 }
 
+// ==================================================================================================
+void AdjustBinContent(TH1F* h_pass, TH1F* h_all, TString text){
+  for(unsigned int i=1; i<=h_all->GetNbinsX(); i++){
+    if(h_pass->GetBinContent(i) > h_all->GetBinContent(i)){
+      cout << text << "\t pass: " << h_pass->GetBinContent(i) << "\t all: " << h_all->GetBinContent(i) << endl;
+      h_pass->SetBinContent(i, h_all->GetBinContent(i));
+    }
+  }
+}
 
+// ==================================================================================================
+
+void fill_control(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
+  if(!tree) cout << "could not read tree\n";
+
+  // outputFile->cd();
+  tree->ResetBranchAddresses();
+  tree->SetBranchAddress("pt",&pt);
+  tree->SetBranchAddress("eta",&eta);
+  tree->SetBranchAddress("passed",&passed);
+  tree->SetBranchAddress("weight",&weight);
+
+  for(Int_t ievent=0; ievent < tree->GetEntriesFast(); ievent++) {
+    if(tree->GetEntry(ievent)<=0) break;
+    h_pt[0]->Fill(pt, weight);
+    h_eta[0]->Fill(eta, weight);
+
+    if(passed){
+      h_pt[1]->Fill(pt, weight);
+      h_eta[1]->Fill(eta, weight);
+    }
+  }
+  return;
+}
 
 // ==================================================================================================
 
 void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
   if(!tree) cout << "could not read tree\n";
-  else      cout << "Filling Histograms...\n";
 
   // For debugging pt efficiency in 2017
   TH2F* h_eta_pt_all = new TH2F("h_eta_pt_all", "eta vs pt", eta_bins.size()-1, &eta_bins[0], pt_bins.size()-1, &pt_bins[0]);
@@ -401,8 +485,8 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
   tree->SetBranchAddress("pt",&pt);
   tree->SetBranchAddress("eta",&eta);
   tree->SetBranchAddress("passed",&passed);
-  tree->SetBranchAddress("passed_elec",&passed_elec);
-  tree->SetBranchAddress("passed_photon",&passed_photon);
+  // tree->SetBranchAddress("passed_elec",&passed_elec);
+  // tree->SetBranchAddress("passed_photon",&passed_photon);
   tree->SetBranchAddress("weight_sfpt",&weight_sfpt);
   tree->SetBranchAddress("weight_sfeta",&weight_sfeta);
   tree->SetBranchAddress("weight_sfetapt",&weight_sfetapt);
@@ -469,8 +553,8 @@ void fill_pteta(TTree* tree, vector<TH1F*> h_pt, vector<TH1F*> h_eta){
     }
 
     /* Only checked one trigger for pT>120 GeV */
-    if( (pt<120 && passed) || passed_elec) h_pt[4]->Fill(pt, weight);
-    if( (pt<120 && passed) || passed_photon) h_pt[5]->Fill(pt, weight);
+    // if( (pt<120 && passed) || passed_elec) h_pt[4]->Fill(pt, weight);
+    // if( (pt<120 && passed) || passed_photon) h_pt[5]->Fill(pt, weight);
 
   }
 
@@ -516,9 +600,9 @@ vector<TH1F*> GetSF(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TH1F* hi
     double down = 0;
     if(value_mc != 0) down = -value_data/(value_mc*value_mc) * e_mc_lo + e_data_lo/value_mc;
 
-    // add 1% uncertainty to cover non-closure
-    up += 0.01;
-    down += 0.01;
+    // add 2% uncertainty to cover non-closure
+    up += 0.02;
+    down += 0.02;
 
     // cout << i<< ", " << xvalue << ", " << value_mc << ", " << value_data << ", "<< central << endl;
     h_central->SetBinContent(i+1, central);
@@ -577,11 +661,14 @@ void PlotEfficiency(TGraphAsymmErrors* h_data, TGraphAsymmErrors* h_mc, TString 
   gPad->SetBottomMargin(0.1);
   h_data->Draw("AP");
   h_mc->Draw("P SAME");
-  // line->Draw("SAME");
+
   TLegend *leg = new TLegend(0.33,0.20,0.66,0.33);
+  // leg->SetHeader(textBin);
   leg->AddEntry(h_data,"data","pl");
   leg->AddEntry(h_mc,"simulation","pl");
   leg->Draw("");
+
+  DrawText(histname);
   gPad->RedrawAxis();
   if(weighttag == "weight_sfpt") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_pt/"+histname+"_"+year+".pdf");
   else if(weighttag == "weight_sfeta") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_eta/"+histname+"_"+year+".pdf");
@@ -615,6 +702,7 @@ void PlotHist(TH1F* hist, TString xaxis, TString histname){
   gPad->SetLeftMargin(0.15);
   gPad->SetBottomMargin(0.1);
   hist->Draw("HIST");
+  DrawText(histname);
   gPad->RedrawAxis();
   if(weighttag == "weight_sfpt") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_pt/"+histname+"_"+year+".pdf");
   else if(weighttag == "weight_sfeta") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_eta/"+histname+"_"+year+".pdf");
@@ -649,6 +737,7 @@ void PlotHist(TH2F* hist, TString xaxis, TString yaxis, TString histname){
   gPad->SetRightMargin(0.15);
   gPad->SetBottomMargin(0.1);
   hist->Draw("COLZ");
+  DrawText(histname);
   gPad->RedrawAxis();
   A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/"+histname+"_"+year+".pdf");
   delete A;
@@ -671,6 +760,18 @@ void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname){
   h_SF[0]->SetLineWidth(3);
   h_SF[0]->SetFillColor(13);
   h_SF[0]->SetMarkerStyle(0);
+
+  if(weighttag == "weight_sfpt") h_SF[0]->GetYaxis()->SetRangeUser(0.89, 1.11);
+  else if(weighttag == "weight_sfeta") h_SF[0]->GetYaxis()->SetRangeUser(0.89, 1.11);
+  else if(weighttag == "weight_sfetapt") h_SF[0]->GetYaxis()->SetRangeUser(0.89, 1.11);
+  // else if(weighttag == "weight_sfetaptUP") h_SF[0]->GetYaxis()->SetRangeUser(0.85, 1.15);
+  // else if(weighttag == "weight_sfetaptDOWN") h_SF[0]->GetYaxis()->SetRangeUser(0.85, 1.15);
+
+  // For root file
+  h_SF[1]->GetYaxis()->SetTitle("scale factor");
+  h_SF[1]->GetYaxis()->SetRangeUser(0.7, 1.05);
+  h_SF[2]->GetYaxis()->SetTitle("scale factor");
+  h_SF[2]->GetYaxis()->SetRangeUser(0.7, 1.05);
 
   Color_t uncert_col = kOrange+9;
 
@@ -698,6 +799,7 @@ void PlotSF(vector<TH1F*> h_SF, TString xaxis, TString histname){
   leg->AddEntry(h_SF[1],"uncertainty","f");
   leg->Draw();
 
+  DrawText(histname);
   gPad->RedrawAxis();
   if(weighttag == "weight_sfpt") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_pt/"+histname+"_"+year+".pdf");
   else if(weighttag == "weight_sfeta") A->SaveAs("/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/CLOSURE_eta/"+histname+"_"+year+".pdf");
@@ -744,7 +846,7 @@ void CompareHists(TH1F* h_all, TH1F* h_pass, TString xaxis, TString histname){
 
 // ==================================================================================================
 
-TH1F* GetRatio(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData){
+TH1F* GetRatioGraph(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData){
   TH1F* g1 = h1->GetHistogram();
   TH1F* g2 = h2->GetHistogram();
   TH1F* ratio = (TH1F*) g1->Clone();
@@ -773,11 +875,137 @@ TH1F* GetRatio(TGraphAsymmErrors* h1, TGraphAsymmErrors* h2, bool isData){
 }
 
 // ==================================================================================================
-
 void FillEGap(TH1F* h){
   for(unsigned int i=1; i<=h->GetNbinsX(); i++){
     // high bin content to make error bars very small
     if(abs(h->GetBinCenter(i))==1.505) h->SetBinContent(i, 1000000);
   }
   return;
+}
+
+// ==================================================================================================
+void DrawControl(TString path, VecH hists, TH1F* rData, TH1F* rMC, VecI colors, VecTS names, TString xaxis)
+{
+  TString unique_path = "/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/ElecTriggerSF/Control_"+path+".pdf";
+  double nHists = hists.size();
+  double bins = hists[0]->GetNbinsX();
+
+  if(debug) cout << "Draw Control Hists ..." << endl;
+  hists[0]->SetTitle("");
+  hists[0]->GetXaxis()->SetTitle("");
+  hists[0]->GetYaxis()->SetTitle("Events");
+  hists[0]->SetMarkerStyle(8);
+  hists[0]->SetMarkerColor(colors[0]);
+  hists[0]->SetLineColor(colors[0]);
+
+  THStack* stack = new THStack(unique_path, "");
+  for(unsigned int c=1; c<colors.size(); c++){
+    hists[c]->SetFillColor(colors[c]);
+    hists[c]->SetLineColor(colors[c]);
+    stack->Add(hists[c]);
+  }
+  double maximum = stack->GetMaximum();
+
+  TLegend *leg = new TLegend(0.7,0.6,0.85,0.85);
+  TCanvas *A = new TCanvas(unique_path, unique_path, 600, 600);
+
+  gPad->SetLeftMargin(0.15);
+  gPad->SetBottomMargin(0.12);
+
+  TH1F* errorUp = (TH1F*) rMC->Clone(); TH1F* errorDown = (TH1F*) rMC->Clone();
+  for(unsigned int i=1; i<=rMC->GetNbinsX(); i++){
+    errorUp->SetBinContent(i, rMC->GetBinContent(i)+rMC->GetBinError(i));
+    errorDown->SetBinContent(i, rMC->GetBinContent(i)-rMC->GetBinError(i));
+  }
+  errorUp->SetFillColorAlpha(kGray+2, 0.5);
+  errorUp->SetLineWidth(0);
+  errorDown->SetFillColorAlpha(kWhite, 1);
+  errorDown->SetLineWidth(0);
+
+  TPad *pad1 = new TPad("pad1", "pad1", 0, 0.31, 1, 1.0);
+  pad1->SetBottomMargin(0.02); // 0.015
+  pad1->SetLeftMargin(0.19);
+  pad1->Draw();
+  pad1->cd();
+
+  hists[0]->Draw("P");
+  hists[0]->GetXaxis()->SetLabelSize(0);
+  hists[0]->GetYaxis()->SetRangeUser(0, maximum*1.5);
+  hists[0]->GetYaxis()->SetTitle("Events");
+  hists[0]->GetYaxis()->SetLabelSize(0.05);
+  hists[0]->GetYaxis()->SetTitleSize(0.06);
+  hists[0]->GetYaxis()->SetTitleOffset(1.15);
+  stack->Draw("same hist");
+  hists[0]->Draw("same PE"); // redraw
+  gPad->RedrawAxis();
+
+  leg->AddEntry(hists[0], "Data", "pl");
+  for(int i=nHists-1; 1<=i; i--) leg->AddEntry(hists[i], names[i], "f");
+  leg->SetTextSize(0.04);
+  leg->Draw();
+
+  CMSLabel(0.25, 0.83, "Work in Progress");
+  LumiInfo(lumi_plot, false, 0.9, 0.96);
+
+  // Ratio Plot kommt in unteres pad
+  A->cd();
+  if(debug) cout << "\t ... Pad2" << endl;
+  TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
+  pad2->SetLeftMargin(0.19);
+  pad2->SetTopMargin(0);
+  pad2->SetBottomMargin(0.4);
+  pad2->Draw();
+  pad2->cd();
+
+  A->SetTickx(0);
+  A->SetTicky(0);
+
+  TLine* lMC = new TLine(-2.5, 1, 2.5, 1);
+  lMC->SetLineWidth(1);
+  lMC->SetLineColor(kBlack);
+
+  rData->SetMarkerStyle(8);
+  rData->SetLineColor(colors[0]);
+  rMC->SetFillStyle(0);
+  rMC->SetLineStyle(kSolid);
+  rMC->SetLineWidth(0);
+  rMC->GetXaxis()->SetLabelSize(0.15);
+  rMC->GetYaxis()->SetLabelSize(0.13);
+  rMC->GetXaxis()->SetTitleSize(0.1);
+  rMC->GetYaxis()->SetRangeUser(0.4, 1.6);
+  rMC->GetXaxis()->SetTitle(xaxis);
+  rMC->GetYaxis()->SetTitle("#frac{DATA}{MC}");
+  rMC->GetXaxis()->SetTitleOffset(0.8);
+  rMC->GetXaxis()->SetTitleSize(0.2);
+  rMC->GetYaxis()->SetTitleSize(0.15);
+  rMC->GetYaxis()->SetNdivisions(505);
+  rMC->GetYaxis()->SetTitleOffset(0.4);
+  rMC->GetYaxis()->CenterTitle();
+  rMC->Draw("Axis");
+  errorUp->Draw("Hist same");
+  errorDown->Draw("Hist same");
+  lMC->Draw("same");
+  rData->Draw("SAME PE");
+
+  gPad->RedrawAxis();
+  A->SaveAs(unique_path);
+
+  delete A;
+  leg->Clear();
+}
+
+// ==================================================================================================
+void DrawText(TString name){
+  TString textBin = "";
+  if(name.Contains("lowpt")) textBin = "p_{T} < 120 GeV";
+  if(name.Contains("midpt")) textBin = "120 < p_{T} < 200 GeV";
+  if(name.Contains("highpt")) textBin = "200 < p_{T} GeV";
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);
+  latex.SetTextFont(42);
+  latex.SetTextAlign(31);
+  latex.SetTextSize(0.04);
+  latex.DrawLatex(0.89, 0.925,textBin);
 }

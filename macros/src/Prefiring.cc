@@ -40,15 +40,15 @@ int main(int argc, char* argv[]){
   TH1F* h_off_norm = Normalize(h_off);
 
   // TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal, bool isEffi){
-  TH1F* ratio_nom = GetRatio(h_nom, h_nom, true, false);
-  TH1F* ratio_up = GetRatio(h_up, h_nom, true, false);
-  TH1F* ratio_down = GetRatio(h_down, h_nom, true, false);
-  TH1F* ratio_off = GetRatio(h_off, h_nom, true, false);
+  TH1F* ratio_nom = GetRatio(h_nom, h_nom, true);
+  TH1F* ratio_up = GetRatio(h_up, h_nom, false);
+  TH1F* ratio_down = GetRatio(h_down, h_nom, false);
+  TH1F* ratio_off = GetRatio(h_off, h_nom, false);
 
-  TH1F* ratio_nom_norm = GetRatio(h_nom_norm, h_nom_norm, true, false);
-  TH1F* ratio_up_norm = GetRatio(h_up_norm, h_nom_norm, true, false);
-  TH1F* ratio_down_norm = GetRatio(h_down_norm, h_nom_norm, true, false);
-  TH1F* ratio_off_norm = GetRatio(h_off_norm, h_nom_norm, true, false);
+  TH1F* ratio_nom_norm = GetRatio(h_nom_norm, h_nom_norm, true);
+  TH1F* ratio_up_norm = GetRatio(h_up_norm, h_nom_norm, false);
+  TH1F* ratio_down_norm = GetRatio(h_down_norm, h_nom_norm, false);
+  TH1F* ratio_off_norm = GetRatio(h_off_norm, h_nom_norm, false);
 
   cout << "Draw ..." << endl;
   cout << "\t ... default" << endl;

@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-bool forTalk = true;
+bool forTalk = false;
 bool debug   = true;
 
 using namespace std;
@@ -28,7 +28,7 @@ void main_plot_settings(TH1F* hist, int x_min, int x_max, int color, TString tit
   hist->GetXaxis()->SetTitleSize(0.05);
   hist->GetYaxis()->SetTitleSize(0.07);
   hist->GetXaxis()->SetTitleOffset(0.9);
-  hist->GetYaxis()->SetTitleOffset(1.5);
+  hist->GetYaxis()->SetTitleOffset(1.2);
   hist->GetYaxis()->SetLabelFont(43);
   hist->GetYaxis()->SetLabelSize(19);
   hist->GetXaxis()->SetTitle(xAxis);
@@ -165,7 +165,7 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
   if(diffLeg_ll)          leg = new TLegend(0.25,0.6,0.5,0.8);
   if(diffLeg_lh)          leg = new TLegend(0.45,0.15,0.70,0.35);
   if(diffLeg_lh&&plotAll) leg = new TLegend(0.45,0.10,0.70,0.37);
-  if(diffLeg_ll&&plotAll) leg = new TLegend(0.25,0.55,0.5,0.82);
+  if(diffLeg_ll&&plotAll) leg = new TLegend(0.22,0.55,0.47,0.82);
 
   TCanvas *A = new TCanvas(unique_path, unique_path, 600, 600);
 
@@ -201,7 +201,8 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
     xup   = "t#bar{t} f^{XCone}=+1 ";
     xdown = "t#bar{t} f^{XCone}=-1  ";
   }
-  TString data  = "Data    ";
+  // TString data  = "Data    ";
+  TString data  = "Data - bkg";
 
   leg->SetNColumns(2);
 
@@ -228,6 +229,8 @@ void draw_plot_ratio(vector<TH1F*> hists, vector<TH1F*> ratios, vector<TString> 
 
   leg->SetTextSize(0.03);
   leg->Draw();
+
+  CMSLabelOffset(0.19, 0.95, 0.075, -0.0105);
 
   // Ratio Plot kommt in unteres pad
   A->cd();
@@ -288,7 +291,7 @@ int main(int argc, char* argv[]){
   // Directories ---------------------------------------------------------------
 
   TString save_path = get_save_path();
-  save_path += "/Plots/JetCorrections";
+  save_path += "/JetCorrections";
   save_path = creat_folder_and_path(save_path, "MassPlots");
   // if reconst is not btag include another folder here
   save_path = creat_folder_and_path(save_path, "BinWidth_"+to_string(bin_width));
@@ -319,9 +322,8 @@ int main(int argc, char* argv[]){
     if(ptbin==4) addition="";
     string add = (string) addition;
 
-    if(debug) cout << setw(12) << "\n|----------------- " << setw(9) << centered(add) << " -------------------|\n" << endl;
+    cout << endl << "Start with bin " << addition << " ..." << endl;
 
-    cout << '\n';
     TString w_mass; TString hist_class = "comparison_topjet_xcone_pass_rec/";
     // if(reconst=="btag")      w_mass = hist_class+"wmass_match";
     if(reconst=="btag"&&ptbin==0) w_mass = hist_class+"wmass_match_ptdiv_hh";
@@ -333,7 +335,7 @@ int main(int argc, char* argv[]){
 
     // #################################################################################################
     // Get Hists #######################################################################################
-    if(debug) cout << "Get Hists" << endl;
+    cout << "Get Hists ..." << endl;
 
     vector<TH1F*> h_data_muon          = get_all_hists(data_muon, w_mass);
     vector<TH1F*> h_data_elec          = get_all_hists(data_elec, w_mass);
@@ -375,15 +377,24 @@ int main(int argc, char* argv[]){
 
     // #################################################################################################
     // Combine Hists ###################################################################################
-    if(debug) cout << "Combine Hists" << endl;
+    cout << "Combine Hists ..." << endl;
+
+    // Bkg -----------------------------------------------------------------------
+    vector<TH1F*> h_bkg_muon                 = AddHists(h_st_muon, h_wjets_muon, h_other_muon, 1);
+    vector<TH1F*> h_bkg_elec                 = AddHists(h_st_elec, h_wjets_elec, h_other_elec, 1);
+    vector<TH1F*> h_bkg_combine              = AddHists(h_st_combine, h_wjets_combine, h_other_combine, 1);
 
     // Data ----------------------------------------------------------------------
+    if(debug) cout << "\t ... data - bkg" << endl;
 
     // dummy: in order to keep code clean and faster to write
 
-    vector<TH1F*> all_data_muon              = h_data_muon;        // dummy
-    vector<TH1F*> all_data_elec              = h_data_elec;        // dummy
-    vector<TH1F*> all_data_combine           = h_data_combine;     // dummy
+    // vector<TH1F*> all_data_muon              = h_data_muon;        // dummy
+    // vector<TH1F*> all_data_elec              = h_data_elec;        // dummy
+    // vector<TH1F*> all_data_combine           = h_data_combine;     // dummy
+    vector<TH1F*> all_data_muon              = AddHists(h_data_muon, h_bkg_muon, -1);
+    vector<TH1F*> all_data_elec              = AddHists(h_data_elec, h_bkg_elec, -1);
+    vector<TH1F*> all_data_combine           = AddHists(h_data_combine, h_bkg_combine, -1);
 
     vector<TH1F*> all_data_muon_rebin        = RebinVector(all_data_muon, bin_width);
     vector<TH1F*> all_data_elec_rebin        = RebinVector(all_data_elec, bin_width);
@@ -393,18 +404,17 @@ int main(int argc, char* argv[]){
     vector<TH1F*> all_data_elec_norm         = normalize(all_data_elec_rebin);
     vector<TH1F*> all_data_combine_norm      = normalize(all_data_combine_rebin);
 
-    // Bkg -----------------------------------------------------------------------
 
-    vector<TH1F*> h_bkg_muon                 = AddHists(h_st_muon, h_wjets_muon, h_other_muon, 1);
-    vector<TH1F*> h_bkg_elec                 = AddHists(h_st_elec, h_wjets_elec, h_other_elec, 1);
-    vector<TH1F*> h_bkg_combine              = AddHists(h_st_combine, h_wjets_combine, h_other_combine, 1);
 
     // TTbar ---------------------------------------------------------------------
-    if(debug) cout << "TTbar" << endl;
+    if(debug) cout << "\t ... ttbar" << endl;
 
-    vector<TH1F*> all_ttbar_muon             = AddHists(h_bkg_muon, h_ttbar_muon, 1);
-    vector<TH1F*> all_ttbar_elec             = AddHists(h_bkg_elec, h_ttbar_elec, 1);
-    vector<TH1F*> all_ttbar_combine          = AddHists(h_bkg_combine, h_ttbar_combine, 1);
+    vector<TH1F*> all_ttbar_muon             = h_ttbar_muon; // dummy
+    vector<TH1F*> all_ttbar_elec             = h_ttbar_elec; // dummy
+    vector<TH1F*> all_ttbar_combine          = h_ttbar_combine; // dummy
+    // vector<TH1F*> all_ttbar_muon             = AddHists(h_bkg_muon, h_ttbar_muon, 1);
+    // vector<TH1F*> all_ttbar_elec             = AddHists(h_bkg_elec, h_ttbar_elec, 1);
+    // vector<TH1F*> all_ttbar_combine          = AddHists(h_bkg_combine, h_ttbar_combine, 1);
 
     vector<TH1F*> all_ttbar_muon_rebin       = RebinVector(all_ttbar_muon, bin_width);
     vector<TH1F*> all_ttbar_elec_rebin       = RebinVector(all_ttbar_elec, bin_width);
@@ -415,15 +425,21 @@ int main(int argc, char* argv[]){
     vector<TH1F*> all_ttbar_combine_norm     = normalize(all_ttbar_combine_rebin);
 
     // JEC -----------------------------------------------------------------------
-    if(debug) cout << "JEC" << endl;
+    if(debug) cout << "\t ... JEC" << endl;
 
-    vector<TH1F*> all_jec_up_muon            = AddHists(h_bkg_muon, h_jec_up_muon, 1);
-    vector<TH1F*> all_jec_up_elec            = AddHists(h_bkg_elec, h_jec_up_elec, 1);
-    vector<TH1F*> all_jec_up_combine         = AddHists(h_bkg_combine, h_jec_up_combine, 1);
+    vector<TH1F*> all_jec_up_muon            = h_jec_up_muon; // dummy
+    vector<TH1F*> all_jec_up_elec            = h_jec_up_elec; // dummy
+    vector<TH1F*> all_jec_up_combine         = h_jec_up_combine; // dummy
+    // vector<TH1F*> all_jec_up_muon            = AddHists(h_bkg_muon, h_jec_up_muon, 1);
+    // vector<TH1F*> all_jec_up_elec            = AddHists(h_bkg_elec, h_jec_up_elec, 1);
+    // vector<TH1F*> all_jec_up_combine         = AddHists(h_bkg_combine, h_jec_up_combine, 1);
 
-    vector<TH1F*> all_jec_down_muon          = AddHists(h_bkg_muon, h_jec_down_muon, 1);
-    vector<TH1F*> all_jec_down_elec          = AddHists(h_bkg_elec, h_jec_down_elec, 1);
-    vector<TH1F*> all_jec_down_combine       = AddHists(h_bkg_combine, h_jec_down_combine, 1);
+    vector<TH1F*> all_jec_down_muon          = h_jec_down_muon; // dummy
+    vector<TH1F*> all_jec_down_elec          = h_jec_down_elec; // dummy
+    vector<TH1F*> all_jec_down_combine       = h_jec_down_combine; // dummy
+    // vector<TH1F*> all_jec_down_muon          = AddHists(h_bkg_muon, h_jec_down_muon, 1);
+    // vector<TH1F*> all_jec_down_elec          = AddHists(h_bkg_elec, h_jec_down_elec, 1);
+    // vector<TH1F*> all_jec_down_combine       = AddHists(h_bkg_combine, h_jec_down_combine, 1);
 
     vector<TH1F*> all_jec_down_muon_rebin    = RebinVector(all_jec_down_muon, bin_width);
     vector<TH1F*> all_jec_down_elec_rebin    = RebinVector(all_jec_down_elec, bin_width);
@@ -442,15 +458,21 @@ int main(int argc, char* argv[]){
     vector<TH1F*> all_jec_up_combine_norm    = normalize(all_jec_up_combine_rebin);
 
     // COR -----------------------------------------------------------------------
-    if(debug) cout << "COR" << endl;
+    if(debug) cout << "\t ... XCone" << endl;
 
-    vector<TH1F*> all_cor_up_muon            = AddHists(h_bkg_muon, h_cor_up_muon, 1);
-    vector<TH1F*> all_cor_up_elec            = AddHists(h_bkg_elec, h_cor_up_elec, 1);
-    vector<TH1F*> all_cor_up_combine         = AddHists(h_bkg_combine, h_cor_up_combine, 1);
+    vector<TH1F*> all_cor_up_muon            = h_cor_up_muon; // dummy
+    vector<TH1F*> all_cor_up_elec            = h_cor_up_elec; // dummy
+    vector<TH1F*> all_cor_up_combine         = h_cor_up_combine; // dummy
+    // vector<TH1F*> all_cor_up_muon            = AddHists(h_bkg_muon, h_cor_up_muon, 1);
+    // vector<TH1F*> all_cor_up_elec            = AddHists(h_bkg_elec, h_cor_up_elec, 1);
+    // vector<TH1F*> all_cor_up_combine         = AddHists(h_bkg_combine, h_cor_up_combine, 1);
 
-    vector<TH1F*> all_cor_down_muon          = AddHists(h_bkg_muon, h_cor_down_muon, 1);
-    vector<TH1F*> all_cor_down_elec          = AddHists(h_bkg_elec, h_cor_down_elec, 1);
-    vector<TH1F*> all_cor_down_combine       = AddHists(h_bkg_combine, h_cor_down_combine, 1);
+    vector<TH1F*> all_cor_down_muon          = h_cor_down_muon; // dummy
+    vector<TH1F*> all_cor_down_elec          = h_cor_down_elec; // dummy
+    vector<TH1F*> all_cor_down_combine       = h_cor_down_combine; // dummy
+    // vector<TH1F*> all_cor_down_muon          = AddHists(h_bkg_muon, h_cor_down_muon, 1);
+    // vector<TH1F*> all_cor_down_elec          = AddHists(h_bkg_elec, h_cor_down_elec, 1);
+    // vector<TH1F*> all_cor_down_combine       = AddHists(h_bkg_combine, h_cor_down_combine, 1);
 
     vector<TH1F*> all_cor_up_muon_rebin      = RebinVector(all_cor_up_muon, bin_width);
     vector<TH1F*> all_cor_up_elec_rebin      = RebinVector(all_cor_up_elec, bin_width);
@@ -481,24 +503,26 @@ int main(int argc, char* argv[]){
     TString yAxis_norm = "#Delta N/N";
 
     for(int year=0; year<4; year++){
-
       string sYear = (string) years[year];
-      if(debug) cout << setw(12) << "\n|------------ " << setw(8) << centered(sYear) << " --------------|\n" << endl;
-      if(year!=3) continue; // skip single years
+      cout << "Start with year "+sYear+" ..." << endl;
+
+      // if(debug) cout << setw(12) << "\n|------------ " << setw(8) << centered(sYear) << " --------------|\n" << endl;
+      if(year==1) continue; // skip single years
+      if(year==2) continue; // skip single years
 
       // #################################################################################################
       // Settings ########################################################################################
 
       // Masspeack -------------------------------------------------------------
-      if(debug) cout << "Masspeak Bins" << endl;
+      cout << "\t ... Masspeak Bins" << endl;
 
       // Get bins with bin-content>Limit
       vector<double> PeakLimit;
       vector<int> peak_bins_muon, peak_bins_elec, peak_bins_combine;
-      cout << all_data_muon_rebin[3]->GetBinContent(100) << endl;
-      peak_bins_muon    = bins_upper_limit(all_data_muon_rebin[year], 75);
-      peak_bins_elec    = bins_upper_limit(all_data_elec_rebin[year], 75);
-      peak_bins_combine = bins_upper_limit(all_data_combine_rebin[year], 100);
+      double limit = (year==3)?100:1;
+      peak_bins_muon    = bins_upper_limit(all_data_muon_rebin[year], limit);
+      peak_bins_elec    = bins_upper_limit(all_data_elec_rebin[year], limit);
+      peak_bins_combine = bins_upper_limit(all_data_combine_rebin[year], limit);
 
       // Bin Center
       vector<double> bin_centers_muon    = bin_center_upper_limit(all_data_muon_rebin[year],    peak_bins_muon,    bin_width);
@@ -506,7 +530,7 @@ int main(int argc, char* argv[]){
       vector<double> bin_centers_combine = bin_center_upper_limit(all_data_combine_rebin[year], peak_bins_combine, bin_width);
 
       // Path
-      if(debug) cout << "Create Path" << endl;
+      if(debug) cout << "\t ... Create Path" << endl;
       vector<TString> path_muon_jec         = {save_path, "muon",    "JEC", addition, years[year], ""};
       vector<TString> path_elec_jec         = {save_path, "elec",    "JEC", addition, years[year], ""};
       vector<TString> path_combine_jec      = {save_path, "combine", "JEC", addition, years[year], ""};
@@ -530,7 +554,7 @@ int main(int argc, char* argv[]){
 
       // ttbar -----------------------------------------------------------------
 
-      if(debug) cout << "Plot settings ttbar" << endl;
+      if(debug) cout << "\t ... Plot settings ttbar" << endl;
       // void main_plot_settings(hist, x_min, x_max, color, title, TString xAxis, TString yAxis,save_path)
       main_plot_settings(all_ttbar_muon_rebin[year],    0, 180, kRed, "", xAxis, "Events");
       main_plot_settings(all_ttbar_elec_rebin[year],    0, 180, kRed, "", xAxis, "Events");
@@ -542,7 +566,7 @@ int main(int argc, char* argv[]){
       // data ------------------------------------------------------------------
 
       // data_plot_settings(TH1F* hist)
-      if(debug) cout << "Plot settings data" << endl;
+      if(debug) cout << "\t ... Plot settings data" << endl;
       data_plot_settings(all_data_muon_rebin[year]);
       data_plot_settings(all_data_elec_rebin[year]);
       data_plot_settings(all_data_combine_rebin[year]);
@@ -553,7 +577,7 @@ int main(int argc, char* argv[]){
       // jms -------------------------------------------------------------------
 
       // add_plot_settings(TH1F* hist, int color=1, int style=kSolid, int width=2)
-      if(debug) cout << "Plot settings jms" << endl;
+      if(debug) cout << "\t ... Plot settings jms" << endl;
       add_plot_settings(all_jec_up_muon_rebin[year], kBlue);
       add_plot_settings(all_jec_up_elec_rebin[year], kBlue);
       add_plot_settings(all_jec_up_combine_rebin[year], kBlue);
@@ -584,11 +608,11 @@ int main(int argc, char* argv[]){
 
       // #################################################################################################
       // Mass Plots ######################################################################################
-      if(debug) cout << "Mass Plots" << endl;
+      if(debug) cout << "\t ... Mass Plots" << endl;
 
       // Mean ------------------------------------------------------------------
 
-      if(debug) cout << "truncated mean" << endl;
+      if(debug) cout << "\t\t ... truncated mean" << endl;
       double mean_ttbar_muon    = trunc_mean(all_ttbar_muon_norm[year],    bin_centers_muon[0], bin_centers_muon[1]);
       double mean_data_muon     = trunc_mean(all_data_muon_norm[year],     bin_centers_muon[0], bin_centers_muon[1]);
       double mean_jec_up_muon   = trunc_mean(all_jec_up_muon_norm[year],   bin_centers_muon[0], bin_centers_muon[1]);
@@ -619,27 +643,29 @@ int main(int argc, char* argv[]){
       vector<double> means_cor_combine  = {mean_ttbar_combine, mean_cor_up_combine, mean_cor_down_combine, mean_data_combine};
       vector<double> means_all_combine  = {mean_ttbar_combine, mean_jec_up_combine, mean_jec_down_combine, mean_cor_up_combine, mean_cor_down_combine, mean_data_combine};
 
-      cout << left; // for setw()
-      cout << "ttbar    - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_ttbar_muon       << " GeV" << endl;
-      cout << "data     - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_data_muon        << " GeV" << endl;
-      cout << "jec up   - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_jec_up_muon      << " GeV" << endl;
-      cout << "jec down - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_jec_down_muon    << " GeV" << endl;
-      cout << "cor up   - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_cor_up_muon      << " GeV" << endl;
-      cout << "cor down - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_cor_down_muon    << " GeV" << endl;
-      cout << "ttbar    - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_ttbar_elec       << " GeV" << endl;
-      cout << "data     - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_data_elec        << " GeV" << endl;
-      cout << "jec up   - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_jec_up_elec      << " GeV" << endl;
-      cout << "jec down - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_jec_down_elec    << " GeV" << endl;
-      cout << "cor up   - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_cor_up_elec      << " GeV" << endl;
-      cout << "cor down - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_cor_down_elec    << " GeV" << endl;
-      cout << "ttbar    - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_ttbar_combine    << " GeV" << endl;
-      cout << "data     - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_data_combine     << " GeV" << endl;
-      cout << "jec up   - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_jec_up_combine   << " GeV" << endl;
-      cout << "jec down - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_jec_down_combine << " GeV" << endl;
-      cout << "cor up   - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_cor_up_combine   << " GeV" << endl;
-      cout << "cor down - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_cor_down_combine << " GeV" << endl;
-      cout << endl;
-      cout << right;
+      if(debug){
+        cout << left; // for setw()
+        cout << "ttbar    - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_ttbar_muon       << " GeV" << endl;
+        cout << "data     - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_data_muon        << " GeV" << endl;
+        cout << "jec up   - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_jec_up_muon      << " GeV" << endl;
+        cout << "jec down - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_jec_down_muon    << " GeV" << endl;
+        cout << "cor up   - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_cor_up_muon      << " GeV" << endl;
+        cout << "cor down - " << years[year] << setw(12) << " - muon: "    << setw(4) << mean_cor_down_muon    << " GeV" << endl;
+        cout << "ttbar    - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_ttbar_elec       << " GeV" << endl;
+        cout << "data     - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_data_elec        << " GeV" << endl;
+        cout << "jec up   - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_jec_up_elec      << " GeV" << endl;
+        cout << "jec down - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_jec_down_elec    << " GeV" << endl;
+        cout << "cor up   - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_cor_up_elec      << " GeV" << endl;
+        cout << "cor down - " << years[year] << setw(12) << " - elec: "    << setw(4) << mean_cor_down_elec    << " GeV" << endl;
+        cout << "ttbar    - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_ttbar_combine    << " GeV" << endl;
+        cout << "data     - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_data_combine     << " GeV" << endl;
+        cout << "jec up   - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_jec_up_combine   << " GeV" << endl;
+        cout << "jec down - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_jec_down_combine << " GeV" << endl;
+        cout << "cor up   - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_cor_up_combine   << " GeV" << endl;
+        cout << "cor down - " << years[year] << setw(12) << " - combine: " << setw(4) << mean_cor_down_combine << " GeV" << endl;
+        cout << endl;
+        cout << right;
+      }
 
       // Plot ------------------------------------------------------------------
 
@@ -656,6 +682,12 @@ int main(int argc, char* argv[]){
       vector<TH1F*> all_muon = {all_ttbar_muon_rebin[year],    all_jec_up_muon_rebin[year],    all_jec_down_muon_rebin[year],    all_cor_up_muon_rebin[year],    all_cor_down_muon_norm[year],    all_data_muon_norm[year]};
 
       draw_plot(jec_muon, path_muon_jec, means_jec_muon);
+
+      vector<TH1F*> jec_combine_notNorm = {all_ttbar_combine_rebin[year],    all_jec_up_combine_rebin[year],    all_jec_down_combine_rebin[year],    all_data_combine_rebin[year]};
+      vector<TH1F*> cor_combine_notNorm = {all_ttbar_combine_rebin[year],    all_cor_up_combine_rebin[year],    all_cor_down_combine_rebin[year],    all_data_combine_rebin[year]};
+      vector<TH1F*> all_combine_notNorm = {all_ttbar_combine_rebin[year],    all_jec_up_combine_rebin[year],    all_jec_down_combine_rebin[year],    all_cor_up_combine_rebin[year],    all_cor_down_combine_norm[year],    all_data_combine_norm[year]};
+
+      draw_plot(jec_combine_notNorm, path_combine_jec, means_jec_combine);
 
       // normalized ------------------------
       vector<double> norm_err_muon = normalize_error(all_data_muon_rebin[year]);
