@@ -7,31 +7,35 @@ sys.path.append('/nfs/dust/cms/user/tholenhe/installs/varial-stable/Varial')
 
 ##################################### definition of UserConfig item changes ###
 
-sys_uncerts = {
-    #'name' : {'item name': 'item value', ...},
-    # 'FSRup_sqrt2'              : {'PS_variation':'FSRup_sqrt2'},
-    # 'FSRdown_sqrt2'            : {'PS_variation':'FSRdown_sqrt2'},
-    # 'FSRup_2'                  : {'PS_variation':'FSRup_2'},
-    # 'FSRdown_2'                : {'PS_variation':'FSRdown_2'},
-    # 'FSRup_4'                  : {'PS_variation':'FSRup_4'},
-    # 'FSRdown_4'                : {'PS_variation':'FSRdown_4'},
-    # 'ISRup_sqrt2'              : {'PS_variation':'ISRup_sqrt2'},
-    # 'ISRdown_sqrt2'            : {'PS_variation':'ISRdown_sqrt2'},
-    # 'ISRup_2'                  : {'PS_variation':'ISRup_2'},
-    # 'ISRdown_2'                : {'PS_variation':'ISRdown_2'},
-    # 'ISRup_4'                  : {'PS_variation':'ISRup_4'},
-    # 'ISRdown_4'                : {'PS_variation':'ISRdown_4'},
-    'JMS_upup'                 : {'JetMassScale_direction':'upup'},
-    'JMS_updown'               : {'JetMassScale_direction':'updown'},
-    'JMS_downup'               : {'JetMassScale_direction':'downup'},
-    'JMS_downdown'             : {'JetMassScale_direction':'downdown'},
-    # 'JMS_up'                   : {'JetMassScale_direction':'up'},
-    # 'JMS_down'                 : {'JetMassScale_direction':'down'},
-    'JEC_up'                   : {'jecsmear_direction':'up'},
-    'JEC_down'                 : {'jecsmear_direction':'down'},
-    'COR_up'                   : {'JetCorrection_direction':'up'},
-    'COR_down'                 : {'JetCorrection_direction':'down'},
-}
+#'name' : {'item name': 'item value', ...},
+sys_uncerts = {}
+if "2017" in sys.argv[1] or "2018" in sys.argv[1]:
+    sys_uncerts['FSRup_sqrt2'] = {'PS_variation':'FSRup_sqrt2'}
+    sys_uncerts['FSRdown_sqrt2'] = {'PS_variation':'FSRdown_sqrt2'}
+    sys_uncerts['FSRup_2'] = {'PS_variation':'FSRup_2'}
+    sys_uncerts['FSRdown_2'] = {'PS_variation':'FSRdown_2'}
+    sys_uncerts['FSRup_4'] = {'PS_variation':'FSRup_4'}
+    sys_uncerts['FSRdown_4'] = {'PS_variation':'FSRdown_4'}
+    sys_uncerts['ISRup_sqrt2'] = {'PS_variation':'ISRup_sqrt2'}
+    sys_uncerts['ISRdown_sqrt2'] = {'PS_variation':'ISRdown_sqrt2'}
+    sys_uncerts['ISRup_2'] = {'PS_variation':'ISRup_2'}
+    sys_uncerts['ISRdown_2'] = {'PS_variation':'ISRdown_2'}
+    sys_uncerts['ISRup_4'] = {'PS_variation':'ISRup_4'}
+    sys_uncerts['ISRdown_4'] = {'PS_variation':'ISRdown_4'}
+sys_uncerts['JMS_downdown'] = {'JetMassScale_direction':'downdown'}
+sys_uncerts['JMS_upup'] = {'JetMassScale_direction':'upup'}
+sys_uncerts['JEC_up'] = {'jecsmear_direction':'up'}
+sys_uncerts['JEC_down'] = {'jecsmear_direction':'down'}
+sys_uncerts['JER_up'] = {'jersmear_direction':'up'}
+sys_uncerts['JER_down'] = {'jersmear_direction':'down'}
+sys_uncerts['COR_up'] = {'JetCorrection_direction':'up'}
+sys_uncerts['COR_down'] = {'JetCorrection_direction':'down'}
+
+# sys_uncerts['JMS_updown'] = {'JetMassScale_direction':'updown'}
+# sys_uncerts['JMS_downup'] = {'JetMassScale_direction':'downup'}
+# sys_uncerts['JMS_up'] = {'JetMassScale_direction':'up'}
+# sys_uncerts['JMS_down'] = {'JetMassScale_direction':'down'}
+
 start_all_parallel = False
 
 ############################################################### script code ###
@@ -88,7 +92,7 @@ class MySFrameBatch(SFrame):
     def configure(self):
         self.xml_doctype = self.xml_doctype + """
 <!--
-   <ConfigParse NEventsBreak="100000" FileSplit="0" AutoResubmit="0" />
+   <ConfigParse NEventsBreak="500000" FileSplit="0" AutoResubmit="0" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="workdir"/>
 -->
 """
