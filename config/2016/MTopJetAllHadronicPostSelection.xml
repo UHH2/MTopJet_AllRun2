@@ -3,8 +3,8 @@
 
   <!ENTITY NEVT "-1">
 
- <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet/Selection/2016/muon/AllHad">
- <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/2016/muon/AllHad">
+ <!ENTITY INdir   "/nfs/dust/cms/user/paaschal/MTopJet_Run2/Selection/AllHad">
+ <!ENTITY OUTdir  "/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/AllHad">
 
 <!-- =============================================== ttbar =========================================================================== -->
 <!ENTITY TTbar_Mtt0000to0700_allHad_1    "&INdir;/uhh2.AnalysisModuleRunner.MC.TTbar_Mtt0000to0700_allHad_2016v3_1.root">
@@ -65,13 +65,13 @@
       	<Item Name="dometfilters" Value="true" />
       	<Item Name="dopvfilter" Value="true" />
 
-        <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_muon.root"/>
-      	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/DeepJet_2016LegacySF_WP_V1.csv" />
+        <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/BTagMCEfficiencyHists_AllHad_2016.root"/>
+      	<Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/DeepJet_2016LegacySF_WP_V1.csv" />
 
-        <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
-      	<Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
-      	<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
-      	<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/CMSSW_10_2_X/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
+        <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
+      	<Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
+      	<Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
+      	<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
 
       	<Item Name="ScaleVariationMuR" Value="none"/>
       	<Item Name="ScaleVariationMuF" Value="none"/>

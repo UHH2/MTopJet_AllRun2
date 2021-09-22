@@ -43,10 +43,13 @@ PDFHists::PDFHists(uhh2::Context & ctx, const std::string & dirname): Hists(ctx,
 }
 
 void PDFHists::fill(const Event & event){
+  bool debug = false;
+  if(debug) std::cout << "In PDFHists ... " << std::endl;
   double weight = event.weight;
   std::vector<TopJet> hadjets = event.get(h_hadjets);
   TLorentzVector hadjet_v4;
   double pxhad, pyhad, pzhad, Ehad;
+  if(debug) std::cout << "\t ... Get 4vector" << std::endl;
   pxhad = hadjets.at(0).v4().Px();
   pyhad = hadjets.at(0).v4().Py();
   pzhad = hadjets.at(0).v4().Pz();
@@ -54,8 +57,12 @@ void PDFHists::fill(const Event & event){
   hadjet_v4.SetPxPyPzE(pxhad, pyhad, pzhad, Ehad);
 
 
+  if(debug) std::cout << "\t ... Look at ttbar" << std::endl;
   if(isTTbar){    // only fill pdf hists for ttbar MC
+    if(debug) std::cout << "\t ... Check systweight" << std::endl;
+    if(debug) std::cout << "\t ... " << event.genInfo->systweights().size() << std::endl;
     if(event.genInfo->systweights().size()){
+      if(debug) std::cout << "\t ... Passed systweight" << std::endl;
       for(int i=0; i<100; i++){
         double pdf_weight = event.genInfo->systweights().at(i+9);
         double fillweight = weight * pdf_weight/event.genInfo->originalXWGTUP();

@@ -196,7 +196,9 @@ bool MTopJetAllHadronicPostSelectionModule::process(uhh2::Event& event){
     if(BTag(BTag::DEEPJET, BTag::WP_TIGHT)(j, event)) ++jetbtagN;
   }
   if(jetbtagN < 1) return false;
+  // cout << "before btag" << endl;
   BTagScaleFactors->process(event);
+  // cout << "after btag" << endl;
 
   /** pT Selection *********************/
   // if(!pt_sel1->passes(event) && !pt_sel2->passes(event)) return false;

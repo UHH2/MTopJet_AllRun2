@@ -17,7 +17,7 @@
 ]>
 
 <!--
-<ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
+<ConfigParse NEventsBreak="200000" LastBreak="0" FileSplit="0"/>
 <ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSel_SYS_2016"/>
 -->
 
@@ -74,13 +74,13 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_elec.root"/>
-  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepJet_2016LegacySF_V1.csv" />
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/BTagMCEfficiencyHists_2016_elec.root"/>
+  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/DeepJet_2016LegacySF_V1.csv" />
 
-  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
-  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
-  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
-  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
+  <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
+  <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />
+  <Item Name="pileup_directory_data_up" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root" />
+  <Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root" />
 
   <Item Name="ScaleVariationMuR" Value="none"/>
   <Item Name="ScaleVariationMuF" Value="none"/>
@@ -91,6 +91,7 @@
   <Item Name="ElID_variation" Value="nominal" />
   <Item Name="ElReco_variation" Value="nominal" />
   <Item Name="ElTrigger_variation" Value="nominal" />
+  <Item Name="prefire_variation" Value="nominal" />
 
   <!-- 1: JEC - 2: XCone - nominal, upup, downdown, downup, updown -->
   <Item Name="JetMassScale_channel" Value="combine" />

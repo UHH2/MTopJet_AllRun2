@@ -1,4 +1,6 @@
 #pragma once
+#include "TASImage.h"
+#include "TBox.h"
 #include <TCanvas.h>
 #include <TColor.h>
 #include <TDecompSVD.h>
@@ -9,6 +11,7 @@
 #include <TF3.h>
 #include <TFile.h>
 #include <TFitResult.h>
+#include "TFrame.h"
 #include <TGaxis.h>
 #include <TGraph.h>
 #include <TGraph2D.h>
@@ -16,16 +19,22 @@
 #include <TGraphAsymmErrors.h>
 #include <TGraphErrors.h>
 #include <TH1.h>
+#include "TH1D.h"
 #include <TH2.h>
+#include <THStack.h>
 #include <TLine.h>
 #include <TLatex.h>
 #include <TLegend.h>
+#include "TLegendEntry.h"
 #include <TMath.h>
 #include <TMatrix.h>
 #include <TMatrixDSym.h>
 #include <TMatrixDSymEigen.h>
 #include <TMultiGraph.h>
+#include "TPad.h"
+#include "TPaveLabel.h"
 #include <TPolyLine3D.h>
+#include <TPolyMarker3D.h>
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TTree.h>
@@ -63,6 +72,9 @@ typedef map<TString, VecI> MapVI;
 typedef map<TString, MapVI> MapVII;
 typedef map<TString, MapVII> MapVIII;
 
+typedef map<TString, TString> MapTS;
+typedef map<TString, VecTS> MapVecTS;
+
 typedef map<TString, double> MapD;
 typedef map<TString, VecD> MapVD;
 typedef map<TString, MapVD> MapVDD;
@@ -72,6 +84,15 @@ typedef map<TString, TH1F*> MapH;
 typedef map<TString, MapH> MapHH;
 typedef map<TString, MapHH> MapHHH;
 typedef map<TString, MapHHH> MapHHHH;
+
+typedef map<TString, THStack*> MapStack;
+typedef map<TString, MapStack> Map2Stack;
+typedef map<TString, Map2Stack> Map3Stack;
+typedef map<TString, Map3Stack> Map4Stack;
+
+typedef map<TString, TFile*> MapF;
+typedef map<TString, MapF> MapFF;
+
 
 // -------------------------------------------------------------------------------------------
 // Get path
@@ -85,7 +106,7 @@ TString get_save_path(){
   // // cout << user.First("/");
   TString save_dir = "/afs/desy.de/user/s/schwarzd";
   if(user.Contains("paaschal")){
-    save_dir = "/afs/desy.de/user/p/paaschal/files";
+    save_dir = "/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet";
   }
   return save_dir;
 }
@@ -131,7 +152,7 @@ void SetupGlobalStyle()
 }
 
 // -------------------------------------------------------------------------------------------
-void CMSLabel(bool prelim, double x=0.25, double y=0.83){
+void CMSLabel(double x=0.25, double y=0.83, TString extra = ""){
   TString cmstext = "CMS";
   TLatex *text = new TLatex(3.5, 24, cmstext);
   text->SetNDC();
@@ -142,17 +163,37 @@ void CMSLabel(bool prelim, double x=0.25, double y=0.83){
   text->SetY(y);
   text->Draw();
 
-  if(prelim){
-    TString simtext = "Work in Progress";
-    TLatex *text3 = new TLatex(3.5, 24, simtext);
-    text3->SetNDC();
-    text3->SetTextAlign(13);
-    text3->SetX(x);
-    text3->SetTextFont(52);
-    text3->SetTextSize(0.05);
-    text3->SetY(y-0.06);
-    text3->Draw();
-  }
+  TLatex *text3 = new TLatex(3.5, 24, extra);
+  text3->SetNDC();
+  text3->SetTextAlign(13);
+  text3->SetX(x);
+  text3->SetTextFont(52);
+  text3->SetTextSize(0.05);
+  text3->SetY(y-0.06);
+  text3->Draw();
+}
+
+// -------------------------------------------------------------------------------------------
+void CMSLabelOffset(double x=0.25, double y=0.83, double x1 = 0.0, double y1 = 0.0){
+  TString cmstext = "CMS";
+  TLatex *text = new TLatex(3.5, 24, cmstext);
+  text->SetNDC();
+  text->SetTextAlign(13);
+  text->SetX(x);
+  text->SetTextFont(62);
+  text->SetTextSize(0.05);
+  text->SetY(y);
+  text->Draw();
+
+  TString simtext = "Work in Progress";
+  TLatex *text3 = new TLatex(3.5, 24, simtext);
+  text3->SetNDC();
+  text3->SetTextAlign(13);
+  text3->SetX(x+x1);
+  text3->SetTextFont(52);
+  text3->SetTextSize(0.035);
+  text3->SetY(y+y1);
+  text3->Draw();
 }
 
 // -------------------------------------------------------------------------------------------

@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
   for(auto mass_string: masswindows){
     cout << "Start with mass " << mass_string << " ... " << endl;
     if(debug) cout << "\t ... Create save_path" << endl;
-    save_path = get_save_path()+"/Plots/FSRuncertainty/";
+    save_path = get_save_path()+"/FSRuncertainty/";
     save_path = creat_folder_and_path(save_path, year);
     save_path = creat_folder_and_path(save_path, ichannel);
     save_path = creat_folder_and_path(save_path, mass_string);

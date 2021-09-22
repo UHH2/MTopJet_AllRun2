@@ -3,6 +3,7 @@
 #include "../include/HistogramUtils.h"
 #include "../include/GraphUtils.h"
 #include "../include/Utils.h"
+#include "../include/tdrstyle_all.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -27,17 +28,16 @@ void printVector(VecD vector, TString info);
 void printVector(VecI vector, TString info);
 void AddTwoMaps(MapHHH map1, MapHHH map2, int option);
 void Plot2DGraph(TGraph2DErrors* bin_fit, int bin, TString title, VecD content, VecD error);
-void DrawPoints(const VecDD& vec1, const VecDD& vec2);
-void DrawTestEllipse(const VecDD& vec1);
-void Draw2DChi2(TF2* chi2, VecDD points, VecD minimum, TString hist, TEllipse* ell);
+void Draw2DChi2(TF2* chi2, VecDD points, VecDD extrema, VecD minimum, TString hist);
 void drawChi2Projection(TF1* chi2function, TString xaxis, VecD xRange, VecD yRange);
 void PoUinTXT(double nom, double up, double down, TString variation);
-bool sortcolx( const VecD& v1, const VecD& v2 );
 void JMSinTXT(VecDD points, VecD PoU, double sig2cor, double sig1cor, double sig1jec, double sigJMS, TString variation);
+bool sortcolx( const VecD& v1, const VecD& v2 );
 MapF2 GetFits(MapSI2DGe map, MapVIII peak, TString hists);
 MapHH GetHistograms(TString process, TString h_name);
 MapHHH RebinAndNormalize(MapHHH process, int width);
 MapSI2DGe Creat2DGraph(MapHHHH map, MapVIII peak, VecTS hists);
+TH1F* SubtractBackgrounds(const TH1F* data, const VecH &bgr);
 TF2* GetChi2(MapF2 fits, MapHHHH nhists, MapVIII peak, TString hist);
 TEllipse* ApproxEllipse(const VecD& mid, const VecD& uu, const VecD& dd, const VecD& ud, const VecD& du);
 TPolyLine3D* SetPolyLine(double x1, double x2, double y1, double y2, double z1, double z2, int color);
@@ -45,7 +45,7 @@ VecD ExtractJMSValues(const TF1* chi2function, const double& var);
 VecD GetMinimumChi2(TF2* chi2, TString hist);
 VecDD Get1sigmaEllipse(TF2* chi2, VecD minimum, TString hist, double runs, double acc);
 
-bool debug = true;
+bool debug = false;
 TString save, year, channel;
 TString schannel = "";
 VecTS hists = {
@@ -67,7 +67,11 @@ int main(int argc, char* argv[]){
   year = argv[1];
   channel = argv[2];
   if(channel.EqualTo("muon")||channel.EqualTo("elec")) schannel = "_"+channel;
+  // TString sub = argv[3]; bool isSUB = false;
+  // if(sub.EqualTo("1")) isSUB = true;
+  // cout << isSUB << endl;
   gErrorIgnoreLevel = kWarning;
+  gStyle->SetOptTitle(0);
 
   // year ---------------------------------------------------------------------
   bool is16=false; bool is17=false; bool is18=false; bool isAll=false; bool is1718=false;
@@ -83,7 +87,7 @@ int main(int argc, char* argv[]){
   TString str_number_bins = to_string(number_bins); // For creating folders
 
   // Limit for bin content -----------------------------------------------------
-  int limit = 100;
+  int limit = (isAll)?100:40;
   // int limit = (channel.EqualTo("muon")||channel.EqualTo("elec"))?50:100;
   TString slimit = to_string(limit);
 
@@ -91,22 +95,22 @@ int main(int argc, char* argv[]){
   // Create Directories --------------------------------------------------------
   if(debug) cout << "Create Directiories ..." << endl;
 
-  save = get_save_path()+"/Plots";
+  save = get_save_path();
   save = creat_folder_and_path(save, "JetCorrections");
-  // save = creat_folder_and_path(save, "Dennis");
+
+  // save = creat_folder_and_path(save, "V20");
+
+  save = creat_folder_and_path(save, "Dennis");
+  // if(isSUB) save = creat_folder_and_path(save, "Subtraction");
   save = creat_folder_and_path(save, "fit");
   save = creat_folder_and_path(save, year);
   save = creat_folder_and_path(save, channel);
   save = creat_folder_and_path(save, slimit);
-  cout << save << endl;
-
   save = creat_folder_and_path(save, "BinWidth_"+to_string(bin_width));
   creat_folder(save, "all_bins");
   creat_folder(save, "projection");
+  cout << save << endl;
 
-  // =====================================================================================
-  // === Get Histograms                                                                ===
-  // =====================================================================================
   cout << "Start collecting Histograms ..." << endl;
   // ---------------------------------------------------------------------------
   // I load all histograms; This code was created after studies ended. Only one
@@ -135,29 +139,6 @@ int main(int argc, char* argv[]){
     m_CORdown[hist] = GetHistograms("CORdown", hist);
   }
 
-  if(debug) cout << "\t ... Get Background" << endl;
-  MapHHH m_bkg = m_other;
-  for(MapHHH map: {m_wjets, m_st}) AddTwoMaps(m_bkg, map, 1);
-
-  AddTwoMaps(m_ttbar, m_bkg, 1);
-  AddTwoMaps(m_JECup, m_bkg, 1);
-  AddTwoMaps(m_JECdown, m_bkg, 1);
-  AddTwoMaps(m_CORup, m_bkg, 1);
-  AddTwoMaps(m_CORdown, m_bkg, 1);
-
-
-  if(debug) cout << "\t ... Normalize and Rebin" << endl;
-  MapHHH m_data_norm = RebinAndNormalize(m_data, bin_width);
-  MapHHH m_ttbar_norm = RebinAndNormalize(m_ttbar, bin_width);
-  MapHHH m_JECup_norm = RebinAndNormalize(m_JECup, bin_width);
-  MapHHH m_JECdown_norm = RebinAndNormalize(m_JECdown, bin_width);
-  MapHHH m_CORup_norm = RebinAndNormalize(m_CORup, bin_width);
-  MapHHH m_CORdown_norm = RebinAndNormalize(m_CORdown, bin_width);
-
-  // =====================================================================================
-  // === Get considered bins (exclude empty ones in data and no peak bin)              ===
-  // =====================================================================================
-
   if(debug) cout << "\t ... Get empty/peak bins" << endl;
   // TODO: adjust limits for non combined years
   // int limit = (channel.EqualTo("muon")||channel.EqualTo("elec"))?50:100;
@@ -167,19 +148,34 @@ int main(int argc, char* argv[]){
     for(TString c: channels){
       for(TString y: years){
         if(!c.EqualTo(channel)||!y.EqualTo(year)) continue;
-        empty_bins[h][c][y] = bins_empty(m_data_norm[h][c][y]);
-        peak_bins[h][c][y] = bins_upper_limit((TH1F*) m_data[h][c][y]->Rebin(bin_width), limit);
+        empty_bins[h][c][y] = bins_empty(m_data[h][c][y]);
         peak_bins[h][c][y] = bins_upper_limit((TH1F*) m_data[h][c][y]->Rebin(bin_width), limit);
         if(debug) printVector(peak_bins[h][c][y], "PEAK:("+h+","+c+","+y+")");
+        if(debug) printVector(empty_bins[h][c][y], "EMPTY:("+h+","+c+","+y+")");
       }
     }
   }
 
-  // =====================================================================================
-  // === Creat TGraphErrors for each bin                                               ===
-  // =====================================================================================
-  if(debug) cout << "Create TGraph2DErrors ... " << endl;
+  if(debug) cout << "\t ... Get Background" << endl;
+  MapHHH m_bkg = m_other;
+  for(MapHHH map: {m_wjets, m_st}) AddTwoMaps(m_bkg, map, 1);
 
+  AddTwoMaps(m_data, m_bkg, -1); // Subtract Bkg from data
+  // AddTwoMaps(m_ttbar, m_bkg, 1);
+  // AddTwoMaps(m_JECup, m_bkg, 1);
+  // AddTwoMaps(m_JECdown, m_bkg, 1);
+  // AddTwoMaps(m_CORup, m_bkg, 1);
+  // AddTwoMaps(m_CORdown, m_bkg, 1);
+
+  if(debug) cout << "\t ... Normalize and Rebin" << endl;
+  MapHHH m_data_norm = RebinAndNormalize(m_data, bin_width);
+  MapHHH m_ttbar_norm = RebinAndNormalize(m_ttbar, bin_width);
+  MapHHH m_JECup_norm = RebinAndNormalize(m_JECup, bin_width);
+  MapHHH m_JECdown_norm = RebinAndNormalize(m_JECdown, bin_width);
+  MapHHH m_CORup_norm = RebinAndNormalize(m_CORup, bin_width);
+  MapHHH m_CORdown_norm = RebinAndNormalize(m_CORdown, bin_width);
+
+  if(debug) cout << "Create TGraph2DErrors ... " << endl;
   MapHHHH m_all_norm;
   m_all_norm["data"] = m_data_norm;
   m_all_norm["ttbar"] = m_ttbar_norm;
@@ -192,7 +188,7 @@ int main(int argc, char* argv[]){
   MapSI2DGe m_combine = Creat2DGraph(m_all_norm, peak_bins, hists);
 
   // =====================================================================================
-  // === Creat Chi2 functions for each bin                                              ===
+  // === Creat chi2 function for pT bins                                               ===
   // =====================================================================================
 
   if(debug) cout << "Get single Chi2 ... " << endl;
@@ -227,19 +223,14 @@ int main(int argc, char* argv[]){
   VecDD ellipse_lh = Get1sigmaEllipse(chi2_lh, minimum_lh, w_mass_lh, 2000, 0.1);
   VecDD ellipse_ll = Get1sigmaEllipse(chi2_ll, minimum_ll, w_mass_ll, 2000, 0.1);
 
-  TEllipse *ell_hh = new TEllipse();
-  TEllipse *ell_hl = new TEllipse();
-  TEllipse *ell_lh = new TEllipse();
-  TEllipse *ell_ll = new TEllipse();
-
   if(debug) cout << "\t ... Draw Chi2" << endl;
   gStyle->SetPalette(kDeepSea); // kDeepSea kGreyScale kRust
   TColor::InvertPalette();
 
-  Draw2DChi2(chi2_hh, ellipse_hh, minimum_hh, w_mass_hh, ell_hh);
-  Draw2DChi2(chi2_hl, ellipse_hl, minimum_hl, w_mass_hl, ell_hl);
-  Draw2DChi2(chi2_lh, ellipse_lh, minimum_lh, w_mass_lh, ell_lh);
-  Draw2DChi2(chi2_ll, ellipse_ll, minimum_ll, w_mass_ll, ell_ll);
+  Draw2DChi2(chi2_hh, ellipse_hh, {}, minimum_hh, w_mass_hh);
+  Draw2DChi2(chi2_hl, ellipse_hl, {}, minimum_hl, w_mass_hl);
+  Draw2DChi2(chi2_lh, ellipse_lh, {}, minimum_lh, w_mass_lh);
+  Draw2DChi2(chi2_ll, ellipse_ll, {}, minimum_ll, w_mass_ll);
 
   // =====================================================================================
   // === Creat chi2 function for JMS                                                   ===
@@ -322,7 +313,6 @@ int main(int argc, char* argv[]){
     if(yp<=limit) lower.push_back(ellipse_JMS[i]);
     else upper.push_back(ellipse_JMS[i]);
   }
-  // DrawPoints(upper, lower);
 
   sort(upper.begin(), upper.end(), sortcolx); // Precaution
   sort(lower.begin(), lower.end(), sortcolx); // Precaution
@@ -439,12 +429,8 @@ int main(int argc, char* argv[]){
 
   VecDD ordered_ellipse = upper;
   ordered_ellipse.insert(ordered_ellipse.end(), lower.begin(), lower.end());
-  // DrawTestEllipse(ordered_ellipse);
   TEllipse* ellipse = ApproxEllipse(nominal_JMS, upper[iumin], lower[ilmin], upper[iumax], lower[ilmax]);
-  Draw2DChi2(chi2_JMS, ordered_ellipse, nominal_JMS, "JMS", ellipse);
-
-  double te = 0.324328574805972405743285992347054;
-  cout << te << "\t" << to_string(te) << "\t" << dtos(te, 10) << endl;
+  Draw2DChi2(chi2_JMS, ordered_ellipse, {uu, dd, ud, du}, nominal_JMS, "JMS");
 }
 
 
@@ -514,7 +500,16 @@ void AddTwoMaps(MapHHH map1, MapHHH map2, int option){
       }
     }
   }
-  // return map;
+}
+
+// ======================================================================================================
+// ===                                                                                                ===
+// ======================================================================================================
+TH1F* SubtractBackgrounds(const TH1F* data, const VecH &bgr){
+  int nbins = data->GetXaxis()->GetNbins();
+  TH1F* result = (TH1F*) data->Clone();
+  for(unsigned int i=0; i<bgr.size(); i++) result->Add(bgr[i], -1);
+  return result;
 }
 
 // ======================================================================================================
@@ -694,11 +689,12 @@ MapF2 GetFits(MapSI2DGe map, MapVIII peak, TString hist){
   vector<VecTS> name_fits = {{"linear"}, {"mixed (xy2)", "mixed (x2y)"}, {"mixed (xyy2)", "mixed (xx2y)"}, {"quadratic"}, {"polynomial of order 2"}};
   VecII ndfs  = {{2}, {2, 2}, {1, 1}, {2}, {0}}; // ndf = n_points - n_parameters = 5 - n_para
   VecII n_fit_para  = {{3}, {3, 3}, {4, 4}, {3}, {5}};
-
+  int nlin = 0; int ntot = 0;
   TString replace = hist; replace.ReplaceAll("comparison_topjet_xcone_pass_rec/", "");
   cout << "Start fitting " << replace << " ... " << endl;
   for(unsigned int i=0; i<peak[hist][channel][year].size(); i++)
   {
+    ntot++;
     int bin = peak[hist][channel][year].at(i);
     TString name = to_string(bin);
     TGraph2DErrors* bin_fit=map[hist][bin];
@@ -736,7 +732,7 @@ MapF2 GetFits(MapSI2DGe map, MapVIII peak, TString hist){
       if(prob>0.05 || ndfs[order][0]==0){ // prob > 0.05 is common in data science
         if(debug) cout << " -> Bin " << name << ": A " << GREEN << name_fits[order][index] << RESET << " fit fullfills the criterion (" << prob << ")" << endl;
         functions[name]=fits[order][index];
-
+        if(order == 0) nlin++;
         // Information which can be extracted later.
         // This way, no further information then the function itself has to be provided
         // Necessary for Chi2 construction to decide which formula to use
@@ -746,6 +742,7 @@ MapF2 GetFits(MapSI2DGe map, MapVIII peak, TString hist){
       }
     }
   }
+  cout << "\t ... " << nlin << " linear fits with " << ntot << " fits in total (" << dtos(100*nlin/(double)ntot, 2) << " %)" << endl;
   return functions;
 }
 
@@ -828,19 +825,15 @@ VecDD Get1sigmaEllipse(TF2* chi2, VecD minimum, TString hist, double runs, doubl
 // ======================================================================================================
 // ===                                                                                                ===
 // ======================================================================================================
-void Draw2DChi2(TF2* chi2, VecDD points, VecD minimum, TString hist, TEllipse* ell){
+void Draw2DChi2(TF2* chi2, VecDD points, VecDD extrema, VecD minimum, TString hist){
 
-  TGraph* test = new TGraph();
-  test->SetPoint(0, 0.3, 0.3);
-  test->SetMarkerColor(kBlack);
-
-  TGraph2D *zmin_point = new TGraph2D();
+  TPolyMarker3D* zmin_point = new TPolyMarker3D(1);
   zmin_point->SetPoint(0, minimum[0], minimum[1], minimum[2]);
   zmin_point->SetMarkerColor(kBlack);
   zmin_point->SetMarkerStyle(kFullCircle);
-  zmin_point->SetMarkerSize(0.5);
+  zmin_point->SetMarkerSize(0.4);
 
-  TGraph2D *sigma_points = new TGraph2D();
+  TPolyMarker3D* sigma_points = new TPolyMarker3D();
   if(points.size()>0){ // precaution, ellipse for bins is not important
     for(unsigned int i=0; i<points.size(); i++) sigma_points->SetPoint(i, points[i][0], points[i][1], points[i][2]);
   }
@@ -848,43 +841,51 @@ void Draw2DChi2(TF2* chi2, VecDD points, VecD minimum, TString hist, TEllipse* e
   sigma_points->SetMarkerStyle(kFullCircle);
   sigma_points->SetMarkerSize(0.1);
 
-  // VecD x, y, z;
-  // for(auto vec:points){
-  //   x.push_back(vec[0]);
-  //   y.push_back(vec[1]);
-  //   z.push_back(vec[2]);
-  // }
-  // x.push_back(points[0][0]); y.push_back(points[0][1]); z.push_back(points[0][2]);
-  // TPolyLine3D* line = new TPolyLine3D(points.size()+1, &x[0], &y[0], &z[0]);
-  // line->SetLineColor(kRed);
-  // line->SetLineWidth(1);
+  TPolyMarker3D* extrema_points = new TPolyMarker3D();
+  if(extrema.size()>0){
+    extrema_points->SetPoint(0, extrema[0][0], extrema[0][1], extrema[0][2]);
+    extrema_points->SetPoint(1, extrema[1][0], extrema[1][1], extrema[1][2]);
+    extrema_points->SetPoint(2, extrema[2][0], extrema[2][1], extrema[2][2]);
+    extrema_points->SetPoint(3, extrema[3][0], extrema[3][1], extrema[3][2]);
+  }
+  extrema_points->SetMarkerColor(kBlue);
+  extrema_points->SetMarkerStyle(kFullCircle);
+  extrema_points->SetMarkerSize(0.4);
 
-  //TEllipse* ApproxEllipse(const VecD& mid, const VecD& uu, const VecD& dd, const VecD& ud, const VecD& du)
-  ell->SetLineColor(kGreen+2);
-  ell->SetFillStyle(0);
-
+  Int_t nb = 50;
   chi2->SetTitle("");
-  chi2->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
-  chi2->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
-  chi2->GetHistogram()->GetZaxis()->SetTitle("#chi^{2}");
-  chi2->GetHistogram()->GetZaxis()->CenterTitle();
-  chi2->GetHistogram()->GetZaxis()->SetTitleOffset(0.5);
   chi2->SetFillStyle(1000);
   chi2->SetLineWidth(1);
   chi2->SetRange(-3, -3, 3, 3);
-  chi2->SetContour(50);        // Contours
+  chi2->SetContour(nb); // Contours
+
+  const Int_t Number = 5;
+  Double_t Red[Number]    = { 0.98, 0.00, 0.00, 0.00, 0.00};
+  Double_t Green[Number]  = { 0.98, 0.84, 0.315, 0.00, 0.00};
+  Double_t Blue[Number]   = { 0.98, 0.84, 0.56, 0.28, 0.00};
+  Double_t Length[Number] = { 0.00, 0.19, 0.46, 0.73, 1.00};
+  TColor::CreateGradientColorTable(Number,Length,Red,Green,Blue,nb);
 
   TCanvas *D = new TCanvas(hist,"D", 600, 600);
   D->SetRightMargin(0.12);
   D->SetLogz();
-  // test->Draw("P");
   chi2->Draw("cont4z");
+  chi2->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
+  chi2->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
+  chi2->GetHistogram()->GetZaxis()->SetTitle("#chi^{2}");
+  chi2->GetHistogram()->GetXaxis()->SetTitleOffset(1.0);
+  chi2->GetHistogram()->GetYaxis()->SetTitleOffset(1.1);
+  chi2->GetHistogram()->GetZaxis()->SetTitleOffset(0.5);
+  chi2->GetHistogram()->GetZaxis()->CenterTitle();
+  // chi2->GetHistogram()->GetZaxis()->SetRangeUser(95, 1200);
+  chi2->SetMinimum(95);
+  gPad->RedrawAxis();
   D->SetTheta(90);
   D->SetPhi(0);
-  zmin_point->Draw("SAME P");
   sigma_points->Draw("SAME P");
-  // line->Draw("SAME LINE");
-  // ell->Draw("SAME");
+  zmin_point->Draw("SAME P");
+  extrema_points->Draw("SAME P");
+  CMSLabelOffset(0.11, 0.95, 0.105, -0.012);
   TString id = hist.ReplaceAll("comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_", "");
   D->SaveAs(save+"/chi2_"+id+".pdf");
   D->Clear();
@@ -962,115 +963,4 @@ void PoUinTXT(double nom, double up, double down, TString variation){
   textfile << setw(10) <<  nom  << setw(10) <<  up  << setw(10) <<  down;
   textfile << "\n";
   textfile.close();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ======================================================================================================
-// ===                                                                                                ===
-// ======================================================================================================
-void DrawPoints(const VecDD& vec1, const VecDD& vec2){
-
-  TGraph2D *range = new TGraph2D();
-  range->SetPoint(0, 0, -0.6, vec1[0][2]);
-  range->SetPoint(1, 0, 1.1, vec1[0][2]);
-  range->SetPoint(2, 1.0, -0.6, vec1[0][2]);
-  range->SetPoint(3, 1.0, 1.1, vec1[0][2]);
-  range->SetMarkerColor(kGray);
-  range->SetMarkerStyle(kFullCircle);
-  range->SetMarkerSize(0.1);
-
-  TGraph2D *points1 = new TGraph2D();
-  for(unsigned int i=0; i<vec1.size(); i++) points1->SetPoint(i, vec1[i][0], vec1[i][1], vec1[i][2]);
-  points1->SetMarkerColor(kRed);
-  points1->SetMarkerStyle(kFullCircle);
-  points1->SetMarkerSize(0.1);
-
-  TGraph2D *points2 = new TGraph2D();
-  for(unsigned int i=0; i<vec2.size(); i++) points2->SetPoint(i, vec2[i][0], vec2[i][1], vec2[i][2]);
-  points2->SetMarkerColor(kBlue);
-  points2->SetMarkerStyle(kFullCircle);
-  points2->SetMarkerSize(0.1);
-
-  points1->SetTitle("");
-  // points1->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
-  // points1->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
-  points1->GetHistogram()->GetZaxis()->SetTitle("#chi^{2}");
-  points1->GetHistogram()->GetZaxis()->CenterTitle();
-  points1->GetHistogram()->GetZaxis()->SetTitleOffset(0.5);
-  points1->SetFillStyle(1000);
-  points1->SetLineWidth(1);
-
-  TCanvas *D = new TCanvas("testpoints","D", 600, 600);
-  D->SetRightMargin(0.12);
-  D->SetLogz();
-  D->SetTheta(90);
-  D->SetPhi(0);
-  range->Draw("P");
-  points1->Draw("SAME P");
-  points2->Draw("SAME P");
-  D->SaveAs(save+"/test_points_sort.pdf");
-  D->Clear();
-}
-
-// ======================================================================================================
-// ===                                                                                                ===
-// ======================================================================================================
-void DrawTestEllipse(const VecDD& vec1){
-
-  TGraph2D *range = new TGraph2D();
-  range->SetPoint(0, 0, -0.6, vec1[0][2]);
-  range->SetPoint(1, 0, 1.1, vec1[0][2]);
-  range->SetPoint(2, 1.0, -0.6, vec1[0][2]);
-  range->SetPoint(3, 1.0, 1.1, vec1[0][2]);
-  range->SetMarkerColor(kGray);
-  range->SetMarkerStyle(kFullCircle);
-  range->SetMarkerSize(0.1);
-
-  TGraph2D *points1 = new TGraph2D();
-  for(unsigned int i=0; i<vec1.size(); i++) points1->SetPoint(i, vec1[i][0], vec1[i][1], vec1[i][2]);
-  points1->SetMarkerColor(kRed);
-  points1->SetMarkerStyle(kFullCircle);
-  points1->SetMarkerSize(0.1);
-
-  points1->SetTitle("");
-  // points1->GetHistogram()->GetXaxis()->SetTitle("JEC factor");
-  // points1->GetHistogram()->GetYaxis()->SetTitle("Additional XCone correction factor");
-  points1->GetHistogram()->GetZaxis()->SetTitle("#chi^{2}");
-  points1->GetHistogram()->GetZaxis()->CenterTitle();
-  points1->GetHistogram()->GetZaxis()->SetTitleOffset(0.5);
-  points1->SetFillStyle(1000);
-  points1->SetLineWidth(1);
-
-  VecD x, y, z;
-  for(auto vec:vec1){
-    x.push_back(vec[0]);
-    y.push_back(vec[1]);
-    z.push_back(vec[2]);
-  }
-  x.push_back(vec1[0][0]); y.push_back(vec1[0][1]); z.push_back(vec1[0][2]);
-  TPolyLine3D* line = new TPolyLine3D(vec1.size()+1, &x[0], &y[0], &z[0]);
-  line->SetLineColor(kBlue);
-
-  TCanvas *D = new TCanvas("testpoints","D", 600, 600);
-  D->SetRightMargin(0.12);
-  D->SetLogz();
-  D->SetTheta(90);
-  D->SetPhi(0);
-  range->Draw("P");
-  // points1->Draw("SAME LINE");
-  points1->Draw("SAME P");
-  // line->Draw("SAME");
-  D->SaveAs(save+"/test_ellipse_line.pdf");
-  D->Clear();
 }

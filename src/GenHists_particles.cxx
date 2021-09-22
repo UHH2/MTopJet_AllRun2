@@ -77,18 +77,22 @@ GenHists_particles::GenHists_particles(uhh2::Context & ctx, const std::string & 
 
 
 void GenHists_particles::fill(const Event & event){
+  bool debug = false;
 
+  if(debug) std::cout << "In GenHists_particle_fill ..." << std::endl;
   const auto & ttbargen = event.get(h_ttbargen);
   // get weight
   double weight = event.weight;
 
   // get jets
+  if(debug) std::cout << "\t ... Get jets" << std::endl;
   std::vector<TopJet> hadjets = event.get(h_hadjets);
   std::vector<Jet> subjets = hadjets[0].subjets();
   std::vector<GenTopJet> hadjets_gen = event.get(h_hadjets_gen);
 
-  // cout tops
+  // std::cout tops
   int n_top = 0;
+  if(debug) std::cout << "\t ... Get particles" << std::endl;
   std::vector<GenParticle>* genparts = event.genparticles;
   for (unsigned int i=0; i<(genparts->size()); ++i){
     GenParticle p = genparts->at(i);
@@ -101,6 +105,7 @@ void GenHists_particles::fill(const Event & event){
 
   // get particles from ttbargen class
   GenParticle tophad, toplep, bot, q1, q2, bot_lep, lep1, lep2, lepton, neutrino;
+  if(debug) std::cout << "\t ... from ttbar class" << std::endl;
   if(ttbargen.IsTopHadronicDecay()){
     tophad = ttbargen.Top();
     toplep = ttbargen.Antitop();
@@ -126,6 +131,7 @@ void GenHists_particles::fill(const Event & event){
   }
 
   //check which lep is neutrino and which is elec/muon
+  if(debug) std::cout << "\t ... Choose lepton" << std::endl;
   if(abs(lep1.pdgId()) == 11 || abs(lep1.pdgId()) == 13){
     lepton = lep1;
     neutrino = lep2;
@@ -135,6 +141,7 @@ void GenHists_particles::fill(const Event & event){
     neutrino = lep1;
   }
 
+  if(debug) std::cout << "\t ... Fill bunch of hists" << std::endl;
   hadtop_pt->Fill(tophad.pt(), weight);
   leptop_pt->Fill(toplep.pt(), weight);
   pthadtop_ptleptop->Fill(tophad.pt(), toplep.pt(), weight);
@@ -150,6 +157,7 @@ void GenHists_particles::fill(const Event & event){
   deltaR_hadtop_leptop->Fill(deltaR(tophad, toplep), weight);
   deltaR_bot_jet1->Fill(deltaR(bot, hadjets.at(0)), weight);
 
+  if(debug) std::cout << "\t ... Identify jet" << std::endl;
   if(hadjets.size()>0){
     deltaR_hadtop_jet1->Fill(deltaR(tophad, hadjets.at(0)), weight);
     deltaPT_hadtop_jet1->Fill(hadjets.at(0).pt() - tophad.pt(), weight);
@@ -165,6 +173,7 @@ void GenHists_particles::fill(const Event & event){
   int b_index = -1;
   // sort jets by pT and get index of b-jet
   sort_by_pt<Jet> (subjets);
+  if(debug) std::cout << "\t ... Match" << std::endl;
   for(unsigned int i=0; i<subjets.size(); i++){
     dR_temp = deltaR(bot, subjets[i]);
     if(dR_temp < dR_min){
@@ -180,6 +189,7 @@ void GenHists_particles::fill(const Event & event){
   // this is for measuring the flavor fraction
   // match genparts to reco subjets and fill subjet pT if matched
   // A: just count jet to flavor if dR(parton, jet) < 0.4
+  if(debug) std::cout << "\t ... Get IDs" << std::endl;
   for(unsigned int j=0; j<subjets.size(); j++){
     Jet subjet = subjets[j];
     double pt = subjet.pt();

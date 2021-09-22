@@ -609,6 +609,8 @@ bool MTopJetSelectionModule::process(uhh2::Event& event){
 
 
   /* *********** b-tag counter *********** */
+  // This part of the code does not influences the PostSelection since passed_btag
+  // is not stored or applied on the events
   bool passed_btag = false;
   int jetbtagN(0);
   for(const auto& j : *event.jets) if(CSVBTag(CSVBTag::WP_TIGHT)(j, event)) ++jetbtagN;

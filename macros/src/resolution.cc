@@ -20,16 +20,18 @@ int main(int argc, char* argv[]){
   bool year_18 = false;
   TString year = "";
   if(argc > 1 && strcmp(argv[1], "median") == 0) use_median = true;
-  if(argc > 1 && strcmp(argv[1], "2016") == 0) year = "2016";
-  if(argc > 1 && strcmp(argv[1], "2017") == 0) year = "2017";
-  if(argc > 1 && strcmp(argv[1], "2018") == 0) year = "2018";
+  if(argc > 1 && strcmp(argv[1], "2016") == 0){year = "2016"; year_16=true;}
+  if(argc > 1 && strcmp(argv[1], "2017") == 0){year = "2017"; year_17=true;}
+  if(argc > 1 && strcmp(argv[1], "2018") == 0){year = "2018"; year_18=true;}
 
 
   // declare files
-  TString filedir;
-  if(channel == "muon") filedir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/"+year+"/muon/";
-  else filedir = "/nfs/dust/cms/user/paaschal/MTopJet/PostSel/"+year+"/elec/";
-  TFile *f_tt = new TFile(filedir+"uhh2.AnalysisModuleRunner.MC.TTbar.root");
+  TString version;
+  if(year_16) version = "v3";
+  if(year_17) version = "v2";
+  if(year_18) version = "";
+  TString filedir = "/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/"+channel+"/uhh2.AnalysisModuleRunner.MC.TTbar_"+year+version+".root";
+  TFile *f_tt = new TFile(filedir);
   // set binning
   int n_ptbin = 10;
   Float_t bins[] = {0, 50, 80, 120, 170, 220, 270, 320, 370, 420, 600};
@@ -170,11 +172,11 @@ int main(int argc, char* argv[]){
   text1.DrawLatex(.2,.2, "lepton+jets");
   gPad->RedrawAxis();
   // first save without additional correction
-  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+"_noAdditional.pdf");
+  c1->SaveAs(save_path+"/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+"_noAdditional.pdf");
   // and once again with the additional correction
   resolution_cor->Draw("SAME E1");
   leg1->AddEntry(resolution_cor,"additional correction","l");
-  c1->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+".pdf");
+  c1->SaveAs(save_path+"/Resolution_Subjets/"+channel+"/pt_"+mean_median+"_"+year+".pdf");
 
   // ---------------------------------------------------------------------------
 
@@ -198,7 +200,7 @@ int main(int argc, char* argv[]){
   leg2->AddEntry(area_percent, "non-closure", "f");
   leg2->Draw();
   gPad->RedrawAxis();
-  c2->SaveAs(save_path+"/Plots/Resolution_Subjets/"+channel+"/nonClosure_"+mean_median+"_"+year+".pdf");
+  c2->SaveAs(save_path+"/Resolution_Subjets/"+channel+"/nonClosure_"+mean_median+"_"+year+".pdf");
 
   return 0;
 }
