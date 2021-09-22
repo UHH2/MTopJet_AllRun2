@@ -40,7 +40,7 @@ void JetCorrections_xcone::init(uhh2::Context & ctx, const std::string& jet_coll
   isMC = (ctx.get("dataset_type") == "MC");
 
   string jec_tag_2016 = "Summer16_07Aug2017";
-  string jec_ver_2016 = "20";
+  string jec_ver_2016 = "11"; // 11
 
   string jec_tag_2017 = "Fall17_17Nov2017";
   string jec_ver_2017 = "32";

@@ -24,6 +24,8 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   number_largedR_all   = book<TH1F>("number_largedR_all", "number", 1, 0.5, 1.5);
   number_largedR_pass  = book<TH1F>("number_largedR_pass", "number", 1, 0.5, 1.5);
 
+  h_csv = book<TH1F>("h_csv", "csv", 50, 0, 1);
+  h_deepjet = book<TH1F>("h_deepjet", "deep jet", 50, 0, 1);
   csvmax = book<TH1F>("csvmax", "csv max", 50, 0, 1);
   deepjetmax = book<TH1F>("deepjetmax", "deep jet max", 50, 0, 1);
 
@@ -246,14 +248,18 @@ void RecoHists_xcone::fill(const Event & event){
   }
   double maxcsv = -1;
   for(unsigned int i=0; i<event.jets->size(); i++){
-    if(event.jets->at(i).btag_combinedSecondaryVertex() > maxcsv){
-      maxcsv = event.jets->at(i).btag_combinedSecondaryVertex();
+    double btag = event.jets->at(i).btag_combinedSecondaryVertex();
+    h_csv->Fill(btag, weight);
+    if(btag > maxcsv){
+      maxcsv = btag;
     }
   }
   double maxdeepjet = -1;
   for(unsigned int i=0; i<event.jets->size(); i++){
-    if(event.jets->at(i).btag_DeepJet() > maxdeepjet){
-      maxdeepjet = event.jets->at(i).btag_DeepJet();
+    double btag = event.jets->at(i).btag_DeepJet();
+    h_deepjet->Fill(btag, weight);
+    if(btag > maxdeepjet){
+      maxdeepjet = btag;
     }
   }
   csvmax->Fill(maxcsv, weight);
