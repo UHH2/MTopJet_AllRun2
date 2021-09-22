@@ -240,9 +240,9 @@
 <InputData Version="TTbar_hdampup_2016v3" Lumi="70531.1436" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_hdampup;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_hdampdown_2016v3" Lumi="70098.79412" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTbar_hdampdown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<!-- <InputData Version="TTbar_GluonMove_2016v3" Lumi="71435.02934" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_GluonMove_2016v3" Lumi="71435.02934" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_GluonMove;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_QCDbased_2016v3" Lumi="34020.75118" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_QCDbased;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -359,8 +359,8 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2016_elec.root"/>
-  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepJet_2016LegacySF_V1.csv" />
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/BTagMCEfficiencyHists_2016_elec.root"/>
+  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/DeepJet_2016LegacySF_V1.csv" />
 
   <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyDataPileupHistogram.root" />
   <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2016/MyMCPileupHistogram.root" />

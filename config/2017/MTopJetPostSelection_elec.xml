@@ -127,7 +127,7 @@
 ]>
 
 <!--
-<ConfigParse NEventsBreak="200000" LastBreak="0" FileSplit="0"/>
+<ConfigParse NEventsBreak="300000" LastBreak="0" FileSplit="0"/>
 <ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelEl_2017"/>
 -->
 
@@ -247,7 +247,7 @@
 ██      ██    ██     ██████  ██
 -->
 
-<!-- <InputData Version="TTbar_mtop1665_2L2Nu_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
+<InputData Version="TTbar_mtop1665_2L2Nu_2017v2" Lumi="2436561.834" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTbar_mtop1695_2L2Nu_2017v2" Lumi="4196335.082" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1695_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -327,7 +327,7 @@
 <InputData Version="TTTo2L2Nu_hdampUp_2017v2" Lumi="2714077.984" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTTo2L2Nu_hdampUp;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="TTTo2L2Nu_hdampDown_2017v2" Lumi="4519976.008" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTTo2L2Nu_hdampDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+<In FileName="&TTTo2L2Nu_hdampDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
 <!--
@@ -456,8 +456,8 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2017_elec.root"/>
-  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepFlavour_94XSF_V4_B_F.csv" />
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/BTagMCEfficiencyHists_2017_elec.root"/>
+  <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/ScaleFactors/BTag/DeepFlavour_94XSF_V4_B_F.csv" />
 
   <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2017/MyDataPileupHistogram.root" />
   <Item Name="pileup_directory" Value="/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/common/data/2017/MyMCPileupHistogram.root" />

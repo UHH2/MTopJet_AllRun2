@@ -24,8 +24,8 @@
 ]>
 
 <!--
-<ConfigParse NEventsBreak="100000" LastBreak="0" FileSplit="0"/>
-<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelMu_2017_JMSelecINmuon"/>
+<ConfigParse NEventsBreak="200000" LastBreak="0" FileSplit="0"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelMu_2017_JMSelec"/>
 -->
 
 <JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
@@ -94,7 +94,7 @@
   <Item Name="dopvfilter" Value="true" />
   <Item Name="channel" Value="&channel;"/>
 
-  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2017_elec.root"/>
+  <Item Name="MCBtagEfficiencies" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btag_effi/BTagMCEfficiencyHists_2017_muon.root"/>
   <Item Name="BTagCalibration" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/MTopJet/btagreshape/DeepFlavour_94XSF_V4_B_F.csv" />
 
   <Item Name="pileup_directory_data" Value="/nfs/dust/cms/user/schwarzd/CMSSW10/CMSSW_10_2_17/src/UHH2/common/data/2017/MyDataPileupHistogram.root" />
