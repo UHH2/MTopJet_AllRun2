@@ -39,7 +39,7 @@ public:
   explicit CorrectionFactor_JMS(uhh2::Context &,  const std::string &, const std::string &, Year year_);
   virtual bool process(uhh2::Event & event) override;
   vector<Jet> GetSubjetsJMS(uhh2::Event &, const VecD&, const int &);
-  double get_mass_BestFit(vector<Jet>);
+  double get_mass_BestFit(vector<Jet>, const std::vector<int>& WSubIndices, TString var);
   double get_wmass_BestFit(vector<Jet>, const std::vector<int>&);
 
 private:
@@ -75,6 +75,7 @@ private:
   std::unique_ptr<FactorizedJetCorrector> corrector;
   std::unique_ptr<FactorizedJetCorrector> corrector_MC_2016, corrector_MC_2017, corrector_MC_2018;
   JetCorrectionUncertainty *uncertainty_MC_2016, *uncertainty_MC_2017, *uncertainty_MC_2018;
+  JetCorrectionUncertainty *b_uncertainty_MC_2016, *b_uncertainty_MC_2017, *b_uncertainty_MC_2018;
 
   // JMS -----------------------------------------------------------------------
   VecD error_JMS(VecD, VecD, VecDD, VecDD);
