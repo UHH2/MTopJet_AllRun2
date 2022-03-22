@@ -271,6 +271,7 @@ void RecoGenHists_xcone_topjet::fill(const Event & event){
   double tau_32_ak  = ak8_had.tau3()/ak8_had.tau2();
   double tau_43_ak  = ak8_had.tau4()/ak8_had.tau3();
   mass = ak8_had_v4.M();
+  ak8pt = ak8_had_v4.Pt();
   tau32 = tau_32_ak;
 
   bool pass_masscut = false;
@@ -842,4 +843,8 @@ double RecoGenHists_xcone_topjet::get_tau32(){
 
 double RecoGenHists_xcone_topjet::get_mass(){
   return mass;
+}
+
+double RecoGenHists_xcone_topjet::get_pt(){
+  return ak8pt;
 }
