@@ -61,6 +61,7 @@ TString y18      = "_2018";    int index_18  = 2;
 TString yCombine = "_combine"; int index_Com = 3;
 
 VecTS years = {"2016", "2017", "2018", "combine"};
+VecD  lumis = {36., 41., 59., 138.};
 // VecTS years = {"2016"};
 VecTS channels = {"muon", "elec", "combine"};
 // VecTS channels = {"muon"};
@@ -74,27 +75,29 @@ TString other_f  = "uhh2.AnalysisModuleRunner.MC.other";
 TString uhh_mc   = "uhh2.AnalysisModuleRunner.MC.";
 
 // systematics
-TString fsr_up_16 = "uhh2.AnalysisModuleRunner.MC.TTbar_fsrup_2016v3.root";
+TString fsr_up_16   = "uhh2.AnalysisModuleRunner.MC.TTbar_fsrup_2016v3.root";
 TString fsr_down_16 = "uhh2.AnalysisModuleRunner.MC.TTbar_fsrdown_2016v3.root";
 
-TString fsr_up_sqrt2 = "FSRup_sqrt2";
-TString fsr_up_2 = "FSRup_2";
-TString fsr_up_4 = "FSRup_4";
+TString fsr_up_sqrt2   = "FSRup_sqrt2";
+TString fsr_up_2       = "FSRup_2";
+TString fsr_up_4       = "FSRup_4";
 TString fsr_down_sqrt2 = "FSRdown_sqrt2";
-TString fsr_down_2 = "FSRdown_2";
-TString fsr_down_4 = "FSRdown_4";
-TString jms_uu   = "JMS_upup";
-TString jms_ud   = "JMS_updown";
-TString jms_du   = "JMS_downup";
-TString jms_dd   = "JMS_downdown";
-TString jms_u    = "JMS_up";
-TString jms_d    = "JMS_down";
-TString jms_u_corr = "JMS_up_acorr";
-TString jms_d_corr = "JMS_down_acorr";
-TString jec_up   = "JEC_up";
-TString jec_down = "JEC_down";
-TString cor_up   = "COR_up";
-TString cor_down = "COR_down";
+TString fsr_down_2     = "FSRdown_2";
+TString fsr_down_4     = "FSRdown_4";
+TString jms_uu         = "JMS_upup";
+TString jms_ud         = "JMS_updown";
+TString jms_du         = "JMS_downup";
+TString jms_dd         = "JMS_downdown";
+TString jms_u          = "JMS_up";
+TString jms_d          = "JMS_down";
+TString jms_u_corr     = "JMS_up_acorr";
+TString jms_d_corr     = "JMS_down_acorr";
+TString jec_up         = "JEC_up";
+TString jec_down       = "JEC_down";
+TString cor_up         = "COR_up";
+TString cor_down       = "COR_down";
+TString flavor_up      = "JMS_flavor_up";
+TString flavor_down    = "JMS_flavor_down";
 
 // =====================================================================================
 // === Commonly used                                                                 ===
@@ -367,3 +370,23 @@ TString cor_down_elec_17 = dir+elec+"/"+cor_down+"/"+ttbar_f+y17+".root";
 TString cor_down_elec_18 = dir+elec+"/"+cor_down+"/"+ttbar_f+y18+".root";
 vector<TString> cor_down_muon = {cor_down_muon_16, cor_down_muon_17, cor_down_muon_18};
 vector<TString> cor_down_elec = {cor_down_elec_16, cor_down_elec_17, cor_down_elec_18};
+
+// ----------------------------------------------------------------------------- Flavor
+
+TString flavor_up_muon_16 = dir+muon+"/"+flavor_up+"/"+ttbar_f+y16+".root";
+TString flavor_up_muon_17 = dir+muon+"/"+flavor_up+"/"+ttbar_f+y17+".root";
+TString flavor_up_muon_18 = dir+muon+"/"+flavor_up+"/"+ttbar_f+y18+".root";
+TString flavor_up_elec_16 = dir+elec+"/"+flavor_up+"/"+ttbar_f+y16+".root";
+TString flavor_up_elec_17 = dir+elec+"/"+flavor_up+"/"+ttbar_f+y17+".root";
+TString flavor_up_elec_18 = dir+elec+"/"+flavor_up+"/"+ttbar_f+y18+".root";
+vector<TString> flavor_up_muon = {flavor_up_muon_16, flavor_up_muon_17, flavor_up_muon_18};
+vector<TString> flavor_up_elec = {flavor_up_elec_16, flavor_up_elec_17, flavor_up_elec_18};
+
+TString flavor_down_muon_16 = dir+muon+"/"+flavor_down+"/"+ttbar_f+y16+".root";
+TString flavor_down_muon_17 = dir+muon+"/"+flavor_down+"/"+ttbar_f+y17+".root";
+TString flavor_down_muon_18 = dir+muon+"/"+flavor_down+"/"+ttbar_f+y18+".root";
+TString flavor_down_elec_16 = dir+elec+"/"+flavor_down+"/"+ttbar_f+y16+".root";
+TString flavor_down_elec_17 = dir+elec+"/"+flavor_down+"/"+ttbar_f+y17+".root";
+TString flavor_down_elec_18 = dir+elec+"/"+flavor_down+"/"+ttbar_f+y18+".root";
+vector<TString> flavor_down_muon = {flavor_down_muon_16, flavor_down_muon_17, flavor_down_muon_18};
+vector<TString> flavor_down_elec = {flavor_down_elec_16, flavor_down_elec_17, flavor_down_elec_18};
