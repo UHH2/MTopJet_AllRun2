@@ -72,8 +72,8 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
   // x_limit -----------------------------------------------------------------------------------------
   bool reached_x_limit_up   = false;
   bool reached_x_limit_down = false;
-  int step_limit_x_up   = 0;
-  int step_limit_x_down = 0;
+  int step_limit_x_up   = steps*0.8; // taken from previous iterations - depends on range
+  int step_limit_x_down = steps*0.2; // taken from previous iterations - depends on range
 
   for(int xpar=0; xpar<n_wide+1; xpar++){
     x=xmin+wide_steps*xpar*dx;
@@ -98,13 +98,13 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
       }
     }
   }
-  // cout << "\nup: " << step_limit_x_up << "   down: " << step_limit_x_down << endl;
+  cout << "\nup: " << step_limit_x_up << "   down: " << step_limit_x_down << endl;
 
   // y_limit -----------------------------------------------------------------------------------------
   bool reached_y_limit_up   = false;
   bool reached_y_limit_down = false;
-  int step_limit_y_up   = 0;
-  int step_limit_y_down = 0;
+  int step_limit_y_up   = steps*0.95;
+  int step_limit_y_down = steps*0.05;
 
   for(int ypar=0; ypar<n_wide+1; ypar++){
     y=ymin+wide_steps*ypar*dy;
@@ -129,7 +129,7 @@ vector<vector<double>> FindXY(TF2 *function, double zfix, double xmin, double xm
       }
     }
   }
-  // cout << "up: " << step_limit_y_up << "   down: " << step_limit_y_down << endl;
+  cout << "up: " << step_limit_y_up << "   down: " << step_limit_y_down << endl;
 
   /* First step is to decrease the area to increase the speed of the algorithm*/
   // For 2000 -> calculation time decreases!
