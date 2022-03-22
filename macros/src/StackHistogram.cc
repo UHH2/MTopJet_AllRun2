@@ -2,6 +2,8 @@
 #include "../include/tdrstyle_all.h"
 #include "../include/HistogramUtils.h"
 
+// #include <ranges>
+
 using namespace std;
 
 Double_t lumi_plot;
@@ -14,21 +16,31 @@ bool debug = false;
 VecTS process = {"other", "WJets", "SingleTop", "TTbar"};
 
 MapVecTS hists = {
-  {"XCone_cor", {"M_jet1_"}},
-  {"XCone_cor_SF", {"M_jet1_"}},
-  {"comparison_topjet_xcone_pass_rec", {"wmass_match"}},
+  {"XCone_cor",                        {"M_jet1_"}        },
+  {"XCone_cor_SF",                     {"M_jet1_"}        },
+  {"XCone_cor_subjets_SF",             {"pt_had_subjets"} },
+  {"comparison_topjet_xcone_pass_rec", {"wmass_match"}    },
+  {"JetMassScaleHists",                {"hadjet_jms_mass"}},
+  {"PreSel04_Event",                   {"MET"}            },
+  {"PreSel04_Muon",                    {"pt"}             },
+  {"MuonHists",                        {"pt"}             },
+  {"PreSel04_Elec",                    {"pt"}             },
+  {"ElecHists",                        {"pt"}             },
 };
 
 MapTS xaxis = {
-  {"M_jet1_", "#m_{jet}"},
-  {"wmass_match", "#m_{W}"},
+  {"M_jet1_", "#it{m}_{jet}"},
+  {"wmass_match", "#it{m}_{W}"},
+  {"hadjet_jms_mass", "#it{m}_{jet}"},
+  {"pt", "#it{p}_{T}"},
+  {"MET", "missing #it{p}_{T}"},
 };
 
 MapI colors = {
   {"TTbar", kRed+1},
-  {"SingleTop", kBlue+1},
+  {"SingleTop", kBlue+2},
   {"WJets", kGreen+1},
-  {"other", kYellow+1}
+  {"other", kOrange}
 };
 
 MapFF files;
@@ -40,6 +52,7 @@ void DrawText(TString name);
 void DrawControl(TH1F* data, THStack* stack, TH1F* rData, TH1F* rMC, TString xaxis, TString h_class, TString h);
 TH1F* GetDataHistograms(TFile* data, TString h_class, TString h);
 TH1F* GetMCHistograms(TFile* file, TString h_class, TString h);
+TH1F* GetRatioStack(TH1F* h1, TH1F* h2);
 THStack* StackHistograms(MapF files, TString h_class, TString h);
 
 int main(int argc, char* argv[]){
@@ -105,8 +118,8 @@ int main(int argc, char* argv[]){
     {
       ratios_data[c][h_class]; ratios_data[c][h_class];
       for(auto const& h: vec_h){
-        ratios_mc[c][h_class][h] = GetRatio(hists_mc[c][h_class][h], hists_mc[c][h_class][h], true);
-        ratios_data[c][h_class][h] = GetRatio(hists_data[c][h_class][h], hists_mc[c][h_class][h], false);
+        ratios_mc[c][h_class][h] = GetRatioStack(hists_mc[c][h_class][h], hists_mc[c][h_class][h]);
+        ratios_data[c][h_class][h] = GetRatioStack(hists_data[c][h_class][h], hists_mc[c][h_class][h]);
       }
     }
   }
@@ -162,6 +175,7 @@ THStack* StackHistograms(MapF files, TString h_class, TString h){
     TH1F* hist = (TH1F*) files[p]->Get(h_class+"/"+h);
     hist->SetFillColor(colors[p]);
     hist->SetLineColor(colors[p]);
+    hist->SetLineWidth(0);
     stack->Add(hist);
   }
   return stack;
@@ -170,7 +184,7 @@ THStack* StackHistograms(MapF files, TString h_class, TString h){
 // ==================================================================================================
 void DrawControl(TH1F* data, THStack* stack, TH1F* rData, TH1F* rMC, TString xaxis, TString h_class, TString h)
 {
-  if(debug) cout << "Draw Control Hists ..." << endl;
+  if(debug) cout << "Draw Control Hists ("+h+") ..." << endl;
   gStyle->SetOptStat(0); // turn off stats box
 
   TString unique_path = "/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/PostSel/"+year+"/"+h_class+"_"+h+".pdf";
@@ -200,7 +214,7 @@ void DrawControl(TH1F* data, THStack* stack, TH1F* rData, TH1F* rMC, TString xax
   pad1->cd();
 
   data->Draw("P");
-  data->GetYaxis()->SetRangeUser(0, data->GetMaximum()*1.5);
+  data->GetYaxis()->SetRangeUser(0.1, data->GetMaximum()*1.5);
   stack->Draw("same hist");
   data->Draw("same PE"); // redraw
   gPad->RedrawAxis();
@@ -209,14 +223,18 @@ void DrawControl(TH1F* data, THStack* stack, TH1F* rData, TH1F* rMC, TString xax
 
   // dummy hists for legend
   MapH dummies;
-  for(TString p: process){
+  vector<TString> flip = process;
+  reverse(flip.begin(), flip.end());
+  for (auto p: flip) {
     TH1F* dummy = new TH1F();
     dummy->SetFillColor(colors[p]);
+    dummy->SetLineColor(colors[p]);
     leg->AddEntry(dummy, p, "f");
   }
   leg->SetTextSize(0.04);
   leg->Draw();
 
+  if(debug) cout << "\t ... Plot info (CMS+Lumi)" << endl;
   CMSLabel(0.22, 0.85, "Work in Progress");
   LumiInfo(lumi_plot, false, 0.9, 0.96);
 
@@ -286,7 +304,7 @@ void SetupCanvasForEPS()
   Float_t yplot = 0.65;
   Float_t yratio = 0.34;
 
-                                                //  coordinates:
+  //  coordinates:
   // set up the coordinates of the two pads:    //
   Float_t y1, y2, y3;                           //  y3 +-------------+
   y3 = 0.99;                                    //     |             |
@@ -295,8 +313,8 @@ void SetupCanvasForEPS()
   Float_t x1, x2;                               //     |     rp1     |
   x1 = 0.01;                                    //  y1 +-------------+
   x2 = 0.99;                                    //     x1            x2
-                                                //
-                                                // No Pad 2!
+  //
+  // No Pad 2!
 
 
   TPad* m_rp1_top = new TPad("pad1", "Control Plots 2", x1, y2, x2, y3);
@@ -331,11 +349,33 @@ void SetupCanvasForEPS()
   m_rp1_top->Draw();
   m_rp2_top->Draw();
 
-  // if (bPlotRatio){
-  //   m_rp1->Draw();
-  //   m_rp2->Draw();
-  // }
+  // m_rp1->Draw();
+  // m_rp2->Draw();
 
   return;
 
+}
+
+// ==================================================================================================
+TH1F* GetRatioStack(TH1F* h1, TH1F* h2){
+  CompareHistStructure(h1, h2);
+  TH1F* ratio = (TH1F*) h1->Clone();
+  int Nbins = h1->GetNbinsX();
+  for(int i=1; i<=Nbins;i++){
+    double N1 = h1->GetBinContent(i);
+    double N2 = h2->GetBinContent(i);
+    double E1 = h1->GetBinError(i);
+    double E2 = h2->GetBinError(i);
+    if(N1==0 || N2==0){
+      ratio->SetBinContent(i, 0);
+      ratio->SetBinError(i, 10);
+    }
+    else{
+      double r = N1/N2;
+      double error = sqrt(E1/N2 * E1/N2 + N1*E2/(N2*N2) * N1*E2/(N2*N2));
+      ratio->SetBinContent(i, r);
+      ratio->SetBinError(i, error);
+    }
+  }
+  return ratio;
 }

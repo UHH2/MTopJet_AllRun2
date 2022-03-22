@@ -69,6 +69,9 @@ class MTopJetPostSelectionModule : public ModuleBASE {
 public:
   explicit MTopJetPostSelectionModule(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
+  void declare_output(uhh2::Context& ctx);
+  void init_hists(uhh2::Context& ctx);
+  void init_MC_hists(uhh2::Context& ctx);
 
 protected:
   enum lepton { muon, elec };
@@ -244,7 +247,7 @@ protected:
   std::vector<Event::Handle<float>> h_weight_btag_upvars;
   std::vector<Event::Handle<float>> h_weight_btag_downvars;
 
-  Event::Handle<float> h_ak8tau, h_ak8mass;
+  Event::Handle<float> h_ak8tau, h_ak8mass, h_ak8pt;
 
   //width reweight
   std::unique_ptr<tt_width_reweight> width2_reweight;
@@ -316,7 +319,7 @@ protected:
   std::unique_ptr<RecoGenHists_xcone_topjet> h_comparison_topjet_xcone_pass_rec_masscut_120, h_comparison_topjet_xcone_pass_rec_masscut_130, h_comparison_topjet_xcone_pass_rec_masscut_140, h_comparison_topjet_xcone_pass_rec_masscut_150;
 
   std::unique_ptr<Hists> h_gen_weights, h_gen_weights_pass_gen, h_gen_weights_massbin_145, h_gen_weights_massbin_275;
-  std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_gensel_300;
+  std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_300_left, h_gen_weight_gensel_300;
   std::unique_ptr<Hists> h_leptonictop, h_leptonictop_SF;
 
   std::unique_ptr<Hists> h_wrong_events_mtop_17;
@@ -347,6 +350,7 @@ protected:
   string PU_variation ="nominal";
   string corvar ="nominal";
   TString jms_direction ="nominal";
+  TString jms_flavor ="nominal";
   TString prefire_variation ="nominal";
   TString jms_channel ="combine";
   TString syear = "";
@@ -363,6 +367,299 @@ protected:
 
   bool do_ps = false;
 };
+
+void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
+  h_matched = ctx.declare_event_output<bool>("matched");
+  h_measure_rec = ctx.declare_event_output<bool>("passed_measurement_rec");
+  h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
+  h_nomass_rec = ctx.declare_event_output<bool>("passed_massmigration_rec");
+  h_nomass_gen = ctx.declare_event_output<bool>("passed_massmigration_gen");
+  h_ptsub_rec = ctx.declare_event_output<bool>("passed_subptmigration_rec");
+  h_ptsub_gen = ctx.declare_event_output<bool>("passed_subptmigration_gen");
+  h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
+  h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
+  h_nobtag_rec = ctx.declare_event_output<bool>("passed_btagmigration_rec");
+  h_ptlepton_rec = ctx.declare_event_output<bool>("passed_leptonptmigration_rec");
+  h_ptlepton_gen = ctx.declare_event_output<bool>("passed_leptonptmigration_gen");;
+  h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
+  h_npv = ctx.declare_event_output<int>("NPV");
+  h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
+  h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
+  h_mass_rec = ctx.declare_event_output<double>("Mass_Rec_old");
+  h_mass_jms = ctx.declare_event_output<double>("Mass_Rec");
+  h_ptsub1_rec = ctx.declare_event_output<double>("ptsub1");
+  h_ptsub2_rec = ctx.declare_event_output<double>("ptsub2");
+  h_ptsub3_rec = ctx.declare_event_output<double>("ptsub3");
+  h_mW_rec = ctx.declare_event_output<double>("mW");
+
+  h_pt_gen33 = ctx.declare_event_output<double>("Pt_Gen33");
+  h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
+  h_genweight = ctx.declare_event_output<double>("gen_weight");
+  h_recweight = ctx.declare_event_output<double>("rec_weight");
+  h_genweight_ttfactor = ctx.declare_event_output<double>("gen_weight_ttfactor");
+  h_factor_2width = ctx.declare_event_output<double>("factor_2width");
+  h_factor_4width = ctx.declare_event_output<double>("factor_4width");
+  h_factor_8width = ctx.declare_event_output<double>("factor_8width");
+  h_pdf_weights = ctx.declare_event_output<vector<double>>("pdf_weights");
+  h_bquark_pt = ctx.declare_event_output<vector<double>>("bquark_pt");
+  h_softdropmass_rec = ctx.declare_event_output<double>("SoftDropMass_Rec");
+  h_muid_up = ctx.declare_event_output<float>("sf_muid_up");
+  h_muid_down = ctx.declare_event_output<float>("sf_muid_down");
+  h_mutr_up = ctx.declare_event_output<float>("sf_mutr_up");
+  h_mutr_down = ctx.declare_event_output<float>("sf_mutr_down");
+  h_elid_up = ctx.declare_event_output<float>("sf_elid_up");
+  h_elid_down = ctx.declare_event_output<float>("sf_elid_down");
+  h_eltr_up = ctx.declare_event_output<float>("sf_eltr_up");
+  h_eltr_down = ctx.declare_event_output<float>("sf_eltr_down");
+  h_elreco_up = ctx.declare_event_output<float>("sf_elreco_up");
+  h_elreco_down = ctx.declare_event_output<float>("sf_elreco_down");
+  h_pu_up = ctx.declare_event_output<float>("sf_pu_up");
+  h_pu_down = ctx.declare_event_output<float>("sf_pu_down");
+  h_prefire_up = ctx.declare_event_output<float>("sf_prefire_up");
+  h_prefire_down = ctx.declare_event_output<float>("sf_prefire_down");
+  h_btag_up = ctx.declare_event_output<float>("sf_btag_up");
+  h_btag_down = ctx.declare_event_output<float>("sf_btag_down");
+  h_scale_upup = ctx.declare_event_output<float>("sf_scale_upup");
+  h_scale_upnone = ctx.declare_event_output<float>("sf_scale_upnone");
+  h_scale_noneup = ctx.declare_event_output<float>("sf_scale_noneup");
+  h_scale_nonedown = ctx.declare_event_output<float>("sf_scale_nonedown");
+  h_scale_downnone = ctx.declare_event_output<float>("sf_scale_downnone");
+  h_scale_downdown = ctx.declare_event_output<float>("sf_scale_downdown");
+  h_fsr_upsqrt2 = ctx.declare_event_output<float>("sf_fsr_upsqrt2");
+  h_fsr_up2 = ctx.declare_event_output<float>("sf_fsr_up2");
+  h_fsr_up4 = ctx.declare_event_output<float>("sf_fsr_up4");
+  h_fsr_downsqrt2 = ctx.declare_event_output<float>("sf_fsr_downsqrt2");
+  h_fsr_down2 = ctx.declare_event_output<float>("sf_fsr_down2");
+  h_fsr_down4 = ctx.declare_event_output<float>("sf_fsr_down4");
+  h_isr_up2 = ctx.declare_event_output<float>("sf_isr_up2");
+  h_isr_down2 = ctx.declare_event_output<float>("sf_isr_down2");
+  h_ak8tau = ctx.declare_event_output<float>("tau32_ak8_had");
+  h_ak8mass = ctx.declare_event_output<float>("mass_ak8_had");
+  h_ak8pt = ctx.declare_event_output<float>("pt_ak8_had");
+}
+
+void MTopJetPostSelectionModule::init_MC_hists(uhh2::Context& ctx){
+  h_CorrectionHists.reset(new CorrectionHists_subjets(ctx, "CorrectionHists", "jec"));
+  h_CorrectionHists_after.reset(new CorrectionHists_subjets(ctx, "CorrectionHists_after", "cor"));
+  h_CorrectionHists_WJets.reset(new CorrectionHists_subjets(ctx, "CorrectionHists_WJets", "jec"));
+
+
+  h_XCone_GEN_Sel_measurement.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_measurement"));
+  h_XCone_GEN_Sel_noMass.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_noMass"));
+  h_XCone_GEN_Sel_pt350.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_pt350"));
+  h_XCone_GEN_Sel_ptsub.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_ptsub"));
+
+  h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
+  h_XCone_GEN_GenOnly_matched.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_matched"));
+  h_XCone_GEN_GenOnly_unmatched.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_unmatched"));
+  h_XCone_GEN_GenOnly_matched_fat.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_matched_fat"));
+  h_XCone_GEN_GenOnly_unmatched_fat.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_unmatched_fat"));
+  h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
+  h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
+
+  h_XCone_GEN_ST.reset(new GenHists_xcone(ctx, "XCone_GEN_ST"));
+
+  h_GenParticles_GenOnly.reset(new GenHists_particles(ctx, "GenParticles_GenOnly"));
+  h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
+  h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
+
+  h_GenParticles_SM.reset(new GenHists_particles(ctx, "GenParticles_SM"));
+  h_GenParticles_newWidth.reset(new GenHists_particles(ctx, "GenParticles_newWidth"));
+
+  h_GenProcess.reset(new GenHists_process(ctx, "GenProcess"));
+
+  h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", "jec"));
+  h_RecGenHists_subjets_matched.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_matched", "jec"));
+  h_RecGenHists_subjets_lowPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_lowPU", "jec"));
+  h_RecGenHists_subjets_medPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_medPU", "jec"));
+  h_RecGenHists_subjets_highPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_highPU", "jec"));
+  h_RecGenHists_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC", "raw"));
+  h_RecGenHists_subjets_noJEC_lowPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_lowPU", "raw"));
+  h_RecGenHists_subjets_noJEC_medPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_medPU", "raw"));
+  h_RecGenHists_subjets_noJEC_highPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_highPU", "raw"));
+  h_RecGenHists_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_corrected", "cor"));
+
+  h_RecGenHists_subjets_WJets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_WJets", "jec"));
+  h_RecGenHists_subjets_noJEC_WJets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_WJets", "raw"));
+
+  h_RecGenHistsST_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets", "jec"));
+  h_RecGenHistsST_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets_noJEC", "raw"));
+  h_RecGenHistsST_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets_corrected", "cor"));
+
+
+  h_RecGenHists_ak4.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4", true));
+  h_RecGenHists_ak4_noJEC.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4_noJEC", false));
+
+  h_RecGenHists_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU", "jec"));
+  h_RecGenHists_medPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU", "jec"));
+  h_RecGenHists_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU", "jec"));
+  h_RecGenHists_lowPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU_noJEC", "raw"));
+  h_RecGenHists_medPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU_noJEC", "raw"));
+  h_RecGenHists_highPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU_noJEC", "raw"));
+
+  // "true" for RecGenHists means to use jets with JEC applied
+  h_RecGenHists_GenOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly", "jec"));
+  h_RecGenHists_RecOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly", "jec"));
+  h_RecGenHists_RecOnly_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC", "raw"));
+  h_RecGenHists_RecOnly_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_corrected", "cor"));
+  h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", "jec"));
+  h_RecGenHists_Both_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_corrected", "cor"));
+  h_RecGenHists_GenSelRecInfo.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo", "cor"));
+  h_RecGenHists_GenSelRecInfo_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_lowPU", "cor"));
+  h_RecGenHists_GenSelRecInfo_midPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_midPU", "cor"));
+  h_RecGenHists_GenSelRecInfo_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_highPU", "cor"));
+  h_RecGenHists_GenSelRecInfo_matched.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched", "cor"));
+  h_RecGenHists_GenSelRecInfo_matched_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_lowPU", "cor"));
+  h_RecGenHists_GenSelRecInfo_matched_midPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_midPU", "cor"));
+  h_RecGenHists_GenSelRecInfo_matched_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_highPU", "cor"));
+}
+
+void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
+  //BTagMCEfficiencyHists
+  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",DeepjetTight));
+  //LeptonicTop_Hists
+  h_leptonictop.reset(new LeptonicTop_Hists(ctx, "LeptonicTop"));
+  h_leptonictop_SF.reset(new LeptonicTop_Hists(ctx, "LeptonicTop_SF"));
+
+  //750GeV hists
+  h_750_xcone.reset(new RecoHists_xcone(ctx, "750_xcone", "cor"));
+
+  // XCone Combined Jet
+  h_XCone_raw.reset(new RecoHists_xcone(ctx, "XCone_raw", "raw"));
+  h_XCone_cor.reset(new RecoHists_xcone(ctx, "XCone_cor", "cor"));
+  h_XCone_jec.reset(new RecoHists_xcone(ctx, "XCone_jec", "jec"));
+  h_XCone_raw_SF.reset(new RecoHists_xcone(ctx, "XCone_raw_SF", "raw"));
+  h_XCone_cor_SF.reset(new RecoHists_xcone(ctx, "XCone_cor_SF", "cor"));
+  h_XCone_jec_SF.reset(new RecoHists_xcone(ctx, "XCone_jec_SF", "jec"));
+
+  h_XCone_cor_SF_pt400.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt400", "cor"));
+  h_XCone_cor_SF_pt450.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt450", "cor"));
+  h_XCone_cor_SF_pt530.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt530", "cor"));
+
+  h_XCone_cor_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_pt350", "cor"));
+  h_XCone_cor_noptcut.reset(new RecoHists_xcone(ctx, "XCone_cor_noptcut", "cor"));
+
+  h_XCone_puppi.reset(new RecoHists_puppi(ctx, "XCone_puppi"));
+
+  // XCone Subjets
+  h_XCone_jec_subjets.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets", "jec"));
+  h_XCone_raw_subjets.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets", "raw"));
+  h_XCone_cor_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets", "cor"));
+  h_XCone_jec_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets_SF", "jec"));
+  h_XCone_raw_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets_SF", "raw"));
+  h_XCone_cor_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets_SF", "cor"));
+
+  // migrations from not passing rec cuts
+  h_XCone_cor_migration_pt.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_pt", "cor"));
+  h_XCone_cor_migration_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_pt350", "cor"));
+  h_XCone_cor_migration_mass.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_mass", "cor"));
+  h_XCone_cor_migration_btag.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_btag", "cor"));
+
+  // Different REC Selection applied
+  h_XCone_cor_Sel_noSel.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noSel", "cor"));
+  h_XCone_cor_Sel_noMass.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass", "cor"));
+  h_XCone_cor_Sel_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt350", "cor"));
+  h_XCone_cor_Sel_nobtag.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_nobtag", "cor"));
+  h_XCone_cor_Sel_ptsub.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_ptsub", "cor"));
+  h_XCone_cor_subjets_Sel_ptsub.reset(new SubjetHists_xcone(ctx, "h_XCone_cor_subjets_Sel_ptsub", "cor"));
+
+  // PU dependence
+  h_XCone_cor_PUlow.reset(new RecoHists_xcone(ctx, "XCone_cor_PUlow", "cor"));
+  h_XCone_cor_PUmid.reset(new RecoHists_xcone(ctx, "XCone_cor_PUmid", "cor"));
+  h_XCone_cor_PUhigh.reset(new RecoHists_xcone(ctx, "XCone_cor_PUhigh", "cor"));
+
+  h_XCone_cor_PUlow_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_PUlow_subjets", "cor"));
+  h_XCone_cor_PUmid_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_PUmid_subjets", "cor"));
+  h_XCone_cor_PUhigh_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_PUhigh_subjets", "cor"));
+
+  // Matching hists
+  h_XCone_cor_m.reset(new RecoHists_xcone(ctx, "XCone_cor_matched", "cor"));
+  h_XCone_cor_u.reset(new RecoHists_xcone(ctx, "XCone_cor_unmatched", "cor"));
+  h_XCone_cor_m_fat.reset(new RecoHists_xcone(ctx, "XCone_cor_matched_fat", "cor"));
+  h_XCone_cor_u_fat.reset(new RecoHists_xcone(ctx, "XCone_cor_unmatched_fat", "cor"));
+
+  // Weight Hists
+  h_weights01.reset(new WeightHists(ctx, "WeightHists01_noSF"));
+  h_weights02.reset(new WeightHists(ctx, "WeightHists02_PU"));
+  h_weights03.reset(new WeightHists(ctx, "WeightHists03_Lepton"));
+  h_weights04.reset(new WeightHists(ctx, "WeightHists04_BTag"));
+
+  // AK8 N-subjetiness
+  h_comparison_topjet_xcone.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_gen.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_gen", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_rec.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_rec_SF.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_SF", isTTbar, 0));
+  h_comparison_topjet_xcone_pass_genrec.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_genrec", isTTbar, 0));
+
+  h_comparison_topjet_xcone_pass_rec_masscut_120.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_120", isTTbar, 120));
+  h_comparison_topjet_xcone_pass_rec_masscut_130.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_130", isTTbar, 130));
+  h_comparison_topjet_xcone_pass_rec_masscut_140.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_140", isTTbar, 140));
+  h_comparison_topjet_xcone_pass_rec_masscut_150.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_150", isTTbar, 150));
+
+  // Control Hists for FSRx_4
+  h_gen_weights.reset(new GenWeightRangeHists(ctx, "Gen_Weights"));
+  h_gen_weights_massbin_145.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_145"));
+  h_gen_weights_pass_gen.reset(new GenWeightRangeHists(ctx, "Gen_Weights_pass_gen"));
+  h_gen_weights_massbin_275.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_275"));
+
+  h_gen_weight_300.reset(new CountingEventHists(ctx, "Gen_Weight_300"));
+  h_gen_weight_300_left.reset(new CountingEventHists(ctx, "Gen_Weight_300_left"));
+  h_gen_weight_gensel_300.reset(new CountingEventHists(ctx, "Gen_Weight_gensel_300"));
+
+  h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
+  h_Muon.reset(new MuonHists(ctx, "MuonHists"));
+  h_Elec.reset(new ElectronHists(ctx, "ElecHists"));
+  h_Jets.reset(new JetHists(ctx, "JetHits"));
+
+  h_MTopJet_PreSel01.reset(new MTopJetHists(ctx, "PreSel01_Event"));
+  h_Muon_PreSel01.reset(new MuonHists(ctx, "PreSel01_Muon"));
+  h_Elec_PreSel01.reset(new ElectronHists(ctx, "PreSel01_Elec"));
+  h_Jets_PreSel01.reset(new JetHists(ctx, "PreSel01_Jet"));
+  h_XCone_cor_PreSel01.reset(new RecoHists_xcone(ctx, "PreSel01_XCone", "cor"));
+
+  h_MTopJet_PreSel02.reset(new MTopJetHists(ctx, "PreSel02_Event"));
+  h_Muon_PreSel02.reset(new MuonHists(ctx, "PreSel02_Muon"));
+  h_Elec_PreSel02.reset(new ElectronHists(ctx, "PreSel02_Elec"));
+  h_Jets_PreSel02.reset(new JetHists(ctx, "PreSel02_Jet"));
+  h_XCone_cor_PreSel02.reset(new RecoHists_xcone(ctx, "PreSel02_XCone", "cor"));
+
+  h_MTopJet_PreSel03.reset(new MTopJetHists(ctx, "PreSel03_Event"));
+  h_Muon_PreSel03.reset(new MuonHists(ctx, "PreSel03_Muon"));
+  h_Elec_PreSel03.reset(new ElectronHists(ctx, "PreSel03_Elec"));
+  h_Jets_PreSel03.reset(new JetHists(ctx, "PreSel03_Jet"));
+  h_XCone_cor_PreSel03.reset(new RecoHists_xcone(ctx, "PreSel03_XCone", "cor"));
+
+  h_MTopJet_PreSel03b.reset(new MTopJetHists(ctx, "PreSel03b_Event"));
+  h_Muon_PreSel03b.reset(new MuonHists(ctx, "PreSel03b_Muon"));
+  h_Elec_PreSel03b.reset(new ElectronHists(ctx, "PreSel03b_Elec"));
+  h_Jets_PreSel03b.reset(new JetHists(ctx, "PreSel03b_Jet"));
+  h_XCone_cor_PreSel03b.reset(new RecoHists_xcone(ctx, "PreSel03b_XCone", "cor"));
+
+  h_MTopJet_PreSelReshapeSF.reset(new MTopJetHists(ctx, "PreSelReshapeSF_Event"));
+  h_Muon_PreSelReshapeSF.reset(new MuonHists(ctx, "PreSelReshapeSF_Muon"));
+  h_Elec_PreSelReshapeSF.reset(new ElectronHists(ctx, "PreSelReshapeSF_Elec"));
+  h_Jets_PreSelReshapeSF.reset(new JetHists(ctx, "PreSelReshapeSF_Jet"));
+  h_XCone_cor_PreSelReshapeSF.reset(new RecoHists_xcone(ctx, "PreSelReshapeSF_XCone", "cor"));
+
+  h_MTopJet_PreSel04.reset(new MTopJetHists(ctx, "PreSel04_Event"));
+  h_Muon_PreSel04.reset(new MuonHists(ctx, "PreSel04_Muon"));
+  h_Elec_PreSel04.reset(new ElectronHists(ctx, "PreSel04_Elec"));
+  h_Jets_PreSel04.reset(new JetHists(ctx, "PreSel04_Jet"));
+  h_XCone_cor_PreSel04.reset(new RecoHists_xcone(ctx, "PreSel04_XCone", "cor"));
+
+  h_MTopJet_PreSel_Prefire.reset(new MTopJetHists(ctx, "PreSel_Prefire_Event"));
+  h_Muon_PreSel_Prefire.reset(new MuonHists(ctx, "PreSel_Prefire_Muon"));
+  h_Elec_PreSel_Prefire.reset(new ElectronHists(ctx, "PreSel_Prefire_Elec"));
+  h_Jets_PreSel_Prefire.reset(new JetHists(ctx, "PreSel_Prefire_Jet"));
+  h_XCone_cor_PreSel_Prefire.reset(new RecoHists_xcone(ctx, "PreSel_Prefire_XCone", "cor"));
+
+  h_XCone_JMS.reset(new JetMassScaleHists(ctx, "JetMassScaleHists"));
+
+  // PDF hists
+  h_PDFHists.reset(new PDFHists(ctx, "PDFHists"));
+}
+
+
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
@@ -604,230 +901,16 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   /*************************** Set up Hists classes **********************************************************************************/
   if(debug) cout << "Setup Hists " << endl;
-  //BTagMCEfficiencyHists
-  BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",DeepjetTight));
-  //LeptonicTop_Hists
-  h_leptonictop.reset(new LeptonicTop_Hists(ctx, "LeptonicTop"));
-  h_leptonictop_SF.reset(new LeptonicTop_Hists(ctx, "LeptonicTop_SF"));
-
-  //750GeV hists
-  h_750_xcone.reset(new RecoHists_xcone(ctx, "750_xcone", "cor"));
-
-  // XCone Combined Jet
-  h_XCone_raw.reset(new RecoHists_xcone(ctx, "XCone_raw", "raw"));
-  h_XCone_cor.reset(new RecoHists_xcone(ctx, "XCone_cor", "cor"));
-  h_XCone_jec.reset(new RecoHists_xcone(ctx, "XCone_jec", "jec"));
-  h_XCone_raw_SF.reset(new RecoHists_xcone(ctx, "XCone_raw_SF", "raw"));
-  h_XCone_cor_SF.reset(new RecoHists_xcone(ctx, "XCone_cor_SF", "cor"));
-  h_XCone_jec_SF.reset(new RecoHists_xcone(ctx, "XCone_jec_SF", "jec"));
-
-  h_XCone_cor_SF_pt400.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt400", "cor"));
-  h_XCone_cor_SF_pt450.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt450", "cor"));
-  h_XCone_cor_SF_pt530.reset(new RecoHists_xcone(ctx, "XCone_cor_SF_pt530", "cor"));
-
-  h_XCone_cor_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_pt350", "cor"));
-  h_XCone_cor_noptcut.reset(new RecoHists_xcone(ctx, "XCone_cor_noptcut", "cor"));
-
-  h_XCone_puppi.reset(new RecoHists_puppi(ctx, "XCone_puppi"));
-
-  // XCone Subjets
-  h_XCone_jec_subjets.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets", "jec"));
-  h_XCone_raw_subjets.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets", "raw"));
-  h_XCone_cor_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets", "cor"));
-  h_XCone_jec_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_jec_subjets_SF", "jec"));
-  h_XCone_raw_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_raw_subjets_SF", "raw"));
-  h_XCone_cor_subjets_SF.reset(new SubjetHists_xcone(ctx, "XCone_cor_subjets_SF", "cor"));
-
-  // migrations from not passing rec cuts
-  h_XCone_cor_migration_pt.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_pt", "cor"));
-  h_XCone_cor_migration_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_pt350", "cor"));
-  h_XCone_cor_migration_mass.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_mass", "cor"));
-  h_XCone_cor_migration_btag.reset(new RecoHists_xcone(ctx, "XCone_cor_migration_btag", "cor"));
-
-  // Different REC Selection applied
-  h_XCone_cor_Sel_noSel.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noSel", "cor"));
-  h_XCone_cor_Sel_noMass.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_noMass", "cor"));
-  h_XCone_cor_Sel_pt350.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_pt350", "cor"));
-  h_XCone_cor_Sel_nobtag.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_nobtag", "cor"));
-  h_XCone_cor_Sel_ptsub.reset(new RecoHists_xcone(ctx, "XCone_cor_Sel_ptsub", "cor"));
-  h_XCone_cor_subjets_Sel_ptsub.reset(new SubjetHists_xcone(ctx, "h_XCone_cor_subjets_Sel_ptsub", "cor"));
-
-  // PU dependence
-  h_XCone_cor_PUlow.reset(new RecoHists_xcone(ctx, "XCone_cor_PUlow", "cor"));
-  h_XCone_cor_PUmid.reset(new RecoHists_xcone(ctx, "XCone_cor_PUmid", "cor"));
-  h_XCone_cor_PUhigh.reset(new RecoHists_xcone(ctx, "XCone_cor_PUhigh", "cor"));
-
-  h_XCone_cor_PUlow_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_PUlow_subjets", "cor"));
-  h_XCone_cor_PUmid_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_PUmid_subjets", "cor"));
-  h_XCone_cor_PUhigh_subjets.reset(new SubjetHists_xcone(ctx, "XCone_cor_PUhigh_subjets", "cor"));
-
-  // Matching hists
-  h_XCone_cor_m.reset(new RecoHists_xcone(ctx, "XCone_cor_matched", "cor"));
-  h_XCone_cor_u.reset(new RecoHists_xcone(ctx, "XCone_cor_unmatched", "cor"));
-  h_XCone_cor_m_fat.reset(new RecoHists_xcone(ctx, "XCone_cor_matched_fat", "cor"));
-  h_XCone_cor_u_fat.reset(new RecoHists_xcone(ctx, "XCone_cor_unmatched_fat", "cor"));
-
-  // Weight Hists
-  h_weights01.reset(new WeightHists(ctx, "WeightHists01_noSF"));
-  h_weights02.reset(new WeightHists(ctx, "WeightHists02_PU"));
-  h_weights03.reset(new WeightHists(ctx, "WeightHists03_Lepton"));
-  h_weights04.reset(new WeightHists(ctx, "WeightHists04_BTag"));
-
-  // AK8 N-subjetiness
-  h_comparison_topjet_xcone.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone", isTTbar, 0));
-  h_comparison_topjet_xcone_pass_gen.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_gen", isTTbar, 0));
-  h_comparison_topjet_xcone_pass_rec.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec", isTTbar, 0));
-  h_comparison_topjet_xcone_pass_rec_SF.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_SF", isTTbar, 0));
-  h_comparison_topjet_xcone_pass_genrec.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_genrec", isTTbar, 0));
-
-  h_comparison_topjet_xcone_pass_rec_masscut_120.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_120", isTTbar, 120));
-  h_comparison_topjet_xcone_pass_rec_masscut_130.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_130", isTTbar, 130));
-  h_comparison_topjet_xcone_pass_rec_masscut_140.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_140", isTTbar, 140));
-  h_comparison_topjet_xcone_pass_rec_masscut_150.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_150", isTTbar, 150));
-
-  // Control Hists for FSRx_4
-  h_gen_weights.reset(new GenWeightRangeHists(ctx, "Gen_Weights"));
-  h_gen_weights_massbin_145.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_145"));
-  h_gen_weights_pass_gen.reset(new GenWeightRangeHists(ctx, "Gen_Weights_pass_gen"));
-  h_gen_weights_massbin_275.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_275"));
-
-  h_gen_weight_300.reset(new CountingEventHists(ctx, "Gen_Weight_300"));
-  h_gen_weight_gensel_300.reset(new CountingEventHists(ctx, "Gen_Weight_gensel_300"));
-
-  h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
-  h_Muon.reset(new MuonHists(ctx, "MuonHists"));
-  h_Elec.reset(new ElectronHists(ctx, "ElecHists"));
-  h_Jets.reset(new JetHists(ctx, "JetHits"));
-
-  h_MTopJet_PreSel01.reset(new MTopJetHists(ctx, "PreSel01_Event"));
-  h_Muon_PreSel01.reset(new MuonHists(ctx, "PreSel01_Muon"));
-  h_Elec_PreSel01.reset(new ElectronHists(ctx, "PreSel01_Elec"));
-  h_Jets_PreSel01.reset(new JetHists(ctx, "PreSel01_Jet"));
-  h_XCone_cor_PreSel01.reset(new RecoHists_xcone(ctx, "PreSel01_XCone", "cor"));
-
-  h_MTopJet_PreSel02.reset(new MTopJetHists(ctx, "PreSel02_Event"));
-  h_Muon_PreSel02.reset(new MuonHists(ctx, "PreSel02_Muon"));
-  h_Elec_PreSel02.reset(new ElectronHists(ctx, "PreSel02_Elec"));
-  h_Jets_PreSel02.reset(new JetHists(ctx, "PreSel02_Jet"));
-  h_XCone_cor_PreSel02.reset(new RecoHists_xcone(ctx, "PreSel02_XCone", "cor"));
-
-  h_MTopJet_PreSel03.reset(new MTopJetHists(ctx, "PreSel03_Event"));
-  h_Muon_PreSel03.reset(new MuonHists(ctx, "PreSel03_Muon"));
-  h_Elec_PreSel03.reset(new ElectronHists(ctx, "PreSel03_Elec"));
-  h_Jets_PreSel03.reset(new JetHists(ctx, "PreSel03_Jet"));
-  h_XCone_cor_PreSel03.reset(new RecoHists_xcone(ctx, "PreSel03_XCone", "cor"));
-
-  h_MTopJet_PreSel03b.reset(new MTopJetHists(ctx, "PreSel03b_Event"));
-  h_Muon_PreSel03b.reset(new MuonHists(ctx, "PreSel03b_Muon"));
-  h_Elec_PreSel03b.reset(new ElectronHists(ctx, "PreSel03b_Elec"));
-  h_Jets_PreSel03b.reset(new JetHists(ctx, "PreSel03b_Jet"));
-  h_XCone_cor_PreSel03b.reset(new RecoHists_xcone(ctx, "PreSel03b_XCone", "cor"));
-
-  h_MTopJet_PreSelReshapeSF.reset(new MTopJetHists(ctx, "PreSelReshapeSF_Event"));
-  h_Muon_PreSelReshapeSF.reset(new MuonHists(ctx, "PreSelReshapeSF_Muon"));
-  h_Elec_PreSelReshapeSF.reset(new ElectronHists(ctx, "PreSelReshapeSF_Elec"));
-  h_Jets_PreSelReshapeSF.reset(new JetHists(ctx, "PreSelReshapeSF_Jet"));
-  h_XCone_cor_PreSelReshapeSF.reset(new RecoHists_xcone(ctx, "PreSelReshapeSF_XCone", "cor"));
-
-  h_MTopJet_PreSel04.reset(new MTopJetHists(ctx, "PreSel04_Event"));
-  h_Muon_PreSel04.reset(new MuonHists(ctx, "PreSel04_Muon"));
-  h_Elec_PreSel04.reset(new ElectronHists(ctx, "PreSel04_Elec"));
-  h_Jets_PreSel04.reset(new JetHists(ctx, "PreSel04_Jet"));
-  h_XCone_cor_PreSel04.reset(new RecoHists_xcone(ctx, "PreSel04_XCone", "cor"));
-
-  h_MTopJet_PreSel_Prefire.reset(new MTopJetHists(ctx, "PreSel_Prefire_Event"));
-  h_Muon_PreSel_Prefire.reset(new MuonHists(ctx, "PreSel_Prefire_Muon"));
-  h_Elec_PreSel_Prefire.reset(new ElectronHists(ctx, "PreSel_Prefire_Elec"));
-  h_Jets_PreSel_Prefire.reset(new JetHists(ctx, "PreSel_Prefire_Jet"));
-  h_XCone_cor_PreSel_Prefire.reset(new RecoHists_xcone(ctx, "PreSel_Prefire_XCone", "cor"));
-
-  h_XCone_JMS.reset(new JetMassScaleHists(ctx, "JetMassScaleHists"));
-
-  // PDF hists
-  h_PDFHists.reset(new PDFHists(ctx, "PDFHists"));
+  init_hists(ctx);
 
   if(debug) cout << "MC Hists" << endl;
-  if(isMC){
-
-    h_CorrectionHists.reset(new CorrectionHists_subjets(ctx, "CorrectionHists", "jec"));
-    h_CorrectionHists_after.reset(new CorrectionHists_subjets(ctx, "CorrectionHists_after", "cor"));
-    h_CorrectionHists_WJets.reset(new CorrectionHists_subjets(ctx, "CorrectionHists_WJets", "jec"));
-
-
-    h_XCone_GEN_Sel_measurement.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_measurement"));
-    h_XCone_GEN_Sel_noMass.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_noMass"));
-    h_XCone_GEN_Sel_pt350.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_pt350"));
-    h_XCone_GEN_Sel_ptsub.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_ptsub"));
-
-    h_XCone_GEN_GenOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly"));
-    h_XCone_GEN_GenOnly_matched.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_matched"));
-    h_XCone_GEN_GenOnly_unmatched.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_unmatched"));
-    h_XCone_GEN_GenOnly_matched_fat.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_matched_fat"));
-    h_XCone_GEN_GenOnly_unmatched_fat.reset(new GenHists_xcone(ctx, "XCone_GEN_GenOnly_unmatched_fat"));
-    h_XCone_GEN_RecOnly.reset(new GenHists_xcone(ctx, "XCone_GEN_RecOnly"));
-    h_XCone_GEN_Both.reset(new GenHists_xcone(ctx, "XCone_GEN_Both"));
-
-    h_XCone_GEN_ST.reset(new GenHists_xcone(ctx, "XCone_GEN_ST"));
-
-    h_GenParticles_GenOnly.reset(new GenHists_particles(ctx, "GenParticles_GenOnly"));
-    h_GenParticles_RecOnly.reset(new GenHists_particles(ctx, "GenParticles_RecOnly"));
-    h_GenParticles_Both.reset(new GenHists_particles(ctx, "GenParticles_Both"));
-
-    h_GenParticles_SM.reset(new GenHists_particles(ctx, "GenParticles_SM"));
-    h_GenParticles_newWidth.reset(new GenHists_particles(ctx, "GenParticles_newWidth"));
-
-    h_GenProcess.reset(new GenHists_process(ctx, "GenProcess"));
-
-    h_RecGenHists_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets", "jec"));
-    h_RecGenHists_subjets_matched.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_matched", "jec"));
-    h_RecGenHists_subjets_lowPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_lowPU", "jec"));
-    h_RecGenHists_subjets_medPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_medPU", "jec"));
-    h_RecGenHists_subjets_highPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_highPU", "jec"));
-    h_RecGenHists_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC", "raw"));
-    h_RecGenHists_subjets_noJEC_lowPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_lowPU", "raw"));
-    h_RecGenHists_subjets_noJEC_medPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_medPU", "raw"));
-    h_RecGenHists_subjets_noJEC_highPU.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_highPU", "raw"));
-    h_RecGenHists_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_corrected", "cor"));
-
-    h_RecGenHists_subjets_WJets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_WJets", "jec"));
-    h_RecGenHists_subjets_noJEC_WJets.reset(new RecoGenHists_subjets(ctx, "RecGenHists_subjets_noJEC_WJets", "raw"));
-
-    h_RecGenHistsST_subjets.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets", "jec"));
-    h_RecGenHistsST_subjets_noJEC.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets_noJEC", "raw"));
-    h_RecGenHistsST_subjets_corrected.reset(new RecoGenHists_subjets(ctx, "RecGenHistsST_subjets_corrected", "cor"));
-
-
-    h_RecGenHists_ak4.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4", true));
-    h_RecGenHists_ak4_noJEC.reset(new RecoGenHists_ak4(ctx, "RecGenHists_ak4_noJEC", false));
-
-    h_RecGenHists_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU", "jec"));
-    h_RecGenHists_medPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU", "jec"));
-    h_RecGenHists_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU", "jec"));
-    h_RecGenHists_lowPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_lowPU_noJEC", "raw"));
-    h_RecGenHists_medPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_medPU_noJEC", "raw"));
-    h_RecGenHists_highPU_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_highPU_noJEC", "raw"));
-
-    // "true" for RecGenHists means to use jets with JEC applied
-    h_RecGenHists_GenOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenOnly", "jec"));
-    h_RecGenHists_RecOnly.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly", "jec"));
-    h_RecGenHists_RecOnly_noJEC.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_noJEC", "raw"));
-    h_RecGenHists_RecOnly_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_RecOnly_corrected", "cor"));
-    h_RecGenHists_Both.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both", "jec"));
-    h_RecGenHists_Both_corr.reset(new RecoGenHists_xcone(ctx, "RecGenHists_Both_corrected", "cor"));
-    h_RecGenHists_GenSelRecInfo.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo", "cor"));
-    h_RecGenHists_GenSelRecInfo_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_lowPU", "cor"));
-    h_RecGenHists_GenSelRecInfo_midPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_midPU", "cor"));
-    h_RecGenHists_GenSelRecInfo_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_highPU", "cor"));
-    h_RecGenHists_GenSelRecInfo_matched.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched", "cor"));
-    h_RecGenHists_GenSelRecInfo_matched_lowPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_lowPU", "cor"));
-    h_RecGenHists_GenSelRecInfo_matched_midPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_midPU", "cor"));
-    h_RecGenHists_GenSelRecInfo_matched_highPU.reset(new RecoGenHists_xcone(ctx, "RecGenHists_GenSelRecInfo_matched_highPU", "cor"));
-  }
+  if(isMC) init_MC_hists(ctx);
 
   // Best Fit
   if(isMC){
     if(debug) cout << "BestFit" << endl;
     jms_direction = ctx.get("JetMassScale_direction","nominal");
+    jms_flavor = ctx.get("JetMassScale_Flavor","nominal");
     jms_channel = ctx.get("JetMassScale_channel","combine");
     BestFit.reset(new CorrectionFactor_JMS(ctx, "XCone33_had_Combined_noJEC", "genXCone33TopJets", year));
   }
@@ -870,77 +953,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_fatjets    =ctx.get_handle<std::vector<TopJet>>("xconeCHS_Corrected");
   h_fatjets_raw=ctx.get_handle<std::vector<TopJet>>("xconeCHS");
 
-
-  // undeclare event output (jet collections etc) to get small root files
-  ctx.undeclare_all_event_output();
-  // declare event output used for unfolding
-  h_matched = ctx.declare_event_output<bool>("matched");
-  h_measure_rec = ctx.declare_event_output<bool>("passed_measurement_rec");
-  h_measure_gen = ctx.declare_event_output<bool>("passed_measurement_gen");
-  h_nomass_rec = ctx.declare_event_output<bool>("passed_massmigration_rec");
-  h_nomass_gen = ctx.declare_event_output<bool>("passed_massmigration_gen");
-  h_ptsub_rec = ctx.declare_event_output<bool>("passed_subptmigration_rec");
-  h_ptsub_gen = ctx.declare_event_output<bool>("passed_subptmigration_gen");
-  h_pt350_rec = ctx.declare_event_output<bool>("passed_ptmigration_rec");
-  h_pt350_gen = ctx.declare_event_output<bool>("passed_ptmigration_gen");
-  h_nobtag_rec = ctx.declare_event_output<bool>("passed_btagmigration_rec");
-  h_ptlepton_rec = ctx.declare_event_output<bool>("passed_leptonptmigration_rec");
-  h_ptlepton_gen = ctx.declare_event_output<bool>("passed_leptonptmigration_gen");;
-  h_ttbar = ctx.declare_event_output<bool>("is_TTbar");
-  h_npv = ctx.declare_event_output<int>("NPV");
-  h_ttbar_SF = ctx.declare_event_output<double>("TTbar_SF");
-  h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
-  h_mass_rec = ctx.declare_event_output<double>("Mass_Rec_old");
-  h_mass_jms = ctx.declare_event_output<double>("Mass_Rec");
-  h_ptsub1_rec = ctx.declare_event_output<double>("ptsub1");
-  h_ptsub2_rec = ctx.declare_event_output<double>("ptsub2");
-  h_ptsub3_rec = ctx.declare_event_output<double>("ptsub3");
-  h_mW_rec = ctx.declare_event_output<double>("mW");
-
-  h_pt_gen33 = ctx.declare_event_output<double>("Pt_Gen33");
-  h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
-  h_genweight = ctx.declare_event_output<double>("gen_weight");
-  h_recweight = ctx.declare_event_output<double>("rec_weight");
-  h_genweight_ttfactor = ctx.declare_event_output<double>("gen_weight_ttfactor");
-  h_factor_2width = ctx.declare_event_output<double>("factor_2width");
-  h_factor_4width = ctx.declare_event_output<double>("factor_4width");
-  h_factor_8width = ctx.declare_event_output<double>("factor_8width");
-  h_pdf_weights = ctx.declare_event_output<vector<double>>("pdf_weights");
-  h_bquark_pt = ctx.declare_event_output<vector<double>>("bquark_pt");
-  h_softdropmass_rec = ctx.declare_event_output<double>("SoftDropMass_Rec");
-  h_muid_up = ctx.declare_event_output<float>("sf_muid_up");
-  h_muid_down = ctx.declare_event_output<float>("sf_muid_down");
-  h_mutr_up = ctx.declare_event_output<float>("sf_mutr_up");
-  h_mutr_down = ctx.declare_event_output<float>("sf_mutr_down");
-  h_elid_up = ctx.declare_event_output<float>("sf_elid_up");
-  h_elid_down = ctx.declare_event_output<float>("sf_elid_down");
-  h_eltr_up = ctx.declare_event_output<float>("sf_eltr_up");
-  h_eltr_down = ctx.declare_event_output<float>("sf_eltr_down");
-  h_elreco_up = ctx.declare_event_output<float>("sf_elreco_up");
-  h_elreco_down = ctx.declare_event_output<float>("sf_elreco_down");
-  h_pu_up = ctx.declare_event_output<float>("sf_pu_up");
-  h_pu_down = ctx.declare_event_output<float>("sf_pu_down");
-  h_prefire_up = ctx.declare_event_output<float>("sf_prefire_up");
-  h_prefire_down = ctx.declare_event_output<float>("sf_prefire_down");
-  h_btag_up = ctx.declare_event_output<float>("sf_btag_up");
-  h_btag_down = ctx.declare_event_output<float>("sf_btag_down");
-  h_scale_upup = ctx.declare_event_output<float>("sf_scale_upup");
-  h_scale_upnone = ctx.declare_event_output<float>("sf_scale_upnone");
-  h_scale_noneup = ctx.declare_event_output<float>("sf_scale_noneup");
-  h_scale_nonedown = ctx.declare_event_output<float>("sf_scale_nonedown");
-  h_scale_downnone = ctx.declare_event_output<float>("sf_scale_downnone");
-  h_scale_downdown = ctx.declare_event_output<float>("sf_scale_downdown");
-  h_fsr_upsqrt2 = ctx.declare_event_output<float>("sf_fsr_upsqrt2");
-  h_fsr_up2 = ctx.declare_event_output<float>("sf_fsr_up2");
-  h_fsr_up4 = ctx.declare_event_output<float>("sf_fsr_up4");
-  h_fsr_downsqrt2 = ctx.declare_event_output<float>("sf_fsr_downsqrt2");
-  h_fsr_down2 = ctx.declare_event_output<float>("sf_fsr_down2");
-  h_fsr_down4 = ctx.declare_event_output<float>("sf_fsr_down4");
-  h_isr_up2 = ctx.declare_event_output<float>("sf_isr_up2");
-  h_isr_down2 = ctx.declare_event_output<float>("sf_isr_down2");
-  h_ak8tau = ctx.declare_event_output<float>("tau32_ak8_had");
-  h_ak8mass = ctx.declare_event_output<float>("mass_ak8_had");
-
+  ctx.undeclare_all_event_output(); // undeclare event output (jet collections etc) to get small root files
+  declare_output(ctx); // declare event output used for unfolding
 
   /*********************************************************************************************************************************/
 
@@ -956,6 +970,9 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
+  if(debug) cout << "Start process --------------------------------------------------------------" << endl;
+  // cout << "Start process --------------------------------------------------------------" << endl;
+
   /***************************  First do JEC/JER/XCONE *******************************************************************************/
 
   JetCorrections->process(event);          // apply AK4 JEC to subjets of the original Fatjet Collection
@@ -964,10 +981,8 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   Correction->process(event);              // apply additional correction (a new 'cor' TopJet Collection is generated)
   jetprod_reco_corrected->process(event);  // finally store sum of 'cor' subjets
 
-
   /************************************************************************************************************************************/
 
-  if(debug) cout << "Start process --------------------------------------------------------------" << endl;
   if(isMTop){
     std::vector<TopJet> test_fatjets = event.get(h_fatjets);
     for(auto & jet: test_fatjets){
@@ -985,6 +1000,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   bool passed_gensel33;
   passed_recsel = event.get(h_recsel_2);
   passed_gensel33 = event.get(h_gensel_2);
+  if(debug) cout << "Pass recsel is " << passed_recsel << " and passed_gensel33 is " << passed_gensel33 << endl;
 
   // check if event has one had and one lep jet
   if( !(njet_had->passes(event)) ) return false;
@@ -1020,23 +1036,22 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   int PoU = 0;
   if(isMC){
-    // Data+MC
     // calculated with combined channels
     if(jms_channel == "combine"){
-      // if     (jms_direction == "nominal")  points = {0.698225,  -0.140094}; // BestFit point
-      // else if(jms_direction == "upup")     points = {0.835925, -0.0932941}; // clostest point, right
-      // else if(jms_direction == "downdown") points = {0.559625,  -0.185094}; // clostest point, left
-      // else if(jms_direction == "downup")   points = {0.481325,   0.541206}; // furthest point, up
-      // else if(jms_direction == "updown")   points = {0.897125,  -0.782694}; // furthest point, down
-      if     (jms_direction == "nominal")  points = {0.944669,  -0.648365}; // BestFit point
-      else if(jms_direction == "upup")     points = {1.082369,  -0.603365}; // clostest point, right
-      else if(jms_direction == "downdown") points = {0.806969,  -0.695165}; // clostest point, left
-      else if(jms_direction == "downup")   points = {0.699869,   0.051835}; // furthest point, up
-      else if(jms_direction == "updown")   points = {1.171469,  -1.314365}; // furthest point, down
+      // nom (  0.851987,  -0.287289) { 0.74799, -0.0535399};
+      // uu  (  0.985587,  -0.235289) { 0.88079, -0.0103399};
+      // dd  (  0.718387,  -0.339289) { 0.61359, -0.0931399};
+      // du  (  0.577587,   0.502711) { 0.52799,    0.61786};
+      // ud  (  1.126387,  -1.077289) { 0.94959,   -0.70514};
+      if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
+      else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
+      else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
+      else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
+      else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
       else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
     }
     // calculated with muon channel; ud & du are not intresting in these channels
-    else if(jms_channel == "muon"){
+    else if(jms_channel == "muon"){ // UNCORRELATED
       // nom points = {0.742004, 0.232502}; uu points = {0.994004, 0.312602}; dd points = {0.490904, 0.147902};
       if     (jms_direction == "nominal")  points = {0.759732, 0.269837};
       else if(jms_direction == "upup")     points = {1.01983, 0.344537};
@@ -1044,7 +1059,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
     }
     // calculated with elec channel; ud & du are not intresting in these channels
-    else if(jms_channel == "elec"){
+    else if(jms_channel == "elec"){ // UNCORRELATED
       // nom points = {0.318239, 0.338609}; uu points = {0.630539, 0.453809}; dd points = {0.005039, 0.226109};
       if     (jms_direction == "nominal")  points = {0.501565, 0.0392776}; // BestFit point
       else if(jms_direction == "upup")     points = {0.825565, 0.160778}; // clostest point, right
@@ -1057,11 +1072,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     if(jms_direction.EqualTo("up"))   PoU = 1;
     if(jms_direction.EqualTo("down")) PoU = 2;
     newsubjets = BestFit->GetSubjetsJMS(event, points, PoU);
-    mass_jms = BestFit->get_mass_BestFit(newsubjets);
-    // mass_jms = BestFit->get_mass_BestFit(event, points);
+    mass_jms = BestFit->get_mass_BestFit(newsubjets, WSubjetIndex, jms_flavor);
     event.set(h_mass_jms, mass_jms);
     mass_wjms = BestFit->get_wmass_BestFit(newsubjets, WSubjetIndex);
-    // mass_wjms = BestFit->get_wmass_BestFit(event, points, WSubjetIndex);
     event.set(h_mW_rec, mass_wjms);
   }
   else{
@@ -1184,6 +1197,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   bool GenWeight300 = false;
   if(isTTbar && gen_weight>300){
+    cout << "GenWeight > 300 with " << gen_weight << endl;
     GenWeight300 = true;
     h_gen_weight_300->fill(event);
   }
@@ -1487,7 +1501,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   /*************************************************************************************************************************************************/
   /* In two steps because Event with gen_weight > 300 should be deleted completly but still be shown if it passes the GenSelection *****************/
   if(GenWeight300 && pass_measurement_gen) h_gen_weight_gensel_300->fill(event);
-  if(GenWeight300) return false;
+  // if(GenWeight300) return false;
 
   /*************************** Pile Up bools  ******************************************************************************************************/
   bool lowPU = (event.pvs->size() <= 10);
@@ -1576,6 +1590,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   event.set(h_ak8tau, -1.); // set default value
   event.set(h_ak8mass, -1.); // set default value
+  event.set(h_ak8pt, -1.); // set default value
 
   if(debug) cout << "\t ... pass_measurement_rec" << endl;
   if(pass_measurement_rec){
@@ -1606,8 +1621,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_comparison_topjet_xcone_pass_rec_masscut_150->fill(event);
     double tau32 = h_comparison_topjet_xcone_pass_rec_masscut_140->get_tau32();
     double mass = h_comparison_topjet_xcone_pass_rec_masscut_140->get_mass();
+    double ak8pt = h_comparison_topjet_xcone_pass_rec_masscut_140->get_pt();
     event.set(h_ak8tau, tau32);
     event.set(h_ak8mass, mass);
+    event.set(h_ak8pt, ak8pt);
 
     if(isTTbar && scale_ttbar) event.weight *= SF_tt;
 
@@ -1751,29 +1768,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_pdf_weights, pdf_weights);
   /*************************** only store events that survive one of the selections (use looser pt cut) ****************************************************************/
   if(debug) cout << "Event Set" << endl;
-  bool in_migrationmatrix = ( pass_measurement_rec ||
-    pass_measurement_gen ||
-    pass_pt350migration_rec ||
-    pass_pt350migration_gen ||
-    pass_massmigration_rec ||
-    pass_massmigration_gen ||
-    pass_btagmigration_rec ||
-    pass_subptmigration_rec ||
-    pass_subptmigration_gen ||
-    pass_leptonptmigration_rec ||
-    pass_leptonptmigration_gen   );
-    if(debug) cout << "Event Set" << endl;
+  bool in_migrationmatrix = (pass_measurement_rec || pass_measurement_gen || pass_pt350migration_rec || pass_pt350migration_gen || pass_massmigration_rec || pass_massmigration_gen || pass_btagmigration_rec || pass_subptmigration_rec || pass_subptmigration_gen || pass_leptonptmigration_rec || pass_leptonptmigration_gen);
 
-    if(!in_migrationmatrix) return false;
-
-
-
-
-
-
-
-    else return true;
-
+  if(!in_migrationmatrix) return false;
+  else{
+    if(isTTbar && gen_weight>300) h_gen_weight_300_left->fill(event);
+    return true;
   }
 
-  UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPostSelectionModule)
+}
+
+UHH2_REGISTER_ANALYSIS_MODULE(MTopJetPostSelectionModule)

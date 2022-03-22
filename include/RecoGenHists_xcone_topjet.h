@@ -24,6 +24,7 @@ public:
   double get_tau32();
   double get_tau43();
   double get_mass();
+  double get_pt();
 
 
 private:
@@ -86,6 +87,7 @@ protected:
   double tau32 = -1;
   double tau43 = -1;
   double mass = -1;
+  double ak8pt = -1;
 
 
 };
