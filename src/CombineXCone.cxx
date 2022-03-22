@@ -254,7 +254,7 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
   double btag_high = 0;
   Jet ak4_highest_btag;
 
-  if(ak4_matched_xcone_had.size()==0) return {0,1};
+  if(ak4_matched_xcone_had.size()==0) return {0,1,2};
   else{
     for(unsigned int i=0; i<ak4_matched_xcone_had.size(); i++){
       btag_v.push_back(ak4_matched_xcone_had[i].btag_DeepJet());
@@ -277,21 +277,24 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
   double dR_subjet3_ak4 = deltaR(xcone_had_subjets[2], ak4_highest_btag);
 
   if(debug) std::cout << " - Identify Wjet: Compare Distance" << '\n';
-  int index_Wjet1 = -1; int index_Wjet2 = -1;
+  int index_Wjet1 = -1; int index_Wjet2 = -1; int index_bjet = -1;
   if(dR_subjet1_ak4<dR_subjet2_ak4 && dR_subjet1_ak4<dR_subjet3_ak4){ // bjet is 0
     index_Wjet1 = 1;
     index_Wjet2 = 2;
+    index_bjet = 0;
   }
   else if(dR_subjet2_ak4<dR_subjet1_ak4 && dR_subjet2_ak4<dR_subjet3_ak4){ // bjet is 1
     index_Wjet1 = 0;
     index_Wjet2 = 2;
+    index_bjet = 1;
   }
   else{ // bjet is 2
     index_Wjet1 = 0;
     index_Wjet2 = 1;
+    index_bjet = 2;
   }
 
-  vector<int> WSubjetsIndex = {index_Wjet1, index_Wjet2};
+  vector<int> WSubjetsIndex = {index_Wjet1, index_Wjet2, index_bjet};
   return WSubjetsIndex;
 }
 
