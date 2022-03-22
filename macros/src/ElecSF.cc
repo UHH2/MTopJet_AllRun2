@@ -276,8 +276,8 @@ int main(int argc, char* argv[]){
   // void DrawControl(TString path, VecH hists, TH1F* rData, TH1F* rMC, VecI colors, VecTS names)
   DrawControl("eta_all_"+year, {h_eta_data_control[0], h_eta_dy[0], h_eta_di[0], h_eta_wj[0], h_eta_st[0], h_eta_tt[0]}, ratio_eta_all_data, ratio_eta_all_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed+1}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "#eta_{e}");
   DrawControl("eta_pass_"+year, {h_eta_data_control[1], h_eta_dy[1], h_eta_di[1], h_eta_wj[1], h_eta_st[1], h_eta_tt[1]}, ratio_eta_pass_data, ratio_eta_pass_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed+1}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "#eta_{e}");
-  DrawControl("pt_all_"+year, {h_pt_data_control[0], h_pt_dy[0], h_pt_di[0], h_pt_wj[0], h_pt_st[0], h_pt_tt[0]}, ratio_pt_all_data, ratio_pt_all_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "p_{T}");
-  DrawControl("pt_pass_"+year, {h_pt_data_control[1], h_pt_dy[1], h_pt_di[1], h_pt_wj[1], h_pt_st[1], h_pt_tt[1]}, ratio_pt_pass_data, ratio_pt_pass_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "p_{T}");
+  DrawControl("pt_all_"+year, {h_pt_data_control[0], h_pt_dy[0], h_pt_di[0], h_pt_wj[0], h_pt_st[0], h_pt_tt[0]}, ratio_pt_all_data, ratio_pt_all_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed+1}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "p_{T}");
+  DrawControl("pt_pass_"+year, {h_pt_data_control[1], h_pt_dy[1], h_pt_di[1], h_pt_wj[1], h_pt_st[1], h_pt_tt[1]}, ratio_pt_pass_data, ratio_pt_pass_mc, {kBlack, kYellow+1, kMagenta+2, kGreen+2, kBlue+1, kRed+1}, {"Data", "DY", "Diboson", "WJets", "Single Top", "t#bar{t}"}, "p_{T}");
 
   // ===========================================================================
   //                        Efficiency
@@ -999,7 +999,7 @@ void DrawText(TString name){
   TString textBin = "";
   if(name.Contains("lowpt")) textBin = "p_{T} < 120 GeV";
   if(name.Contains("midpt")) textBin = "120 < p_{T} < 200 GeV";
-  if(name.Contains("highpt")) textBin = "200 < p_{T} GeV";
+  if(name.Contains("highpt")) textBin = "200 GeV < p_{T}";
   TLatex latex;
   latex.SetNDC();
   latex.SetTextAngle(0);
