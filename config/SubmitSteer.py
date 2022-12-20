@@ -10,11 +10,24 @@ import glob
 import os
 import shutil
 
+config = os.environ["CMSSW_BASE"]+"/src/UHH2/MTopJet/config/"
 year = '2016'
 internal_option = ""
 command = ["python", "sframe_syst_batch.py", ""]
 program = "sframe_syst_batch.py"
-n_jobs = 8 # can be change via shell
+syst = ["JMS", "JMS_flavor", "JER", "JEC", "COR", "FSR", "ISR"]
+syst_uncert = {
+    'JMS':        { 'para': 'JetMassScale_direction',  'nominal': 'nominal'},
+    'JMS_flavor': { 'para': 'JetMassScale_Flavor',     'nominal': 'nominal'},
+    'JEC':        { 'para': 'jecsmear_direction',      'nominal': 'nominal'},
+    'JER':        { 'para': 'jersmear_direction',      'nominal': 'nominal'},
+    'COR':        { 'para': 'JetCorrection_direction', 'nominal': 'nominal'},
+    'FSR':        { 'para': 'PS_variation',            'nominal': 'none'},
+    'ISR':        { 'para': 'PS_variation',            'nominal': 'none'},
+}
+var = ["up", "down"]
+ps_weights = ["sqrt2", "2", "4"]
+n_jobs = 4 # can be change via shell
 Ndone = 0 # keep track of finished jobs by each worker
 
 # ------------------------------------------------------------------------------
@@ -29,11 +42,17 @@ def main():
 
     global year; global command; global program; global internal_option; global n_jobs
     delete = False
+    create = False
 
     option = sys.argv[1]
     if option == "submit":
         internal_option = "-s"
-        command = ["python", "sframe_syst_batch.py"]
+        command = ["./syst_submit.sh"]
+
+    elif option == "create" or option == "split":
+        internal_option = ""
+        command = [""]
+        create = True
 
     elif option == "resubmit":
         internal_option = "-r"
@@ -48,7 +67,7 @@ def main():
         command = ["./syst_status.sh"]
 
     elif option == "remove" or option == "delete":
-        command = ["./delete_workdir.sh"]
+        command = ["rm", "-r"]
         delete = True
 
     else:
@@ -68,13 +87,18 @@ def main():
 
     xmls.append("MTopJetPostSelection_muon.xml")
     xmls.append("MTopJetPostSelection_elec.xml")
+
+    # xmls.append("MTopJetPostSelection_tt_muon.xml")
+    # xmls.append("MTopJetPostSelection_tt_elec.xml")
+
+    # xmls.append("MTopJetPostSelection_SYS_muon.xml")
+    # xmls.append("MTopJetPostSelection_SYS_elec.xml")
+
     # xmls.append("MTopJetPostSelection_muon_V20.xml")
     # xmls.append("MTopJetPostSelection_elec_V20.xml")
     # xmls.append("MTopJetPostSelection_JMSmuon_elec.xml")
     # xmls.append("MTopJetPostSelection_JMSelec_muon.xml")
 
-    xmls.append("MTopJetPostSelection_SYS_muon.xml")
-    xmls.append("MTopJetPostSelection_SYS_elec.xml")
     # xmls.append("MTopJetPostSelection_SYS_muon_V20.xml")
     # xmls.append("MTopJetPostSelection_SYS_elec_V20.xml")
     # xmls.append("MTopJetPostSelection_JMSelec_SYS_muon.xml")
@@ -96,8 +120,13 @@ def main():
 
     print(job_lists)
 
+    xmls_sys = [s for s in xmls if 'SYS' in s]
+    print xmls_sys
+
     if delete:
         result = pool.map_async(delete_workdirs, job_lists, chunksize=1)
+    if create:
+        create_workdirs(xmls_sys)
     else:
         result = pool.map_async(submit_job, job_lists, chunksize=1)
 
@@ -116,23 +145,72 @@ def submit_job(dirlist):
         logname = logname.replace("MTopJetPostSelection_", "")
         logname = logname.replace(".xml", "")
 
-        cmd = command # to avoid overlapping commands
+        channel = "muon" if "muon" in arg else "elec"
+
+        cmd = command+[year+'_'+channel] # to avoid overlapping commands
         print 'starting',arg,logname
         if not isSYS:
             subprocess.call(['sframe_batch.py', internal_option, year+'/'+arg], stdout=open("./logfiles/log_"+year+"_"+logname+".txt","w"), stderr=subprocess.STDOUT)
         else:
-            if internal_option == "-s":
-                cmd.append(year+'/'+arg)
-            else:
-                Workdir = ""
-                if "MTopJetPostSelection_SYS_muon" in arg: Workdir = year+"MTopJetmuon"
-                elif "MTopJetPostSelection_SYS_elec" in arg: Workdir = year+"MTopJetelec"
-                elif "MTopJetPostSelection_JMSelec_SYS_muon" in arg: Workdir = year+"MTopJetJMSelecmuon"
-                elif "MTopJetPostSelection_JMSmuon_SYS_elec" in arg: Workdir = year+"MTopJetJMSmuonelec"
-                cmd.append(Workdir)
-
-            # print cmd
             subprocess.call(cmd, stdout=open("./logfiles/log_"+year+"_"+logname+".txt","w"), stderr=subprocess.STDOUT)
+
+# ------------------------------------------------------------------------------
+# ---           Submit                                                       ---
+# ------------------------------------------------------------------------------
+#
+def create_workdirs(dirlist):
+    for arg in dirlist:
+        print arg
+        isSYS = True if 'SYS' in arg else False
+        if not isSYS:
+            continue
+
+        logname = arg
+        logname = logname.replace("MTopJetPostSelection_", "")
+        logname = logname.replace(".xml", "")
+
+        cmd = command # to avoid overlapping commands
+        print 'starting',arg,logname
+        for s in syst:
+            isPS = True if 'SR' in s else False
+            if year == '2016' and isPS:
+                continue
+            add = ps_weights if isPS else [""]
+            for v in var:
+                for a in add:
+                    print '\n-ls    ------',s,v,a
+                    sys = s+'_'+v
+                    direction = v # up down
+                    if isPS:
+                        sys = s+v+'_'+a
+                        direction = sys
+                    elif 'JMS' in s and not 'flavor' in s:
+                        sys = s+'_'+v+v
+                        direction = v+v
+                    elif 'JMS' in s and 'flavor' in s:
+                        sys = s+'_'+v
+                    channel = 'muon' if 'muon' in arg else 'elec'
+                    workdir = './SFrameUncerts_'+year+'_'+channel+'/'+sys+'/'
+                    cmd = 'mkdir -p '+workdir
+                    os.system(cmd)
+                    cmd = 'cp '+year+'/MTopJetPostSelection_SYS_'+channel+'.xml '+workdir+'config.xml'
+                    os.system(cmd)
+                    cmd = 'cp JobConfig.dtd '+workdir
+                    os.system(cmd)
+                    cmd = "sed -i '/<PARA>/s/<NOM>/<VAR>/g' "+workdir+"config.xml;"
+                    cmd += "sed -i 's/<SYST>/"+sys+"/g' "+workdir+"config.xml"
+                    cmdtmp = cmd.replace('<PARA>', syst_uncert[s]['para'])
+                    cmdtmp2 = cmdtmp.replace('<NOM>', syst_uncert[s]['nominal'])
+                    cmd = cmdtmp2.replace('<VAR>', direction)
+                    # print cmd
+                    os.system(cmd)
+                    cmd = "grep -n '"+syst_uncert[s]['para']+"' "+workdir+"config.xml"
+                    os.system(cmd)
+                    # for test in syst_uncert:
+                    #     cmd = "grep -n '"+syst_uncert[test]['para']+"' "+workdir+"config.xml"
+                    #     os.system(cmd)
+                    cmd = "grep -n '<!ENTITY OUTdir' "+workdir+"config.xml"
+                    os.system(cmd)
 
 # ------------------------------------------------------------------------------
 # ---           Delete                                                       ---
@@ -153,11 +231,19 @@ def delete_workdirs(dirlist):
 
         elif "MTopJetElecSF" in arg: Workdir = "Workdir_ElecSF_"+year
 
+        channel = 'muon' if '_muon' in arg else 'elec'
+        dirROOT = '/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/'+channel+'/'
+        dirXML = '/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/'
+
         cmd = command
-        command.append(Workdir)
+        cmd.append(dirROOT+Workdir)
+        cmd.append(dirXML+Workdir)
         print cmd
-        # os.system(cmd)
-        subprocess.call(cmd, stdout=open("/test.txt","w"), stderr=subprocess.STDOUT) # Popen runs command in backgorund
+        subprocess.call(cmd, stdout=open("logfiles/delete.txt","w"), stderr=subprocess.STDOUT) # Popen runs command in backgorund
+
+# def DeleteWorkdirs(dirlist):
+#     for (path, dirs, files) in os.walk(config+"SFrameUncerts "):
+
 
 # ------------------------------------------------------------------------------
 # ---           Creat list                                                   ---
