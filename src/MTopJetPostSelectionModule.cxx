@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <memory>
 
 #include <UHH2/core/include/AnalysisModule.h>
@@ -100,7 +101,9 @@ protected:
   std::unique_ptr<uhh2::Selection> matched_fat;
   std::unique_ptr<uhh2::Selection> subjet_quality;
   std::unique_ptr<uhh2::Selection> subjet_quality10;
+  std::unique_ptr<uhh2::Selection> subjet_quality_eta;
   std::unique_ptr<uhh2::Selection> subjet_quality_gen;
+  std::unique_ptr<uhh2::Selection> subjet_quality_eta_gen;
   std::unique_ptr<uhh2::Selection> lepton_sel;
   std::unique_ptr<uhh2::Selection> muon_highpt_sel;
   std::unique_ptr<uhh2::Selection> lepton_sel_gen;
@@ -314,6 +317,7 @@ protected:
 
   std::unique_ptr<Hists> h_XCone_GEN_Sel_measurement, h_XCone_GEN_Sel_noMass, h_XCone_GEN_Sel_pt350, h_XCone_GEN_Sel_ptsub;
   std::unique_ptr<Hists> h_PDFHists;
+  std::unique_ptr<Hists> h_BTagHists;
 
   std::unique_ptr<RecoGenHists_xcone_topjet> h_comparison_topjet_xcone_pass_gen, h_comparison_topjet_xcone_pass_rec, h_comparison_topjet_xcone_pass_rec_SF, h_comparison_topjet_xcone_pass_genrec, h_comparison_topjet_xcone;
   std::unique_ptr<RecoGenHists_xcone_topjet> h_comparison_topjet_xcone_pass_rec_masscut_120, h_comparison_topjet_xcone_pass_rec_masscut_130, h_comparison_topjet_xcone_pass_rec_masscut_140, h_comparison_topjet_xcone_pass_rec_masscut_150;
@@ -321,6 +325,8 @@ protected:
   std::unique_ptr<Hists> h_gen_weights, h_gen_weights_pass_gen, h_gen_weights_massbin_145, h_gen_weights_massbin_275;
   std::unique_ptr<Hists> h_gen_weight_300, h_gen_weight_300_left, h_gen_weight_gensel_300;
   std::unique_ptr<Hists> h_leptonictop, h_leptonictop_SF;
+  std::unique_ptr<Hists> h_eff_all, h_eff_masscut, h_eff_subjet, h_eff_lep_pt;
+  std::unique_ptr<Hists> h_eff_all_gen, h_eff_masscut_gen, h_eff_subjet_gen, h_eff_lep_pt_gen;
 
   std::unique_ptr<Hists> h_wrong_events_mtop_17;
 
@@ -439,10 +445,25 @@ void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
 }
 
 void MTopJetPostSelectionModule::init_MC_hists(uhh2::Context& ctx){
+
+  h_eff_all_gen.reset(new CountingEventHists(ctx, "efficiency_all_gen"));
+  h_eff_masscut_gen.reset(new CountingEventHists(ctx, "efficiency_masscut_gen"));
+  h_eff_subjet_gen.reset(new CountingEventHists(ctx, "efficiency_subjet_gen"));
+  h_eff_lep_pt_gen.reset(new CountingEventHists(ctx, "efficiency_lep_pt_gen"));
+
   h_CorrectionHists.reset(new CorrectionHists_subjets(ctx, "CorrectionHists", "jec"));
   h_CorrectionHists_after.reset(new CorrectionHists_subjets(ctx, "CorrectionHists_after", "cor"));
   h_CorrectionHists_WJets.reset(new CorrectionHists_subjets(ctx, "CorrectionHists_WJets", "jec"));
 
+  // Control Hists for FSRx_4
+  h_gen_weights.reset(new GenWeightRangeHists(ctx, "Gen_Weights"));
+  h_gen_weights_massbin_145.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_145"));
+  h_gen_weights_pass_gen.reset(new GenWeightRangeHists(ctx, "Gen_Weights_pass_gen"));
+  h_gen_weights_massbin_275.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_275"));
+
+  h_gen_weight_300.reset(new CountingEventHists(ctx, "Gen_Weight_300"));
+  h_gen_weight_300_left.reset(new CountingEventHists(ctx, "Gen_Weight_300_left"));
+  h_gen_weight_gensel_300.reset(new CountingEventHists(ctx, "Gen_Weight_gensel_300"));
 
   h_XCone_GEN_Sel_measurement.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_measurement"));
   h_XCone_GEN_Sel_noMass.reset(new GenHists_xcone(ctx, "XCone_GEN_Sel_noMass"));
@@ -517,6 +538,7 @@ void MTopJetPostSelectionModule::init_MC_hists(uhh2::Context& ctx){
 void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
   //BTagMCEfficiencyHists
   BTagEffHists.reset(new BTagMCEfficiencyHists(ctx,"EffiHists/BTag",DeepjetTight));
+
   //LeptonicTop_Hists
   h_leptonictop.reset(new LeptonicTop_Hists(ctx, "LeptonicTop"));
   h_leptonictop_SF.reset(new LeptonicTop_Hists(ctx, "LeptonicTop_SF"));
@@ -596,15 +618,10 @@ void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
   h_comparison_topjet_xcone_pass_rec_masscut_140.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_140", isTTbar, 140));
   h_comparison_topjet_xcone_pass_rec_masscut_150.reset(new RecoGenHists_xcone_topjet(ctx, "comparison_topjet_xcone_pass_rec_masscut_150", isTTbar, 150));
 
-  // Control Hists for FSRx_4
-  h_gen_weights.reset(new GenWeightRangeHists(ctx, "Gen_Weights"));
-  h_gen_weights_massbin_145.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_145"));
-  h_gen_weights_pass_gen.reset(new GenWeightRangeHists(ctx, "Gen_Weights_pass_gen"));
-  h_gen_weights_massbin_275.reset(new GenWeightRangeHists(ctx, "Gen_Weights_Massbin_275"));
-
-  h_gen_weight_300.reset(new CountingEventHists(ctx, "Gen_Weight_300"));
-  h_gen_weight_300_left.reset(new CountingEventHists(ctx, "Gen_Weight_300_left"));
-  h_gen_weight_gensel_300.reset(new CountingEventHists(ctx, "Gen_Weight_gensel_300"));
+  h_eff_all.reset(new CountingEventHists(ctx, "efficiency_all"));
+  h_eff_masscut.reset(new CountingEventHists(ctx, "efficiency_masscut"));
+  h_eff_subjet.reset(new CountingEventHists(ctx, "efficiency_subjet"));
+  h_eff_lep_pt.reset(new CountingEventHists(ctx, "efficiency_lep_pt"));
 
   h_MTopJet.reset(new MTopJetHists(ctx, "EventHists"));
   h_Muon.reset(new MuonHists(ctx, "MuonHists"));
@@ -657,6 +674,9 @@ void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
 
   // PDF hists
   h_PDFHists.reset(new PDFHists(ctx, "PDFHists"));
+
+  // BTag hists
+  h_BTagHists.reset(new PositionBTagHists(ctx, "PositionBTagHists"));
 }
 
 
@@ -807,6 +827,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   subjet_quality.reset(new SubjetQuality(ctx, jet_label_had, 30, 2.5));
   subjet_quality10.reset(new SubjetQuality(ctx, jet_label_had, 10, 2.5));
+  subjet_quality_eta.reset(new SubjetQuality(ctx, jet_label_had, 0, 2.5));
   pt_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 400));
   pt450_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 450));
   pt530_sel.reset(new LeadingRecoJetPT(ctx, jet_label_had, 530));
@@ -834,6 +855,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     lepton_Nsel_gen.reset(new GenElecCount(ctx));
   }
   subjet_quality_gen.reset(new SubjetQuality_gen(ctx, "GEN_XCone33_had_Combined", 30, 2.5));
+  subjet_quality_eta_gen.reset(new SubjetQuality_gen(ctx, "GEN_XCone33_had_Combined", 0, 2.5));
   pt_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 400));
   pt2_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_lep_Combined", 10));
   pt350_gensel.reset(new LeadingJetPT_gen(ctx, "GEN_XCone33_had_Combined", 350));
@@ -1038,17 +1060,24 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isMC){
     // calculated with combined channels
     if(jms_channel == "combine"){
-      // nom (  0.851987,  -0.287289) { 0.74799, -0.0535399};
-      // uu  (  0.985587,  -0.235289) { 0.88079, -0.0103399};
-      // dd  (  0.718387,  -0.339289) { 0.61359, -0.0931399};
-      // du  (  0.577587,   0.502711) { 0.52799,    0.61786};
-      // ud  (  1.126387,  -1.077289) { 0.94959,   -0.70514};
-      if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
-      else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
-      else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
-      else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
-      else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
-      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+
+      // ========== ONLY LIN + SYS + Fit from nom tt ====== chi2min = 338.96
+      if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
+      else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
+      else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
+
+      // ========== ONLY LIN + SYS =======================
+      // if     (jms_direction == "nominal")  points = { 0.833438,  -0.187411}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 0.984438,  -0.138411}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.683438,  -0.238411}; // clostest point, left
+
+      // ========== ONLY LIN =============================
+      // if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
+      // else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
+      // else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
+
     }
     // calculated with muon channel; ud & du are not intresting in these channels
     else if(jms_channel == "muon"){ // UNCORRELATED
@@ -1434,6 +1463,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // ===========================================================================
 
   bool pass_measurement_rec;
+  bool pass_ignore_mass;
+  bool pass_ignore_subjet;
+  bool pass_ignore_lep_pt;
   bool pass_pt350migration_rec;
   bool pass_ptmigration_rec;
   bool pass_massmigration_rec;
@@ -1466,8 +1498,20 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && !lepton_sel->passes(event)) pass_leptonptmigration_rec = true;
   else pass_leptonptmigration_rec = false;
+
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_ignore_mass = true;
+  else pass_ignore_mass = false;
+
+  if(passed_recsel && pt_sel->passes(event) && pt2_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality_eta->passes(event) && lepton_sel->passes(event)) pass_ignore_subjet = true;
+  else pass_ignore_subjet = false;
+
+  if(passed_recsel && pt_sel->passes(event) && eta_sel->passes(event) && mass_sel->passes(event) && passed_btag && subjet_quality->passes(event) && lepton_sel->passes(event)) pass_ignore_lep_pt = true;
+  else pass_ignore_lep_pt = false;
   /*************************** Selection again on generator level (data events will not pass gen sel but will be stored if they pass rec sel)  *****/
   bool pass_measurement_gen;
+  bool pass_ignore_mass_gen;
+  bool pass_ignore_subjet_gen;
+  bool pass_ignore_lep_pt_gen;
   bool pass_pt350migration_gen;
   bool pass_massmigration_gen;
   bool pass_subptmigration_gen;
@@ -1489,6 +1533,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
     if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && !lepton_sel_gen->passes(event)) pass_leptonptmigration_gen = true;
     else pass_leptonptmigration_gen = false;
+
+    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event)) pass_ignore_mass_gen = true;
+    else pass_ignore_mass_gen = false;
+
+    if(passed_gensel33 && pt_gensel->passes(event) && pt2_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_eta_gen->passes(event) && lepton_sel_gen->passes(event)) pass_ignore_subjet_gen = true;
+    else pass_ignore_subjet_gen = false;
+
+    if(passed_gensel33 && pt_gensel->passes(event) && mass_gensel->passes(event) && subjet_quality_gen->passes(event) && lepton_sel_gen->passes(event)) pass_ignore_lep_pt_gen = true;
+    else pass_ignore_lep_pt_gen = false;
   }
   else if(!isTTbar){
     pass_measurement_gen = false;
@@ -1496,6 +1549,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     pass_massmigration_gen = false;
     pass_subptmigration_gen = false;
     pass_leptonptmigration_gen = false;
+    pass_ignore_mass_gen = false;
+    pass_ignore_subjet_gen = false;
+    pass_ignore_lep_pt_gen = false;
   }
 
   /*************************************************************************************************************************************************/
@@ -1517,6 +1573,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   // hists to see events that are generated in measurement phase-space, but reconstructed outside
   if(debug) cout << "\t ... pass_measurement_gen" << endl;
   if(pass_measurement_gen){
+    h_eff_all_gen->fill(event);
     if(pass_pt350migration_rec) h_XCone_cor_migration_pt350->fill(event);
     if(pass_ptmigration_rec)    h_XCone_cor_migration_pt->fill(event);
     if(pass_massmigration_rec)  h_XCone_cor_migration_mass->fill(event);
@@ -1524,11 +1581,14 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
   // see all events reconstructed outside measurement phase-space
   if(debug) cout << "\t ... Single passes" << endl;
-  if(pass_ptmigration_rec) h_XCone_cor_noptcut->fill(event);
+  if(pass_ptmigration_rec)    h_XCone_cor_noptcut->fill(event);
   if(pass_pt350migration_rec) h_XCone_cor_pt350->fill(event);
   if(pass_btagmigration_rec)  h_XCone_cor_Sel_nobtag->fill(event);
   if(pass_pt350migration_rec) h_XCone_cor_Sel_pt350->fill(event);
   if(pass_massmigration_rec)  h_XCone_cor_Sel_noMass->fill(event);
+  if(pass_ignore_subjet)      h_eff_subjet->fill(event);
+  if(pass_ignore_mass)        h_eff_masscut->fill(event);
+  if(pass_ignore_lep_pt)      h_eff_lep_pt->fill(event);
   if(pass_subptmigration_rec){
     h_XCone_cor_Sel_ptsub->fill(event);
     h_XCone_cor_subjets_Sel_ptsub->fill(event);
@@ -1538,6 +1598,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(pass_pt350migration_gen) h_XCone_GEN_Sel_pt350->fill(event);
   if(pass_massmigration_gen)  h_XCone_GEN_Sel_noMass->fill(event);
   if(pass_subptmigration_gen) h_XCone_GEN_Sel_ptsub->fill(event);
+  if(pass_ignore_subjet_gen)  h_eff_subjet_gen->fill(event);
+  if(pass_ignore_mass_gen)    h_eff_masscut_gen->fill(event);
+  if(pass_ignore_lep_pt_gen)  h_eff_lep_pt_gen->fill(event);
   if(pass_WJets_sel && isTTbar){
     h_CorrectionHists_WJets->fill(event);
     h_RecGenHists_subjets_WJets->fill(event);
@@ -1592,11 +1655,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_ak8mass, -1.); // set default value
   event.set(h_ak8pt, -1.); // set default value
 
-  if(debug) cout << "\t ... pass_measurement_rec" << endl;
   if(pass_measurement_rec){
-    if(debug) cout << "\t ... PDF" << endl;
     h_PDFHists->fill(event);
-    if(debug) cout << "\t\t ... xcone" << endl;
+    h_BTagHists->fill(event);
+    h_eff_all->fill(event);
 
     /**+ b-tagging *** Object Review ********/
     // BTagReshape->process(event);
@@ -1738,6 +1800,19 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     double weight_after = event.weight;
     ttfactor = weight_after / weight_before;
   }
+
+  bool BtoB = TMath::Abs(TVector2::Phi_mpi_pi((hadjet.phi() - lepjets[0].phi()))) > 2.7;
+  TLorentzVector hadjet_v4 = lorentz_to_tlorentz(hadjet.v4());
+  bool inMass = 150 < hadjet_v4.M() && hadjet_v4.M() < 190;
+  // if ( !BtoB ) { std::cout << "Jets are not back to back" << std::endl; return kTRUE;}
+  ofstream f;
+  f.open("forISpy.txt", std::ios_base::app);
+  // if(f.is_open()) f << setw(9) << "  pt  " << setw(9) << "  mass  " << setw(14) << "  event  " << setw(8) << "  run  " << setw(7) << " lumi " << endl;
+  if(pass_measurement_rec && hadjet.pt()>500 && BtoB && inMass){
+    if(f.is_open()) f << setw(9) << hadjet.pt() << setw(9) << hadjet_v4.M() << setw(14) << event.event << setw(8) << event.run << setw(7) << event.luminosityBlock << "\n";
+    cout << setw(9) << hadjet.pt() << setw(9) << hadjet_v4.M() << setw(14) << event.event << setw(8) << event.run << setw(7) << event.luminosityBlock << endl;
+  }
+  f.close();
 
   /*************************** write bools for passing selections **********************************************************************************/
   if(debug) cout << "Event Set" << endl;

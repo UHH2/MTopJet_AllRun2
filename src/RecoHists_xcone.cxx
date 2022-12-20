@@ -4,6 +4,8 @@
 RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirname, const std::string & type): Hists(ctx, dirname){
   // book all histograms here
 
+  nevents = book<TH1F>("n_events", "", 1, 0, 1);
+
   HadJetMass       = book<TH1F>("M_jet1", "m_{jet} [GeV]", 50, 0, 500);
   HadJetMass_B     = book<TH1F>("M_jet1_B", "m_{jet} [GeV]", 100, 0, 500);
   HadJetMass_rebin = book<TH1F>("M_jet1_", "m_{jet} [GeV]", 25, 0, 500);
@@ -40,7 +42,6 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
   RhoA      = book<TH1F>("RhoA", "#rho A_{final}", 50, 0, 100);
   RhoA_diff = book<TH1F>("RhoA_diff", "#rho (A_{fat} - A_{final})", 50, -50, 50);
   E_diff    = book<TH1F>("E_diff", "E_{fat} - E_{final}", 50, -50, 50);
-
 
   FatJetPT_had = book<TH1F>("FatJetPT_had", "p_{T, fat had jet}", 50, 0, 1000);
   FatJetPT_lep = book<TH1F>("FatJetPT_lep", "p_{T, fat lep jet}", 50, 0, 1000);
@@ -86,7 +87,6 @@ RecoHists_xcone::RecoHists_xcone(uhh2::Context & ctx, const std::string & dirnam
 
 
 void RecoHists_xcone::fill(const Event & event){
-
   //---------------------------------------------------------------------------------------
   //--------------------------------- get jets and lepton ---------------------------------
   //---------------------------------------------------------------------------------------
@@ -113,6 +113,7 @@ void RecoHists_xcone::fill(const Event & event){
     index_had = 1;
     index_lep = 0;
   }
+
   //---------------------------------------------------------------------------------------
   //-------- set Lorentz Vectors of Combined Jets ---------- ------------------------------
   //---------------------------------------------------------------------------------------
@@ -150,6 +151,8 @@ void RecoHists_xcone::fill(const Event & event){
 
   // get weight
   double weight = event.weight;
+
+  nevents->Fill(0.5, weight);
 
   number_hadjet->Fill(hadjets.size(), weight); // just for checks
   number_lepjet->Fill(lepjets.size(), weight); // just for checks
