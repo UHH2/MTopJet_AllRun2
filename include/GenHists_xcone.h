@@ -34,6 +34,7 @@ protected:
     TH1F *DeltaR_jet2_23_33, *DeltaMass_jet2_23_33, *DeltaPT_jet2_23_33;
 
     TH1F *SoftDropMass;
+    TH1F *nevents;
 
     TH1F *min_mass_Wjet, *min_mass_Wjet_zoom, *min_mass_Wjet_ptlow, *min_mass_Wjet_pthigh, *min_mass_Wjet_ptmix, *all_mass_Wjet;
     TH1F *pt_Wjet, *pt_Wjet_i, *pt_Wjet_j, *pt_Wjet_diff;

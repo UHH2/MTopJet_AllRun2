@@ -113,3 +113,21 @@ private:
 
   TH1F *MPT;
 };
+
+// -----------------------------------------------------------------------------
+class PositionBTagHists: public uhh2::Hists {
+public:
+  // use the same constructor arguments as Hists for forwarding:
+  PositionBTagHists(uhh2::Context & ctx, const std::string & dirname);
+
+  virtual void fill(const uhh2::Event & ev) override;
+
+private:
+
+  TH1F *Position1stBtag, *Position2ndBtag;
+  TH1F *PositionBoth;
+
+  uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_lepjets;
+  uhh2::Event::Handle<std::vector<TopJet>>h_fatjets;
+};

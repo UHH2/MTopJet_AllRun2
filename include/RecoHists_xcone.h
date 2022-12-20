@@ -39,6 +39,7 @@ protected:
   TH1F *h_csv, *h_deepjet, *csvmax, *deepjetmax;
   TH1F *number_smalldR_all,*number_smalldR_pass,*number_largedR_all,*number_largedR_pass;
   TH1F *mass_W, *mass_subjet, *pt_subjet, *number_btag_tight_subjet;
+  TH1F *nevents;
 
   uhh2::Event::Handle<std::vector<TopJet>>h_hadjets;
   uhh2::Event::Handle<std::vector<TopJet>>h_lepjets;
