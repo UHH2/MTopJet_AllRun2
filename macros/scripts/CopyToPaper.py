@@ -26,13 +26,15 @@ hists = {
 
 # ------------------------------------------------------------------------------
 # Convert To PDF
-def MoveToPaper(): # 1: year - 2: channel - 3: histclass - 4: histname
+def MoveToPaper(isPaper, isPre): # 1: year - 2: channel - 3: histclass - 4: histname
 
-    path_in  = '/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/PaperPlots/'
-    path_out = '/afs/desy.de/user/p/paaschal/WorkingArea/CMSNotes/Papers/TOP-21-012/figs/'
+    folder = "Papers" if isPaper else "PAS"
+    prelim = "preliminary/" if isPre and isPaper else ""
+    path_in  = '/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/PaperPlots/'+prelim
+    path_out = '/afs/desy.de/user/p/paaschal/WorkingArea/CMSNotes/'+folder+'/TOP-21-012/figs/'+prelim
     # Save space for print
     tmp_nfs  = '/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots'
-    tmp_afs  = '/afs/desy.de/user/p/paaschal/WorkingArea/CMSNotes/Papers'
+    tmp_afs  = '/afs/desy.de/user/p/paaschal/WorkingArea/CMSNotes/'+folder
 
     print "Start moving ... "
     cmd  = 'cp'+' '
@@ -54,4 +56,9 @@ def MoveToPaper(): # 1: year - 2: channel - 3: histclass - 4: histname
 #
 
 if __name__ == "__main__":
-    MoveToPaper()
+    print("Copy to Paper")
+    MoveToPaper(1, 0) # Paper
+    # print("Copy preliminary to Paper")
+    # MoveToPaper(1, 1) # Paper Prelim
+    # print("Copy to PAS")
+    # MoveToPaper(0, 0) # PAS
