@@ -1,8 +1,0 @@
-starting manager
-Using saved settings from: Workdir_PostSelEl_2018/SubmissinInfoSave.p
-Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
-Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
-Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
-Found Submission Info for TTbar_Mtt0700to1000_2018
-Found Submission Info for TTbar_Mtt1000toInft_2018
- Result.xml created for further jobs

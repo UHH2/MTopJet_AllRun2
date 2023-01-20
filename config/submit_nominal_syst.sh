@@ -1,2 +1,0 @@
-python sframe_syst_batch.py $1/Alex_MTopJetPostSelection_SYS_muon.xml
-python sframe_syst_batch.py $1/Alex_MTopJetPostSelection_SYS_elec.xml
