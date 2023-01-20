@@ -1,0 +1,177 @@
+Workdir_PostSelMu_2016_V20 has been created
+starting manager
+DATA_SingleMuonB_2016v3: 178457 events
+DATA_SingleMuonC_2016v3: 85435 events
+DATA_SingleMuonD_2016v3: 140394 events
+DATA_SingleMuonE_2016v3: 141471 events
+DATA_SingleMuonF_2016v3: 111317 events
+DATA_SingleMuonG_2016v3: 281251 events
+DATA_SingleMuonH_2016v3: 335022 events
+ST_t-channel_antitop_2016v3: 73758 events
+ST_t-channel_top_2016v3: 144444 events
+ST_s-channel_2016v3: 66240 events
+ST_tW_antitop_2016v3: 198114 events
+ST_tW_top_2016v3: 198267 events
+Diboson_WW_2016v3: 24524 events
+Diboson_WZ_2016v3: 9309 events
+Diboson_ZZ_2016v3: 1905 events
+TTbar_Mtt0000to0700_2016v3: 796389 events
+TTbar_Mtt0700to1000_2016v3: 1976411 events
+TTbar_Mtt1000toInft_2016v3: 2241523 events
+WJetsToLNu_HT-0100to0200_2016v3: 72530 events
+WJetsToLNu_HT-0200to0400_2016v3: 486445 events
+WJetsToLNu_HT-0400to0600_2016v3: 515472 events
+WJetsToLNu_HT-0600to0800_2016v3: 1527840 events
+WJetsToLNu_HT-0800to1200_2016v3: 721454 events
+WJetsToLNu_HT-1200to2500_2016v3: 729708 events
+WJetsToLNu_HT-2500toInft_2016v3: 330104 events
+DYJetsToLL_LO_M50_HT0070to0100_2016v3: 1817 events
+DYJetsToLL_LO_M50_HT0100to0200_2016v3: 22844 events
+DYJetsToLL_LO_M50_HT0200to0400_2016v3: 183512 events
+DYJetsToLL_LO_M50_HT0400to0600_2016v3: 484991 events
+DYJetsToLL_LO_M50_HT0600to0800_2016v3: 368511 events
+DYJetsToLL_LO_M50_HT0800to1200_2016v3: 196809 events
+DYJetsToLL_LO_M50_HT1200to2500_2016v3: 53942 events
+DYJetsToLL_LO_M50_HT2500toInft_2016v3: 45296 events
+QCD_Pt-0050to0080_MuEnrichedPt5_2016v3: 3 events
+QCD_Pt-0080to0120_MuEnrichedPt5_2016v3: 55 events
+QCD_Pt-0120to0170_MuEnrichedPt5_2016v3: 377 events
+QCD_Pt-0170to0300_MuEnrichedPt5_2016v3: 1320 events
+QCD_Pt-0300to0470_MuEnrichedPt5_2016v3: 3587 events
+QCD_Pt-0470to0600_MuEnrichedPt5_2016v3: 2057 events
+QCD_Pt-0600to0800_MuEnrichedPt5_2016v3: 3607 events
+QCD_Pt-0800to1000_MuEnrichedPt5_2016v3: 3013 events
+QCD_Pt-1000toInft_MuEnrichedPt5_2016v3: 2541 events
+ Result.xml created for further jobs
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonB_2016v3 has been created
+Submitted jobs DATA_SingleMuonB_2016v3 pid 23976685
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonC_2016v3 has been created
+Submitted jobs DATA_SingleMuonC_2016v3 pid 23976689
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonD_2016v3 has been created
+Submitted jobs DATA_SingleMuonD_2016v3 pid 23976693
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonE_2016v3 has been created
+Submitted jobs DATA_SingleMuonE_2016v3 pid 23976697
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonF_2016v3 has been created
+Submitted jobs DATA_SingleMuonF_2016v3 pid 23976701
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonG_2016v3 has been created
+Submitted jobs DATA_SingleMuonG_2016v3 pid 23976705
+Workdir_PostSelMu_2016_V20/Stream_DATA_SingleMuonH_2016v3 has been created
+Submitted jobs DATA_SingleMuonH_2016v3 pid 23976709
+Workdir_PostSelMu_2016_V20/Stream_ST_t-channel_antitop_2016v3 has been created
+Submitted jobs ST_t-channel_antitop_2016v3 pid 23976713
+Workdir_PostSelMu_2016_V20/Stream_ST_t-channel_top_2016v3 has been created
+Submitted jobs ST_t-channel_top_2016v3 pid 23976717
+Workdir_PostSelMu_2016_V20/Stream_ST_s-channel_2016v3 has been created
+Submitted jobs ST_s-channel_2016v3 pid 23976721
+Workdir_PostSelMu_2016_V20/Stream_ST_tW_antitop_2016v3 has been created
+Submitted jobs ST_tW_antitop_2016v3 pid 23976725
+Workdir_PostSelMu_2016_V20/Stream_ST_tW_top_2016v3 has been created
+Submitted jobs ST_tW_top_2016v3 pid 23976728
+Workdir_PostSelMu_2016_V20/Stream_Diboson_WW_2016v3 has been created
+Submitted jobs Diboson_WW_2016v3 pid 23976733
+Workdir_PostSelMu_2016_V20/Stream_Diboson_WZ_2016v3 has been created
+Submitted jobs Diboson_WZ_2016v3 pid 23976736
+Workdir_PostSelMu_2016_V20/Stream_Diboson_ZZ_2016v3 has been created
+Submitted jobs Diboson_ZZ_2016v3 pid 23976739
+Workdir_PostSelMu_2016_V20/Stream_TTbar_Mtt0000to0700_2016v3 has been created
+Submitted jobs TTbar_Mtt0000to0700_2016v3 pid 23976742
+Workdir_PostSelMu_2016_V20/Stream_TTbar_Mtt0700to1000_2016v3 has been created
+Submitted jobs TTbar_Mtt0700to1000_2016v3 pid 23976744
+Workdir_PostSelMu_2016_V20/Stream_TTbar_Mtt1000toInft_2016v3 has been created
+Submitted jobs TTbar_Mtt1000toInft_2016v3 pid 23976747
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-0100to0200_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-0100to0200_2016v3 pid 23976751
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-0200to0400_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-0200to0400_2016v3 pid 23976755
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-0400to0600_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-0400to0600_2016v3 pid 23976759
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-0600to0800_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-0600to0800_2016v3 pid 23976763
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-0800to1200_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-0800to1200_2016v3 pid 23976767
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-1200to2500_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-1200to2500_2016v3 pid 23976772
+Workdir_PostSelMu_2016_V20/Stream_WJetsToLNu_HT-2500toInft_2016v3 has been created
+Submitted jobs WJetsToLNu_HT-2500toInft_2016v3 pid 23976776
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT0070to0100_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT0070to0100_2016v3 pid 23976781
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT0100to0200_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT0100to0200_2016v3 pid 23976785
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT0200to0400_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT0200to0400_2016v3 pid 23976789
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT0400to0600_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT0400to0600_2016v3 pid 23976793
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT0600to0800_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT0600to0800_2016v3 pid 23976797
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT0800to1200_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT0800to1200_2016v3 pid 23976801
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT1200to2500_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT1200to2500_2016v3 pid 23976805
+Workdir_PostSelMu_2016_V20/Stream_DYJetsToLL_LO_M50_HT2500toInft_2016v3 has been created
+Submitted jobs DYJetsToLL_LO_M50_HT2500toInft_2016v3 pid 23976809
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0050to0080_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0050to0080_MuEnrichedPt5_2016v3 pid 23976814
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0080to0120_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0080to0120_MuEnrichedPt5_2016v3 pid 23976817
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0120to0170_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0120to0170_MuEnrichedPt5_2016v3 pid 23976821
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0170to0300_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0170to0300_MuEnrichedPt5_2016v3 pid 23976824
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0300to0470_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0300to0470_MuEnrichedPt5_2016v3 pid 23976827
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0470to0600_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0470to0600_MuEnrichedPt5_2016v3 pid 23976831
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0600to0800_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0600to0800_MuEnrichedPt5_2016v3 pid 23976835
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-0800to1000_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-0800to1000_MuEnrichedPt5_2016v3 pid 23976839
+Workdir_PostSelMu_2016_V20/Stream_QCD_Pt-1000toInft_MuEnrichedPt5_2016v3 has been created
+Submitted jobs QCD_Pt-1000toInft_MuEnrichedPt5_2016v3 pid 23976843
+--------------------------------------------------------------------------------
+Status of files
+                           Sample Name:  Ready #Files [%]
+               DATA_SingleMuonB_2016v3:      0      4 000 [94m Working [0m
+               DATA_SingleMuonC_2016v3:      0      2 000 [94m Working [0m
+               DATA_SingleMuonD_2016v3:      0      3 000 [94m Working [0m
+               DATA_SingleMuonE_2016v3:      0      3 000 [94m Working [0m
+               DATA_SingleMuonF_2016v3:      0      3 000 [94m Working [0m
+               DATA_SingleMuonG_2016v3:      0      6 000 [94m Working [0m
+               DATA_SingleMuonH_2016v3:      0      7 000 [94m Working [0m
+           ST_t-channel_antitop_2016v3:      0      2 000 [94m Working [0m
+               ST_t-channel_top_2016v3:      0      3 000 [94m Working [0m
+                   ST_s-channel_2016v3:      0      2 000 [94m Working [0m
+                  ST_tW_antitop_2016v3:      0      4 000 [94m Working [0m
+                      ST_tW_top_2016v3:      0      4 000 [94m Working [0m
+                     Diboson_WW_2016v3:      0      1 000 [94m Working [0m
+                     Diboson_WZ_2016v3:      0      1 000 [94m Working [0m
+                     Diboson_ZZ_2016v3:      0      1 000 [94m Working [0m
+            TTbar_Mtt0000to0700_2016v3:      0     16 000 [94m Working [0m
+            TTbar_Mtt0700to1000_2016v3:      0     40 000 [94m Working [0m
+            TTbar_Mtt1000toInft_2016v3:      0     45 000 [94m Working [0m
+       WJetsToLNu_HT-0100to0200_2016v3:      0      2 000 [94m Working [0m
+       WJetsToLNu_HT-0200to0400_2016v3:      0     10 000 [94m Working [0m
+       WJetsToLNu_HT-0400to0600_2016v3:      0     11 000 [94m Working [0m
+       WJetsToLNu_HT-0600to0800_2016v3:      0     31 000 [94m Working [0m
+       WJetsToLNu_HT-0800to1200_2016v3:      0     15 000 [94m Working [0m
+       WJetsToLNu_HT-1200to2500_2016v3:      0     15 000 [94m Working [0m
+       WJetsToLNu_HT-2500toInft_2016v3:      0      7 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT0070to0100_2016v3:      0      1 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT0100to0200_2016v3:      0      1 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT0200to0400_2016v3:      0      4 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT0400to0600_2016v3:      0     10 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT0600to0800_2016v3:      0      8 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT0800to1200_2016v3:      0      4 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT1200to2500_2016v3:      0      2 000 [94m Working [0m
+ DYJetsToLL_LO_M50_HT2500toInft_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0050to0080_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0080to0120_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0120to0170_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0170to0300_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0300to0470_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0470to0600_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0600to0800_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-0800to1000_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+QCD_Pt-1000toInft_MuEnrichedPt5_2016v3:      0      1 000 [94m Working [0m
+Number of files:  0 / 278 (100) / /
+================================================================================
+SFrame Batch was running for 34.03 sec

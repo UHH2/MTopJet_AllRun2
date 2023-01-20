@@ -1,0 +1,13 @@
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016MTopJetmuon/*/./conf.txt
+./syst_resubmit.sh: line 7: cd: /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016MTopJetmuon/*/./: No such file or directory
+warning: failed to load external entity "conf.xml"
+Traceback (most recent call last):
+  File "/nfs/dust/cms/user/paaschal/SFrameBatch/sframe_batch.py", line 263, in <module>
+    status = SFrameBatchMain(sys.argv[1:])
+  File "/nfs/dust/cms/user/paaschal/SFrameBatch/sframe_batch.py", line 158, in SFrameBatchMain
+    xmlparsed = parse(xmlfile_strio,sax_parser)
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc700/external/python/2.7.14-omkpbe4/lib/python2.7/xml/dom/minidom.py", line 1922, in parse
+    {'parser': parser, 'bufsize': bufsize})
+  File "/cvmfs/cms.cern.ch/slc7_amd64_gcc700/external/python/2.7.14-omkpbe4/lib/python2.7/xml/dom/minidom.py", line 1909, in _do_pulldom_parse
+    toktype, rootNode = events.getEvent()
+TypeError: 'NoneType' object is not iterable

@@ -27,7 +27,7 @@
 ]>
 
 <!--
-<ConfigParse NEventsBreak="500000" LastBreak="0" FileSplit="0"/>
+<ConfigParse NEventsBreak="300000" LastBreak="0" FileSplit="0"/>
 <ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="workdir"/>
 -->
 

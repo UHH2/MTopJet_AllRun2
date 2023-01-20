@@ -7,7 +7,7 @@ using namespace std;
 
 class chi2value{
 public:
-  chi2value(TH1F* data, TH2F* cov_matrix, TH1F* hypothesis, double lower, double upper, bool width);
+  chi2value(TH1F* data, TH2F* cov_matrix, TH1F* hypothesis, double lower, double upper, bool width, bool random);
 
   void CalculateChi2();
 
@@ -31,6 +31,7 @@ private:
   TH1F* data_;
   int lower_, upper_;
   bool width_;
+  bool random_;
   TH2F* cov_;
   std::vector<int>  bins_;
   double chi2_;
@@ -38,8 +39,9 @@ private:
 
 };
 
-chi2value::chi2value(TH1F* data, TH2F* cov_matrix, TH1F* hypothesis, double lower, double upper, bool width){
+chi2value::chi2value(TH1F* data, TH2F* cov_matrix, TH1F* hypothesis, double lower, double upper, bool width, bool random){
   width_ = width;
+  random_ = random;
   SetData(data);
   SetCovMatrix(cov_matrix);
   SetHypothesis(hypothesis);
@@ -54,19 +56,20 @@ void chi2value::SetHypothesis(TH1F* hypothesis){
 }
 
 void chi2value::SetData(TH1F* data){
-  data_ = (TH1F*)data->Clone("data_");
+  data_ = (TH1F*)data->Clone();
   return;
 }
 
 void chi2value::SetCovMatrix(TH2F* cov_matrix){
-  cov_ = (TH2F*)cov_matrix->Clone("cov_");
+  cov_ = (TH2F*)cov_matrix->Clone();
   return;
 }
 
 
 void chi2value::SetRange(double lower, double upper){
   lower_ = data_->GetXaxis()->FindBin(lower);
-  upper_ = data_->GetXaxis()->FindBin(upper-1);
+  // upper_ = data_->GetXaxis()->FindBin(upper-1);
+  upper_ = data_->GetXaxis()->FindBin(upper);
   cout << "lower bin = " << lower_ << ", upper bin = " << upper_ << endl;
   return;
 }
@@ -87,12 +90,13 @@ void chi2value::SetBins(TH1F* hypothesis){
   // for every masspoint, the bins that should be used are written into a vector
   bool skip;
   int rand_bin = rand()%(upper_-lower_+1)+lower_;
+  // int rand_bin = rand()%(upper_-lower_+1)+upper_;
   // int rand_bin = 20;
   std::cout << "Exclude bin " << rand_bin << " from chi2" << std::endl;
 
   std::vector<int> bins_this;
   for(int i=lower_; i<=upper_; i++){
-    if(i == rand_bin) skip = true;
+    if(i == rand_bin && random_) skip = true;
     else skip = false;
     if(!skip) bins_this.push_back(i);
   }
@@ -106,9 +110,9 @@ void chi2value::SetBins(TH1F* hypothesis){
 //
 double chi2value::ComputeChi2(TH1F* MC, std::vector<int> bins){
   //double chi2 = 0;
-  TH1F* data_sc = (TH1F*)data_->Clone("data_sc");
-  TH2F* cov_sc = (TH2F*)cov_->Clone("cov_sc");
-  TH1F* MC_sc = (TH1F*)MC->Clone("MC_sc");
+  TH1F* data_sc = (TH1F*)data_->Clone();
+  TH2F* cov_sc = (TH2F*)cov_->Clone();
+  TH1F* MC_sc = (TH1F*)MC->Clone();
 
   // bins
   int N =  bins.size();

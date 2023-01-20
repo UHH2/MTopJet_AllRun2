@@ -1,0 +1,70 @@
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/COR_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/COR_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JEC_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JEC_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JER_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JER_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JMS_downdown/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JMS_flavor_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JMS_flavor_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2016_elec/JMS_upup/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_Mtt0000to0700_2016v3
+Found Submission Info for TTbar_Mtt0700to1000_2016v3
+Found Submission Info for TTbar_Mtt1000toInft_2016v3
+ Result.xml created for further jobs

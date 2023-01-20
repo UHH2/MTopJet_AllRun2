@@ -8,6 +8,7 @@
 #include "../include/tdrstyle_all.h"
 
 #include "TRandom2.h"
+#include "TFormula.h"
 #include "TF3.h"
 #include "TError.h"
 #include "Fit/BinData.h"
@@ -50,42 +51,39 @@ void PrintValues(VecD& nominal, VecD& uu, VecD& ud, VecD& du, VecD& dd, TString 
 void SubtractBackgroundsMap(MapHHH& m_data, MapHHH& m_st, MapHHH& m_wjets, MapHHH& m_other);
 void AddTwoMaps(MapHHH& map1, MapHHH& map2, int option);
 bool sortcolx( const VecD& v1, const VecD& v2 );
-TString GetChi2Cor(TMatrixD &m, vector<TString> &vecS, VecD &vecD, int nbins, vector<bool> &skipBin, TString wbin="");
-MapF2 GetFits(MapSI2DGe& map, MapVI& peak, TString& hists);
+MapF2 GetFits(MapSI2DGe& map, TString& hist);
 MapHH GetHistograms(TString process, TString h_name);
 MapH RebinAndNormalize(MapHHH& process, int& width);
 MapH RebinMap(MapHHH& process, int& width);
 MapH NormalizeMap(MapH& process);
-MapM GetCovMatrixMap(MapH& map, const TString& save, const TString& process);
-MapM GetCovMatrixNormMap(MapM& map, MapH& hists, const TString& save, const TString& process);
+MapH TrimMap(MapH& process, MapVI& range, TString name);
+MapH TrimMatrixMap(MapM& Matrix);
+MapM GetCovMatrixMap(MapH& map, const TString& process);
+MapM GetCovMatrixNormMap(MapM& map, MapH& hists, const TString& process);
 TMatrixD GetSYSCov(TH1F* hist, TH1F* var, TString sysname, int panel=0, TString add = "");
 MapM GetSYSCovMap(MapH& hists, MapH& vars, TString sysname, TString bin, int panel=0);
-MapSI2DGe Creat2DGraph(MapHH& map, MapVI& peak, VecTS& hists);
 TH1F* SubtractBackgrounds(TH1F* data, vector<TH1F*> bgr, vector<double> syssize);
 TF1* GetSplitFunction(VecDD& ellipse);
-TF2* GetChi2(MapF2& fits, MapHH& nhists, MapVI& peak, TString hist);
 TEllipse* ApproxEllipse(const VecD& mid, const VecD& uu, const VecD& dd, const VecD& ud, const VecD& du);
 TPolyLine3D* SetPolyLine(double x1, double x2, double y1, double y2, double z1, double z2, int color);
 VecD ExtractJMSValues(const TF1* chi2function, const double& var);
 VecD GetMinimumChi2(TF2* chi2, TString hist);
-VecD StoreBinContentInVector(MapH& map, MapVI& peak, TString& hist);
 VecDD GetSigmaEllipse(TF2* chi2, VecD& minimum, TString hist, double runs, double acc, double at=2.3);
-VecDD GetSigmaEllipse_alt(TF2* chi2, VecD &minimum, TString hist, double runs, double acc, double at=2.3);
+VecDD GetSigmaEllipse_alt(TF2* chi2, VecD &minimum, TString hist, double runs, double acc, double at=2.3, double range = 1.0);
 VecDD GetExtreme(VecDD& ellipseJMS, VecD& nominal_JMS);
-VecTS GetFitFunctions(MapF2& fits, MapVI& peak, TString& hist);
 vector<bool> GetSkipBins(MapHHH &map, MapVI& peak, TString& hist);
+VecD StoreBinContentInVector(MapH& map, TString& hist);
+MapSI2DGe Creat2DGraph(MapHH& map, VecTS& hists);
+VecTS GetFitFunctions(MapF2& fits);
+
+TString GetChi2Cor(TMatrixD &m, vector<TString> &vecS, VecD &vecD, int nbins, int nbins_hh, int nbins_hl, int nbins_lh, int nbins_ll, bool uncor);
 
 vector<vector<double>> FindXY_alt(TF2 *function, double zfix, double xmin, double xmax, double ymin, double ymax, int steps = 1000, double accuracy = 0, bool count=false);
 
 TCanvas *c_sys = new TCanvas("sys", "sys", 600, 600); // to Plot all systematics in on pdf
 
 bool debug = false;
-bool fast = true; // Reads Cov Matrix for data and SYS from root file
-bool onlyLin = true;
-bool addSyst = false;
-TString save, year, channel;
-TString save_path, save_general, save_nfs;
-TString schannel = "";
+TString year, channel, save_nfs;
 TString addition = "";
 TString fsr_sys = "2";
 VecTS hists = {
@@ -99,11 +97,22 @@ int space;
 int precision = 10; // For double to string function - dtos()
 int cout_precision = 6;
 
+MapVI range = {
+  {"comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_hh", {70, 105}},
+  {"comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_hl", {75, 104}},
+  {"comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_lh", {62, 98}},
+  {"comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_ll", {63, 101}},
+};
+
 double ymax_global = 0; // TODO
 
 inline TString wbin(TString h){return h.ReplaceAll(cut, "");}
 
 int main(int argc, char* argv[]){
+
+  printf("= ============================== =\n");
+  printf("=   Usage: ./JEC_SYS <folder>    =\n");
+  printf("= ============================== =\n\n");
 
   // =====================================================================================
   // === Preperations                                                                  ===
@@ -112,22 +121,8 @@ int main(int argc, char* argv[]){
   // Input ---------------------------------------------------------------------
   year = "combine"; // argv[1]
   channel = "combine"; // argv[2]
-  fast = stob(argv[1]);
-  addSyst = stob(argv[2]);
-  bool FitAll = stob(argv[3]);
+  addition = argv[1];
 
-  cout << year << "   " << channel << "    syst " << addSyst << "    fast " << fast << "    covFit all " << FitAll  << endl;
-  // if(addSyst) addition = "syst_noJER";
-  // if(addSyst) addition = "syst";
-  if(addSyst){
-    addition = "syst";
-  }
-  addition += (FitAll)?"_fitall":"";
-
-  if(channel.EqualTo("muon")||channel.EqualTo("elec")) schannel = "_"+channel;
-  // TString sub = argv[3]; bool isSUB = false;
-  // if(sub.EqualTo("1")) isSUB = true;
-  // cout << isSUB << endl;
   gErrorIgnoreLevel = kWarning;
   gStyle->SetOptTitle(0);
   SetupGlobalStyle();
@@ -153,14 +148,8 @@ int main(int argc, char* argv[]){
   // Create Directories --------------------------------------------------------
   if(debug) cout << "Create Directiories ..." << endl;
 
-  save = get_save_path();
-  save += "/JetCorrections/fit/"+year+"/"+channel+"/"+slimit+"/"+"BinWidth_"+to_string(bin_width)+"/"+addition+"/";
-  TString temp_path = save+"{all_bins,projection}"; // Creats Subdirs x and y for {x,y}
-  CreateSavePath((string) temp_path);
-  cout << save << endl;
-
   save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/"+year+"/"+channel+"/"+slimit+"/"+addition+"/";
-  temp_path = save_nfs+"SYS/"+year;
+  TString temp_path = save_nfs+"SYS/";
   CreateSavePath((string) save_nfs);
   CreateSavePath((string) temp_path);
 
@@ -236,7 +225,7 @@ int main(int argc, char* argv[]){
     m_isrdown = m_isrdown_4;
   }
   else{
-    if(addSyst) throw runtime_error("<E> You are adding systematics to fit but not defined a correct FSR/ISR variation (sqrt2,2,4)");
+    throw runtime_error("<E> You are adding systematics to fit but not defined a correct FSR/ISR variation (sqrt2,2,4)");
   }
 
   if(debug) cout << "\t ... Get empty/peak bins" << endl;
@@ -244,12 +233,35 @@ int main(int argc, char* argv[]){
   for(TString h: hists){
     TString c = channel; TString y = year;
     empty_bins[h] = bins_empty(m_data[h][c][y]);
-    peak_bins[h] = bins_upper_limit((TH1F*) m_data[h][c][y]->Rebin(bin_width), limit);
+    // peak_bins[h] = bins_upper_limit((TH1F*) m_data[h][c][y]->Rebin(bin_width), limit);
+    vector<int> bin_pass_v;
+    for(int bin=1; bin <= m_data[h][c][y]->GetNbinsX(); bin++){
+      if((m_data[h][c][y]->GetBinContent(bin)>limit)) bin_pass_v.push_back(bin);
+    }
+    peak_bins[h] = bin_pass_v;
     if(debug){
       printVector(peak_bins[h], "PEAK:("+h+","+c+","+y+")");
       printVector(empty_bins[h], "EMPTY:("+h+","+c+","+y+")");
     }
   }
+
+  // ===========================================================================
+  // === Sub-study to check high uncertainty in data
+  // === Result: large bin uncertatiny comes from data-sub
+  // === Which sample causes this ? - Check all three
+
+  MapH m_data_rebin_v0 = RebinMap(m_data, bin_width);
+  MapH m_st_rebin_v0 = RebinMap(m_st, bin_width);
+  MapH m_wjets_rebin_v0 = RebinMap(m_wjets, bin_width);
+  MapH m_other_rebin_v0 = RebinMap(m_other, bin_width);
+
+  // Study bin in Wmass
+  MapM m_cov_data_v0 = GetCovMatrixMap(m_data_rebin_v0, "data_noSub");
+  MapM m_cov_st_v0 = GetCovMatrixMap(m_st_rebin_v0, "st");
+  MapM m_cov_wjets_v0 = GetCovMatrixMap(m_wjets_rebin_v0, "wjets");
+  MapM m_cov_other_v0 = GetCovMatrixMap(m_other_rebin_v0, "other");
+
+  // ===========================================================================
 
   SubtractBackgroundsMap(m_data, m_st, m_wjets, m_other); // Subtract Bkg from data
   if(debug) cout << "\t ... Rebin" << endl;
@@ -272,108 +284,99 @@ int main(int argc, char* argv[]){
   MapH m_isrup_rebin = RebinMap(m_isrup, bin_width);
   MapH m_isrdown_rebin = RebinMap(m_isrdown, bin_width);
 
-  int mDim = m_data_rebin[w_mass_hh]->GetNbinsX();
-  if(mDim!=m_data_rebin[w_mass_hl]->GetNbinsX()||
-  mDim!=m_data_rebin[w_mass_hl]->GetNbinsX()||
-  mDim!=m_data_rebin[w_mass_hl]->GetNbinsX()) throw runtime_error("Number of bins for jet mass are not equal");
+  // =================================================================================
+  // === Only Peak
 
-  if(debug) cout << "\t ... Get Cov Matrix" << endl;
-  MapM m_cov_ttbar = GetCovMatrixMap(m_ttbar_rebin, save, "ttbar");
-  MapM m_cov_JECup = GetCovMatrixMap(m_JECup_rebin, save, "JECup");
-  MapM m_cov_JECdown = GetCovMatrixMap(m_JECdown_rebin, save, "JECdown");
-  MapM m_cov_CORup = GetCovMatrixMap(m_CORup_rebin, save, "CORup");
-  MapM m_cov_CORdown = GetCovMatrixMap(m_CORdown_rebin, save, "CORdown");
+  if(debug) cout << "\t ... Trim hists" << endl;
+  MapH m_data_peak = TrimMap(m_data_rebin, range, "m_data_trim");
+  MapH m_ttbar_peak = TrimMap(m_ttbar_rebin, range, "m_ttbar_trim");
+  MapH m_JECup_peak = TrimMap(m_JECup_rebin, range, "m_JECup_trim");
+  MapH m_JECdown_peak = TrimMap(m_JECdown_rebin, range, "m_JECdown_trim");
+  MapH m_CORup_peak = TrimMap(m_CORup_rebin, range, "m_CORup_trim");
+  MapH m_CORdown_peak = TrimMap(m_CORdown_rebin, range, "m_CORdown_trim");
+  MapH m_JERup_peak = TrimMap(m_JERup_rebin, range, "m_JERup_trim");
+  MapH m_JERdown_peak = TrimMap(m_JERdown_rebin, range, "m_JERdown_trim");
+  MapH m_tuneup_peak = TrimMap(m_tuneup_rebin, range, "m_tuneup_trim");
+  MapH m_tunedown_peak = TrimMap(m_tunedown_rebin, range, "m_tunedown_trim");
+  MapH m_hdampup_peak = TrimMap(m_hdampup_rebin, range, "m_hdampup_trim");
+  MapH m_hdampdown_peak = TrimMap(m_hdampdown_rebin, range, "m_hdampdown_trim");
+  MapH m_CRqb_peak = TrimMap(m_CRqb_rebin, range, "m_CRqb_trim");
+  MapH m_CRgm_peak = TrimMap(m_CRgm_rebin, range, "m_CRgm_trim");
+  MapH m_fsrup_peak = TrimMap(m_fsrup_rebin, range, "m_fsrup_trim");
+  MapH m_fsrdown_peak = TrimMap(m_fsrdown_rebin, range, "m_fsrdown_trim");
+  MapH m_isrup_peak = TrimMap(m_isrup_rebin, range, "m_isrup_trim");
+  MapH m_isrdown_peak = TrimMap(m_isrdown_rebin, range, "m_isrdown_trim");
 
-  MapM m_cov_norm_ttbar = GetCovMatrixNormMap(m_cov_ttbar, m_ttbar_rebin, save, "ttbar");
-  MapM m_cov_norm_JECup = GetCovMatrixNormMap(m_cov_JECup, m_JECup_rebin, save, "JECup");
-  MapM m_cov_norm_JECdown = GetCovMatrixNormMap(m_cov_JECdown, m_JECdown_rebin, save, "JECdown");
-  MapM m_cov_norm_CORup = GetCovMatrixNormMap(m_cov_CORup, m_CORup_rebin, save, "CORup");
-  MapM m_cov_norm_CORdown = GetCovMatrixNormMap(m_cov_CORdown, m_CORdown_rebin, save, "CORdown");
+  // =================================================================================
+  // === Normalize
 
+  MapH m_data_norm = NormalizeMap(m_data_peak);
+  MapH m_ttbar_norm = NormalizeMap(m_ttbar_peak);
+  MapH m_JECup_norm = NormalizeMap(m_JECup_peak);
+  MapH m_JECdown_norm = NormalizeMap(m_JECdown_peak);
+  MapH m_CORup_norm = NormalizeMap(m_CORup_peak);
+  MapH m_CORdown_norm = NormalizeMap(m_CORdown_peak);
+  MapH m_JERup_norm = NormalizeMap(m_JERup_peak);
+  MapH m_JERdown_norm = NormalizeMap(m_JERdown_peak);
+  MapH m_tuneup_norm = NormalizeMap(m_tuneup_peak);
+  MapH m_tunedown_norm = NormalizeMap(m_tunedown_peak);
+  MapH m_hdampup_norm = NormalizeMap(m_hdampup_peak);
+  MapH m_hdampdown_norm = NormalizeMap(m_hdampdown_peak);
+  MapH m_CRqb_norm = NormalizeMap(m_CRqb_peak);
+  MapH m_CRgm_norm = NormalizeMap(m_CRgm_peak);
+  MapH m_fsrup_norm = NormalizeMap(m_fsrup_peak);
+  MapH m_fsrdown_norm = NormalizeMap(m_fsrdown_peak);
+  MapH m_isrup_norm = NormalizeMap(m_isrup_peak);
+  MapH m_isrdown_norm = NormalizeMap(m_isrdown_peak);
 
-  TString add2="";
-  // if(!addition.EqualTo("") && !addition.EqualTo("lin") && !addition.Contains("syst") && !addition.EqualTo("check")) add2 = "_"+addition;
-  if(debug) cout << "add: " << add2 << endl;
+  // =================================================================================
+  // === Store bin content of data in vector for chi2
+  // === Define here for consitency checks & bin dimension definiton
 
-  MapM m_cov_data = GetCovMatrixMap(m_data_rebin, save, "data");
-  MapM m_cov_norm_data; // skip long runtime
-  m_cov_norm_data[w_mass_hh].ResizeTo(mDim, mDim);
-  m_cov_norm_data[w_mass_hl].ResizeTo(mDim, mDim);
-  m_cov_norm_data[w_mass_lh].ResizeTo(mDim, mDim);
-  m_cov_norm_data[w_mass_ll].ResizeTo(mDim, mDim);
+  if(debug) cout << "\t ... Store Data bin Content" << endl;
+  VecD content_data_hh = StoreBinContentInVector(m_data_norm, w_mass_hh);
+  VecD content_data_hl = StoreBinContentInVector(m_data_norm, w_mass_hl);
+  VecD content_data_lh = StoreBinContentInVector(m_data_norm, w_mass_lh);
+  VecD content_data_ll = StoreBinContentInVector(m_data_norm, w_mass_ll);
 
-  TString option = gSystem->AccessPathName("files/CovMatrices_JMS.root")?"recreate":"update";
-  TFile *f = new TFile("files/CovMatrices_JMS.root", option);
-  f->cd();
+  int dim_hh = content_data_hh.size();
+  int dim_hl = content_data_hl.size();
+  int dim_lh = content_data_lh.size();
+  int dim_ll = content_data_ll.size();
+  int dim_full = dim_hh+dim_hl+dim_lh+dim_ll;
+  MapI dims = {{w_mass_hh, dim_hh},{w_mass_hl, dim_hl},{w_mass_lh, dim_lh},{w_mass_ll, dim_ll}};
+  printf("dim hh: %4i hl: %4i lh: %4i ll: %4i\n",dim_hh,dim_hl,dim_lh,dim_ll);
 
-  if(fast){
-    cout << "Matricies for data " << RED << "from ROOT file" << RESET << endl;
-    m_cov_norm_data[w_mass_hh] = TMatrixD(*((TMatrixD*) f->Get("covData_hh_norm_"+year+"_"+channel+add2)));
-    m_cov_norm_data[w_mass_hl] = TMatrixD(*((TMatrixD*) f->Get("covData_hl_norm_"+year+"_"+channel+add2)));
-    m_cov_norm_data[w_mass_lh] = TMatrixD(*((TMatrixD*) f->Get("covData_lh_norm_"+year+"_"+channel+add2)));
-    m_cov_norm_data[w_mass_ll] = TMatrixD(*((TMatrixD*) f->Get("covData_ll_norm_"+year+"_"+channel+add2)));
+  int n_bins_hh = m_data_norm[w_mass_hh]->GetNbinsX();
+  int n_bins_hl = m_data_norm[w_mass_hl]->GetNbinsX();
+  int n_bins_lh = m_data_norm[w_mass_lh]->GetNbinsX();
+  int n_bins_ll = m_data_norm[w_mass_ll]->GetNbinsX();
+  int n_bins_full = n_bins_hh+n_bins_hl+n_bins_lh+n_bins_ll;
+
+  if(dim_hh != n_bins_hh){
+    printf("#content %3i vs. #bins %3i in hh",dim_hh,m_data_norm[w_mass_hh]->GetNbinsX());
+    throw runtime_error("[ERROR] Somethings wrong with dimension in hh");
   }
-  else{
-    m_cov_norm_data = GetCovMatrixNormMap(m_cov_data, m_data_rebin, save, "data");
-    m_cov_norm_data[w_mass_hh].Write("covData_hh_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
-    m_cov_norm_data[w_mass_hl].Write("covData_hl_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
-    m_cov_norm_data[w_mass_lh].Write("covData_lh_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
-    m_cov_norm_data[w_mass_ll].Write("covData_ll_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
+  if(dim_hl != n_bins_hl){
+    printf("#content %3i vs. #bins %3i in hl",dim_hl,m_data_norm[w_mass_hl]->GetNbinsX());
+    throw runtime_error("[ERROR] Somethings wrong with dimension in hl");
   }
-  f->Close();
-
-
-  // ==========================================================================================================
-  // === Normalize Map
-
-  if(debug) cout << "\t ... Normalize" << endl;
-  MapH m_data_norm = NormalizeMap(m_data_rebin);
-  MapH m_ttbar_norm = NormalizeMap(m_ttbar_rebin);
-  MapH m_JECup_norm = NormalizeMap(m_JECup_rebin);
-  MapH m_JECdown_norm = NormalizeMap(m_JECdown_rebin);
-  MapH m_CORup_norm = NormalizeMap(m_CORup_rebin);
-  MapH m_CORdown_norm = NormalizeMap(m_CORdown_rebin);
-  MapH m_JERup_norm = NormalizeMap(m_JERup_rebin);
-  MapH m_JERdown_norm = NormalizeMap(m_JERdown_rebin);
-  MapH m_tuneup_norm = NormalizeMap(m_tuneup_rebin);
-  MapH m_tunedown_norm = NormalizeMap(m_tunedown_rebin);
-  MapH m_hdampup_norm = NormalizeMap(m_hdampup_rebin);
-  MapH m_hdampdown_norm = NormalizeMap(m_hdampdown_rebin);
-  MapH m_CRqb_norm = NormalizeMap(m_CRqb_rebin);
-  MapH m_CRgm_norm = NormalizeMap(m_CRgm_rebin);
-  MapH m_fsrup_norm = NormalizeMap(m_fsrup_rebin);
-  MapH m_fsrdown_norm = NormalizeMap(m_fsrdown_rebin);
-  MapH m_isrup_norm = NormalizeMap(m_isrup_rebin);
-  MapH m_isrdown_norm = NormalizeMap(m_isrdown_rebin);
-
-  // ==========================================================================================================
-  // === Covariance Matrix for systematics
-
-  MapH h_sys_tune, h_sys_hdamp, h_sys_CR, h_sys_fsr, h_sys_isr, h_sys_jer;
-  MapM m_sys_tune, m_sys_hdamp, m_sys_CR, m_sys_fsr, m_sys_isr, m_sys_jer;
-  for(auto h: hists){
-    cout << "\n" << h << endl;
-    h_sys_tune[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_tune[h]->Add(m_tuneup_norm[h], -1);
-    h_sys_hdamp[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_hdamp[h]->Add(m_hdampup_norm[h], -1);
-    h_sys_CR[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_CR[h]->Add(m_CRqb_norm[h], -1);
-    h_sys_fsr[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_fsr[h]->Add(m_fsrup_norm[h], -1);
-    h_sys_isr[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_isr[h]->Add(m_isrup_norm[h], -1);
-    h_sys_jer[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_jer[h]->Add(m_JERup_norm[h], -1);
-
-    // Get systematic cov matrix
-    m_sys_tune[h].ResizeTo(mDim, mDim); m_sys_tune[h] = GetSystCovMatrix(h_sys_tune[h], debug);
-    m_sys_hdamp[h].ResizeTo(mDim, mDim); m_sys_hdamp[h] = GetSystCovMatrix(h_sys_hdamp[h], debug);
-    m_sys_CR[h].ResizeTo(mDim, mDim); m_sys_CR[h] = GetSystCovMatrix(h_sys_CR[h], debug);
-    m_sys_fsr[h].ResizeTo(mDim, mDim); m_sys_fsr[h] = GetSystCovMatrix(h_sys_fsr[h], debug);
-    m_sys_isr[h].ResizeTo(mDim, mDim); m_sys_isr[h] = GetSystCovMatrix(h_sys_isr[h], debug);
-    m_sys_jer[h].ResizeTo(mDim, mDim); m_sys_jer[h] = GetSystCovMatrix(h_sys_jer[h], debug);
+  if(dim_lh != n_bins_lh){
+    printf("#content %3i vs. #bins %3i in lh",dim_lh,m_data_norm[w_mass_lh]->GetNbinsX());
+    throw runtime_error("[ERROR] Somethings wrong with dimension in lh");
+  }
+  if(dim_ll != n_bins_ll){
+    printf("#content %3i vs. #bins %3i in ll",dim_ll,m_data_norm[w_mass_ll]->GetNbinsX());
+    throw runtime_error("[ERROR] Somethings wrong with dimension in ll");
+  }
+  if(dim_full != n_bins_full){
+    printf("#content %3i vs. #bins %3i in ll",dim_full,n_bins_full);
+    throw runtime_error("[ERROR] Somethings wrong with full dimension");
   }
 
-  // =====================================================================================
-  // === Creat chi2 function for pT bins                                               ===
-  // =====================================================================================
+  // =================================================================================
+  // === Get Fits
 
-  if(debug) cout << "Create TGraph2DErrors ... " << endl;
   MapHH m_all_norm;
   m_all_norm["data"] = m_data_norm;
   m_all_norm["ttbar"] = m_ttbar_norm;
@@ -383,251 +386,364 @@ int main(int argc, char* argv[]){
   m_all_norm["CORdown"] = m_CORdown_norm;
 
   if(debug) cout << "Get single Chi2 ... " << endl;
-  MapSI2DGe m_combine = Creat2DGraph(m_all_norm, peak_bins, hists);
+  MapSI2DGe m_combine = Creat2DGraph(m_all_norm, hists);
 
   if(debug) cout << "\t ... Get Fit functions" << endl;
-  MapF2 m_fit_combine_hh = GetFits(m_combine, peak_bins, w_mass_hh);
-  MapF2 m_fit_combine_hl = GetFits(m_combine, peak_bins, w_mass_hl);
-  MapF2 m_fit_combine_lh = GetFits(m_combine, peak_bins, w_mass_lh);
-  MapF2 m_fit_combine_ll = GetFits(m_combine, peak_bins, w_mass_ll);
-
-  if(debug) cout << "\t ... Construct Chi2" << endl;
-  MapFF2 m_fit_combine;
-  m_fit_combine[w_mass_hh] = m_fit_combine_hh;
-  m_fit_combine[w_mass_hl] = m_fit_combine_hl;
-  m_fit_combine[w_mass_lh] = m_fit_combine_lh;
-  m_fit_combine[w_mass_ll] = m_fit_combine_ll;
+  MapF2 m_fit_combine_hh = GetFits(m_combine, w_mass_hh);
+  MapF2 m_fit_combine_hl = GetFits(m_combine, w_mass_hl);
+  MapF2 m_fit_combine_lh = GetFits(m_combine, w_mass_lh);
+  MapF2 m_fit_combine_ll = GetFits(m_combine, w_mass_ll);
 
   space = cout_precision+4;
   cout << fixed << setprecision(cout_precision) << endl;
   cout << "Prepare results for JMS ..." << endl;
 
-  // =====================================================================================
-  // === Get JMS factors for correlated bin uncertainty                                ===
-  // =====================================================================================
-
   if(debug) cout << "\t ... Construct FitFunctions" << endl;
-  VecTS fits_hh = GetFitFunctions(m_fit_combine_hh, peak_bins, w_mass_hh);
-  VecTS fits_hl = GetFitFunctions(m_fit_combine_hl, peak_bins, w_mass_hl);
-  VecTS fits_lh = GetFitFunctions(m_fit_combine_lh, peak_bins, w_mass_lh);
-  VecTS fits_ll = GetFitFunctions(m_fit_combine_ll, peak_bins, w_mass_ll);
+  VecTS fits_hh = GetFitFunctions(m_fit_combine_hh);
+  VecTS fits_hl = GetFitFunctions(m_fit_combine_hl);
+  VecTS fits_lh = GetFitFunctions(m_fit_combine_lh);
+  VecTS fits_ll = GetFitFunctions(m_fit_combine_ll);
 
-  if(debug) cout << "\t ... Store Data bin Content" << endl;
-  VecD content_data_hh = StoreBinContentInVector(m_data_norm, peak_bins, w_mass_hh);
-  VecD content_data_hl = StoreBinContentInVector(m_data_norm, peak_bins, w_mass_hl);
-  VecD content_data_lh = StoreBinContentInVector(m_data_norm, peak_bins, w_mass_lh);
-  VecD content_data_ll = StoreBinContentInVector(m_data_norm, peak_bins, w_mass_ll);
+  // =================================================================================
+  // === Get covarianze matrix
 
-  vector<bool> skipBins_hh = GetSkipBins(m_data, peak_bins, w_mass_hh);
-  vector<bool> skipBins_hl = GetSkipBins(m_data, peak_bins, w_mass_hl);
-  vector<bool> skipBins_lh = GetSkipBins(m_data, peak_bins, w_mass_lh);
-  vector<bool> skipBins_ll = GetSkipBins(m_data, peak_bins, w_mass_ll);
+  MapM m_cov_tt = GetCovMatrixMap(m_ttbar_peak, "tt");
+  MapM m_cov_data = GetCovMatrixMap(m_data_peak, "data");
 
-  // ------------ Create covariance matrix for fit
+  MapM m_cov_tt_norm = GetCovMatrixNormMap(m_cov_tt, m_ttbar_peak, "tt norm");
+  MapM m_cov_data_norm = GetCovMatrixNormMap(m_cov_data, m_data_peak, "data norm");
 
-  MapM m_covFit_ttbar;
-  if(debug) cout << "\t ... Dimension of cov matricies is " << mDim << endl;
-  m_covFit_ttbar[w_mass_hh].ResizeTo(mDim, mDim);
-  m_covFit_ttbar[w_mass_hl].ResizeTo(mDim, mDim);
-  m_covFit_ttbar[w_mass_lh].ResizeTo(mDim, mDim);
-  m_covFit_ttbar[w_mass_ll].ResizeTo(mDim, mDim);
+  MapH h_sys_tune, h_sys_hdamp, h_sys_CR, h_sys_fsr, h_sys_isr, h_sys_jer;
+  MapM m_sys_tune, m_sys_hdamp, m_sys_CR, m_sys_fsr, m_sys_isr, m_sys_jer;
+  for(auto h: hists){
+    h_sys_tune[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_tune[h]->Add(m_tuneup_norm[h], -1);
+    h_sys_hdamp[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_hdamp[h]->Add(m_hdampup_norm[h], -1);
+    h_sys_CR[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_CR[h]->Add(m_CRqb_norm[h], -1);
+    h_sys_fsr[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_fsr[h]->Add(m_fsrup_norm[h], -1);
+    h_sys_isr[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_isr[h]->Add(m_isrup_norm[h], -1);
+    h_sys_jer[h] = (TH1F*) m_ttbar_norm[h]->Clone(); h_sys_jer[h]->Add(m_JERup_norm[h], -1);
 
-  for(int x=0; x<mDim; x++){
-    m_covFit_ttbar[w_mass_hh][x][x] = m_cov_norm_ttbar[w_mass_hh][x][x];
-    m_covFit_ttbar[w_mass_hl][x][x] = m_cov_norm_ttbar[w_mass_hl][x][x];
-    m_covFit_ttbar[w_mass_lh][x][x] = m_cov_norm_ttbar[w_mass_lh][x][x];
-    m_covFit_ttbar[w_mass_ll][x][x] = m_cov_norm_ttbar[w_mass_ll][x][x];
+    // Get systematic cov matrix
+    m_sys_tune[h].ResizeTo(dims[h], dims[h]); m_sys_tune[h] = GetSystCovMatrix(h_sys_tune[h], debug);
+    m_sys_hdamp[h].ResizeTo(dims[h], dims[h]); m_sys_hdamp[h] = GetSystCovMatrix(h_sys_hdamp[h], debug);
+    m_sys_CR[h].ResizeTo(dims[h], dims[h]); m_sys_CR[h] = GetSystCovMatrix(h_sys_CR[h], debug);
+    m_sys_fsr[h].ResizeTo(dims[h], dims[h]); m_sys_fsr[h] = GetSystCovMatrix(h_sys_fsr[h], debug);
+    m_sys_isr[h].ResizeTo(dims[h], dims[h]); m_sys_isr[h] = GetSystCovMatrix(h_sys_isr[h], debug);
+    m_sys_jer[h].ResizeTo(dims[h], dims[h]); m_sys_jer[h] = GetSystCovMatrix(h_sys_jer[h], debug);
   }
 
-  MapM m_covFit_all;
-  for(TString h: hists){
-    vector<double> diagValues;
-    int mDim = m_data_rebin[h]->GetNbinsX();
-    if(debug) cout << "\t ... Dimension of cov matricies is " << mDim << endl;
-    TMatrixD covFit_all = TMatrixD(mDim, mDim);
-
-    TMatrixD covTTbar   = m_cov_norm_ttbar[h];
-    TMatrixD covJECup   = m_cov_norm_JECup[h];
-    TMatrixD covJECdown = m_cov_norm_JECdown[h];
-    TMatrixD covCORup   = m_cov_norm_CORup[h];
-    TMatrixD covCORdown = m_cov_norm_CORdown[h];
-
-    if(debug) cout << "\t ... Fill covFit from all for " << h << endl;
-    for(int x=0; x<mDim; x++){
-      diagValues.push_back(covTTbar[x][x]);
-      diagValues.push_back(covJECup[x][x]);
-      diagValues.push_back(covJECdown[x][x]);
-      diagValues.push_back(covCORup[x][x]);
-      diagValues.push_back(covCORdown[x][x]);
-
-      // diagValues.pop_back();
-      double max = *max_element(diagValues.begin(), diagValues.end());
-
-      if(debug){ for(auto v: diagValues) cout << v*1e7 << "\t"; }
-      if(debug){ cout<<"Max value: "<<max*1e7<<endl; }
-
-      covFit_all[x][x] = max;
-      diagValues = {};
-    }
-    m_covFit_all[h].ResizeTo(covFit_all); m_covFit_all[h] = covFit_all;
-    TString wbin = h; wbin.ReplaceAll(cut, "");
-    if(debug) cout << "\t ... Draw covFit " << h << endl;
-    TH2D* temp = TMatrixDtoTH2D(covFit_all, covFit_all.GetNcols(), 0, 180, h+channel+year+"Fit_all");
-    DrawCov(temp, save+"Fit_"+wbin+"_"+channel+"_"+year, "#it{m}_{W}", 0.3);
-  }
-
-  MapM m_covFit = FitAll?m_covFit_all:m_covFit_ttbar;
-
-  TH2D* temp = new TH2D();
-  temp = TMatrixDtoTH2D(m_covFit[w_mass_hh], m_covFit[w_mass_hh].GetNcols(), 0, 180, "hhnorm"+channel+year+"Fit"); DrawCov(temp, save+"Fit_hh_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
-  temp = TMatrixDtoTH2D(m_covFit[w_mass_hl], m_covFit[w_mass_hl].GetNcols(), 0, 180, "hlnorm"+channel+year+"Fit"); DrawCov(temp, save+"Fit_hl_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
-  temp = TMatrixDtoTH2D(m_covFit[w_mass_lh], m_covFit[w_mass_lh].GetNcols(), 0, 180, "lhnorm"+channel+year+"Fit"); DrawCov(temp, save+"Fit_lh_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
-  temp = TMatrixDtoTH2D(m_covFit[w_mass_ll], m_covFit[w_mass_ll].GetNcols(), 0, 180, "llnorm"+channel+year+"Fit"); DrawCov(temp, save+"Fit_ll_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
-
-  TMatrixD m_covTotal_hh = TMatrixD(m_cov_norm_data[w_mass_hh]); m_covTotal_hh += m_covFit[w_mass_hh];
-  TMatrixD m_covTotal_hl = TMatrixD(m_cov_norm_data[w_mass_hl]); m_covTotal_hl += m_covFit[w_mass_hl];
-  TMatrixD m_covTotal_lh = TMatrixD(m_cov_norm_data[w_mass_lh]); m_covTotal_lh += m_covFit[w_mass_lh];
-  TMatrixD m_covTotal_ll = TMatrixD(m_cov_norm_data[w_mass_ll]); m_covTotal_ll += m_covFit[w_mass_ll];
-
-  vector<MapM> m_sys = {m_sys_tune, m_sys_hdamp, m_sys_CR, m_sys_fsr, m_sys_isr, m_sys_jer};
-  if(addSyst){
-    for(auto m: m_sys){
-      m_covTotal_hh += m[w_mass_hh];
-      m_covTotal_hl += m[w_mass_hl];
-      m_covTotal_lh += m[w_mass_lh];
-      m_covTotal_ll += m[w_mass_ll];
+  MapM m_covFit;
+  for(auto h:hists){
+    int dim = dims[h];
+    cout << "\t ... Dimension of cov matricies is " << dim << endl;
+    m_covFit[h].ResizeTo(dim, dim);
+    for(int x=0; x<dim; x++){
+      m_covFit[h][x][x] = m_cov_tt_norm[h][x][x];
     }
   }
+
+  TMatrixD m_covFull_data = TMatrixD(dim_full, dim_full);
+  TMatrixD m_covFull_fit = TMatrixD(dim_full, dim_full);
+
+  int d_counter = 0;
+  for(auto h:hists){
+    int dim = dims[h];
+    for(int k=0; k<dim; k++){
+      for(int l=0; l<dim; l++){
+        int r = k + d_counter;
+        int c = l + d_counter;
+        m_covFull_data[r][c] = m_cov_data_norm[h][k][l];
+        m_covFull_fit[r][c] = m_covFit[h][k][l];
+      }
+    }
+    d_counter += dim;
+    cout << h << "  " << d_counter << endl;
+  }
+  if(d_counter != dim_full){
+    printf("counter %3i vs. full dim %3i",d_counter,dim_full);
+    throw runtime_error("[ERROR] Counter does not match full dim");
+  }
+  TH2D* temp_data = TMatrixDtoTH2D(m_covFull_data, m_covFull_data.GetNcols(), 0, dim_full, "datafullnormpeak"+channel+year);
+  DrawCov(temp_data, save_nfs+"SYS/SYS_full_data_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+  if(debug){
+    cout << setw(7) << "stat"<< " Check if off diagonal is 0: | n0? " << setw(15) << m_covFull_data[20][20]*1e10;
+    cout << " | n0? " << setw(15) << m_covFull_data[20][10]*1e10 << " | 0? " << setw(15) << m_covFull_data[100][20]*1e10;
+    cout << " | 0? " << setw(15) << m_covFull_data[50][110]*1e10 << " | n0? " << setw(15) << m_covFull_data[40][40]*1e10;
+    cout << " | n0? " << setw(15) << m_covFull_data[110][120]*1e10 << endl;
+  }
+
+  // === Correlated syst
+
+  MapH h_full_sys;
+  MapM m_covFull_sys;
+  // h_sys_tune contains norm ttbar - norm systematic
+  map<TString, MapH> h_sys = {{"tune", h_sys_tune}, {"hdamp", h_sys_hdamp}, {"CR", h_sys_CR}, {"isr", h_sys_isr}, {"fsr", h_sys_fsr}, {"jer", h_sys_jer}};
+  for(auto s: h_sys){
+    TH1F* hist = new TH1F(s.first, s.first, dim_full, 0, dim_full);
+    d_counter = 0;
+    for(auto h:hists){
+      int dim = dims[h];
+      for(int j=1; j<=dim; j++){
+        // order hh - hl - lh - ll
+        int bin = j + d_counter;
+        hist->SetBinContent(bin, s.second[h]->GetBinContent(j));
+      }
+      d_counter += dim;
+      cout << h << " " << s.first << " " << d_counter << endl;
+    }
+    if(d_counter != dim_full){
+      printf("counter %3i vs. full dim %3i",d_counter,dim_full);
+      throw runtime_error("[ERROR] Counter does not match full dim");
+    }
+    h_full_sys[s.first] = (TH1F*) hist->Clone();
+    m_covFull_sys[s.first].ResizeTo(dim_full, dim_full);
+    m_covFull_sys[s.first] = GetSystCovMatrix(h_full_sys[s.first], debug);
+    if(debug) cout << s.first << " - Number bins " << hist->GetNbinsX() << " and " << h_full_sys[s.first]->GetNbinsX() << " and " << m_covFull_sys[s.first].GetNcols() << " and " << m_covFull_sys[s.first].GetNrows() << endl;
+    TH2D* temp = TMatrixDtoTH2D(m_covFull_sys[s.first], m_covFull_sys[s.first].GetNcols(), 0, dim_full, s.first+"fullnormpeak"+channel+year);
+    DrawCov(temp, save_nfs+"SYS/SYS_full_"+s.first+"_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+  }
+
+  // // === Unorrelated syst
+  //
+  // MapM m_covFull_sys_uncor;
+  // MapMM m_sys = {{"tune", m_sys_tune}, {"hdamp", m_sys_hdamp}, {"CR", m_sys_CR}, {"isr", m_sys_isr}, {"fsr", m_sys_fsr}, {"jer", m_sys_jer}};
+  // for(auto s: h_sys){
+  //   int d_counter = 0;
+  //   m_covFull_sys_uncor[s.first].ResizeTo(dim_full,dim_full);
+  //   for(auto h:hists){
+  //     int dim = dims[h];
+  //     for(int k=0; k<dim; k++){
+  //       for(int l=0; l<dim; l++){
+  //         int r = k + d_counter;
+  //         int c = l + d_counter;
+  //         m_covFull_sys_uncor[s.first][r][c] = m_sys[s.first][h][k][l];
+  //       }
+  //     }
+  //     d_counter += dim;
+  //     cout << h << "  " << d_counter << endl;
+  //   }
+  // }
+  // if(d_counter != dim_full){
+  //   printf("counter %3i vs. full dim %3i",d_counter,dim_full);
+  //   throw runtime_error("[ERROR] Counter does not match full dim");
+  // }
+  // TH2D* temp_data_uncor = TMatrixDtoTH2D(m_covFull_data, m_covFull_data.GetNcols(), 0, dim_full, "datafullnormpeak"+channel+year);
+  // DrawCov(temp_data_uncor, save_nfs+"SYS/SYS_full_data_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+  // if(debug){
+  //   cout << setw(7) << "stat"<< " Check if off diagonal is 0: | n0? " << setw(15) << m_covFull_data[20][20]*1e10;
+  //   cout << " | n0? " << setw(15) << m_covFull_data[20][10]*1e10 << " | 0? " << setw(15) << m_covFull_data[100][20]*1e10;
+  //   cout << " | 0? " << setw(15) << m_covFull_data[50][110]*1e10 << " | n0? " << setw(15) << m_covFull_data[40][40]*1e10;
+  //   cout << " | n0? " << setw(15) << m_covFull_data[110][120]*1e10 << endl;
+  // }
+
+
+  // === full matrix
+  // Consider all systematics correlated in pt bins
+  // Statistical and fit uncertainty uncorrelated
+
+  TMatrixD m_covFull = TMatrixD(dim_full, dim_full);
+  m_covFull += m_covFull_data + m_covFull_fit;
+  for(auto m: m_covFull_sys) m_covFull += m.second;
+
+  vector<double> content_data = content_data_hh; // Possible error if not in same order then matrix
+  content_data.insert(content_data.end(), content_data_hl.begin(), content_data_hl.end());
+  content_data.insert(content_data.end(), content_data_lh.begin(), content_data_lh.end());
+  content_data.insert(content_data.end(), content_data_ll.begin(), content_data_ll.end());
+  if(debug) cout << "total size content " << setw(10) << content_data.size() << " with hh " << setw(10) << content_data_hh.size() << " and hl " << setw(10) << content_data_hl.size() << " and lh " << setw(10) << content_data_lh.size() << " and ll " << setw(10) << content_data_ll.size() << endl;
+
+  vector<TString> fits = fits_hh; // Possible error if not in same order then matrix
+  fits.insert(fits.end(), fits_hl.begin(), fits_hl.end());
+  fits.insert(fits.end(), fits_lh.begin(), fits_lh.end());
+  fits.insert(fits.end(), fits_ll.begin(), fits_ll.end());
+  if(debug) cout << "total size fits    " << setw(10) << fits.size() << " with hh " << setw(10) << fits_hh.size() << " and hl " << setw(10) << fits_hl.size() << " and lh " << setw(10) << fits_lh.size() << " and ll " << setw(10) << fits_ll.size() << endl;
+
+  int c_hh = content_data_hh.size();
+  int c_hl = content_data_hl.size();
+  int c_lh = content_data_lh.size();
+  int c_ll = content_data_ll.size();
+
+  // ===========================================================================
+  // === Get Chi2
+
+  // === All syst Correlated
+
+  TString Chi2Cor_full = GetChi2Cor(m_covFull, fits, content_data, dim_full, c_hh, c_hl, c_lh, c_ll, false);
+  TF2* chi2_JMS_cor_full = new TF2("JMSfull", Chi2Cor_full, -2, 2, -2, 2);
+
+  VecD nominal_JMS_cor_full = GetMinimumChi2(chi2_JMS_cor_full, "JMS");
+  // VecDD ellipse_JMS_cor_full = GetSigmaEllipse_alt(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 1500, 0.1);
+  VecDD ellipse_JMS_cor_full = GetSigmaEllipse(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 1000, 0.1);
+  // VecDD ellipse2_JMS_cor_full = GetSigmaEllipse_alt(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 3000, 0.1, 6.18, 1.5);
+  VecDD ellipse2_JMS_cor_full = GetSigmaEllipse(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 1000, 0.1, 6.18);
+  cout << "Number of points for correlated 1\u03C3 ellipse_alt: " << ellipse_JMS_cor_full.size() << endl;
+  cout << "Number of points for correlated 2\u03C3 ellipse_alt: " << ellipse2_JMS_cor_full.size() << endl;
+
+
+  VecDD AllExtrema_JMS_cor_full = GetExtreme(ellipse_JMS_cor_full, nominal_JMS_cor_full);
+  VecD uu_cor_full = {AllExtrema_JMS_cor_full[0]};
+  VecD dd_cor_full = {AllExtrema_JMS_cor_full[1]};
+  VecD du_cor_full = {AllExtrema_JMS_cor_full[2]};
+  VecD ud_cor_full = {AllExtrema_JMS_cor_full[3]};
+
+  TString full_chi2_jec = Chi2Cor_full;
+  TString full_chi2_nan = Chi2Cor_full;
+  TString full_chi2_cor = Chi2Cor_full;
+
+  full_chi2_jec.ReplaceAll("y", "("+to_string(nominal_JMS_cor_full[1])+")");
+  full_chi2_cor.ReplaceAll("x", to_string(nominal_JMS_cor_full[0]));
+  full_chi2_cor.ReplaceAll("y", "x");
+
+  TF1 *full_chi2_function_jec = new TF1("chi2_function_jec", full_chi2_jec, -3, 3);
+  TF1 *full_chi2_function_cor = new TF1("chi2_function_cor", full_chi2_cor, -3, 3);
+
+  // returns: VecD {f_JMS, sigmaup, sigmadown, f_up, f_down, minChi2}
+  VecD PoU_JEC = ExtractJMSValues(full_chi2_function_jec, 1);
+  VecD PoU_COR = ExtractJMSValues(full_chi2_function_cor, 1);
 
   if(debug){
-    cout << "data hh - cols: " << m_cov_norm_data[w_mass_hh].GetNcols() << "\t rows: " << m_cov_norm_data[w_mass_hh].GetNrows() << "\t 90.90: " << m_cov_norm_data[w_mass_hh][90][90]*1e6 << "\t 90.95: " << m_cov_norm_data[w_mass_hh][90][95]*1e6 << endl;
-    cout << "data hl - cols: " << m_cov_norm_data[w_mass_hl].GetNcols() << "\t rows: " << m_cov_norm_data[w_mass_hl].GetNrows() << "\t 90.90: " << m_cov_norm_data[w_mass_hl][90][90]*1e6 << "\t 90.95: " << m_cov_norm_data[w_mass_hl][90][95]*1e6 << endl;
-    cout << "data lh - cols: " << m_cov_norm_data[w_mass_lh].GetNcols() << "\t rows: " << m_cov_norm_data[w_mass_lh].GetNrows() << "\t 90.90: " << m_cov_norm_data[w_mass_lh][90][90]*1e6 << "\t 90.95: " << m_cov_norm_data[w_mass_lh][90][95]*1e6 << endl;
-    cout << "data ll - cols: " << m_cov_norm_data[w_mass_ll].GetNcols() << "\t rows: " << m_cov_norm_data[w_mass_ll].GetNrows() << "\t 90.90: " << m_cov_norm_data[w_mass_ll][90][90]*1e6 << "\t 90.95: " << m_cov_norm_data[w_mass_ll][90][95]*1e6 << endl;
-
-    cout << "fit hh - cols: " << m_covFit[w_mass_hh].GetNcols() << "\t rows: " << m_covFit[w_mass_hh].GetNrows() << "\t 90.90: " << m_covFit[w_mass_hh][90][90]*1e6 << "\t 90.95: " << m_covFit[w_mass_hh][90][95]*1e6 << endl;
-    cout << "fit hl - cols: " << m_covFit[w_mass_hl].GetNcols() << "\t rows: " << m_covFit[w_mass_hl].GetNrows() << "\t 90.90: " << m_covFit[w_mass_hl][90][90]*1e6 << "\t 90.95: " << m_covFit[w_mass_hl][90][95]*1e6 << endl;
-    cout << "fit lh - cols: " << m_covFit[w_mass_lh].GetNcols() << "\t rows: " << m_covFit[w_mass_lh].GetNrows() << "\t 90.90: " << m_covFit[w_mass_lh][90][90]*1e6 << "\t 90.95: " << m_covFit[w_mass_lh][90][95]*1e6 << endl;
-    cout << "fit ll - cols: " << m_covFit[w_mass_ll].GetNcols() << "\t rows: " << m_covFit[w_mass_ll].GetNrows() << "\t 90.90: " << m_covFit[w_mass_ll][90][90]*1e6 << "\t 90.95: " << m_covFit[w_mass_ll][90][95]*1e6 << endl;
-
-    cout << "total hh - cols: " << m_covTotal_hh.GetNcols() << "\t rows: " << m_covTotal_hh.GetNrows() << "\t 90.90: " << m_covTotal_hh[90][90]*1e6 << "\t 90.95: " << m_covTotal_hh[90][95]*1e6 << endl;
-    cout << "total hl - cols: " << m_covTotal_hl.GetNcols() << "\t rows: " << m_covTotal_hl.GetNrows() << "\t 90.90: " << m_covTotal_hl[90][90]*1e6 << "\t 90.95: " << m_covTotal_hl[90][95]*1e6 << endl;
-    cout << "total lh - cols: " << m_covTotal_lh.GetNcols() << "\t rows: " << m_covTotal_lh.GetNrows() << "\t 90.90: " << m_covTotal_lh[90][90]*1e6 << "\t 90.95: " << m_covTotal_lh[90][95]*1e6 << endl;
-    cout << "total ll - cols: " << m_covTotal_ll.GetNcols() << "\t rows: " << m_covTotal_ll.GetNrows() << "\t 90.90: " << m_covTotal_ll[90][90]*1e6 << "\t 90.95: " << m_covTotal_ll[90][95]*1e6 << endl;
+    printVector(PoU_JEC, "PoU for JEC");
+    printVector(PoU_COR, "PoU for COR");
   }
 
-  // TString GetChi2Cor(TMatrixD m, vector<TString> vecS, VecD vecD, int nbins, vector<bool> skipBin)
-  TString Chi2Cor_hh = GetChi2Cor(m_covTotal_hh, fits_hh, content_data_hh, 180, skipBins_hh, "hh");
-  TString Chi2Cor_hl = GetChi2Cor(m_covTotal_hl, fits_hl, content_data_hl, 180, skipBins_hl, "hl");
-  TString Chi2Cor_lh = GetChi2Cor(m_covTotal_lh, fits_lh, content_data_lh, 180, skipBins_lh, "lh");
-  TString Chi2Cor_ll = GetChi2Cor(m_covTotal_ll, fits_ll, content_data_ll, 180, skipBins_ll, "ll");
+  // PoUinTXT(double nom, double up, double down, TString variation)
+  PoUinTXT(PoU_JEC[0], PoU_JEC[1], PoU_JEC[2], "JEC");
+  PoUinTXT(PoU_COR[0], PoU_COR[1], PoU_COR[2], "COR");
 
-  cout << "\nGet final correlated chi2 ..." << endl;
-  TString Chi2Cor_final = Chi2Cor_hh+Chi2Cor_hl+Chi2Cor_lh+Chi2Cor_ll;
-  cout << "\t ... calculate" << endl;
-  TF2* chi2_JMS_cor = new TF2("JMS", Chi2Cor_final, -2, 2, -2, 2);
+  double sigma_jec = (PoU_JEC[1]+PoU_JEC[2])/2;
+  double sigma_cor = (PoU_COR[1]+PoU_COR[2])/2;
+  double sigma_jms = sqrt(pow(sigma_jec/PoU_JEC[0],2)+pow(sigma_cor/PoU_COR[0],2));
 
-  cout << "Minimum " << chi2_JMS_cor->GetMinimum() << endl;
-  cout << "Get Points from correlated chi2 (Minimum) ..." << endl;
-  VecD nominal_JMS_cor = GetMinimumChi2(chi2_JMS_cor, "JMS");
-  VecDD ellipse_JMS_cor = GetSigmaEllipse(chi2_JMS_cor, nominal_JMS_cor, "JMS", 1000, 0.1);
-  cout << "Number of points for correlated 1\u03C3 ellipse: " << ellipse_JMS_cor.size() << endl;
-  VecDD ellipse2_JMS_cor = GetSigmaEllipse(chi2_JMS_cor, nominal_JMS_cor, "JMS", 1000, 0.1, 6.18);
-  cout << "Number of points for correlated 2\u03C3 ellipse: " << ellipse_JMS_cor.size() << endl;
-  VecDD ellipse_JMS_cor_alt = GetSigmaEllipse_alt(chi2_JMS_cor, nominal_JMS_cor, "JMS", 2000, 0.1);
-  cout << "Number of points for correlated 1\u03C3 ellipse_alt: " << ellipse_JMS_cor_alt.size() << endl;
-  VecDD ellipse2_JMS_cor_alt = GetSigmaEllipse_alt(chi2_JMS_cor, nominal_JMS_cor, "JMS", 2000, 0.1, 6.18);
-  cout << "Number of points for correlated 1\u03C3 ellipse_alt: " << ellipse2_JMS_cor_alt.size() << endl;
+  if(debug){
+    cout << "sigma/min (cor) = " << pow(sigma_cor/PoU_COR[0],2) << endl;
+    cout << "sigma/min (jec) = " << pow(sigma_jec/PoU_JEC[0],2) << endl;
+    cout << "Error f_{JMS}: " << sigma_jms << endl;
+  }
 
-  VecDD AllExtrema_JMS_cor = GetExtreme(ellipse_JMS_cor, nominal_JMS_cor);
-  VecD uu_cor = {AllExtrema_JMS_cor[0]};
-  VecD dd_cor = {AllExtrema_JMS_cor[1]};
-  VecD du_cor = {AllExtrema_JMS_cor[2]};
-  VecD ud_cor = {AllExtrema_JMS_cor[3]};
-
-  VecDD AllExtrema_JMS_cor_alt = GetExtreme(ellipse_JMS_cor_alt, nominal_JMS_cor);
-  VecD uu_cor_alt = {AllExtrema_JMS_cor_alt[0]};
-  VecD dd_cor_alt = {AllExtrema_JMS_cor_alt[1]};
-  VecD du_cor_alt = {AllExtrema_JMS_cor_alt[2]};
-  VecD ud_cor_alt = {AllExtrema_JMS_cor_alt[3]};
-
+  VecD projection_cor_twosig = ExtractJMSValues(full_chi2_function_cor, 2.3);
+  double minY = nominal_JMS_cor_full[1];
+  double sigma_cor_center = projection_cor_twosig[1]+projection_cor_twosig[2];
+  double sigma_cor_full = 2*(ymax_global-minY); // just to avoid comfusion
+  double rho = sqrt(1-sigma_cor_center/sigma_cor_full);
   double zero = 0; VecD vec0 = {0};
-  PrintValues(nominal_JMS_cor, uu_cor, ud_cor, du_cor, dd_cor, "JMScorrelated.txt", zero, zero, zero, zero, vec0, vec0, zero);
-  PrintValues(nominal_JMS_cor, uu_cor_alt, ud_cor_alt, du_cor_alt, dd_cor_alt, "JMScorrelated_alt.txt", zero, zero, zero, zero, vec0, vec0, zero);
-  // VecDD ordered_ellipse_cor = upper_cor;
-  // ordered_ellipse_cor.insert(ordered_ellipse_cor.end(), lower_cor.begin(), lower_cor.end());
-  VecDD extrema_cor = {uu_cor, dd_cor, ud_cor, du_cor};
-  VecDD extrema_cor_alt = {uu_cor_alt, dd_cor_alt, ud_cor_alt, du_cor_alt};
-  Draw2DChi2(chi2_JMS_cor, ellipse_JMS_cor, extrema_cor, nominal_JMS_cor, "JMScor");
-  Draw2DChi2(chi2_JMS_cor, ellipse_JMS_cor_alt, extrema_cor_alt, nominal_JMS_cor, "JMScor_alt");
+  cout << setw(15) << minY << setw(15) << sigma_cor_center << setw(15) << sigma_cor_full << setw(15) << rho << endl;
+  cout << setw(15) << projection_cor_twosig[1] << setw(15) << projection_cor_twosig[2] << setw(15) << ymax_global << endl;
+  // PrintValues(nominal_JMS, uu, ud, du, dd, "JMS.txt", sigma_cor_center, rho, sigma_cor, sigma_jec, PoU_COR, PoU_JEC, sigma_jms);
+  PrintValues(nominal_JMS_cor_full, uu_cor_full, ud_cor_full, du_cor_full, dd_cor_full, "JMScorrelated.txt", sigma_cor_center, rho, sigma_cor, sigma_jec, PoU_COR, PoU_JEC, sigma_jms);
+  VecDD extrema_cor_full = {uu_cor_full, dd_cor_full, ud_cor_full, du_cor_full};
+  Draw2DChi2(chi2_JMS_cor_full, ellipse_JMS_cor_full, extrema_cor_full, nominal_JMS_cor_full, "JMScor");
 
   if(debug) cout << "\t ... Save hist in root file" << endl;
-  TPolyMarker3D* zmin_point = new TPolyMarker3D(1);
-  zmin_point->SetPoint(0, nominal_JMS_cor[0], nominal_JMS_cor[1], nominal_JMS_cor[2]);
+  TPolyMarker3D* zmin_point_full = new TPolyMarker3D(1);
+  zmin_point_full->SetPoint(0, nominal_JMS_cor_full[0], nominal_JMS_cor_full[1], nominal_JMS_cor_full[2]);
 
-  TPolyMarker3D* sigma_points = new TPolyMarker3D();
-  if(ellipse_JMS_cor.size()>0){ // precaution, ellipse for bins is not important
-    for(unsigned int i=0; i<ellipse_JMS_cor.size(); i++) sigma_points->SetPoint(i, ellipse_JMS_cor[i][0], ellipse_JMS_cor[i][1], ellipse_JMS_cor[i][2]);
+  TPolyMarker3D* sigma_points_full = new TPolyMarker3D();
+  if(ellipse_JMS_cor_full.size()>0){ // precaution, ellipse for bins is not important
+    for(unsigned int i=0; i<ellipse_JMS_cor_full.size(); i++) sigma_points_full->SetPoint(i, ellipse_JMS_cor_full[i][0], ellipse_JMS_cor_full[i][1], ellipse_JMS_cor_full[i][2]);
   }
-  TPolyMarker3D* sigma2_points = new TPolyMarker3D();
-  if(ellipse2_JMS_cor.size()>0){ // precaution, ellipse for bins is not important
-    for(unsigned int i=0; i<ellipse2_JMS_cor.size(); i++) sigma2_points->SetPoint(i, ellipse2_JMS_cor[i][0], ellipse2_JMS_cor[i][1], ellipse2_JMS_cor[i][2]);
-  }
-
-  TPolyMarker3D* sigma_points_alt = new TPolyMarker3D();
-  if(ellipse_JMS_cor_alt.size()>0){ // precaution, ellipse for bins is not important
-    for(unsigned int i=0; i<ellipse_JMS_cor_alt.size(); i++) sigma_points_alt->SetPoint(i, ellipse_JMS_cor_alt[i][0], ellipse_JMS_cor_alt[i][1], ellipse_JMS_cor_alt[i][2]);
-  }
-  TPolyMarker3D* sigma2_points_alt = new TPolyMarker3D();
-  if(ellipse2_JMS_cor_alt.size()>0){ // precaution, ellipse for bins is not important
-    for(unsigned int i=0; i<ellipse2_JMS_cor_alt.size(); i++) sigma2_points_alt->SetPoint(i, ellipse2_JMS_cor_alt[i][0], ellipse2_JMS_cor_alt[i][1], ellipse2_JMS_cor_alt[i][2]);
+  TPolyMarker3D* sigma2_points_full = new TPolyMarker3D();
+  if(ellipse2_JMS_cor_full.size()>0){ // precaution, ellipse for bins is not important
+    for(unsigned int i=0; i<ellipse2_JMS_cor_full.size(); i++) sigma2_points_full->SetPoint(i, ellipse2_JMS_cor_full[i][0], ellipse2_JMS_cor_full[i][1], ellipse2_JMS_cor_full[i][2]);
   }
 
-  if(onlyLin && !addSyst){
-    TString option = gSystem->AccessPathName("files/PaperPlots.root")?"recreate":"update";
-    TFile *f_out = new TFile("files/PaperPlots.root", option);
-    f_out->cd();
-    if(f_out->GetDirectory("Functions")==0) gDirectory->mkdir("Functions");
-    if(f_out->GetDirectory("Graphs")==0)    gDirectory->mkdir("Graphs");
-    f_out->cd("Functions");
-    chi2_JMS_cor->Write("JMS_Chi2", TObject::kOverwrite);
-    f_out->cd("Graphs");
-    zmin_point->Write("JMS_nominal", TObject::kOverwrite);
-    double x,y,z;
-    zmin_point->GetPoint(0, x,y,z);
-    cout << x << "\t" << y << "\t" << z << endl;
-    sigma_points->Write("JMS_ellipse", TObject::kOverwrite);
-    sigma2_points->Write("JMS_ellipse_2sigma", TObject::kOverwrite);
-    f_out->Close();
-  }
+  // ========================================================================================
+  // === Write TObjects (chi2, minimum, ellipse) to root file for dedicated paper plot script
 
-  option = gSystem->AccessPathName(save_nfs+"/Ellipse.root")?"recreate":"update";
-  TFile *f_out = new TFile(save_nfs+"/Ellipse.root", option);
+  TString option = gSystem->AccessPathName("files/PaperPlots_Peak.root")?"recreate":"update";
+  TFile *f_out = new TFile("files/PaperPlots_Peak.root", option);
   f_out->cd();
   if(f_out->GetDirectory("Functions")==0) gDirectory->mkdir("Functions");
   if(f_out->GetDirectory("Graphs")==0)    gDirectory->mkdir("Graphs");
   f_out->cd("Functions");
-  chi2_JMS_cor->Write("JMS_Chi2", TObject::kWriteDelete);
+  chi2_JMS_cor_full->Write("JMS_Chi2", TObject::kOverwrite);
   f_out->cd("Graphs");
-  zmin_point->Write("JMS_nominal", TObject::kWriteDelete);
+  zmin_point_full->Write("JMS_nominal", TObject::kOverwrite);
   double x,y,z;
-  zmin_point->GetPoint(0, x,y,z);
+  zmin_point_full->GetPoint(0, x,y,z);
   cout << x << "\t" << y << "\t" << z << endl;
-  sigma_points->Write("JMS_ellipse", TObject::kWriteDelete);
-  sigma2_points->Write("JMS_ellipse_2sigma", TObject::kWriteDelete);
+  sigma_points_full->Write("JMS_ellipse", TObject::kOverwrite);
+  sigma2_points_full->Write("JMS_ellipse_2sigma", TObject::kOverwrite);
+  f_out->Close();
+
+  // ====================================================================
+  // === Write extrame (minimum, ellipse) to root file ellipse comparison
+
+  option = gSystem->AccessPathName(save_nfs+"/Ellipse.root")?"recreate":"update";
+  f_out = new TFile(save_nfs+"/Ellipse.root", option);
+  f_out->cd();
+  if(f_out->GetDirectory("Functions")==0) gDirectory->mkdir("Functions");
+  if(f_out->GetDirectory("Graphs")==0)    gDirectory->mkdir("Graphs");
+  f_out->cd("Functions");
+  chi2_JMS_cor_full->Write("JMS_Chi2", TObject::kWriteDelete);
+  f_out->cd("Graphs");
+  zmin_point_full->Write("JMS_nominal", TObject::kWriteDelete);
+  // double x,y,z;
+  zmin_point_full->GetPoint(0, x,y,z);
+  cout << x << "\t" << y << "\t" << z << endl;
+  sigma_points_full->Write("JMS_ellipse", TObject::kWriteDelete);
+  sigma2_points_full->Write("JMS_ellipse_2sigma", TObject::kWriteDelete);
   f_out->Close();
 
   cout << "====================================================" << endl;
+  cout << "===               'JMS Peak'                    ====" << endl;
+  cout << "====================================================" << endl;
   cout << "JMS factors correlated" << endl;
-  cout << "fJMS = " << setw(space) << nominal_JMS_cor[0] << " + " << setw(space) << abs(nominal_JMS_cor[0]-uu_cor[0]) << " - " << setw(space) << abs(nominal_JMS_cor[0]-dd_cor[0]) << endl;
-  cout << "fCOR = " << setw(space) << nominal_JMS_cor[1] << " + " << setw(space) << abs(nominal_JMS_cor[1]-uu_cor[1]) << " - " << setw(space) << abs(nominal_JMS_cor[1]-dd_cor[1]) << endl;
-  cout << "chi2 = " << setw(space) << nominal_JMS_cor[2] << endl;
-  cout << "----------------------------------------------------" << endl;
-  cout << "JMS factors correlated alt" << endl;
-  cout << "fJMS = " << setw(space) << nominal_JMS_cor[0] << " + " << setw(space) << abs(nominal_JMS_cor[0]-uu_cor_alt[0]) << " - " << setw(space) << abs(nominal_JMS_cor[0]-dd_cor_alt[0]) << endl;
-  cout << "fCOR = " << setw(space) << nominal_JMS_cor[1] << " + " << setw(space) << abs(nominal_JMS_cor[1]-uu_cor_alt[1]) << " - " << setw(space) << abs(nominal_JMS_cor[1]-dd_cor_alt[1]) << endl;
-  cout << "chi2 = " << setw(space) << nominal_JMS_cor[2] << endl;
+  cout << "fJMS = " << setw(space) << nominal_JMS_cor_full[0] << " + " << setw(space) << abs(nominal_JMS_cor_full[0]-uu_cor_full[0]) << " - " << setw(space) << abs(nominal_JMS_cor_full[0]-dd_cor_full[0]) << endl;
+  cout << "fCOR = " << setw(space) << nominal_JMS_cor_full[1] << " + " << setw(space) << abs(nominal_JMS_cor_full[1]-uu_cor_full[1]) << " - " << setw(space) << abs(nominal_JMS_cor_full[1]-dd_cor_full[1]) << endl;
+  cout << "chi2 = " << setw(space) << nominal_JMS_cor_full[2] << endl;
   cout << "====================================================" << endl <<endl;
+
+  return 0;
+
+
+  // =================================================================================
+  // === Continue normal
+
+  // =================================================================================
+  // === Example Code if histogram gets too big
+  // === Run four times over nbins ->
+  // === for 180 bins: 180*180*180*180 bins to loop over
+  // === run ones and save in extra file
+
+  // MapM m_cov_data = GetCovMatrixMap(m_data_rebin, save, "data");
+  // MapM m_cov_norm_data; // skip long runtime
+  // m_cov_norm_data[w_mass_hh].ResizeTo(mDim, mDim);
+  // m_cov_norm_data[w_mass_hl].ResizeTo(mDim, mDim);
+  // m_cov_norm_data[w_mass_lh].ResizeTo(mDim, mDim);
+  // m_cov_norm_data[w_mass_ll].ResizeTo(mDim, mDim);
+  //
+  // option = gSystem->AccessPathName("files/CovMatrices_JMS.root")?"recreate":"update";
+  // TFile *f = new TFile("files/CovMatrices_JMS.root", option);
+  // f->cd();
+  //
+  // if(fast){
+  //   cout << "Matricies for data " << RED << "from ROOT file" << RESET << endl;
+  //   m_cov_norm_data[w_mass_hh] = TMatrixD(*((TMatrixD*) f->Get("covData_hh_norm_"+year+"_"+channel+add2)));
+  //   m_cov_norm_data[w_mass_hl] = TMatrixD(*((TMatrixD*) f->Get("covData_hl_norm_"+year+"_"+channel+add2)));
+  //   m_cov_norm_data[w_mass_lh] = TMatrixD(*((TMatrixD*) f->Get("covData_lh_norm_"+year+"_"+channel+add2)));
+  //   m_cov_norm_data[w_mass_ll] = TMatrixD(*((TMatrixD*) f->Get("covData_ll_norm_"+year+"_"+channel+add2)));
+  // }
+  // else{
+  //   m_cov_norm_data = GetCovMatrixNormMap(m_cov_data, m_data_rebin, save, "data");
+  //   m_cov_norm_data[w_mass_hh].Write("covData_hh_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
+  //   m_cov_norm_data[w_mass_hl].Write("covData_hl_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
+  //   m_cov_norm_data[w_mass_lh].Write("covData_lh_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
+  //   m_cov_norm_data[w_mass_ll].Write("covData_ll_norm_"+year+"_"+channel+add2, TObject::kOverwrite);
+  // }
+  //
+  // TH2D* temp = new TH2D();
+  // temp = TMatrixDtoTH2D(m_cov_norm_data[w_mass_hh], m_cov_norm_data[w_mass_hh].GetNcols(), 0, 180, "hhdatanorm"+channel+year); DrawCov(temp, save_nfs+"SYS/data_hh_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+  // temp = TMatrixDtoTH2D(m_cov_norm_data[w_mass_hl], m_cov_norm_data[w_mass_hl].GetNcols(), 0, 180, "hldatanorm"+channel+year); DrawCov(temp, save_nfs+"SYS/data_hl_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+  // temp = TMatrixDtoTH2D(m_cov_norm_data[w_mass_lh], m_cov_norm_data[w_mass_lh].GetNcols(), 0, 180, "lhdatanorm"+channel+year); DrawCov(temp, save_nfs+"SYS/data_lh_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+  // temp = TMatrixDtoTH2D(m_cov_norm_data[w_mass_ll], m_cov_norm_data[w_mass_ll].GetNcols(), 0, 180, "lldatanorm"+channel+year); DrawCov(temp, save_nfs+"SYS/data_ll_norm_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+
+  // =================================================================================
+  // === Get Skip bins - obsolet
+
+  // vector<bool> skipBins_hh = GetSkipBins(m_data, peak_bins, w_mass_hh);
+  // vector<bool> skipBins_hl = GetSkipBins(m_data, peak_bins, w_mass_hl);
+  // vector<bool> skipBins_lh = GetSkipBins(m_data, peak_bins, w_mass_lh);
+  // vector<bool> skipBins_ll = GetSkipBins(m_data, peak_bins, w_mass_ll);
+
 }
 
 
@@ -772,7 +888,7 @@ void AddTwoMaps(MapHHH& map1, MapHHH& map2, int option){
 // ===                                                                                                ===
 // ======================================================================================================
 
-MapM GetCovMatrixMap(MapH& map, const TString& save, const TString& process){
+MapM GetCovMatrixMap(MapH& map, const TString& process){
   MapM covs;
   for(auto hist: map){
 
@@ -790,7 +906,7 @@ MapM GetCovMatrixMap(MapH& map, const TString& save, const TString& process){
   return covs;
 }
 
-MapM GetCovMatrixNormMap(MapM& map, MapH& hists, const TString& save, const TString& process){
+MapM GetCovMatrixNormMap(MapM& map, MapH& hists, const TString& process){
   MapM covs;
   for(auto hist: map){
     auto start = high_resolution_clock::now(); // Calculation time - start
@@ -799,7 +915,7 @@ MapM GetCovMatrixNormMap(MapM& map, MapH& hists, const TString& save, const TStr
     TString wbin = h; wbin.ReplaceAll(cut, "");
     TMatrixD mtemp = map[h];
     bool onlyDiag = process.Contains("data")?false:true;
-    TMatrixD norm = NormCovMatrix(hists[h], mtemp, false, onlyDiag);
+    TMatrixD norm = NormCovMatrixAlt(hists[h], mtemp, false, onlyDiag);
     TH2D* htemp_norm = TMatrixDtoTH2D(norm, norm.GetNcols(), 0, 180, h+c+y+process+"norm");
     DrawCov(htemp_norm, save_nfs+"SYS/"+process+"_norm_"+wbin+"_"+c+"_"+y, "#it{m}_{W}", 0.3);
 
@@ -846,6 +962,15 @@ MapH NormalizeMap(MapH& process){
   return map;
 }
 
+MapH TrimMap(MapH& process, MapVI& range, TString name){
+  MapH map;
+  for(auto h:hists){
+    // TH1F* TrimHistogram(TH1F* hist_, double r_low, double r_high, TString name, bool debug){
+    map[h] = TrimHistogram(process[h], range[h].at(0), range[h].at(1), h+"_trimmed_"+name, debug);
+  }
+  return map;
+}
+
 // ======================================================================================================
 // ===                                                                                                ===
 // ======================================================================================================
@@ -866,24 +991,26 @@ void printVector(VecI& vector, TString info) {
 // ===                                                                                                ===
 // ======================================================================================================
 
-MapSI2DGe Creat2DGraph(MapHH& map, MapVI& peak, VecTS& hists){
+MapSI2DGe Creat2DGraph(MapHH& map, VecTS& hists){
   if(debug) cout << "\t ... Inside Create2DGraph - " << channel << endl;
   VecD factor_x = {0.0,  1.0, -1.0,  0.0,  0.0};
   VecD factor_y = {0.0,  0.0,  0.0,  1.0, -1.0};
   VecD dummy = {0.0,  0.0,  0.0,  0.0,  0.0};
   VecD content, error;
-  MapI2DGe storage;
   MapSI2DGe bins;
 
   for(TString hist: hists){ // defined in main()
     if(debug) cout << "new hist: " << hist << endl;
-    for(unsigned int i=0; i<peak[hist].size(); i++)
+    MapI2DGe storage;
+    cout << "Create " << hist << " with " << map["data"][hist]->GetNbinsX() << " bins" << endl;
+    for(unsigned int i=1; i<=map["data"][hist]->GetNbinsX(); i++)
     {
+      cout << setw(3) << i;
       // ----------------------------------------------
       // We only want to combine all years and
       // consider all channels (muon, elec and combine)
 
-      int bin = peak[hist].at(i);
+      int bin = i;
       TString name = to_string(bin);
       content.push_back(map["ttbar"][hist]->GetBinContent(bin));
       content.push_back(map["JECup"][hist]->GetBinContent(bin));
@@ -906,7 +1033,9 @@ MapSI2DGe Creat2DGraph(MapHH& map, MapVI& peak, VecTS& hists){
 
       content.clear(); error.clear();
     }
+    cout << endl;
     bins[hist] = storage;
+    cout << "bin size " << bins[hist].size() << endl;
   }
   return bins;
 }
@@ -976,7 +1105,7 @@ void Plot2DGraph(TGraph2DErrors* bin_fit, int bin, TString title, VecD content, 
   if(title.Contains("hl")) nbin = "Bin_"+sbin+"_hl.pdf";
   if(title.Contains("lh")) nbin = "Bin_"+sbin+"_lh.pdf";
   if(title.Contains("hh")) nbin = "Bin_"+sbin+"_hh.pdf";
-  B->SaveAs(save+"/all_bins/"+nbin); // Double / (//) does not affect the dir
+  B->SaveAs(save_nfs+"/all_bins/"+nbin); // Double / (//) does not affect the dir
   B->Clear();
 
   // Remove Additional Points for fit --------------------------------------
@@ -1003,133 +1132,69 @@ TPolyLine3D* SetPolyLine(double x1, double x2, double y1, double y2, double z1, 
 // ===                                                                                                ===
 // ======================================================================================================
 
-MapF2 GetFits(MapSI2DGe& map, MapVI& peak, TString& hist){
+MapF2 GetFits(MapSI2DGe& map, TString& hist){
   if(debug) cout << "\n\t ... Inside GetFits - " << channel << endl;
 
   MapF2 functions;
-  vector<VecTS> name_fits = {{"linear"}, {"mixed (xy2)", "mixed (x2y)"}, {"mixed (xyy2)", "mixed (xx2y)"}, {"quadratic"}, {"polynomial of order 2"}};
-  VecII ndfs  = {{2}, {2, 2}, {1, 1}, {2}, {0}}; // ndf = n_points - n_parameters = 5 - n_para
-  VecII n_fit_para  = {{3}, {3, 3}, {4, 4}, {3}, {5}};
-  int nlin = 0; int ntot = 0;
+  TString name_fit = "linear";
+  int ndf  = 2; // ndf = n_points - n_parameters = 5 - n_para
+  int n_fit_para  = 3;
+  int nlin = 0;
   TString replace = hist; replace.ReplaceAll("comparison_topjet_xcone_pass_rec/", "");
 
   cout << "Start fitting " << replace << " ... " << endl;
-  for(unsigned int i=0; i<peak[hist].size(); i++)
+  cout << map[hist].size() << endl;
+  for(unsigned int i=0; i<map[hist].size(); i++)
   {
-    ntot++;
-    int bin = peak[hist].at(i);
-    TString name = to_string(bin);
-    TGraph2DErrors* bin_fit=map[hist][bin];
+    TString name = to_string(i+1);
+    TGraph2DErrors* bin_fit=map[hist][i+1];
 
-    TF2 *used_fit;
-    TF2 *fit_lin  = new TF2(name, "[0] + [1]*x + [2]*y");
-    TF2 *fit_xy2  = new TF2(name, "[0] + [1]*x + [2]*y*y");
-    TF2 *fit_x2y  = new TF2(name, "[0] + [1]*x*x + [2]*y");
-    TF2 *fit_xyy2 = new TF2(name, "[0] + [1]*x + [2]*y + [3]*y*y");
-    TF2 *fit_xx2y = new TF2(name, "[0] + [1]*x + [2]*x*x + [3]*y");
-    TF2 *fit_quad = new TF2(name, "[0] + [1]*x*x + [2]*y*y");
-    TF2 *fit_poly = new TF2(name, "[0] + [1]*x + [2]*y + [3]*x*x + [4]*y*y");
-    vector<vector<TF2*>> fits = {{fit_lin}, {fit_xy2, fit_x2y}, {fit_xyy2, fit_xx2y}, {fit_quad}, {fit_poly}};
+    TF2 *fit  = new TF2(name, "[0] + [1]*x + [2]*y");
 
-    for(unsigned int order=0; order<fits.size(); order++){
-      if(onlyLin && order>0) continue;
-      bool twoFits = fits[order].size()==2;
-      double chi2a = -1; double chi2b = -1;
-      double prob1 = -1; double prob2 = -1;
+    bin_fit->Fit(fit, "Q");
+    double chi2 = fit->GetChisquare();
+    double prob = TMath::Prob(chi2, ndf);
 
-      bin_fit->Fit(fits[order][0], "Q");
-      if(twoFits) bin_fit->Fit(fits[order][1], "Q");
-
-      chi2a = fits[order][0]->GetChisquare();
-      if(twoFits) chi2b = fits[order][1]->GetChisquare();
-
-      prob1 = TMath::Prob(chi2a, ndfs[order][0]);
-      if(twoFits) prob2 = TMath::Prob(chi2b, ndfs[order][1]);
-
-      bool isProb2 = prob1<prob2;
-      double prob = (isProb2)?prob2:prob1;
-      double chi2 = (isProb2)?chi2b:chi2a;
-      int index = (isProb2)?1:0;
-
-      // -----------------------------------------------------------------------
-      if(!onlyLin){
-        if(prob>0.05 || ndfs[order][0]==0){ // prob > 0.05 is common in data science
-          if(debug) cout << " -> Bin " << name << ": A " << GREEN << name_fits[order][index] << RESET << " fit fullfills the criterion (" << prob << ")" << endl;
-          functions[name]=fits[order][index];
-          if(order == 0) nlin++;
-          // Information which can be extracted later.
-          // This way, no further information then the function itself has to be provided
-          // Necessary for Chi2 construction to decide which formula to use
-          const char* info = name_fits[order][index];
-          functions[name]->SetParName(0, info);
-          break;
-        }
-      }
-      else{
-        functions[name]=fits[order][index];
-        nlin++;
-        const char* info = name_fits[order][index];
-        functions[name]->SetParName(0, info);
-        break; // extra caution
-      }
-    }
+    // -----------------------------------------------------------------------
+    functions[name]=fit;
+    nlin++;
+    const char* info = name_fit;
+    functions[name]->SetParName(0, info);
   }
-  if(debug) cout << "\t ... " << nlin << " linear fits with " << ntot << " fits in total (" << dtos(100*nlin/(double)ntot, 2) << " %)" << endl;
+  cout << "number lins " << nlin << endl;
   return functions;
 }
+
 
 // ======================================================================================================
 // ===                                                                                                ===
 // ======================================================================================================
 
-VecTS GetFitFunctions(MapF2& fits, MapVI& peak, TString& hist){
+VecTS GetFitFunctions(MapF2& fits){
   VecTS fit_functions;
-  for(unsigned int i=0; i<peak[hist].size(); i++)
+  for(unsigned int i=0; i<fits.size(); i++)
   {
-    int bin = peak[hist].at(i);
+    int bin = i+1;
     TString sbin = to_string(bin);
     TFormula *formula = fits[sbin]->GetFormula();
     int npar = formula->GetNpar();
     TString fname = formula->GetParName(0);
 
-    // if(debug){
-    //   cout << npar << "\t";
-    //   for(unsigned int i=0; i<npar; i++)
-    //   {
-    //     cout << fits[sbin]->GetParameter(i) << "\t";
-    //   }
-    //   cout << endl;
-    // }
+    TString function = "[0] + [1]*x + [2]*y";
 
-    TString function;
-    if(fname.EqualTo("linear")) function = "[0] + [1]*x + [2]*y";
-    if(fname.EqualTo("mixed (xy2)")) function = "[0] + [1]*x + [2]*y*y";
-    if(fname.EqualTo("mixed (x2y)")) function = "[0] + [1]*x*x + [2]*y";
-    if(fname.EqualTo("mixed (xyy2)")) function = "[0] + [1]*x + [2]*y + [3]*y*y";
-    if(fname.EqualTo("mixed (xx2y)")) function = "[0] + [1]*x + [2]*x*x + [3]*y";
-    if(fname.EqualTo("quadratic")) function = "[0] + [1]*x*x + [2]*y*y";
-    if(fname.EqualTo("polynomial of order 2")) function = "[0] + [1]*x + [2]*y + [3]*x*x + [4]*y*y";
-
-    // if(debug) cout << function << endl;
+    cout << setw(3) << i << function << endl;
     for(unsigned int i=0; i<npar; i++) function.ReplaceAll("["+to_string(i)+"]", dtos(fits[sbin]->GetParameter(i), precision));
-    // if(debug) cout << function << endl;
+    cout << setw(3) << "" << function << endl;
 
     fit_functions.push_back(function);
   }
   return fit_functions;
 }
 
+
 // ======================================================================================================
 // ===                                                                                                ===
 // ======================================================================================================
-
-VecD StoreBinContentInVector(MapH &map, MapVI& peak, TString& hist){
-  VecD content;
-  for(unsigned int i=0; i<peak[hist].size(); i++){
-    content.push_back(map[hist]->GetBinContent(peak[hist][i]));
-  }
-  return content;
-}
 
 vector<bool> GetSkipBins(MapHHH &map, MapVI& peak, TString& hist){
   vector<bool> skipBin;
@@ -1141,109 +1206,140 @@ vector<bool> GetSkipBins(MapHHH &map, MapVI& peak, TString& hist){
   return skipBin;
 }
 
+VecD StoreBinContentInVector(MapH &map, TString& hist){
+  VecD content;
+  for(unsigned int i=1; i<=map[hist]->GetNbinsX(); i++){
+    content.push_back(map[hist]->GetBinContent(i));
+    printf("(%3i, %2.5d)",i,content[i-1]);
+  }
+  cout << endl;
+  return content;
+}
+
 // ======================================================================================================
 // ===                                                                                                ===
 // ======================================================================================================
-TF2* GetChi2(MapF2& fits, MapHH& nhists, MapVI& peak, TString hist){
-  int ipar = 0;
-  TString fchi2 = "";
-  for(unsigned int i=0; i<peak[hist].size(); i++)
-  {
-    int bin = peak[hist].at(i);
-    TString sbin = to_string(bin);
-    TFormula *formula = fits[sbin]->GetFormula();
-    int npar = formula->GetNpar();
-    TString fname = formula->GetParName(0);
 
-    double data_content = nhists["data"][hist]->GetBinContent(bin);
-    double data_error = nhists["data"][hist]->GetBinError(bin); // stat. error
-    double tt_content = nhists["ttbar"][hist]->GetBinContent(bin); // fit error (estimated)
-    double tt_error = nhists["ttbar"][hist]->GetBinError(bin); // fit error (estimated)
-    double error2 = pow(data_error, 2) + pow(tt_error, 2);
+TString GetChi2Cor(TMatrixD &m, vector<TString> &vecS, VecD &vecD, int nbins, int nbins_hh, int nbins_hl, int nbins_lh, int nbins_ll, bool uncor){
 
-    TString function = "("+dtos(data_content,50);
-    if(fname.EqualTo("linear")) function += " - [0] - [1]*x - [2]*y";
-    if(fname.EqualTo("mixed (xy2)")) function += " - [0] - [1]*x - [2]*y*y";
-    if(fname.EqualTo("mixed (x2y)")) function += " - [0] - [1]*x*x - [2]*y";
-    if(fname.EqualTo("mixed (xyy2)")) function += " - [0] - [1]*x - [2]*y - [3]*y*y";
-    if(fname.EqualTo("mixed (xx2y)")) function += " - [0] - [1]*x - [2]*x*x - [3]*y";
-    if(fname.EqualTo("quadratic")) function += " - [0] - [1]*x*x - [2]*y*y";
-    if(fname.EqualTo("polynomial of order 2")) function += "[0] - [1]*x - [2]*y - [3]*x*x - [4]*y*y";
-    function += ")^2/"+dtos(error2,50);
-    for(int par=0; par<npar; par++)
-    {
-      TString before = "["+to_string(par)+"]";
-      TString after = "("+dtos(formula->GetParameter(par),50)+")";
-      function.ReplaceAll(before, after);
-    }
-    fchi2+=" + "+function;
-  }
-  // dummy parameter - SetParName only available if function has parameters!
-  fchi2 += " + [0]"; // will be set to 0!
-  TF2* chi2 = new TF2(hist, fchi2, -10, 10, -10, 10);
+  cout << "Size input vectors - fits " << setw(5) << vecS.size() << " | data " << setw(5) << vecS.size() << " | #bins " << setw(5) << nbins << endl;
 
-  chi2->SetParameter(0, 0);
-  const char *info = fchi2.ReplaceAll(" + [0]", "");
-  chi2->GetFormula()->SetParName(0, info); // to extract the formula as TString
+  bool uncorrelated = uncor;
+  int n = nbins_hh+nbins_hl+nbins_lh+nbins_ll;
+  if(n!=vecD.size() && n!=0) throw runtime_error("WRONG BINNING!");
 
-  if(debug) cout << "Chi2(0,0) for " << hist << " is " << chi2->Eval(0, 0) << endl;
-  return chi2;
-}
-
-
-
-TString GetChi2Cor(TMatrixD &m, vector<TString> &vecS, VecD &vecD, int nbins, vector<bool> &skipBin, TString wbin){
   TString term = "(di - (gi)) * (dj - (gj)) * Vij-1";
+  TString i_term = "(di - (gi)) * (j_term)";
+  TString j_term = "(dj - (gj)) * Vij-1";
   TString function = "";
+  TString function_ij = "";
   TString temp_term = term;
+  TString temp_term_i = term;
+  TString temp_term_j = term;
+  TString temp_term_ij = term;
 
-  vector<bool> dummy;
-  for(unsigned int i=0; i<nbins; i++){dummy.push_back(false);}
-  TMatrixD m_trim = TrimMatrix(m, dummy); // Cut of diagonals with 0 for .Invert()
-  vector<bool> skipBinTrim = TrimSkipBin(m, skipBin, true); // Keep same size as m_trim
-  if(skipBinTrim.size()!=m_trim.GetNcols()) throw runtime_error("Trimmed Vector not equal to trimmed Matrix!");
+  int skip_1 = rand()%nbins_hh;
+  int skip_2 = rand()%nbins_hl+nbins_hh;
+  int skip_3 = rand()%nbins_lh+(nbins_hh+nbins_hl);
+  int skip_4 = rand()%nbins_ll+(nbins_hh+nbins_hl+nbins_lh);
 
-  // if(debug) printCovMatrix(m, "standard", 100000, 3);
-  // if(debug) printCovMatrix(m_trim, "trimmed", 100000, 3);
+  cout << "Skip four bins:" << setw(4) << skip_1 << setw(4) << skip_2 << setw(4) << skip_3 << setw(4) << skip_4 << endl;
 
-  TMatrixF minvert = TMatrixF(m_trim);
-  minvert.SetTol(1.e-30);
-  minvert.Invert();
-
-  TMatrixF mId = TMatrixF(m_trim);
-  mId *= minvert;
-
-  // if(debug) printCovMatrix(m_trim, "Nominal Matrix", 1.e8, 3);
-  // if(debug) printCovMatrix(minvert, "Inverted Matrix", 100000);
-  // if(debug) printCovMatrix(mId, "Identity Test", 1, 1);
-
-  TMatrixD m_final = TrimMatrix(minvert, skipBinTrim);
-  vector<bool> skipBinFinal = TrimSkipBin(minvert, skipBinTrim, false);
-  TH2D* h_final = TMatrixDtoTH2D(m_final, m_final.GetNcols(), 0, 180, channel+year+wbin+"norm");
-  DrawCov(h_final, save+"CovMatrix_"+wbin+"_"+channel+"_"+year, "#it{m}_{W}", 0.3);
-
-  if(skipBinFinal.size()!=m_final.GetNcols()){
-    cout << "Vector " << skipBinFinal.size() << " | Matrix " << m_final.GetNcols() << endl;
-    throw runtime_error("Final trimmed Vector not equal to trimmed Matrix!");
+  vector<int> bins = {};
+  for(unsigned int i=0; i<nbins; i++){
+    bool skip = false;
+    if(i==skip_1||i==skip_2||i==skip_3||i==skip_4) skip = true;
+    if(!skip) bins.push_back(i);
   }
 
-  // if(debug) cout << term << endl;
-  nbins=m_final.GetNcols();
-  cout << "Final Check --- Matrix: " << nbins << "\t | skipBin: " << skipBinFinal.size() << "\t | data bin content: " << vecD.size() << "\t | terms: " << vecS.size() << endl;
-  for(unsigned int i = 0; i<nbins; i++){
-    for(unsigned int j = 0; j<nbins; j++){
-      if(abs(m_final[i][j])<=10e-30) continue;
-      temp_term = term;
-      temp_term.ReplaceAll("di", dtos(vecD[i], precision));
-      temp_term.ReplaceAll("gi", vecS[i]);
-      temp_term.ReplaceAll("dj", dtos(vecD[j], precision));
-      temp_term.ReplaceAll("gj", vecS[j]);
-      temp_term.ReplaceAll("Vij-1", dtos(m_final[i][j], precision));
-      // if(debug) cout << j << "\t" << temp_term << endl;
-      function += " + "+temp_term;
+  int N = bins.size();
+  TMatrixD m_trim = TMatrixD(N,N);
+  VecD data;
+  vector<TString> fits;
+
+  if(bins.size()!=m_trim.GetNcols()){
+    cout << "Used bins " << N << " | Matrix " << m_trim.GetNcols() << endl;
+    throw runtime_error("Used bins not equal to trimmed Matrix!");
+  }
+  for(int i=0; i<N; i++){
+    data.push_back(vecD[bins[i]]);
+    fits.push_back(vecS[bins[i]]);
+    for(int j=0; j<N; j++){
+      m_trim[i][j] = m[bins[i]][bins[j]];
     }
   }
-  return function;
+
+  // printCovMatrix(m, "standard", 100000, 3);
+  // printCovMatrix(m_trim, "trimmed", 100000, 3);
+
+  TDecompLU lu(m);
+  TMatrixD imat = TMatrixD(m);
+  lu.Invert(imat);
+  TMatrixD test(m, TMatrixD::kMult, imat);
+  TMatrixD unit(TMatrixD::kUnit, m);
+  Bool_t ok = VerifyMatrixIdentity(unit, test, false, 1.e-8);
+  if (!ok){
+    std::cerr << "FcnData::RecalculateInvCovMa. Error inverting the mapped covariance matrix. Aborting." << std::endl;
+    printf("\n\n------------------------------- cov matrix ----------------------------- \n");
+    for (int i=0; i<N; ++i){
+      printf("%3d:  ",i+1);
+      for (int j=0; j<N; ++j)  printf("%7.2f ", m[i][j] );
+      printf("\n");
+    }
+    printf("\n");
+    printf("\n\n------------------------- diag. elements in cov matrix --------------------------- \n");
+    for (int i=0; i<N; ++i){
+      printf("(%3d,%3d)   %9.8f",i,i,m[i][i]*1e8);
+      if ( m[i][i] < 1.e-8 ) printf("   <<<<<<<< \n");
+      else printf("\n");
+    }
+    exit(3);
+  }
+
+  // if(debug) printCovMatrix(imat, "Inverted Matrix", 100000);
+  // if(debug) printCovMatrix(unit, "Identity Test", 1, 1);
+
+  TH2D* h_final = TMatrixDtoTH2D(imat, N, 0, N, channel+year+"norm");
+  DrawCov(h_final, save_nfs+"CovMatrix_inverted_"+channel+"_"+year, "#it{m}_{W}", 0.3);
+
+  cout << "Before Check -- Matrix: " << m.GetNcols() << "\t | used bins: " << bins.size() << "\t | data bin content: " << vecD.size() << "\t | terms: " << vecS.size() << endl;
+  cout << "Final Check --- Matrix: " << imat.GetNcols() << "\t | used bins: " << bins.size() << "\t | data bin content: " << data.size() << "\t | terms: " << fits.size() << endl;
+
+  int b_hh = nbins_hh;
+  int b_hl = b_hh+nbins_hl;
+  int b_lh = b_hl+nbins_lh;
+  int b_ll = b_lh+nbins_ll;
+  cout << setw(5) << nbins_hh << setw(5) << nbins_hl << setw(5) << nbins_lh << setw(5) << nbins_ll << endl;
+  cout << setw(5) << b_hh << setw(5) << b_hl << setw(5) << b_lh << setw(5) << b_ll << endl;
+
+  for(unsigned int i = 0; i<N; i++){
+
+    TString temp_comp_j = "";
+    // double cold=0;
+    // double cnew=0;
+    for(unsigned int j = 0; j<N; j++){
+
+      if(abs(imat[i][j])<=10e-30){cout << "check " << setw(3) << i << setw(3) << j << endl; continue;}
+
+      temp_term_j = j_term;
+      temp_term_j.ReplaceAll("dj", dtos(data[j], precision));
+      temp_term_j.ReplaceAll("gj", fits[j]);
+      temp_term_j.ReplaceAll("Vij-1", dtos(imat[i][j], precision));
+      temp_comp_j += " + "+temp_term_j;
+
+      // cout << "\t\t" << setw(3) << j << temp_term_j << endl;
+
+    }
+
+    temp_term_i = i_term;
+    temp_term_i.ReplaceAll("di", dtos(data[i], precision));
+    temp_term_i.ReplaceAll("gi", fits[i]);
+    // cout << "\t" << setw(3) << i << temp_term_i << endl;
+    temp_term_i.ReplaceAll("j_term", temp_comp_j);
+    function_ij += " + "+temp_term_i;
+
+  }
+  return function_ij;
 }
 
 // ======================================================================================================
@@ -1264,7 +1360,7 @@ VecDD GetSigmaEllipse(TF2* chi2, VecD &minimum, TString hist, double runs, doubl
   if(debug) cout << "Chi2 - Get 1\u03C3 Ellipse\n";
   double z = minimum[2]; double y = minimum[1]; double x = minimum [0];
   auto start = high_resolution_clock::now(); // Calculation time - start
-  VecDD points = FindXY(chi2, z+at, x-0.8, x+0.8, y-2.0, y+2.0, runs, acc);
+  VecDD points = FindXY(chi2, z+at, x-0.8, x+0.8, y-1.5, y+1.5, runs, acc);
   auto stop  = high_resolution_clock::now();  // Calculation time - stop
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "Numeric solution for "+hist.ReplaceAll(cut, "")+"s 1\u03C3 estimation took " << GREEN << duration.count() << "ms" << RESET << endl;
@@ -1272,11 +1368,11 @@ VecDD GetSigmaEllipse(TF2* chi2, VecD &minimum, TString hist, double runs, doubl
   return points;
 }
 
-VecDD GetSigmaEllipse_alt(TF2* chi2, VecD &minimum, TString hist, double runs, double acc, double at){
+VecDD GetSigmaEllipse_alt(TF2* chi2, VecD &minimum, TString hist, double runs, double acc, double at, double range){
   if(debug) cout << "Chi2 - Get 1\u03C3 Ellipse\n";
   double z = minimum[2]; double y = minimum[1]; double x = minimum [0];
   auto start = high_resolution_clock::now(); // Calculation time - start
-  VecDD points = FindXY_alt(chi2, z+at, x-1.0, x+1.0, y-1.0, y+1.0, runs, acc);
+  VecDD points = FindXY_alt(chi2, z+at, x-range, x+range, y-range, y+range, runs, acc);
   auto stop  = high_resolution_clock::now();  // Calculation time - stop
   auto duration = duration_cast<milliseconds>(stop - start);
   cout << "Numeric solution for "+hist.ReplaceAll(cut, "")+"s 1\u03C3 estimation took " << GREEN << duration.count() << "ms" << RESET << endl;
@@ -1357,7 +1453,7 @@ void Draw2DChi2(TF2* chi2, VecDD &points, VecDD &extrema, VecD &minimum, TString
   extrema_points->Draw("SAME P");
   CMSLabelOffset(0.11, 0.95, 0.105, -0.012);
   TString id = hist.ReplaceAll("comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_", "");
-  D->SaveAs(save+"/chi2_"+id+".pdf");
+  D->SaveAs(save_nfs+"/chi2_"+id+".pdf");
   D->SaveAs(save_nfs+"/chi2_"+id+".pdf");
   D->Clear();
 }
@@ -1420,7 +1516,7 @@ void drawChi2Projection(TF1* chi2function, TString xaxis, VecD xRange, VecD yRan
   chi2function->GetYaxis()->SetTitle("#chi^{2}");
   chi2function->GetYaxis()->SetTitleOffset(1.2);
   chi2function->Draw();
-  ccor->SaveAs(save+"/chi2_projection_"+xaxis+".pdf");
+  ccor->SaveAs(save_nfs+"/chi2_projection_"+xaxis+".pdf");
 }
 
 // ======================================================================================================
@@ -1428,7 +1524,7 @@ void drawChi2Projection(TF1* chi2function, TString xaxis, VecD xRange, VecD yRan
 // ======================================================================================================
 void PoUinTXT(double& nom, double& up, double& down, TString variation){
   ofstream textfile;
-  textfile.open(save+"/factor_projection_"+variation+".txt");
+  textfile.open(save_nfs+"/factor_projection_"+variation+".txt");
   textfile << right;
   textfile << setw(10) << "nom" << setw(10) << "up" << setw(10) << "down" << "\n";
   textfile << setw(10) <<  nom  << setw(10) <<  up  << setw(10) <<  down;
@@ -1508,36 +1604,16 @@ void PrintValues(VecD& nominal, VecD& uu, VecD& ud, VecD& du, VecD& dd, TString 
   cout << "fJMS = " << setw(space) << nominal[0] << " + " << setw(space) << abs(nominal[0]-uu[0]) << " - " << setw(space) << abs(nominal[0]-dd[0]) << endl;
   cout << "fCOR = " << setw(space) << nominal[1] << " + " << setw(space) << abs(nominal[1]-uu[1]) << " - " << setw(space) << abs(nominal[1]-dd[1]) << endl;
   cout << endl;
-  if(!name.Contains("cor")){
-    cout << "sigma_cor: " << sigma_cor_center << endl;
-    cout << "\u03C1: " << -rho << endl;
-    cout << "PoU COR: " << pow(sigma_cor/PoU_COR[0],2) << endl;
-    cout << "PoU JEC: " << pow(sigma_jec/PoU_JEC[0],2) << endl;
-    cout << "Error f_{JMS}: " << sigma_jms << endl;
-  }
+  // if(!name.Contains("cor")){
+  cout << "sigma_cor: " << sigma_cor_center << endl;
+  cout << "\u03C1: " << -rho << endl;
+  cout << "PoU COR: " << pow(sigma_cor/PoU_COR[0],2) << endl;
+  cout << "PoU JEC: " << pow(sigma_jec/PoU_JEC[0],2) << endl;
+  cout << "Error f_{JMS}: " << sigma_jms << endl;
+  // }
   cout << "====================================================" << endl <<endl;
 
   ofstream textfile;
-  textfile.open(save+"/"+name);
-  textfile << right;
-  textfile << "nom (" << setw(space) << nominal[0] << ", " << setw(space) << nominal[1] << ") with z = " << nominal[2] << endl;
-  textfile << "uu  (" << setw(space) << uu[0] << ", " << setw(space) << uu[1] << ")" << endl;
-  textfile << "dd  (" << setw(space) << dd[0] << ", " << setw(space) << dd[1] << ")" << endl;
-  textfile << "du  (" << setw(space) << du[0] << ", " << setw(space) << du[1] << ")" << endl;
-  textfile << "ud  (" << setw(space) << ud[0] << ", " << setw(space) << ud[1] << ")" << endl;
-  textfile << "-----------------------------" << endl;
-  textfile << "fJMS = " << setw(space) << nominal[0] << " + " << setw(space) << abs(nominal[0]-uu[0]) << " - " << setw(space) << abs(nominal[0]-dd[0]) << endl;
-  textfile << "fCOR = " << setw(space) << nominal[1] << " + " << setw(space) << abs(nominal[1]-uu[1]) << " - " << setw(space) << abs(nominal[1]-dd[1]) << endl;
-  textfile << endl;
-  if(!name.Contains("cor")){
-    textfile << "sigma_cor: " << sigma_cor_center << endl;
-    textfile << "\u03C1: " << -rho << endl;
-    textfile << "PoU COR: " << pow(sigma_cor/PoU_COR[0],2) << endl;
-    textfile << "PoU JEC: " << pow(sigma_jec/PoU_JEC[0],2) << endl;
-    textfile << "Error f_{JMS}: " << sigma_jms << endl;
-  }
-  textfile.close();
-
   textfile.open(save_nfs+"/"+name);
   textfile << right;
   textfile << "nom (" << setw(space) << nominal[0] << ", " << setw(space) << nominal[1] << ") with z = " << nominal[2] << endl;
@@ -1702,7 +1778,7 @@ TMatrixD GetSYSCov(TH1F* hist, TH1F* var, TString sysname, int panel, TString ad
     }
   }
   TH2D* h_norm = TMatrixDtoTH2D(matrix, nbins, 0, 180, "cov_"+sysname+"_"+year+to_string(panel)+add);
-  DrawCov(h_norm, save_nfs+"/SYS/"+year+"/cov_"+sysname+"_"+year+"_"+add, to_string(panel)+add);
+  DrawCov(h_norm, save_nfs+"/SYS/cov_"+sysname+"_"+year+"_"+add, to_string(panel)+add);
 
   TCanvas *c = new TCanvas(sysname+add, "", 600, 600);
   gPad->SetLeftMargin(0.2);
@@ -1714,9 +1790,7 @@ TMatrixD GetSYSCov(TH1F* hist, TH1F* var, TString sysname, int panel, TString ad
   sys->SetLineColor(kRed);
   sys->SetFillColor(kRed);
   sys->Draw("HIST ][");
-  // c->SaveAs(save_path+"/SYS_"+sysname+".pdf");
-  // if(saveNFS) c->SaveAs(save_nfs+"/"+year+"/SYS/SYS_"+sysname+".pdf");
-  c->SaveAs(save_nfs+"/SYS/"+year+"/SYS_"+sysname+"_"+add+".pdf");
+  c->SaveAs(save_nfs+"/SYS/SYS_"+sysname+"_"+add+".pdf");
 
   // c_sys->cd(panel);
   sys->Draw("HIST ][");
@@ -1724,3 +1798,4 @@ TMatrixD GetSYSCov(TH1F* hist, TH1F* var, TString sysname, int panel, TString ad
   delete c;
   return matrix;
 }
+//

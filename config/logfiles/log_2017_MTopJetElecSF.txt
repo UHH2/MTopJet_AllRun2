@@ -1,0 +1,18 @@
+starting manager
+Using saved settings from: Workdir_ElecSF_2017/SubmissinInfoSave.p
+Found Submission Info for DATA_SingleMuonB_2017v2
+Found Submission Info for DATA_SingleMuonC_2017v2
+Found Submission Info for DATA_SingleMuonD_2017v2
+Found Submission Info for DATA_SingleMuonE_2017v2
+Found Submission Info for DATA_SingleMuonF_2017v2
+Found Submission Info for ST_t-channel_antitop_2017v2
+Found Submission Info for ST_t-channel_top_2017v2
+Found Submission Info for ST_s-channel_2017v2
+Found Submission Info for ST_tW_antitop_2017v2
+Found Submission Info for ST_tW_top_2017v2
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs

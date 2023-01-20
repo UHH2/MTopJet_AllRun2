@@ -1,0 +1,420 @@
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_COR_down/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.95 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_COR_up/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.54 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_FSRdown_2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.93 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_FSRdown_4/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.96 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_FSRdown_sqrt2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.93 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_FSRup_2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.83 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_FSRup_4/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.89 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_FSRup_sqrt2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.86 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_ISRdown_2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.94 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_ISRdown_4/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.0 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_ISRdown_sqrt2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.01 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_ISRup_2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.96 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_ISRup_4/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.04 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_ISRup_sqrt2/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.9 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_JEC_down/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.99 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_JEC_up/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.06 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_JER_down/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.89 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_JER_up/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.05 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_JMS_downdown/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 0.97 sec
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2018MTopJetJMSelecmuon/SFrame_JMS_upup/./conf.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2018
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2018
+Found Submission Info for TTbar_Mtt0700to1000_2018
+Found Submission Info for TTbar_Mtt1000toInft_2018
+ Result.xml created for further jobs
+if grid pid information got lost root Files could still be transferring
+--------------------------------------------------------------------------------
+Status of files
+                          Sample Name:  Ready #Files [%]
+       TTbar_2L2Nu_Mtt0000to0700_2018:      4      4 100 [92m Transferred [0m
+TTbar_SemiLeptonic_Mtt0000to0700_2018:      5      5 100 [92m Transferred [0m
+    TTbar_Hadronic_Mtt0000to0700_2018:      1      1 100 [92m Transferred [0m
+             TTbar_Mtt0700to1000_2018:      4      4 100 [92m Transferred [0m
+             TTbar_Mtt1000toInft_2018:      5      5 100 [92m Transferred [0m
+Number of files:  19 / 19 (000) / /
+================================================================================
+SFrame Batch was running for 1.2 sec

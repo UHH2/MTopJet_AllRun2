@@ -1,0 +1,198 @@
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/COR_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/COR_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/FSRdown_2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/FSRdown_4/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/FSRdown_sqrt2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/FSRup_2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/FSRup_4/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/FSRup_sqrt2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/ISRdown_2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/ISRdown_4/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/ISRdown_sqrt2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/ISRup_2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/ISRup_4/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/ISRup_sqrt2/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JEC_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JEC_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JER_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JER_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JMS_downdown/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JMS_flavor_down/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JMS_flavor_up/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs
+Working on /nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/SFrameUncerts_2017_muon/JMS_upup/config.txt
+starting manager
+Using saved settings from: workdir/SubmissinInfoSave.p
+Found Submission Info for TTbar_2L2Nu_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_SemiLeptonic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Hadronic_Mtt0000to0700_2017v2
+Found Submission Info for TTbar_Mtt0700to1000_ext_2017v2
+Found Submission Info for TTbar_Mtt1000toInft_ext_2017v2
+ Result.xml created for further jobs

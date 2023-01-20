@@ -1,0 +1,8 @@
+python sframe_syst_batch.py 2016/Alex_MTopJetPostSelection_SYS_muon.xml
+python sframe_syst_batch.py 2016/Alex_MTopJetPostSelection_SYS_elec.xml
+
+python sframe_syst_batch.py 2017/Alex_MTopJetPostSelection_SYS_muon.xml
+python sframe_syst_batch.py 2017/Alex_MTopJetPostSelection_SYS_elec.xml
+
+python sframe_syst_batch.py 2018/Alex_MTopJetPostSelection_SYS_muon.xml
+python sframe_syst_batch.py 2018/Alex_MTopJetPostSelection_SYS_elec.xml

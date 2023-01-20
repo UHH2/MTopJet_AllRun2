@@ -33,13 +33,14 @@ void WMassLabel(double x, double y, TString bin);
 TH1F* GetRatioLocal(TH1F* h1, TH1F* h2, bool equal, bool isData = false);
 
 TString save_afs = "/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/PaperPlots/";
-TString save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/PaperPlots/";
+// TString save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/PaperPlots/";
+TString save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/PaperPlots/peak/";
 
 TFile* file;
 
 int main(int argc, char* argv[]){
   cout << "Start" << endl;
-  file = new TFile("files/PaperPlots.root", "read");
+  // file = new TFile("files/PaperPlots_Peaks.root", "read");
 
   gErrorIgnoreLevel = kWarning;
   SetupGlobalStyle();
@@ -75,20 +76,22 @@ int main(int argc, char* argv[]){
   // === Plot WMass plots
   if(drawW){
     cout << "Start with WMass plots ..." << endl;
-
+    file = new TFile("files/PaperPlots_Peak.root", "read");
     DrawWMass("hh");
     DrawWMass("hl");
     DrawWMass("lh");
     DrawWMass("ll");
+    file->Close();
   }
 
   // ===========================================================================
   // === Plot tau32 plots
   if(drawT){
     cout << "Start with WMass plots ..." << endl;
-
+    file = new TFile("files/PaperPlots.root", "read");
     DrawTau("2016");
     DrawTau("combine");
+    file->Close();
   }
 
   // ===========================================================================
@@ -96,6 +99,7 @@ int main(int argc, char* argv[]){
   if(drawC){
     cout << "Start with JMS plots ..." << endl;
 
+    file = new TFile("files/PaperPlots_Peak.root", "read");
     TF2* chi2 = (TF2*) file->Get("Functions/JMS_Chi2");
     // cout << chi2->Eval(0,0) << endl;
     double twoD_minX, twoD_minY;
@@ -138,7 +142,7 @@ int main(int argc, char* argv[]){
     chi2->SetTitle("");
     chi2->SetFillStyle(1000);
     chi2->SetLineWidth(4);
-    chi2->SetRange(-1.7, -1.7, 1.7, 1.7);
+    chi2->SetRange(-2, -2, 2, 2);
     chi2->SetContour(nb); // Contours
 
     cout << "\t ... Define contours" << endl;
@@ -172,7 +176,7 @@ int main(int argc, char* argv[]){
     chi2->GetHistogram()->GetZaxis()->SetTitle("#chi^{ 2}");
     chi2->GetHistogram()->GetZaxis()->CenterTitle();
 
-    chi2->SetMinimum(190);
+    chi2->SetMinimum(100);
     gPad->RedrawAxis();
     m_can->SetTheta(90);
     m_can->SetPhi(0);
@@ -180,8 +184,8 @@ int main(int argc, char* argv[]){
     ellipse->Draw("SAME P");
     ellipse2->Draw("SAME P");
     minimum->Draw("SAME P");
-    ell->Draw("SAME");
-    ell->Paint("SAME");
+    // ell->Draw("SAME");
+    // ell->Paint("SAME");
     DrawLumi(138., false, true, prelim, "JMS");
 
     cout << "\t ... Draw Legend" << endl;
@@ -189,6 +193,7 @@ int main(int argc, char* argv[]){
 
     m_can->SaveAs(save_afs+"/chi2_JMS.pdf");
     m_can->SaveAs(save_nfs+"/chi2_JMS.pdf");
+    file->Close();
   }
 }
 
@@ -342,6 +347,7 @@ void DrawWMass(TString bin){
   ratio_data->Draw("pe same ][");
   gPad->RedrawAxis();
 
+  cout << save_nfs+"wmass_"+bin+".pdf" << endl;
   m_can->Print(save_afs+"wmass_"+bin+".pdf");
   m_can->Print(save_nfs+"wmass_"+bin+".pdf");
 }

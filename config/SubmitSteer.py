@@ -91,8 +91,8 @@ def main():
     # xmls.append("MTopJetPostSelection_tt_muon.xml")
     # xmls.append("MTopJetPostSelection_tt_elec.xml")
 
-    # xmls.append("MTopJetPostSelection_SYS_muon.xml")
-    # xmls.append("MTopJetPostSelection_SYS_elec.xml")
+    xmls.append("MTopJetPostSelection_SYS_muon.xml")
+    xmls.append("MTopJetPostSelection_SYS_elec.xml")
 
     # xmls.append("MTopJetPostSelection_muon_V20.xml")
     # xmls.append("MTopJetPostSelection_elec_V20.xml")
@@ -224,8 +224,8 @@ def delete_workdirs(dirlist):
         elif "MTopJetPostSelection_JMSmuon_elec" in arg: Workdir = "Workdir_PostSelEl_"+year+"_JMSmuon"
         elif "MTopJetPostSelection_JMSelec_muon" in arg: Workdir = "Workdir_PostSelMu_"+year+"_JMSelec"
 
-        elif "MTopJetPostSelection_SYS_muon" in arg: Workdir = "SFrameUncerts_"+year+"MTopJetmuon"
-        elif "MTopJetPostSelection_SYS_elec" in arg: Workdir = "SFrameUncerts_"+year+"MTopJetelec"
+        elif "MTopJetPostSelection_SYS_muon" in arg: Workdir = "SFrameUncerts_"+year+"_muon"
+        elif "MTopJetPostSelection_SYS_elec" in arg: Workdir = "SFrameUncerts_"+year+"_elec"
         elif "MTopJetPostSelection_JMSelec_SYS_muon" in arg: Workdir = "SFrameUncerts_"+year+"MTopJetJMSelecmuon"
         elif "MTopJetPostSelection_JMSmuon_SYS_elec" in arg: Workdir = "SFrameUncerts_"+year+"MTopJetJMSmuonelec"
 
@@ -236,7 +236,10 @@ def delete_workdirs(dirlist):
         dirXML = '/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/config/'
 
         cmd = command
-        cmd.append(dirROOT+Workdir)
+        if not "SFrameUncerts" in Workdir:
+            cmd.append(dirROOT+Workdir)
+        else:
+            cmd.append(dirROOT+"*/workdir")
         cmd.append(dirXML+Workdir)
         print cmd
         subprocess.call(cmd, stdout=open("logfiles/delete.txt","w"), stderr=subprocess.STDOUT) # Popen runs command in backgorund

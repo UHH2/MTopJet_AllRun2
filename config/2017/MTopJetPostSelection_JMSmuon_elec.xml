@@ -477,6 +477,14 @@
   <Item Name="JetMassScale_channel" Value="muon" />
   <Item Name="JetMassScale_direction" Value="nominal" />
 
+  <Item Name="JetMassScale_channel" Value="combine" />
+  <Item Name="JetMassScale_direction" Value="nominal" />   <!-- has to be: nominal, upup, updown, downup or downdown! (up and down for PoU) -->
+  <Item Name="JetMassScale_Flavor" Value="nominal" />      <!-- has to be: nominal, up or down! -->
+  <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+  <Item Name="jersmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+  <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
+  <Item Name="NonClosureUncertainty" Value="false" />      <!-- has to be: true or false! -->
+
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>
 

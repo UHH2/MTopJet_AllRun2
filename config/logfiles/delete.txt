@@ -1,0 +1,1 @@
+rm: cannot remove '/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/muon/*/workdir': No such file or directory

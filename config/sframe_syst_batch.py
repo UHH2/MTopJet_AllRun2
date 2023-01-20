@@ -10,11 +10,11 @@ sys.path.append('/nfs/dust/cms/user/tholenhe/installs/varial-stable/Varial')
 #'name' : {'item name': 'item value', ...},
 sys_uncerts = {}
 if "2017" in sys.argv[1] or "2018" in sys.argv[1]:
+    sys_uncerts['FSRup_4'] = {'PS_variation':'FSRup_4'}
     sys_uncerts['FSRup_sqrt2'] = {'PS_variation':'FSRup_sqrt2'}
     sys_uncerts['FSRdown_sqrt2'] = {'PS_variation':'FSRdown_sqrt2'}
     sys_uncerts['FSRup_2'] = {'PS_variation':'FSRup_2'}
     sys_uncerts['FSRdown_2'] = {'PS_variation':'FSRdown_2'}
-    sys_uncerts['FSRup_4'] = {'PS_variation':'FSRup_4'}
     sys_uncerts['FSRdown_4'] = {'PS_variation':'FSRdown_4'}
     sys_uncerts['ISRup_sqrt2'] = {'PS_variation':'ISRup_sqrt2'}
     sys_uncerts['ISRdown_sqrt2'] = {'PS_variation':'ISRdown_sqrt2'}
@@ -30,6 +30,8 @@ sys_uncerts['JER_up'] = {'jersmear_direction':'up'}
 sys_uncerts['JER_down'] = {'jersmear_direction':'down'}
 sys_uncerts['COR_up'] = {'JetCorrection_direction':'up'}
 sys_uncerts['COR_down'] = {'JetCorrection_direction':'down'}
+sys_uncerts['JMS_flavor_up'] = {'JetMassScale_Flavor':'up'}
+sys_uncerts['JMS_flavor_down'] = {'JetMassScale_Flavor':'down'}
 
 # sys_uncerts['JMS_updown'] = {'JetMassScale_direction':'updown'}
 # sys_uncerts['JMS_downup'] = {'JetMassScale_direction':'downup'}
@@ -92,7 +94,7 @@ class MySFrameBatch(SFrame):
     def configure(self):
         self.xml_doctype = self.xml_doctype + """
 <!--
-   <ConfigParse NEventsBreak="500000" FileSplit="0" AutoResubmit="0" />
+   <ConfigParse NEventsBreak="50000" FileSplit="0" AutoResubmit="0" />
    <ConfigSGE RAM ="2" DISK ="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="workdir"/>
 -->
 """

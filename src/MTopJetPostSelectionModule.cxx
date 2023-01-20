@@ -1061,10 +1061,22 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     // calculated with combined channels
     if(jms_channel == "combine"){
 
+      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 130.06
+      if     (jms_direction == "nominal")  points = { 0.603918,  -0.060578}; // BestFit point
+      else if(jms_direction == "upup")     points = { 0.784718,   0.008422}; // clostest point, right
+      else if(jms_direction == "downdown") points = { 0.423118,  -0.129578}; // clostest point, left
+      // else if(jms_direction == "downup")   points = { 0.587951,   0.483947}; // furthest point, up
+      // else if(jms_direction == "updown")   points = { 1.229551,  -1.313053}; // furthest point, down
+
+      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 344.09
+      // if     (jms_direction == "nominal")  points = { 0.880562,  -0.222858}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 1.026562,  -0.174858}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.735562,  -0.272858}; // clostest point, left
+
       // ========== ONLY LIN + SYS + Fit from nom tt ====== chi2min = 338.96
-      if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
-      else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
-      else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
+      // if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
 
       // ========== ONLY LIN + SYS =======================
       // if     (jms_direction == "nominal")  points = { 0.833438,  -0.187411}; // BestFit point
@@ -1801,18 +1813,21 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     ttfactor = weight_after / weight_before;
   }
 
-  bool BtoB = TMath::Abs(TVector2::Phi_mpi_pi((hadjet.phi() - lepjets[0].phi()))) > 2.7;
-  TLorentzVector hadjet_v4 = lorentz_to_tlorentz(hadjet.v4());
-  bool inMass = 150 < hadjet_v4.M() && hadjet_v4.M() < 190;
-  // if ( !BtoB ) { std::cout << "Jets are not back to back" << std::endl; return kTRUE;}
-  ofstream f;
-  f.open("forISpy.txt", std::ios_base::app);
-  // if(f.is_open()) f << setw(9) << "  pt  " << setw(9) << "  mass  " << setw(14) << "  event  " << setw(8) << "  run  " << setw(7) << " lumi " << endl;
-  if(pass_measurement_rec && hadjet.pt()>500 && BtoB && inMass){
-    if(f.is_open()) f << setw(9) << hadjet.pt() << setw(9) << hadjet_v4.M() << setw(14) << event.event << setw(8) << event.run << setw(7) << event.luminosityBlock << "\n";
-    cout << setw(9) << hadjet.pt() << setw(9) << hadjet_v4.M() << setw(14) << event.event << setw(8) << event.run << setw(7) << event.luminosityBlock << endl;
+  /*************************** Extract "perfect" boosted ttbar events for ISpy **********************************************************************/
+  if(false){
+    bool BtoB = TMath::Abs(TVector2::Phi_mpi_pi((hadjet.phi() - lepjets[0].phi()))) > 2.7;
+    TLorentzVector hadjet_v4 = lorentz_to_tlorentz(hadjet.v4());
+    bool inMass = 150 < hadjet_v4.M() && hadjet_v4.M() < 190;
+    // if ( !BtoB ) { std::cout << "Jets are not back to back" << std::endl; return kTRUE;}
+    ofstream f;
+    f.open("forISpy.txt", std::ios_base::app);
+    // if(f.is_open()) f << setw(9) << "  pt  " << setw(9) << "  mass  " << setw(14) << "  event  " << setw(8) << "  run  " << setw(7) << " lumi " << endl;
+    if(pass_measurement_rec && hadjet.pt()>500 && BtoB && inMass){
+      if(f.is_open()) f << setw(9) << hadjet.pt() << setw(9) << hadjet_v4.M() << setw(14) << event.event << setw(8) << event.run << setw(7) << event.luminosityBlock << "\n";
+      cout << setw(9) << hadjet.pt() << setw(9) << hadjet_v4.M() << setw(14) << event.event << setw(8) << event.run << setw(7) << event.luminosityBlock << endl;
+    }
+    f.close();
   }
-  f.close();
 
   /*************************** write bools for passing selections **********************************************************************************/
   if(debug) cout << "Event Set" << endl;

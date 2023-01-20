@@ -13,7 +13,9 @@
 // e.g. only the peak bins, the matrix is cut (TrimMatrix()) after
 // normaliziations and inversion.
 
-void DrawCov(TH2D* h, TString save, TString axis, double zoff = 0.0);
+// void DrawCov(TH2D* h, TString save, TString axis, double zoff = 0.0);
+void DrawCov(TH2* h, TString save, TString axis, double zoff = 0.0);
+// void DrawCov(TH2F* h, TString save, TString axis, double zoff = 0.0);
 void printCovMatrix(TMatrixD m, TString name, double factor=1, int prec=2, bool diag=true);
 TH2D* TMatrixDtoTH2D(TMatrixD m, double nbins, double xmin, double xmax, TString name, bool debug=false);
 TMatrixD NormCovMatrix(TH1* hist_, TMatrixD old_cov, bool width_, bool onlyDiag=false);
@@ -275,10 +277,6 @@ TMatrixD TrimMatrix(TMatrixD matrix, vector<bool> skip, bool debug){
   return trimmed;
 }
 
-// ======================================================================================================
-// ===                                                                                                ===
-// ======================================================================================================
-
 // Matrix is not invertable if rows or coloumns are 0. Sometimes, these cases needs to be trimmed
 // before the matrix is inverted. TrimMatrix then creats the Matrix for the considered bins.
 
@@ -320,7 +318,7 @@ vector<bool> TrimSkipBin(TMatrixD matrix, vector<bool> vec, bool onlyZero, bool 
 // ===                                                                                                ===
 // ======================================================================================================
 
-void DrawCov(TH2D* h, TString save, TString axis, double zoff){
+void DrawCov(TH2* h, TString save, TString axis, double zoff){
 
   TCanvas *B = new TCanvas(save, "", 800, 800); // name used to avoid Warning
 
@@ -338,5 +336,26 @@ void DrawCov(TH2D* h, TString save, TString axis, double zoff){
   h->Draw("COLZ");
   B->SaveAs(save+".pdf");
 
-  h->Reset();
+  // h->Reset();
 }
+
+// void DrawCov(TH2F* h, TString save, TString axis, double zoff){
+//
+//   TCanvas *B = new TCanvas(save, "", 800, 800); // name used to avoid Warning
+//
+//   B->SetRightMargin(0.09);
+//   B->SetLeftMargin(0.15);
+//   B->SetRightMargin(0.20);
+//
+//   h->GetXaxis()->SetTitle(axis);
+//   h->GetYaxis()->SetTitle(axis);
+//   TString norm = (save.Contains("norm")?"normalized ":"");
+//   TString ztitle = norm + "uncertainty";
+//   h->GetZaxis()->SetTitle(ztitle);
+//   h->GetZaxis()->SetTitleOffset(1.0+zoff);
+//
+//   h->Draw("COLZ");
+//   B->SaveAs(save+".pdf");
+//
+//   h->Reset();
+// }

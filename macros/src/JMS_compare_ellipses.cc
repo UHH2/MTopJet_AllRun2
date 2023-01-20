@@ -87,12 +87,20 @@ int main(int argc, char* argv[]){
   JMS_min["combine_cor_syst"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst");
   JMS_min["combine_cor_syst_noJER"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_noJER");
   JMS_min["combine_cor_fitall"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "_fitall");
+  JMS_min["combine_cor_syst_peak"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak");
+  JMS_min["combine_cor_syst_peak_m4"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_m4");
+  JMS_min["combine_cor_syst_peak_uncor"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_uncor");
+  JMS_min["combine_cor_stat_peak"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "stat_peak");
 
   map<TString, TPolyMarker3D*> JMS_ellipse;
   JMS_ellipse["combine_cor"]        = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "");
   JMS_ellipse["combine_cor_syst"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst");
   JMS_ellipse["combine_cor_syst_noJER"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_noJER");
   JMS_ellipse["combine_cor_fitall"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "_fitall");
+  JMS_ellipse["combine_cor_syst_peak"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak");
+  JMS_ellipse["combine_cor_syst_peak_m4"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_m4");
+  JMS_ellipse["combine_cor_syst_peak_uncor"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_uncor");
+  JMS_ellipse["combine_cor_stat_peak"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "stat_peak");
 
   // // Fill Graph and Ellipse ------------------------------------------------------------------------
   // cout << "Create Graphs ... " << endl;
@@ -152,7 +160,10 @@ int main(int argc, char* argv[]){
 
   TF2* dummy = new TF2("dummy","x*y", 1.5, 1.5);
   // draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_syst"], JMS_min["combine_cor_syst_noJER"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_syst"], JMS_ellipse["combine_cor_syst_noJER"]}, {kRed+2, kBlue+2, kGreen+2}, {kOpenTriangleUp, kOpenTriangleDown, kOpenCircle}, {"No syst", "syst", "syst no JER"}, "syst_comparison_cor");
-  draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_syst"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_syst"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"No syst", "syst"}, "syst_comparison_cor");
+  // draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_syst"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_syst"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"No syst", "syst"}, "syst_comparison_cor");
+  // draw(dummy, {JMS_min["combine_cor_syst_peak"], JMS_min["combine_cor_fitall"]}, {JMS_ellipse["combine_cor_syst_peak"], JMS_ellipse["combine_cor_syst"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"Only Peak", "Peak"}, "syst_comparison_peak");
+  draw(dummy, {JMS_min["combine_cor_syst_peak"], JMS_min["combine_cor_syst_peak_m4"]}, {JMS_ellipse["combine_cor_syst_peak"], JMS_ellipse["combine_cor_syst_peak_m4"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"Only Peak", "Peak"}, "syst_comparison_peak");
+  // draw(dummy, {JMS_min["combine_cor_syst_peak"], JMS_min["combine_cor_syst_peak_uncor"], JMS_min["combine_cor_stat_peak"]}, {JMS_ellipse["combine_cor_syst_peak"], JMS_ellipse["combine_cor_syst_peak_uncor"], JMS_ellipse["combine_cor_stat_peak"]}, {kRed+2, kBlue+2, kGreen+2}, {kOpenTriangleUp, kOpenTriangleDown, kOpenCircle}, {"Correlated", "Uncorrelated", "Only stat"}, "syst_comparison_peak_uncerts");
   // draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_fitall"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_fitall"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"only tt", "largest"}, "fit_comparison");
 
   // void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color,  vector<TString> leg, TString name)
@@ -476,9 +487,11 @@ void draw(TF2* dummy, vector<TPolyMarker3D*> min, vector<TPolyMarker3D*> graph, 
   TLegend *leg = new TLegend(0.2,0.2,0.4,0.4);
   leg->SetTextSize(0.03);
   for(unsigned int i=0; i<color.size(); i++){
+    cout << i << endl;
     set_graph(graph[i], color[i], style[i],0.05);
     graph[i]->Draw("same P");
     leg->AddEntry(graph[i], names[i],"p");
+    cout << i << endl;
     set_graph(min[i], color[i], style[i],0.2);
     min[i]->Draw("same P");
   }
