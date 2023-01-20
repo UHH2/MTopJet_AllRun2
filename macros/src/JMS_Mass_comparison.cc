@@ -115,12 +115,12 @@ int main(int argc, char* argv[])
     return 0;
   }
 
-  save_path = get_save_path();
-  TString save_path_general = save_path+"/Plots"; // CHANGE_PT
-  save_path_general = creat_folder_and_path(save_path_general, "JMS");
-  creat_folder(save_path_general+"/muon");
-  creat_folder(save_path_general+"/elec");
-  creat_folder(save_path_general+"/combine");
+  save_path = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/";
+  TString save_path_general = save_path+"/ImpactMass/"; // CHANGE_PT
+  save_path_general = creat_folder_and_path(save_path_general, "");
+  // creat_folder(save_path_general+"/muon");
+  // creat_folder(save_path_general+"/elec");
+  // creat_folder(save_path_general+"/combine");
 
   vector<int> index_year   = {0,1,2,3};
   vector<TString> years    = {"2016","2017","2018","combine"};
@@ -431,17 +431,17 @@ int main(int argc, char* argv[])
     // draw --------------------------------------------------------------------
 
     // draw_plot_jms(TH1F* h1, TH1F* h2, TH1F* h3, const TString path, const TString year, vector<double> mean, TString norm="")
-    draw_plot_jms(all_ttbar_muon[year], all_jms_uu_muon[year], all_jms_dd_muon[year], path_muon, years[year], mean_muon);
-    draw_plot_jms(all_ttbar_elec[year], all_jms_uu_elec[year], all_jms_dd_elec[year], path_elec, years[year], mean_elec);
+    // draw_plot_jms(all_ttbar_muon[year], all_jms_uu_muon[year], all_jms_dd_muon[year], path_muon, years[year], mean_muon);
+    // draw_plot_jms(all_ttbar_elec[year], all_jms_uu_elec[year], all_jms_dd_elec[year], path_elec, years[year], mean_elec);
     draw_plot_jms(all_ttbar_combine[year], all_jms_uu_combine[year], all_jms_dd_combine[year], path_combine, years[year], mean_combine);
 
-    draw_plot_jms(all_ttbar_muon_norm[year], all_jms_uu_muon_norm[year], all_jms_dd_muon_norm[year], path_muon, years[year], mean_muon, "_norm");
-    draw_plot_jms(all_ttbar_elec_norm[year], all_jms_uu_elec_norm[year], all_jms_dd_elec_norm[year], path_elec, years[year], mean_elec, "_norm");
+    // draw_plot_jms(all_ttbar_muon_norm[year], all_jms_uu_muon_norm[year], all_jms_dd_muon_norm[year], path_muon, years[year], mean_muon, "_norm");
+    // draw_plot_jms(all_ttbar_elec_norm[year], all_jms_uu_elec_norm[year], all_jms_dd_elec_norm[year], path_elec, years[year], mean_elec, "_norm");
     draw_plot_jms(all_ttbar_combine_norm[year], all_jms_uu_combine_norm[year], all_jms_dd_combine_norm[year], path_combine, years[year], mean_combine, "_norm");
 
     // draw_plot_comparison(TH1F* h1, TH1F* h2, TH1F* data, const TString path, const TString year, vector<double> mean={0, 0})
-    draw_plot_comparison(all_ttbar_muon[year], all_ttbar_muon_old[year], all_data_muon[year], path_muon, years[year], mean_muon_old);
-    draw_plot_comparison(all_ttbar_elec[year], all_ttbar_elec_old[year], all_data_elec[year], path_elec, years[year], mean_elec_old);
+    // draw_plot_comparison(all_ttbar_muon[year], all_ttbar_muon_old[year], all_data_muon[year], path_muon, years[year], mean_muon_old);
+    // draw_plot_comparison(all_ttbar_elec[year], all_ttbar_elec_old[year], all_data_elec[year], path_elec, years[year], mean_elec_old);
     draw_plot_comparison(all_ttbar_combine[year], all_ttbar_combine_old[year], all_data_combine[year], path_combine, years[year], mean_combine_old);
 
   }

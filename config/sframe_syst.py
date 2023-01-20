@@ -9,22 +9,22 @@ sys.path.append('/nfs/dust/cms/user/tholenhe/installs/varial-stable/Varial')
 
 sys_uncerts = {
      #'name' : {'item name': 'item value', ...},
-     
-     # 'FSRup_sqrt2'              : {'PS_variation':'FSRup_sqrt2'},
-     # 'FSRdown_sqrt2'            : {'PS_variation':'FSRdown_sqrt2'},
-     # 'FSRup_2'                  : {'PS_variation':'FSRup_2'},
-     # 'FSRdown_2'                : {'PS_variation':'FSRdown_2'},
-     # 'FSRup_4'                  : {'PS_variation':'FSRup_4'},
-     # 'FSRdown_4'                : {'PS_variation':'FSRdown_4'},
-     # 'ISRup_sqrt2'              : {'PS_variation':'ISRup_sqrt2'},
-     # 'ISRdown_sqrt2'            : {'PS_variation':'ISRdown_sqrt2'},
-     # 'ISRup_2'                  : {'PS_variation':'ISRup_2'},
-     # 'ISRdown_2'                : {'PS_variation':'ISRdown_2'},
-     # 'ISRup_4'                  : {'PS_variation':'ISRup_4'},
-     # 'ISRdown_4'                : {'PS_variation':'ISRdown_4'},
+
+     'FSRup_sqrt2'              : {'PS_variation':'FSRup_sqrt2'},
+     'FSRdown_sqrt2'            : {'PS_variation':'FSRdown_sqrt2'},
+     'FSRup_2'                  : {'PS_variation':'FSRup_2'},
+     'FSRdown_2'                : {'PS_variation':'FSRdown_2'},
+     'FSRup_4'                  : {'PS_variation':'FSRup_4'},
+     'FSRdown_4'                : {'PS_variation':'FSRdown_4'},
+     'ISRup_sqrt2'              : {'PS_variation':'ISRup_sqrt2'},
+     'ISRdown_sqrt2'            : {'PS_variation':'ISRdown_sqrt2'},
+     'ISRup_2'                  : {'PS_variation':'ISRup_2'},
+     'ISRdown_2'                : {'PS_variation':'ISRdown_2'},
+     'ISRup_4'                  : {'PS_variation':'ISRup_4'},
+     'ISRdown_4'                : {'PS_variation':'ISRdown_4'},
      'JMS_upup'                 : {'JetMassScale_direction':'upup'},
-     'JMS_updown'               : {'JetMassScale_direction':'updown'},
-     'JMS_downup'               : {'JetMassScale_direction':'downup'},
+     # 'JMS_updown'               : {'JetMassScale_direction':'updown'},
+     # 'JMS_downup'               : {'JetMassScale_direction':'downup'},
      'JMS_downdown'             : {'JetMassScale_direction':'downdown'},
 }
 start_all_parallel = True

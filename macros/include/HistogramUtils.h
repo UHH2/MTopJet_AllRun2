@@ -120,6 +120,88 @@ vector<TH1F*> RebinVector(vector<TH1F*> hists, int rebin){
 // ===                                                                               ===
 // =====================================================================================
 
+TH1F* TrimHistogram(TH1F* hist_, double r_low, double r_high, TString name, bool debug){
+  TH1F* hist = (TH1F*) hist_->Clone();
+  int n_hist = hist->GetNbinsX();
+  vector<int> bins;
+  for(int i=1; i<=n_hist; i++){
+    double center = hist->GetBinCenter(i);
+    if(center > r_low){
+      if(center < r_high){
+        bins.push_back(i);
+      }
+    }
+  }
+  int N = bins.size();
+  int e_low = hist->GetXaxis()->GetBinLowEdge(bins[0]);
+  int e_high = hist->GetXaxis()->GetBinUpEdge(bins[N-1]);
+  if(e_low != r_low){
+    printf("range: %3d vs. edge: %3d\n",r_low,e_low);
+    throw runtime_error("<E> Lower boundaries do not fit - "+name);
+  }
+  if(e_high != r_high){
+    printf("range: %3d vs. edge: %3d\n",r_high,e_high);
+    throw runtime_error("<E> Higher boundaries do not fit - "+name);
+  }
+  if(debug) cout << "Consider" << setw(3) << N << "from" << setw(5) << e_low << "to" << setw(5) << e_high << endl;
+  TH1F* hist_trim = new TH1F(name, name, N, e_low, e_high);
+  for(int i=0; i<N;i++){
+    hist_trim->SetBinContent(i+1, hist->GetBinContent(bins[i]));
+    hist_trim->SetBinError(i+1, hist->GetBinError(bins[i]));
+  }
+  return hist_trim;
+}
+
+// TH1F* TrimHistogram(TH1F* hist_, vector<int> bins, TString name, bool debug){
+//   TH1F* hist = (TH1F*) hist_->Clone();
+//   int n_hist = hist->GetNbinsX();
+//   int N = bins.size();
+//   // int e_low = hist->GetXaxis()->GetBinLowEdge(bins[0]);
+//   // int e_high = hist->GetXaxis()->GetBinUpEdge(bins[N-1]);
+//   if(e_low != r_low){
+//     printf("range: %3d vs. edge: %3d\n",r_low,e_low);
+//     throw runtime_error("<E> Lower boundaries do not fit - "+name);
+//   }
+//   if(e_high != r_high){
+//     printf("range: %3d vs. edge: %3d\n",r_high,e_high);
+//     throw runtime_error("<E> Higher boundaries do not fit - "+name);
+//   }
+//   if(debug) cout << "Consider" << setw(3) << N << "from" << setw(5) << e_low << "to" << setw(5) << e_high << endl;
+//   TH1F* hist_trim = new TH1F(name, name, N, e_low, e_high);
+//   for(int i=0; i<N;i++){
+//     hist_trim->SetBinContent(i+1, hist->GetBinContent(bins[i]));
+//     hist_trim->SetBinError(i+1, hist->GetBinError(bins[i]));
+//   }
+//   return hist_trim;
+// }
+//
+// TH1F* TrimHistogram(TH1F* hist_, vector<int> bins, TString name, bool debug){
+//   TH1F* hist = (TH1F*) hist_->Clone();
+//   int n_hist = hist->GetNbinsX();
+//   int N = bins.size();
+//   int e_low = hist->GetXaxis()->GetBinLowEdge(bins[0]);
+//   int e_high = hist->GetXaxis()->GetBinUpEdge(bins[N-1]);
+//   if(e_low != r_low){
+//     printf("range: %3d vs. edge: %3d\n",r_low,e_low);
+//     throw runtime_error("<E> Lower boundaries do not fit - "+name);
+//   }
+//   if(e_high != r_high){
+//     printf("range: %3d vs. edge: %3d\n",r_high,e_high);
+//     throw runtime_error("<E> Higher boundaries do not fit - "+name);
+//   }
+//   if(debug) cout << "Consider" << setw(3) << N << "from" << setw(5) << e_low << "to" << setw(5) << e_high << endl;
+//   TH1F* hist_trim = new TH1F(name, name, N, e_low, e_high);
+//   for(int i=0; i<N;i++){
+//     hist_trim->SetBinContent(i+1, hist->GetBinContent(bins[i]));
+//     hist_trim->SetBinError(i+1, hist->GetBinError(bins[i]));
+//   }
+//   return hist_trim;
+// }
+
+// =====================================================================================
+// ===                                                                               ===
+// =====================================================================================
+
 // ------------------------------------------------------------------------------------------- uncorrelated
 TH1F* Normalize(TH1F* hist){
   TH1F* norm = (TH1F*) hist->Clone();

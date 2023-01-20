@@ -6,7 +6,7 @@
 <!ENTITY channel "elec">
 
 <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/Selection/elec">
-<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/elec">
+<!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/elec/<SYST>">
 
 
 
@@ -28,7 +28,7 @@
 
 <!--
 <ConfigParse NEventsBreak="300000" LastBreak="0" FileSplit="0"/>
-<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="Workdir_PostSelEl_2018"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="workdir"/>
 -->
 
 <JobConfiguration JobName="MTopJetSelectionJob" OutputLevel="INFO">
@@ -125,10 +125,12 @@
   <Item Name="prefire_variation" Value="nominal" />
 
   <Item Name="JetMassScale_channel" Value="combine" />
-  <Item Name="JetMassScale_direction" Value="nominal" />
+  <Item Name="JetMassScale_direction" Value="nominal" />   <!-- has to be: nominal, upup, updown, downup or downdown! (up and down for PoU) -->
+  <Item Name="JetMassScale_Flavor" Value="nominal" />      <!-- has to be: nominal, up or down! -->
   <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
-  <Item Name="jersmear_direction" Value="nominal" />            <!-- has to be: nominal, up or down! -->
+  <Item Name="jersmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
   <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
+  <Item Name="NonClosureUncertainty" Value="false" />      <!-- has to be: true or false! -->
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>

@@ -1,0 +1,18 @@
+#include "../include/CentralInclude.h"
+#include "../include/tdrstyle_all.h"
+#include "../include/HistogramUtils.h"
+
+using namespace std;
+
+TString year, year_v;
+TString fdir = "/nfs/dust/cms/user/paaschal/MTopJet_Run2/ElecSF/"+study;
+
+void DrawText(TString name);
+void PlotHist(TH1F* h_data, TString xaxis, TString histname);
+void PlotHist(TH2F* h_data, TString xaxis, TString yaxis, TString histname);
+void CompareHists(TH1F* h_all, TH1F* h_pass, TString xaxis, TString histname);
+void DrawControl(TString path, VecH hists, TH1F* rData, TH1F* rMC, VecI colors, VecTS names, TString xaxis);
+
+int main(int argc, char* argv[]){
+  return true;
+}

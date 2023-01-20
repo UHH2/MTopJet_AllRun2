@@ -48,9 +48,11 @@ TH1F* get_hist(TString name, TString hist){
 // Old definitions are kept to not rewrite older macros.
 
 // channels
-TString muon = "muon";
+// TString muon = "muon";
+TString muon = "muon_stat";
 // TString muon = "muon/V20";
-TString elec = "elec";
+// TString elec = "elec";
+TString elec = "elec_stat";
 TString muon_elecJMS = "muon_elecJMS";
 TString elec_muonJMS = "elec_muonJMS";
 
@@ -77,6 +79,8 @@ TString uhh_mc   = "uhh2.AnalysisModuleRunner.MC.";
 // systematics
 TString fsr_up_16   = "uhh2.AnalysisModuleRunner.MC.TTbar_fsrup_2016v3.root";
 TString fsr_down_16 = "uhh2.AnalysisModuleRunner.MC.TTbar_fsrdown_2016v3.root";
+TString isr_up_16   = "uhh2.AnalysisModuleRunner.MC.TTbar_isrup_2016v3.root";
+TString isr_down_16 = "uhh2.AnalysisModuleRunner.MC.TTbar_isrdown_2016v3.root";
 
 TString fsr_up_sqrt2   = "FSRup_sqrt2";
 TString fsr_up_2       = "FSRup_2";
@@ -84,6 +88,12 @@ TString fsr_up_4       = "FSRup_4";
 TString fsr_down_sqrt2 = "FSRdown_sqrt2";
 TString fsr_down_2     = "FSRdown_2";
 TString fsr_down_4     = "FSRdown_4";
+TString isr_up_sqrt2   = "ISRup_sqrt2";
+TString isr_up_2       = "ISRup_2";
+TString isr_up_4       = "ISRup_4";
+TString isr_down_sqrt2 = "ISRdown_sqrt2";
+TString isr_down_2     = "ISRdown_2";
+TString isr_down_4     = "ISRdown_4";
 TString jms_uu         = "JMS_upup";
 TString jms_ud         = "JMS_updown";
 TString jms_du         = "JMS_downup";
@@ -94,6 +104,8 @@ TString jms_u_corr     = "JMS_up_acorr";
 TString jms_d_corr     = "JMS_down_acorr";
 TString jec_up         = "JEC_up";
 TString jec_down       = "JEC_down";
+TString jer_up         = "JER_up";
+TString jer_down       = "JER_down";
 TString cor_up         = "COR_up";
 TString cor_down       = "COR_down";
 TString flavor_up      = "JMS_flavor_up";
@@ -205,6 +217,62 @@ TString mtop_elec_1785_18 = dir+elec+"/"+uhh_mc+"TTbar_mtop1785_2018.root";
 vector<TString> mtop_1785_muon = {mtop_muon_1785_16, mtop_muon_1785_17, mtop_muon_1785_18};
 vector<TString> mtop_1785_elec = {mtop_elec_1785_16, mtop_elec_1785_17, mtop_elec_1785_18};
 
+// ----------------------------------------------------------------------------- SYS
+
+TString cr_gm_muon_16 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2016v3.root";
+TString cr_gm_muon_17 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2017v2.root";
+TString cr_gm_muon_18 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2018.root";
+TString cr_gm_elec_16 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2016v3.root";
+TString cr_gm_elec_17 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2017v2.root";
+TString cr_gm_elec_18 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_GluonMove_2018.root";
+vector<TString> cr_gm_muon = {cr_gm_muon_16, cr_gm_muon_17, cr_gm_muon_18};
+vector<TString> cr_gm_elec = {cr_gm_elec_16, cr_gm_elec_17, cr_gm_elec_18};
+
+TString cr_qb_muon_16 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2016v3.root";
+TString cr_qb_muon_17 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2017v2.root";
+TString cr_qb_muon_18 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2018.root";
+TString cr_qb_elec_16 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2016v3.root";
+TString cr_qb_elec_17 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2017v2.root";
+TString cr_qb_elec_18 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_QCDbased_2018.root";
+vector<TString> cr_qb_muon = {cr_qb_muon_16, cr_qb_muon_17, cr_qb_muon_18};
+vector<TString> cr_qb_elec = {cr_qb_elec_16, cr_qb_elec_17, cr_qb_elec_18};
+
+TString tune_up_muon_16 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2016v3.root";
+TString tune_up_muon_17 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2017v2.root";
+TString tune_up_muon_18 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2018.root";
+TString tune_up_elec_16 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2016v3.root";
+TString tune_up_elec_17 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2017v2.root";
+TString tune_up_elec_18 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneUp_2018.root";
+vector<TString> tune_up_muon = {tune_up_muon_16, tune_up_muon_17, tune_up_muon_18};
+vector<TString> tune_up_elec = {tune_up_elec_16, tune_up_elec_17, tune_up_elec_18};
+
+TString tune_down_muon_16 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2016v3.root";
+TString tune_down_muon_17 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2017v2.root";
+TString tune_down_muon_18 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2018.root";
+TString tune_down_elec_16 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2016v3.root";
+TString tune_down_elec_17 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2017v2.root";
+TString tune_down_elec_18 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_TuneDown_2018.root";
+vector<TString> tune_down_muon = {tune_down_muon_16, tune_down_muon_17, tune_down_muon_18};
+vector<TString> tune_down_elec = {tune_down_elec_16, tune_down_elec_17, tune_down_elec_18};
+
+TString hdamp_up_muon_16 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2016v3.root";
+TString hdamp_up_muon_17 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2017v2.root";
+TString hdamp_up_muon_18 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2018.root";
+TString hdamp_up_elec_16 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2016v3.root";
+TString hdamp_up_elec_17 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2017v2.root";
+TString hdamp_up_elec_18 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampup_2018.root";
+vector<TString> hdamp_up_muon = {hdamp_up_muon_16, hdamp_up_muon_17, hdamp_up_muon_18};
+vector<TString> hdamp_up_elec = {hdamp_up_elec_16, hdamp_up_elec_17, hdamp_up_elec_18};
+
+TString hdamp_down_muon_16 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2016v3.root";
+TString hdamp_down_muon_17 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2017v2.root";
+TString hdamp_down_muon_18 = dir+muon+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2018.root";
+TString hdamp_down_elec_16 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2016v3.root";
+TString hdamp_down_elec_17 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2017v2.root";
+TString hdamp_down_elec_18 = dir+elec+"/uhh2.AnalysisModuleRunner.MC.TTbar_hdampdown_2018.root";
+vector<TString> hdamp_down_muon = {hdamp_down_muon_16, hdamp_down_muon_17, hdamp_down_muon_18};
+vector<TString> hdamp_down_elec = {hdamp_down_elec_16, hdamp_down_elec_17, hdamp_down_elec_18};
+
 // ----------------------------------------------------------------------------- FSR
 
 TString fsr_up_muon_16 = dir+muon+"/"+fsr_up_16;
@@ -216,43 +284,92 @@ TString fsr_up_sqrt2_muon_17 = dir+muon+"/"+fsr_up_sqrt2+"/"+ttbar_f+y17+".root"
 TString fsr_up_sqrt2_muon_18 = dir+muon+"/"+fsr_up_sqrt2+"/"+ttbar_f+y18+".root";
 TString fsr_up_sqrt2_elec_17 = dir+elec+"/"+fsr_up_sqrt2+"/"+ttbar_f+y17+".root";
 TString fsr_up_sqrt2_elec_18 = dir+elec+"/"+fsr_up_sqrt2+"/"+ttbar_f+y18+".root";
-vector<TString> fsr_up_sqrt2_muon = {fsr_up_sqrt2_muon_17, fsr_up_sqrt2_muon_18};
-vector<TString> fsr_up_sqrt2_elec = {fsr_up_sqrt2_elec_17, fsr_up_sqrt2_elec_18};
+vector<TString> fsr_up_sqrt2_muon = {fsr_up_muon_16, fsr_up_sqrt2_muon_17, fsr_up_sqrt2_muon_18};
+vector<TString> fsr_up_sqrt2_elec = {fsr_up_elec_16, fsr_up_sqrt2_elec_17, fsr_up_sqrt2_elec_18};
 
 TString fsr_down_sqrt2_muon_17 = dir+muon+"/"+fsr_down_sqrt2+"/"+ttbar_f+y17+".root";
 TString fsr_down_sqrt2_muon_18 = dir+muon+"/"+fsr_down_sqrt2+"/"+ttbar_f+y18+".root";
 TString fsr_down_sqrt2_elec_17 = dir+elec+"/"+fsr_down_sqrt2+"/"+ttbar_f+y17+".root";
 TString fsr_down_sqrt2_elec_18 = dir+elec+"/"+fsr_down_sqrt2+"/"+ttbar_f+y18+".root";
-vector<TString> fsr_down_sqrt2_muon = {fsr_down_sqrt2_muon_17, fsr_down_sqrt2_muon_18};
-vector<TString> fsr_down_sqrt2_elec = {fsr_down_sqrt2_elec_17, fsr_down_sqrt2_elec_18};
+vector<TString> fsr_down_sqrt2_muon = {fsr_down_muon_16, fsr_down_sqrt2_muon_17, fsr_down_sqrt2_muon_18};
+vector<TString> fsr_down_sqrt2_elec = {fsr_down_elec_16, fsr_down_sqrt2_elec_17, fsr_down_sqrt2_elec_18};
 
 TString fsr_up_2_muon_17 = dir+muon+"/"+fsr_up_2+"/"+ttbar_f+y17+".root";
 TString fsr_up_2_muon_18 = dir+muon+"/"+fsr_up_2+"/"+ttbar_f+y18+".root";
 TString fsr_up_2_elec_17 = dir+elec+"/"+fsr_up_2+"/"+ttbar_f+y17+".root";
 TString fsr_up_2_elec_18 = dir+elec+"/"+fsr_up_2+"/"+ttbar_f+y18+".root";
-vector<TString> fsr_up_2_muon = {fsr_up_2_muon_17, fsr_up_2_muon_18};
-vector<TString> fsr_up_2_elec = {fsr_up_2_elec_17, fsr_up_2_elec_18};
+vector<TString> fsr_up_2_muon = {fsr_up_muon_16, fsr_up_2_muon_17, fsr_up_2_muon_18};
+vector<TString> fsr_up_2_elec = {fsr_up_elec_16, fsr_up_2_elec_17, fsr_up_2_elec_18};
 
 TString fsr_down_2_muon_17 = dir+muon+"/"+fsr_down_2+"/"+ttbar_f+y17+".root";
 TString fsr_down_2_muon_18 = dir+muon+"/"+fsr_down_2+"/"+ttbar_f+y18+".root";
 TString fsr_down_2_elec_17 = dir+elec+"/"+fsr_down_2+"/"+ttbar_f+y17+".root";
 TString fsr_down_2_elec_18 = dir+elec+"/"+fsr_down_2+"/"+ttbar_f+y18+".root";
-vector<TString> fsr_down_2_muon = {fsr_down_2_muon_17, fsr_down_2_muon_18};
-vector<TString> fsr_down_2_elec = {fsr_down_2_elec_17, fsr_down_2_elec_18};
+vector<TString> fsr_down_2_muon = {fsr_down_muon_16, fsr_down_2_muon_17, fsr_down_2_muon_18};
+vector<TString> fsr_down_2_elec = {fsr_down_elec_16, fsr_down_2_elec_17, fsr_down_2_elec_18};
 
 TString fsr_up_4_muon_17 = dir+muon+"/"+fsr_up_4+"/"+ttbar_f+y17+".root";
 TString fsr_up_4_muon_18 = dir+muon+"/"+fsr_up_4+"/"+ttbar_f+y18+".root";
 TString fsr_up_4_elec_17 = dir+elec+"/"+fsr_up_4+"/"+ttbar_f+y17+".root";
 TString fsr_up_4_elec_18 = dir+elec+"/"+fsr_up_4+"/"+ttbar_f+y18+".root";
-vector<TString> fsr_up_4_muon = {fsr_up_4_muon_17, fsr_up_4_muon_18};
-vector<TString> fsr_up_4_elec = {fsr_up_4_elec_17, fsr_up_4_elec_18};
+vector<TString> fsr_up_4_muon = {fsr_up_muon_16, fsr_up_4_muon_17, fsr_up_4_muon_18};
+vector<TString> fsr_up_4_elec = {fsr_up_elec_16, fsr_up_4_elec_17, fsr_up_4_elec_18};
 
 TString fsr_down_4_muon_17 = dir+muon+"/"+fsr_down_4+"/"+ttbar_f+y17+".root";
 TString fsr_down_4_muon_18 = dir+muon+"/"+fsr_down_4+"/"+ttbar_f+y18+".root";
 TString fsr_down_4_elec_17 = dir+elec+"/"+fsr_down_4+"/"+ttbar_f+y17+".root";
 TString fsr_down_4_elec_18 = dir+elec+"/"+fsr_down_4+"/"+ttbar_f+y18+".root";
-vector<TString> fsr_down_4_muon = {fsr_down_4_muon_17, fsr_down_4_muon_18};
-vector<TString> fsr_down_4_elec = {fsr_down_4_elec_17, fsr_down_4_elec_18};
+vector<TString> fsr_down_4_muon = {fsr_down_muon_16, fsr_down_4_muon_17, fsr_down_4_muon_18};
+vector<TString> fsr_down_4_elec = {fsr_down_elec_16, fsr_down_4_elec_17, fsr_down_4_elec_18};
+
+// ----------------------------------------------------------------------------- ISR
+
+TString isr_up_muon_16 = dir+muon+"/"+isr_up_16;
+TString isr_up_elec_16 = dir+elec+"/"+isr_up_16;
+TString isr_down_muon_16 = dir+muon+"/"+isr_down_16;
+TString isr_down_elec_16 = dir+elec+"/"+isr_down_16;
+
+TString isr_up_sqrt2_muon_17 = dir+muon+"/"+isr_up_sqrt2+"/"+ttbar_f+y17+".root";
+TString isr_up_sqrt2_muon_18 = dir+muon+"/"+isr_up_sqrt2+"/"+ttbar_f+y18+".root";
+TString isr_up_sqrt2_elec_17 = dir+elec+"/"+isr_up_sqrt2+"/"+ttbar_f+y17+".root";
+TString isr_up_sqrt2_elec_18 = dir+elec+"/"+isr_up_sqrt2+"/"+ttbar_f+y18+".root";
+vector<TString> isr_up_sqrt2_muon = {isr_up_muon_16, isr_up_sqrt2_muon_17, isr_up_sqrt2_muon_18};
+vector<TString> isr_up_sqrt2_elec = {isr_up_elec_16, isr_up_sqrt2_elec_17, isr_up_sqrt2_elec_18};
+
+TString isr_down_sqrt2_muon_17 = dir+muon+"/"+isr_down_sqrt2+"/"+ttbar_f+y17+".root";
+TString isr_down_sqrt2_muon_18 = dir+muon+"/"+isr_down_sqrt2+"/"+ttbar_f+y18+".root";
+TString isr_down_sqrt2_elec_17 = dir+elec+"/"+isr_down_sqrt2+"/"+ttbar_f+y17+".root";
+TString isr_down_sqrt2_elec_18 = dir+elec+"/"+isr_down_sqrt2+"/"+ttbar_f+y18+".root";
+vector<TString> isr_down_sqrt2_muon = {isr_down_muon_16, isr_down_sqrt2_muon_17, isr_down_sqrt2_muon_18};
+vector<TString> isr_down_sqrt2_elec = {isr_down_elec_16, isr_down_sqrt2_elec_17, isr_down_sqrt2_elec_18};
+
+TString isr_up_2_muon_17 = dir+muon+"/"+isr_up_2+"/"+ttbar_f+y17+".root";
+TString isr_up_2_muon_18 = dir+muon+"/"+isr_up_2+"/"+ttbar_f+y18+".root";
+TString isr_up_2_elec_17 = dir+elec+"/"+isr_up_2+"/"+ttbar_f+y17+".root";
+TString isr_up_2_elec_18 = dir+elec+"/"+isr_up_2+"/"+ttbar_f+y18+".root";
+vector<TString> isr_up_2_muon = {isr_up_muon_16, isr_up_2_muon_17, isr_up_2_muon_18};
+vector<TString> isr_up_2_elec = {isr_up_elec_16, isr_up_2_elec_17, isr_up_2_elec_18};
+
+TString isr_down_2_muon_17 = dir+muon+"/"+isr_down_2+"/"+ttbar_f+y17+".root";
+TString isr_down_2_muon_18 = dir+muon+"/"+isr_down_2+"/"+ttbar_f+y18+".root";
+TString isr_down_2_elec_17 = dir+elec+"/"+isr_down_2+"/"+ttbar_f+y17+".root";
+TString isr_down_2_elec_18 = dir+elec+"/"+isr_down_2+"/"+ttbar_f+y18+".root";
+vector<TString> isr_down_2_muon = {isr_down_muon_16, isr_down_2_muon_17, isr_down_2_muon_18};
+vector<TString> isr_down_2_elec = {isr_down_elec_16, isr_down_2_elec_17, isr_down_2_elec_18};
+
+TString isr_up_4_muon_17 = dir+muon+"/"+isr_up_4+"/"+ttbar_f+y17+".root";
+TString isr_up_4_muon_18 = dir+muon+"/"+isr_up_4+"/"+ttbar_f+y18+".root";
+TString isr_up_4_elec_17 = dir+elec+"/"+isr_up_4+"/"+ttbar_f+y17+".root";
+TString isr_up_4_elec_18 = dir+elec+"/"+isr_up_4+"/"+ttbar_f+y18+".root";
+vector<TString> isr_up_4_muon = {isr_up_muon_16, isr_up_4_muon_17, isr_up_4_muon_18};
+vector<TString> isr_up_4_elec = {isr_up_elec_16, isr_up_4_elec_17, isr_up_4_elec_18};
+
+TString isr_down_4_muon_17 = dir+muon+"/"+isr_down_4+"/"+ttbar_f+y17+".root";
+TString isr_down_4_muon_18 = dir+muon+"/"+isr_down_4+"/"+ttbar_f+y18+".root";
+TString isr_down_4_elec_17 = dir+elec+"/"+isr_down_4+"/"+ttbar_f+y17+".root";
+TString isr_down_4_elec_18 = dir+elec+"/"+isr_down_4+"/"+ttbar_f+y18+".root";
+vector<TString> isr_down_4_muon = {isr_down_muon_16, isr_down_4_muon_17, isr_down_4_muon_18};
+vector<TString> isr_down_4_elec = {isr_down_elec_16, isr_down_4_elec_17, isr_down_4_elec_18};
 
 // ----------------------------------------------------------------------------- JMS
 
@@ -350,6 +467,26 @@ TString jec_down_elec_17 = dir+elec+"/"+jec_down+"/"+ttbar_f+y17+".root";
 TString jec_down_elec_18 = dir+elec+"/"+jec_down+"/"+ttbar_f+y18+".root";
 vector<TString> jec_down_muon = {jec_down_muon_16, jec_down_muon_17, jec_down_muon_18};
 vector<TString> jec_down_elec = {jec_down_elec_16, jec_down_elec_17, jec_down_elec_18};
+
+// ----------------------------------------------------------------------------- JER
+
+TString jer_up_muon_16 = dir+muon+"/"+jer_up+"/"+ttbar_f+y16+".root";
+TString jer_up_muon_17 = dir+muon+"/"+jer_up+"/"+ttbar_f+y17+".root";
+TString jer_up_muon_18 = dir+muon+"/"+jer_up+"/"+ttbar_f+y18+".root";
+TString jer_up_elec_16 = dir+elec+"/"+jer_up+"/"+ttbar_f+y16+".root";
+TString jer_up_elec_17 = dir+elec+"/"+jer_up+"/"+ttbar_f+y17+".root";
+TString jer_up_elec_18 = dir+elec+"/"+jer_up+"/"+ttbar_f+y18+".root";
+vector<TString> jer_up_muon = {jer_up_muon_16, jer_up_muon_17, jer_up_muon_18};
+vector<TString> jer_up_elec = {jer_up_elec_16, jer_up_elec_17, jer_up_elec_18};
+
+TString jer_down_muon_16 = dir+muon+"/"+jer_down+"/"+ttbar_f+y16+".root";
+TString jer_down_muon_17 = dir+muon+"/"+jer_down+"/"+ttbar_f+y17+".root";
+TString jer_down_muon_18 = dir+muon+"/"+jer_down+"/"+ttbar_f+y18+".root";
+TString jer_down_elec_16 = dir+elec+"/"+jer_down+"/"+ttbar_f+y16+".root";
+TString jer_down_elec_17 = dir+elec+"/"+jer_down+"/"+ttbar_f+y17+".root";
+TString jer_down_elec_18 = dir+elec+"/"+jer_down+"/"+ttbar_f+y18+".root";
+vector<TString> jer_down_muon = {jer_down_muon_16, jer_down_muon_17, jer_down_muon_18};
+vector<TString> jer_down_elec = {jer_down_elec_16, jer_down_elec_17, jer_down_elec_18};
 
 // ----------------------------------------------------------------------------- COR
 

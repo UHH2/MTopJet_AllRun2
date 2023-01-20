@@ -1,4 +1,4 @@
-<!-- <?xml version="1.0" encoding="UTF-8"?> -->
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
 
 <!ENTITY NEVT "-1">
@@ -129,13 +129,7 @@
   <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="59740">
     <!-- <Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="36814" RunMode="PROOF" ProofServer="lite://" ProofWorkDir="&PROOFdir;/" ProofNodes="15" >  -->
 
-    <!--
-    ██████   █████  ████████  █████
-    ██   ██ ██   ██    ██    ██   ██
-    ██   ██ ███████    ██    ███████
-    ██   ██ ██   ██    ██    ██   ██
-    ██████  ██   ██    ██    ██   ██
-  -->
+
 
   <InputData Version="DATA_EGammaA_2018" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaA;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -150,13 +144,7 @@
   <InputData Version="DATA_EGammaD_2018_3" Lumi="1" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
   <In FileName="&EGammaD_3;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-  <!--
-  ███████ ██ ███    ██  ██████  ██      ███████     ████████  ██████  ██████
-  ██      ██ ████   ██ ██       ██      ██             ██    ██    ██ ██   ██
-  ███████ ██ ██ ██  ██ ██   ███ ██      █████          ██    ██    ██ ██████
-  .    ██ ██ ██  ██ ██ ██    ██ ██      ██             ██    ██    ██ ██
-  ███████ ██ ██   ████  ██████  ███████ ███████        ██     ██████  ██
--->
+
 
 <InputData Version="ST_t-channel_antitop_2018" Lumi="4029309.273" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ST_t-channel_antitop;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -170,13 +158,7 @@
 <In FileName="&ST_tW_top;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
-<!--
-██████  ██ ██████   ██████  ███████  ██████  ███    ██
-██   ██ ██ ██   ██ ██    ██ ██      ██    ██ ████   ██
-██   ██ ██ ██████  ██    ██ ███████ ██    ██ ██ ██  ██
-██   ██ ██ ██   ██ ██    ██      ██ ██    ██ ██  ██ ██
-██████  ██ ██████   ██████  ███████  ██████  ██   ████
--->
+
 
 <InputData Version="Diboson_WW_2018" Lumi="103401.8972" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WW;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -185,24 +167,7 @@
 <InputData Version="Diboson_ZZ_2018" Lumi="162728.3513" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&ZZ;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<!--
-████████ ████████
-.  ██       ██
-.  ██       ██
-.  ██       ██
-.  ██       ██
--->
 
-<!-- <InputData Version="TTbar_2L2Nu_2018_1" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_2L2Nu_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="TTbar_2L2Nu_2018_2" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_2L2Nu_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="TTbar_SemiLep_2018_1" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_SemiLep_1;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="TTbar_SemiLep_2018_2" Lumi="83703610.93" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_SemiLep_2;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
-<InputData Version="TTbar_Hadronic_2018" Lumi="110354799.3" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
-<In FileName="&TTbar_Hadronic;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
 
 <InputData Version="TTbar_2L2Nu_Mtt0000to0700_2018" Lumi="53077886.47" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTTo2L2Nu_Mtt0000to0700;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -217,13 +182,6 @@
 <In FileName="&TT_Mtt1000toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
-<!--
-███    ███ ████████  ██████  ██████
-████  ████    ██    ██    ██ ██   ██
-██ ████ ██    ██    ██    ██ ██████
-██  ██  ██    ██    ██    ██ ██
-██      ██    ██     ██████  ██
--->
 
 <InputData Version="TTbar_mtop1665_2L2Nu_2018" Lumi="2436727.731" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTbar_mtop1665_2L2Nu;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -304,13 +262,7 @@
 <InputData Version="TTTo2L2Nu_hdampDown_2018" Lumi="4504940.516" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&TTTo2L2Nu_hdampDown;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<!--
-██     ██      ██ ███████ ████████ ███████
-██     ██      ██ ██         ██    ██
-██  █  ██      ██ █████      ██    ███████
-██ ███ ██ ██   ██ ██         ██         ██
-.███ ███   █████  ███████    ██    ███████
--->
+
 
 <InputData Version="WJetsToLNu_HT-0100to0200_2018" Lumi="21190.44971" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -327,13 +279,7 @@
 <InputData Version="WJetsToLNu_HT-2500toInft_2018" Lumi="400319500" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&WJetsToLNu_HT-2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
-<!--
-██████  ██    ██
-██   ██  ██  ██
-██   ██   ████
-██   ██    ██
-██████     ██
--->
+
 
 <InputData Version="DYJetsToLL_LO_M50_HT0100to0200_2018" Lumi="63598.36075" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&DYJetsToLL_LO_M50_HT0100to0200;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -351,14 +297,6 @@
 <In FileName="&DYJetsToLL_LO_M50_HT2500toInft;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 
 
-<!--
-.██████   ██████ ██████
-██    ██ ██      ██   ██
-██    ██ ██      ██   ██
-██ ▄▄ ██ ██      ██   ██
-.██████   ██████ ██████
-.     ▀▀
--->
 
 <InputData Version="QCD_Pt-0050to0080_EMEnriched_2018" Lumi="5.45090005" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0050to0080_EMEnriched;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
@@ -379,6 +317,8 @@
 <In FileName="&QCD_Pt-0170to0250_bcToE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
 <InputData Version="QCD_Pt-0250toInft_bcToE_2018" Lumi="16531.38122" Type="MC" NEventsMax="&NEVT;" Cacheable="False">
 <In FileName="&QCD_Pt-0250toInft_bcToE;" Lumi="0.0"/> <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+
+
 
 <!-- ================================================================================================================================== -->
 <!-- ====================================================== User Config =============================================================== -->
@@ -427,7 +367,12 @@
   <Item Name="prefire_variation" Value="nominal" />
 
   <Item Name="JetMassScale_channel" Value="combine" />
-  <Item Name="JetMassScale_direction" Value="nominal" />
+  <Item Name="JetMassScale_direction" Value="nominal" />   <!-- has to be: nominal, upup, updown, downup or downdown! (up and down for PoU) -->
+  <Item Name="JetMassScale_Flavor" Value="nominal" />      <!-- has to be: nominal, up or down! -->
+  <Item Name="jecsmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+  <Item Name="jersmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
+  <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
+  <Item Name="NonClosureUncertainty" Value="false" />      <!-- has to be: true or false! -->
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>

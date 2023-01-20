@@ -2,6 +2,7 @@
 #include "../include/HistogramUtils.h"
 #include "../include/GraphUtils.h"
 #include "../include/Utils.h"
+#include "../include/Plotting.h"
 
 #include <fstream>
 #include <limits>
@@ -13,20 +14,25 @@
 // #include <io.h>
 using namespace std;
 
-void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color, vector<TString> names, TString name);
+void draw2(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color, vector<TString> names, TString name);
+void draw(TF2* dummy, vector<TPolyMarker3D*> min, vector<TPolyMarker3D*> graph, vector<int> color, vector<int> style,  vector<TString> names, TString name);
 void CompareAreas(vector<TEllipse*> ellipse, vector<TString> names);
 MapVD ExtractFromFile(TString path, TString c);
+TPolyMarker3D* ExtractFromROOT(TString name, TString year, TString channel, TString sys);
+TF2* ExtractFunctionFromROOT(TString year, TString channel, TString sys);
 VecD ExtractPoints(TString line, const TString jms);
 TEllipse* build_ellipse(MapVD points, TString name="");
 TGraph* graph_multiple_points(MapVD points);
 inline void set_ellipse(TEllipse *ellipse, int color);
 inline void set_graph(TGraph *graph, int color);
+inline void set_graph(TPolyMarker3D *graph, int color, double size);
 inline double angle_to_xaxis(const VecD vec);
 inline double distance_points(const VecD vec1, const VecD vec2);
 inline double length_vector(const VecD vec);
 inline VecD subtract_two_vectors(const VecD vec1, const VecD vec2);
 
 bool debug = false;
+TString save;
 
 vector<double> lumis = {138., 36., 41., 60.};
 
@@ -36,6 +42,7 @@ int main(int argc, char* argv[]){
   TString save_path = get_save_path();
 
   TString dir = save_path+"/JetCorrections/fit/combine/";
+  save = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/Ellipses/";
   VecTS channels = {"combine", "muon", "elec"};
   TString width = "/100/BinWidth_1/";
   TString file_txt = "JMS.txt";
@@ -43,78 +50,106 @@ int main(int argc, char* argv[]){
   MapVDD JMSfactor;
 
   cout << "\nExtract Points ... " << endl;
-  JMSfactor["combine_uncor"]        = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/JMS.txt", "combine");
-  JMSfactor["combine_cor"]          = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/JMScorrelated.txt", "combine");
-  JMSfactor["combine_lin_cor"]      = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/lin/JMScorrelated.txt", "combine");
-  JMSfactor["combine_cor_noBKGsys"] = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/noBKGsys/JMScorrelated.txt", "elec");
+  // JMSfactor["combine_uncor"]        = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/JMS.txt", "combine");
+  // JMSfactor["combine_cor"]          = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/JMScorrelated.txt", "combine");
+  // JMSfactor["combine_cor_syst"]     = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/syst/JMScorrelated.txt", "combine");
+  // JMSfactor["combine_lin_cor"]      = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/lin/JMScorrelated.txt", "combine");
+  // JMSfactor["combine_cor_noBKGsys"] = ExtractFromFile(save_path+"/JetCorrections/fit/combine/combine/100/BinWidth_1/noBKGsys/JMScorrelated.txt", "elec");
+  //
+  // JMSfactor["combine_add"] = ExtractFromFile(save_path+"/JetCorrections/fit_t+b/combine/combine/100/BinWidth_1/JMS.txt", "combine");
+  // JMSfactor["muon_add"]    = ExtractFromFile(save_path+"/JetCorrections/fit_t+b/combine/muon/100/BinWidth_1/JMS.txt", "muon");
+  // JMSfactor["elec_add"]    = ExtractFromFile(save_path+"/JetCorrections/fit_t+b/combine/elec/100/BinWidth_1/JMS.txt", "elec");
+  //
+  // JMSfactor["combine_V20"] = ExtractFromFile(save_path+"/JetCorrections/fit_V20/combine/combine/100/BinWidth_1/JMS.txt", "elec");
+  // JMSfactor["muon_V20"]    = ExtractFromFile(save_path+"/JetCorrections/fit_V20/combine/muon/100/BinWidth_1/JMS.txt", "elec");
+  // JMSfactor["elec_V20"]    = ExtractFromFile(save_path+"/JetCorrections/fit_V20/combine/elec/100/BinWidth_1/JMS.txt", "elec");
+  //
+  // JMSfactor["2016_combine"]     = ExtractFromFile(save_path+"/JetCorrections/fit/2016/combine/40/BinWidth_1/JMS.txt", "combine");
+  // JMSfactor["2017_combine"]     = ExtractFromFile(save_path+"/JetCorrections/fit/2017/combine/40/BinWidth_1/JMS.txt", "combine");
+  // JMSfactor["2018_combine"]     = ExtractFromFile(save_path+"/JetCorrections/fit/2018/combine/40/BinWidth_1/JMS.txt", "combine");
+  // JMSfactor["2016_combine_cor"] = ExtractFromFile(save_path+"/JetCorrections/fit/2016/combine/40/BinWidth_1/lin/JMScorrelated.txt", "combine");
+  // JMSfactor["2017_combine_cor"] = ExtractFromFile(save_path+"/JetCorrections/fit/2017/combine/40/BinWidth_1/lin/JMScorrelated.txt", "combine");
+  // JMSfactor["2018_combine_cor"] = ExtractFromFile(save_path+"/JetCorrections/fit/2018/combine/40/BinWidth_1/lin/JMScorrelated.txt", "combine");
 
-  JMSfactor["combine_add"] = ExtractFromFile(save_path+"/JetCorrections/fit_t+b/combine/combine/100/BinWidth_1/JMS.txt", "combine");
-  JMSfactor["muon_add"]    = ExtractFromFile(save_path+"/JetCorrections/fit_t+b/combine/muon/100/BinWidth_1/JMS.txt", "muon");
-  JMSfactor["elec_add"]    = ExtractFromFile(save_path+"/JetCorrections/fit_t+b/combine/elec/100/BinWidth_1/JMS.txt", "elec");
+  // for(TString c: channels){
+  //   if(debug) cout << "\t ... channel "+c << endl;
+  //   TString file = dir+c+width+file_txt;
+  //   JMSfactor[c] = ExtractFromFile(file, c);
+  // }
 
-  JMSfactor["combine_V20"] = ExtractFromFile(save_path+"/JetCorrections/fit_V20/combine/combine/100/BinWidth_1/JMS.txt", "elec");
-  JMSfactor["muon_V20"]    = ExtractFromFile(save_path+"/JetCorrections/fit_V20/combine/muon/100/BinWidth_1/JMS.txt", "elec");
-  JMSfactor["elec_V20"]    = ExtractFromFile(save_path+"/JetCorrections/fit_V20/combine/elec/100/BinWidth_1/JMS.txt", "elec");
 
-  JMSfactor["2016_combine"]     = ExtractFromFile(save_path+"/JetCorrections/fit/2016/combine/40/BinWidth_1/JMS.txt", "combine");
-  JMSfactor["2017_combine"]     = ExtractFromFile(save_path+"/JetCorrections/fit/2017/combine/40/BinWidth_1/JMS.txt", "combine");
-  JMSfactor["2018_combine"]     = ExtractFromFile(save_path+"/JetCorrections/fit/2018/combine/40/BinWidth_1/JMS.txt", "combine");
-  JMSfactor["2016_combine_cor"] = ExtractFromFile(save_path+"/JetCorrections/fit/2016/combine/40/BinWidth_1/lin/JMScorrelated.txt", "combine");
-  JMSfactor["2017_combine_cor"] = ExtractFromFile(save_path+"/JetCorrections/fit/2017/combine/40/BinWidth_1/lin/JMScorrelated.txt", "combine");
-  JMSfactor["2018_combine_cor"] = ExtractFromFile(save_path+"/JetCorrections/fit/2018/combine/40/BinWidth_1/lin/JMScorrelated.txt", "combine");
+  map<TString, TF2*> JMS_chi2;
+  // JMS_chi2["combine_cor"] = ExtractFunctionFromROOT("combine", "combine", "");
+  // JMS_chi2["combine_cor_syst_2"] = ExtractFunctionFromROOT("combine", "combine", "syst_2");
 
-  for(TString c: channels){
-    if(debug) cout << "\t ... channel "+c << endl;
-    TString file = dir+c+width+file_txt;
-    JMSfactor[c] = ExtractFromFile(file, c);
-  }
+  map<TString, TPolyMarker3D*> JMS_min;
+  JMS_min["combine_cor"]        = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "");
+  JMS_min["combine_cor_syst"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst");
+  JMS_min["combine_cor_syst_noJER"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_noJER");
+  JMS_min["combine_cor_fitall"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "_fitall");
+  JMS_min["combine_cor_syst_peak"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak");
+  JMS_min["combine_cor_syst_peak_m4"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_m4");
+  JMS_min["combine_cor_syst_peak_uncor"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_uncor");
+  JMS_min["combine_cor_stat_peak"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "stat_peak");
 
-  // Fill Graph and Ellipse ------------------------------------------------------------------------
-  cout << "Create Graphs ... " << endl;
-  TGraph* extrema_combine              = graph_multiple_points(JMSfactor["combine"]);
-  TGraph* extrema_combine_cor          = graph_multiple_points(JMSfactor["combine_cor"]);
-  TGraph* extrema_combine_lin_cor      = graph_multiple_points(JMSfactor["combine_lin_cor"]);
-  TGraph* extrema_combine_cor_noBKGsys = graph_multiple_points(JMSfactor["combine_cor_noBKGsys"]);
+  map<TString, TPolyMarker3D*> JMS_ellipse;
+  JMS_ellipse["combine_cor"]        = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "");
+  JMS_ellipse["combine_cor_syst"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst");
+  JMS_ellipse["combine_cor_syst_noJER"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_noJER");
+  JMS_ellipse["combine_cor_fitall"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "_fitall");
+  JMS_ellipse["combine_cor_syst_peak"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak");
+  JMS_ellipse["combine_cor_syst_peak_m4"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_m4");
+  JMS_ellipse["combine_cor_syst_peak_uncor"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_uncor");
+  JMS_ellipse["combine_cor_stat_peak"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "stat_peak");
 
-  TGraph* extrema_muon     = graph_multiple_points(JMSfactor["muon"]);
-  TGraph* extrema_elec     = graph_multiple_points(JMSfactor["elec"]);
-  TGraph* extrema_add_comb = graph_multiple_points(JMSfactor["combine_add"]);
-  TGraph* extrema_add_muon = graph_multiple_points(JMSfactor["muon_add"]);
-  TGraph* extrema_add_elec = graph_multiple_points(JMSfactor["elec_add"]);
-
-  TGraph* extrema_V20_comb = graph_multiple_points(JMSfactor["combine_V20"]);
-  TGraph* extrema_V20_muon = graph_multiple_points(JMSfactor["muon_V20"]);
-  TGraph* extrema_V20_elec = graph_multiple_points(JMSfactor["elec_V20"]);
-
-  TGraph* extrema_2016_comb     = graph_multiple_points(JMSfactor["2016_combine"]);
-  TGraph* extrema_2017_comb     = graph_multiple_points(JMSfactor["2017_combine"]);
-  TGraph* extrema_2018_comb     = graph_multiple_points(JMSfactor["2018_combine"]);
-  TGraph* extrema_2016_comb_cor = graph_multiple_points(JMSfactor["2016_combine_cor"]);
-  TGraph* extrema_2017_comb_cor = graph_multiple_points(JMSfactor["2017_combine_cor"]);
-  TGraph* extrema_2018_comb_cor = graph_multiple_points(JMSfactor["2018_combine_cor"]);
-
-  cout << "Create Ellipses ... " << endl;
-  TEllipse* ellipse_combine              = build_ellipse(JMSfactor["combine"]);
-  TEllipse* ellipse_combine_cor          = build_ellipse(JMSfactor["combine_cor"]);
-  TEllipse* ellipse_combine_lin_cor      = build_ellipse(JMSfactor["combine_lin_cor"]);
-  TEllipse* ellipse_combine_cor_noBKGsys = build_ellipse(JMSfactor["combine_cor_noBKGsys"]);
-
-  TEllipse* ellipse_muon     = build_ellipse(JMSfactor["muon"]);
-  TEllipse* ellipse_elec     = build_ellipse(JMSfactor["elec"]);
-  TEllipse* ellipse_add_comb = build_ellipse(JMSfactor["combine_add"]);
-  TEllipse* ellipse_add_muon = build_ellipse(JMSfactor["muon_add"]);
-  TEllipse* ellipse_add_elec = build_ellipse(JMSfactor["elec_add"]);
-
-  TEllipse* ellipse_V20_comb = build_ellipse(JMSfactor["combine_V20"]);
-  TEllipse* ellipse_V20_muon = build_ellipse(JMSfactor["muon_V20"]);
-  TEllipse* ellipse_V20_elec = build_ellipse(JMSfactor["elec_V20"]);
-
-  TEllipse* ellipse_2016_comb     = build_ellipse(JMSfactor["2016_combine"]);
-  TEllipse* ellipse_2017_comb     = build_ellipse(JMSfactor["2017_combine"]);
-  TEllipse* ellipse_2018_comb     = build_ellipse(JMSfactor["2018_combine"]);
-  TEllipse* ellipse_2016_comb_cor = build_ellipse(JMSfactor["2016_combine_cor"]);
-  TEllipse* ellipse_2017_comb_cor = build_ellipse(JMSfactor["2017_combine_cor"]);
-  TEllipse* ellipse_2018_comb_cor = build_ellipse(JMSfactor["2018_combine_cor"]);
+  // // Fill Graph and Ellipse ------------------------------------------------------------------------
+  // cout << "Create Graphs ... " << endl;
+  // TGraph* extrema_combine              = graph_multiple_points(JMSfactor["combine"]);
+  // TGraph* extrema_combine_cor          = graph_multiple_points(JMSfactor["combine_cor"]);
+  // TGraph* extrema_combine_cor_syst     = graph_multiple_points(JMSfactor["combine_cor_syst"]);
+  // TGraph* extrema_combine_lin_cor      = graph_multiple_points(JMSfactor["combine_lin_cor"]);
+  // TGraph* extrema_combine_cor_noBKGsys = graph_multiple_points(JMSfactor["combine_cor_noBKGsys"]);
+  //
+  // TGraph* extrema_muon     = graph_multiple_points(JMSfactor["muon"]);
+  // TGraph* extrema_elec     = graph_multiple_points(JMSfactor["elec"]);
+  // TGraph* extrema_add_comb = graph_multiple_points(JMSfactor["combine_add"]);
+  // TGraph* extrema_add_muon = graph_multiple_points(JMSfactor["muon_add"]);
+  // TGraph* extrema_add_elec = graph_multiple_points(JMSfactor["elec_add"]);
+  //
+  // TGraph* extrema_V20_comb = graph_multiple_points(JMSfactor["combine_V20"]);
+  // TGraph* extrema_V20_muon = graph_multiple_points(JMSfactor["muon_V20"]);
+  // TGraph* extrema_V20_elec = graph_multiple_points(JMSfactor["elec_V20"]);
+  //
+  // TGraph* extrema_2016_comb     = graph_multiple_points(JMSfactor["2016_combine"]);
+  // TGraph* extrema_2017_comb     = graph_multiple_points(JMSfactor["2017_combine"]);
+  // TGraph* extrema_2018_comb     = graph_multiple_points(JMSfactor["2018_combine"]);
+  // TGraph* extrema_2016_comb_cor = graph_multiple_points(JMSfactor["2016_combine_cor"]);
+  // TGraph* extrema_2017_comb_cor = graph_multiple_points(JMSfactor["2017_combine_cor"]);
+  // TGraph* extrema_2018_comb_cor = graph_multiple_points(JMSfactor["2018_combine_cor"]);
+  //
+  // cout << "Create Ellipses ... " << endl;
+  // TEllipse* ellipse_combine              = build_ellipse(JMSfactor["combine"]);
+  // TEllipse* ellipse_combine_cor          = build_ellipse(JMSfactor["combine_cor"]);
+  // TEllipse* ellipse_combine_cor_syst     = build_ellipse(JMSfactor["combine_cor_syst"]);
+  // TEllipse* ellipse_combine_lin_cor      = build_ellipse(JMSfactor["combine_lin_cor"]);
+  // TEllipse* ellipse_combine_cor_noBKGsys = build_ellipse(JMSfactor["combine_cor_noBKGsys"]);
+  //
+  // TEllipse* ellipse_muon     = build_ellipse(JMSfactor["muon"]);
+  // TEllipse* ellipse_elec     = build_ellipse(JMSfactor["elec"]);
+  // TEllipse* ellipse_add_comb = build_ellipse(JMSfactor["combine_add"]);
+  // TEllipse* ellipse_add_muon = build_ellipse(JMSfactor["muon_add"]);
+  // TEllipse* ellipse_add_elec = build_ellipse(JMSfactor["elec_add"]);
+  //
+  // TEllipse* ellipse_V20_comb = build_ellipse(JMSfactor["combine_V20"]);
+  // TEllipse* ellipse_V20_muon = build_ellipse(JMSfactor["muon_V20"]);
+  // TEllipse* ellipse_V20_elec = build_ellipse(JMSfactor["elec_V20"]);
+  //
+  // TEllipse* ellipse_2016_comb     = build_ellipse(JMSfactor["2016_combine"]);
+  // TEllipse* ellipse_2017_comb     = build_ellipse(JMSfactor["2017_combine"]);
+  // TEllipse* ellipse_2018_comb     = build_ellipse(JMSfactor["2018_combine"]);
+  // TEllipse* ellipse_2016_comb_cor = build_ellipse(JMSfactor["2016_combine_cor"]);
+  // TEllipse* ellipse_2017_comb_cor = build_ellipse(JMSfactor["2017_combine_cor"]);
+  // TEllipse* ellipse_2018_comb_cor = build_ellipse(JMSfactor["2018_combine_cor"]);
 
   // Start drawing ---------------------------------------------------------------------------------
   cout << "Start plotting ... " << endl;
@@ -123,11 +158,20 @@ int main(int argc, char* argv[]){
   gStyle->SetOptStat(kFALSE);
   gStyle->SetLegendBorderSize(0);
 
+  TF2* dummy = new TF2("dummy","x*y", 1.5, 1.5);
+  // draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_syst"], JMS_min["combine_cor_syst_noJER"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_syst"], JMS_ellipse["combine_cor_syst_noJER"]}, {kRed+2, kBlue+2, kGreen+2}, {kOpenTriangleUp, kOpenTriangleDown, kOpenCircle}, {"No syst", "syst", "syst no JER"}, "syst_comparison_cor");
+  // draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_syst"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_syst"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"No syst", "syst"}, "syst_comparison_cor");
+  // draw(dummy, {JMS_min["combine_cor_syst_peak"], JMS_min["combine_cor_fitall"]}, {JMS_ellipse["combine_cor_syst_peak"], JMS_ellipse["combine_cor_syst"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"Only Peak", "Peak"}, "syst_comparison_peak");
+  draw(dummy, {JMS_min["combine_cor_syst_peak"], JMS_min["combine_cor_syst_peak_m4"]}, {JMS_ellipse["combine_cor_syst_peak"], JMS_ellipse["combine_cor_syst_peak_m4"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"Only Peak", "Peak"}, "syst_comparison_peak");
+  // draw(dummy, {JMS_min["combine_cor_syst_peak"], JMS_min["combine_cor_syst_peak_uncor"], JMS_min["combine_cor_stat_peak"]}, {JMS_ellipse["combine_cor_syst_peak"], JMS_ellipse["combine_cor_syst_peak_uncor"], JMS_ellipse["combine_cor_stat_peak"]}, {kRed+2, kBlue+2, kGreen+2}, {kOpenTriangleUp, kOpenTriangleDown, kOpenCircle}, {"Correlated", "Uncorrelated", "Only stat"}, "syst_comparison_peak_uncerts");
+  // draw(dummy, {JMS_min["combine_cor"], JMS_min["combine_cor_fitall"]}, {JMS_ellipse["combine_cor"], JMS_ellipse["combine_cor_fitall"]}, {kRed+2, kBlue+2}, {kOpenTriangleUp, kOpenTriangleDown}, {"only tt", "largest"}, "fit_comparison");
+
   // void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color,  vector<TString> leg, TString name)
   // draw({extrema_combine, extrema_combine_cor}, {ellipse_combine, ellipse_combine_cor}, {kBlue+2, kRed+2}, {"uncorrelated", "correlated"}, "correlation_comparison");
   // draw({extrema_combine_cor, extrema_combine_cor_noBKGsys}, {ellipse_combine_cor, ellipse_combine_cor_noBKGsys}, {kBlue+2, kRed+2}, {"with bkg rate", "no bkg rate"}, "BKGsys_cor_comparison");
   // draw({extrema_combine_cor, extrema_2016_comb, extrema_2017_comb, extrema_2018_comb}, {ellipse_combine_cor, ellipse_2016_comb, ellipse_2017_comb, ellipse_2018_comb}, {kBlack, kBlue+2, kRed+2, kGreen+2}, {"Combine", "2016", "2017", "2018"}, "Year_combine_comparison");
-  draw({extrema_combine_lin_cor, extrema_2016_comb_cor, extrema_2017_comb_cor, extrema_2018_comb_cor}, {ellipse_combine_lin_cor, ellipse_2016_comb_cor, ellipse_2017_comb_cor, ellipse_2018_comb_cor}, {kBlack, kBlue+2, kRed+2, kGreen+2}, {"Combine", "2016", "2017", "2018"}, "Year_comparison_cor");
+  // draw({extrema_combine_lin_cor, extrema_2016_comb_cor, extrema_2017_comb_cor, extrema_2018_comb_cor}, {ellipse_combine_lin_cor, ellipse_2016_comb_cor, ellipse_2017_comb_cor, ellipse_2018_comb_cor}, {kBlack, kBlue+2, kRed+2, kGreen+2}, {"Combine", "2016", "2017", "2018"}, "Year_comparison_cor");
+  // draw({extrema_combine_cor, extrema_combine_cor_syst}, {ellipse_combine_cor, ellipse_combine_cor_syst}, {kBlack, kBlue+2}, {"No syst", "syst"}, "syst_comparison_cor");
   // draw({extrema_combine_cor, extrema_combine_lin_cor}, {ellipse_combine_cor, ellipse_combine_lin_cor}, {kBlue+2, kRed+2}, {"with quadratic", "only linear"}, "linear_comparison");
   // draw({extrema_combine, extrema_combine_cor}, {ellipse_combine, ellipse_combine_cor}, {kBlue+2, kRed+2}, {"uncorrelated", "correlated"}, "correlation_comparison");
   // draw({extrema_combine, extrema_muon, extrema_elec}, {ellipse_combine, ellipse_muon, ellipse_elec}, {kBlue+2, kRed+2, kGreen+2}, {"combine", "muon", "elec"}, "channel_comparison");
@@ -135,7 +179,7 @@ int main(int argc, char* argv[]){
   // draw({extrema_combine, extrema_V20_comb}, {ellipse_combine, ellipse_V20_comb}, {kBlue+2, kRed+2}, {"JEC V11", "JEC V20"}, "JECversion_comparison");
   // draw({extrema_add_comb, extrema_add_muon, extrema_add_elec}, {ellipse_add_comb, ellipse_add_muon, ellipse_add_elec}, {kBlue+2, kRed+2, kGreen+2}, {"combine", "muon", "elec"}, "AddBKGChannelComparison");
 
-  CompareAreas({ellipse_combine_lin_cor, ellipse_2016_comb_cor, ellipse_2017_comb_cor, ellipse_2018_comb_cor}, {"Combine", "2016", "2017", "2018"});
+  // CompareAreas({ellipse_combine_lin_cor, ellipse_2016_comb_cor, ellipse_2017_comb_cor, ellipse_2018_comb_cor}, {"Combine", "2016", "2017", "2018"});
 
 }
 
@@ -217,6 +261,27 @@ VecD ExtractPoints(TString line, const TString jms){
   float x; number >> x;
   float y; number >> y;
   return {x, y};
+}
+
+TPolyMarker3D* ExtractFromROOT(TString name, TString year, TString channel, TString sys){
+  TString dir = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/";
+  dir += year+"/"+channel+"/100/";
+  if(!sys.EqualTo("")) dir += sys+"/";
+  TFile *file = new TFile(dir+"Ellipse.root");
+  // TPolyMarker3D* ellipse = (TPolyMarker3D*) file->Get("Graphs/JMS_ellipse");
+  TPolyMarker3D* graph;
+  if(name.Contains("ellipse")) graph = (TPolyMarker3D*) file->Get("Graphs/JMS_ellipse");
+  else if(name.Contains("nominal")) graph = (TPolyMarker3D*) file->Get("Graphs/JMS_nominal");
+  return graph;
+}
+
+TF2* ExtractFunctionFromROOT(TString year, TString channel, TString sys){
+  TString dir = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/";
+  dir += year+"/"+channel+"/100/";
+  if(sys.EqualTo("")) dir += sys+"/";
+  TFile *file = new TFile(dir+"Ellipse.root");
+  TF2* func = (TF2*) file->Get("Functions/JMS_Chi2");
+  return func;
 }
 
 // ======================================================================================================
@@ -301,6 +366,11 @@ inline void set_graph(TGraph *graph, int color){
   graph->GetHistogram()->GetYaxis()->SetTitle("XCone");
 }
 
+inline void set_graph(TPolyMarker3D *graph, int color, int style, double size){
+  graph->SetMarkerColor(color);
+  graph->SetMarkerStyle(style);
+  graph->SetMarkerSize(size);
+}
 // ------------------------------------------------------------------------------------------------
 inline void set_ellipse(TEllipse *ellipse, int color){
   ellipse->SetLineColor(color);
@@ -308,7 +378,7 @@ inline void set_ellipse(TEllipse *ellipse, int color){
 }
 
 // ------------------------------------------------------------------------------------------------
-void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color,  vector<TString> names, TString name){
+void draw2(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color,  vector<TString> names, TString name){
   TString save_path = get_save_path();
 
   for(unsigned int i=0; i<color.size(); i++){
@@ -339,4 +409,98 @@ void draw(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color,  
   leg->Draw();
   gPad->RedrawAxis();
   A->SaveAs(save_path+"/JetCorrections/Ellipse/"+name+".pdf");
+}
+
+
+// ------------------------------------------------------------------------------------------------
+void draw(TF2* dummy, vector<TPolyMarker3D*> min, vector<TPolyMarker3D*> graph, vector<int> color, vector<int> style,  vector<TString> names, TString name){
+  cout << "\t ... " << name << endl;
+
+  TString save_path = get_save_path();
+
+  // TH2F* dummy = new TH2F("dummy","dummy", 100, -1.5, 1.5, 100, -1.5, 1.5);
+
+  gStyle->SetPadTickY(1);
+  gStyle->SetPadTickX(1);
+  gStyle->SetOptStat(kFALSE);
+  gStyle->SetLegendBorderSize(0);
+
+  dummy->GetXaxis()->SetTitle("JEC factor");
+  dummy->GetYaxis()->SetTitle("Additional XCone correction factor");
+
+  SetupCanvas(false);
+  m_can->cd();
+  m_can->SetLeftMargin(0.15);
+  m_can->SetBottomMargin(0.15);
+  m_can->SetRightMargin(0.05);
+
+  Int_t nb = 50;
+  dummy->SetContour(nb); // Contours
+  dummy->SetTitle("");
+  dummy->SetFillStyle(0);
+  dummy->SetLineWidth(4);
+  dummy->SetRange(-1.7, -1.7, 1.7, 1.7);
+
+  const Int_t Number = 2;
+  // Double_t Red[Number]    = { 0.99, 0.49, 0.10, 0.00};
+  // Double_t Green[Number]  = { 0.99, 0.80, 0.40, 0.00};
+  // Double_t Blue[Number]   = { 0.99, 0.88, 0.66, 0.33};
+  // Double_t Length[Number] = { 0.00, 0.33, 0.66, 1.00};
+  Double_t Red[Number]    = { 1.00, 1.00};
+  Double_t Green[Number]  = { 1.00, 1.00};
+  Double_t Blue[Number]   = { 1.00, 1.00};
+  Double_t Length[Number] = { 0.00, 1.00};
+
+  TColor::CreateGradientColorTable(Number,Length,Red,Green,Blue,nb);
+
+  dummy->Draw("cont4z");
+  Cosmetics(dummy->GetHistogram(), "#it{f}^{ JEC}", 0, 0, 0, 0, false);
+  dummy->GetHistogram()->SetFillColorAlpha(kWhite, 0);
+  dummy->GetHistogram()->GetYaxis()->SetTitle("#it{f}^{ XCone}");
+  dummy->GetHistogram()->GetYaxis()->SetTitleOffset(1.2);
+  dummy->GetHistogram()->GetZaxis()->SetTitleOffset(1.1);
+  dummy->GetHistogram()->GetZaxis()->SetTitleSize(0.06);
+  dummy->GetHistogram()->GetZaxis()->SetLabelSize(0.04);
+  dummy->GetHistogram()->GetZaxis()->SetTickLength(0.02);
+  dummy->GetHistogram()->GetZaxis()->SetLabelOffset(0.011);
+  dummy->GetHistogram()->GetZaxis()->SetTitle("#chi^{ 2}");
+  dummy->GetHistogram()->GetZaxis()->CenterTitle();
+
+  gPad->Update();
+  TPaletteAxis *palette = (TPaletteAxis*)dummy->GetHistogram()->GetListOfFunctions()->FindObject("palette");
+
+  // the following lines move the palette. Choose the values you need for the position.
+  palette->SetX1NDC(1.5);
+  palette->SetX2NDC(1.51);
+  palette->SetY1NDC(1.5);
+  palette->SetY2NDC(1.51);
+
+  gPad->Modified();
+  gPad->Update();
+
+  // dummy->SetMinimum(190);
+  dummy->SetMinimum(0);
+  gPad->RedrawAxis();
+  m_can->SetTheta(90);
+  m_can->SetPhi(0);
+
+  TLegend *leg = new TLegend(0.2,0.2,0.4,0.4);
+  leg->SetTextSize(0.03);
+  for(unsigned int i=0; i<color.size(); i++){
+    cout << i << endl;
+    set_graph(graph[i], color[i], style[i],0.05);
+    graph[i]->Draw("same P");
+    leg->AddEntry(graph[i], names[i],"p");
+    cout << i << endl;
+    set_graph(min[i], color[i], style[i],0.2);
+    min[i]->Draw("same P");
+  }
+  // for(unsigned int i=0; i<color.size(); i++){
+  //   set_graph(graph[i], color[i], style[i]);
+  //   graph[i]->Draw("same P");
+  // }
+  DrawLumi(138., false, true, false, "JMS");
+  leg->Draw();
+  // gPad->RedrawAxis();
+  m_can->SaveAs(save+name+".pdf");
 }
