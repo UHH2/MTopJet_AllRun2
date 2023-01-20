@@ -27,6 +27,14 @@ macros/._*
 macros/JEC_*
 macros/JMS_*
 macros/Mass*
+macros/BTag*
+macros/ChannelCompare
+macros/MakeReco*
+macros/RunElec*
+macros/a.out
+macros/jet_mass_fsr
+macros/ol_UnfoldingCombination
+macros/*SYS*
 macros/MjetvsPU
 macros/MtopCompare
 macros/PaperPlots
@@ -56,6 +64,7 @@ macros/CutFlow
 macros/ElecSF
 macros/FSR*
 macros/LeptonPlots
+macros/src/CodeStorage
 
 config/2016/Dennis/
 config/HHtoWWbbSemiLeptonicPreselection_2016.xml
