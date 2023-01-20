@@ -582,8 +582,6 @@ int main(int argc, char* argv[]){
   TString Chi2Cor_full = GetChi2Cor(m_covFull, fits, content_data, dim_full, c_hh, c_hl, c_lh, c_ll, false);
   TF2* chi2_JMS_cor_full = new TF2("JMSfull", Chi2Cor_full, -2, 2, -2, 2);
 
-  return 0;
-
   VecD nominal_JMS_cor_full = GetMinimumChi2(chi2_JMS_cor_full, "JMS");
   // VecDD ellipse_JMS_cor_full = GetSigmaEllipse_alt(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 1500, 0.1);
   VecDD ellipse_JMS_cor_full = GetSigmaEllipse(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 1000, 0.1);
