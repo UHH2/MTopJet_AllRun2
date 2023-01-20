@@ -149,9 +149,9 @@ int main(int argc, char* argv[]){
   if(debug) cout << "Create Directiories ..." << endl;
 
   save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/"+year+"/"+channel+"/"+slimit+"/"+addition+"/";
-  TString temp_path = save_nfs+"SYS/";
-  CreateSavePath((string) save_nfs);
+  TString temp_path = save_nfs+"{SYS,all_bins}";
   CreateSavePath((string) temp_path);
+  // CreateSavePath((string) temp_path);
 
   cout << "Start collecting Histograms ..." << endl;
   // ---------------------------------------------------------------------------
@@ -307,6 +307,18 @@ int main(int argc, char* argv[]){
   MapH m_isrup_peak = TrimMap(m_isrup_rebin, range, "m_isrup_trim");
   MapH m_isrdown_peak = TrimMap(m_isrdown_rebin, range, "m_isrdown_trim");
 
+  for(auto h:m_data_peak){
+    int nbins = h.second->GetNbinsX();
+    int b_low = h.second->GetXaxis()->GetBinLowEdge(1);
+    int b_up = h.second->GetXaxis()->GetBinUpEdge(nbins);
+    int r_low = range[h.first][0];
+    int r_up = range[h.first][1];
+    if(b_low!=r_low || b_up!=r_up){
+      printf("edge low %4i; edge up %4i; range low %4i; range up %4i\n",b_low,b_up,r_low,r_up);
+      throw runtime_error("[ERROR] Bin Edges seem wrong");
+    }
+  }
+
   // =================================================================================
   // === Normalize
 
@@ -410,8 +422,8 @@ int main(int argc, char* argv[]){
   MapM m_cov_tt = GetCovMatrixMap(m_ttbar_peak, "tt");
   MapM m_cov_data = GetCovMatrixMap(m_data_peak, "data");
 
-  MapM m_cov_tt_norm = GetCovMatrixNormMap(m_cov_tt, m_ttbar_peak, "tt norm");
-  MapM m_cov_data_norm = GetCovMatrixNormMap(m_cov_data, m_data_peak, "data norm");
+  MapM m_cov_tt_norm = GetCovMatrixNormMap(m_cov_tt, m_ttbar_peak, "tt_norm");
+  MapM m_cov_data_norm = GetCovMatrixNormMap(m_cov_data, m_data_peak, "data_norm");
 
   MapH h_sys_tune, h_sys_hdamp, h_sys_CR, h_sys_fsr, h_sys_isr, h_sys_jer;
   MapM m_sys_tune, m_sys_hdamp, m_sys_CR, m_sys_fsr, m_sys_isr, m_sys_jer;
@@ -569,6 +581,8 @@ int main(int argc, char* argv[]){
 
   TString Chi2Cor_full = GetChi2Cor(m_covFull, fits, content_data, dim_full, c_hh, c_hl, c_lh, c_ll, false);
   TF2* chi2_JMS_cor_full = new TF2("JMSfull", Chi2Cor_full, -2, 2, -2, 2);
+
+  return 0;
 
   VecD nominal_JMS_cor_full = GetMinimumChi2(chi2_JMS_cor_full, "JMS");
   // VecDD ellipse_JMS_cor_full = GetSigmaEllipse_alt(chi2_JMS_cor_full, nominal_JMS_cor_full, "JMS bin correalted", 1500, 0.1);
@@ -916,7 +930,7 @@ MapM GetCovMatrixNormMap(MapM& map, MapH& hists, const TString& process){
     TMatrixD mtemp = map[h];
     bool onlyDiag = process.Contains("data")?false:true;
     TMatrixD norm = NormCovMatrixAlt(hists[h], mtemp, false, onlyDiag);
-    TH2D* htemp_norm = TMatrixDtoTH2D(norm, norm.GetNcols(), 0, 180, h+c+y+process+"norm");
+    TH2D* htemp_norm = TMatrixDtoTH2D(norm, norm.GetNcols(), 0, norm.GetNcols(), h+c+y+process+"norm");
     DrawCov(htemp_norm, save_nfs+"SYS/"+process+"_norm_"+wbin+"_"+c+"_"+y, "#it{m}_{W}", 0.3);
 
     auto stop = high_resolution_clock::now();  // Calculation time - stop
@@ -1139,10 +1153,9 @@ MapF2 GetFits(MapSI2DGe& map, TString& hist){
   TString name_fit = "linear";
   int ndf  = 2; // ndf = n_points - n_parameters = 5 - n_para
   int n_fit_para  = 3;
-  int nlin = 0;
   TString replace = hist; replace.ReplaceAll("comparison_topjet_xcone_pass_rec/", "");
 
-  cout << "Start fitting " << replace << " ... " << endl;
+  cout << "Start fitting " << replace << " ... " << "(size " << map[hist].size() << ")" << endl;
   cout << map[hist].size() << endl;
   for(unsigned int i=0; i<map[hist].size(); i++)
   {
@@ -1157,11 +1170,9 @@ MapF2 GetFits(MapSI2DGe& map, TString& hist){
 
     // -----------------------------------------------------------------------
     functions[name]=fit;
-    nlin++;
     const char* info = name_fit;
     functions[name]->SetParName(0, info);
   }
-  cout << "number lins " << nlin << endl;
   return functions;
 }
 
@@ -1182,9 +1193,9 @@ VecTS GetFitFunctions(MapF2& fits){
 
     TString function = "[0] + [1]*x + [2]*y";
 
-    cout << setw(3) << i << function << endl;
+    // cout << setw(3) << i << function << endl;
     for(unsigned int i=0; i<npar; i++) function.ReplaceAll("["+to_string(i)+"]", dtos(fits[sbin]->GetParameter(i), precision));
-    cout << setw(3) << "" << function << endl;
+    // cout << setw(3) << "" << function << endl;
 
     fit_functions.push_back(function);
   }
@@ -1210,9 +1221,11 @@ VecD StoreBinContentInVector(MapH &map, TString& hist){
   VecD content;
   for(unsigned int i=1; i<=map[hist]->GetNbinsX(); i++){
     content.push_back(map[hist]->GetBinContent(i));
-    printf("(%3i, %2.5d)",i,content[i-1]);
   }
-  cout << endl;
+  if(debug){
+    for(unsigned int i = 0;i<content.size();i++) printf("(%3i, %2.5d)",i,content[i]);
+    cout << endl;
+  }
   return content;
 }
 
