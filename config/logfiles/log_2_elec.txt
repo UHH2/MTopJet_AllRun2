@@ -1,3 +1,0 @@
-Usage: sframe_batch.py [options] filename
-
-sframe_batch.py: error: wrong number of arguments. Help can be invoked with --help
