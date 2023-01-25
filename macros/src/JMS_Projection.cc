@@ -42,11 +42,11 @@ TPad* m_rp2_top;
 TPad* m_rp2;
 
 TString save_afs = "/afs/desy.de/user/p/paaschal/WorkingArea/Plots/MTopJet/PaperPlots/";
-TString save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/Projection/";
+TString save_nfs = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/Projections/";
 
 int main(int argc, char* argv[]){
 
-  TFile *file = new TFile("files/PaperPlots.root", "read");
+  TFile *file = new TFile("files/PaperPlots_Peak.root", "read");
 
   gErrorIgnoreLevel = kWarning;
   SetupGlobalStyle();
@@ -62,25 +62,123 @@ int main(int argc, char* argv[]){
   TF2* chi2 = (TF2*) file->Get("Functions/JMS_Chi2");
   TString formula = chi2->GetExpFormula();
 
-  TString hold = "y";
-  vector<int> range = {-2,2};
-  TH1F* hist = new TH1F("hist", "hist", 40, -2, 2);
+  TString hold = "x";
+  vector<double> range = {0.0,1.2};
   double step=0.1;
+  TH1F* hist = new TH1F("hist", "hist", abs(range[0]-range[1])/step, range[0], range[1]);
+  for(unsigned int c=1;c<=hist->GetNbinsX();c++){
+    cout << c<<setw(15)<<hist->GetXaxis()->GetBinCenter(c)<<setw(15)<<hist->GetXaxis()->GetBinLowEdge(c)<<setw(15)<<hist->GetXaxis()->GetBinUpEdge(c)<<endl;
+  }
   double start=range[0];
   for(double i=range[0]; i<range[1]; i+=step){
-    string value = to_string(i);
+    double val = i+step/2;
+    string value = to_string(val);
     TString f_temp = formula;
     f_temp.ReplaceAll(hold, value);
+    if(hold.EqualTo("x")) f_temp.ReplaceAll('y', 'x');
     TF1 *func = new TF1("func", f_temp, -1.5, 1.5);
     double minimum = func->GetMinimum();
     double xmin = func->GetX(minimum, -1.5, 1.5);
     double eu = func->GetX(minimum+1, xmin, 1.5)-xmin;
     double ed = xmin-func->GetX(minimum+1, -1.5, xmin);
-    int bin = hist->FindBin(i);
+    int bin = hist->FindBin(val);
     hist->SetBinContent(bin, minimum);
     hist->SetBinError(bin, (eu+ed)/2);
     cout << value << "\t" << bin << "\t" <<  minimum << "\t" << xmin << "\t" << eu << "\t" << ed << endl;
   }
+  TF1 *fit = new TF1("parabel", "[0]*x*x+[1]*x+[2]", range[0], range[1]);
+  hist->Fit(fit, "MQ", "", range[0], range[1]);
+  cout<< fit->Eval(0.6) << "   " << fit->GetParameter(0) << endl;
+
+  double minimum = fit->GetMinimum();
+  double ymin = fit->GetX(minimum, range[0], range[1]);
+  double eu = fit->GetX(minimum+1, ymin, range[1])-ymin;
+  double ed = ymin-fit->GetX(minimum+1, range[0], ymin);
+  cout << minimum << " " << ymin  << " +" << eu  << " -" << ed << endl;
+
+  TCanvas *canvas = new TCanvas("JEC");
+  hist->Draw("L");
+  TLine *lmin=new TLine(ymin, 128, ymin, minimum);
+  TLine *lerr=new TLine(range[0], minimum+1, range[0], minimum+1);
+  TLine *lerrU=new TLine(ymin+eu, 128, ymin+eu, minimum+1);
+  TLine *lerrD=new TLine(ymin-ed, 128, ymin-ed, minimum+1);
+  lmin->SetLineColor(kGray+2);
+  lerr->SetLineColor(kGray+2);
+  lerrU->SetLineColor(kGray+2);
+  lerrD->SetLineColor(kGray+2);
+  lmin->SetLineStyle(2);
+  lerr->SetLineStyle(1);
+  lerrU->SetLineStyle(1);
+  lerrD->SetLineStyle(1);
+  lmin->Draw("same");
+  lerr->Draw("same");
+  lerrU->Draw("same");
+  lerrD->Draw("same");
+  // TLegend *leg = new TLegend(0.3, 0.7, 0.7, 0.8);
+  // leg->AddEntry(lmin, "Minimum ('+str("%.2f"%min_x)+','+str("%.2f"%min_y)+')', 'l');
+  // leg->AddEntry(lerr, "1#sigma ('+str("%.2f"%(min_x-ed))+','+str("%.2f"%(min_x+eu))+')', 'l');
+  // leg->Draw();
+  canvas->Print(save_nfs+"1D_JEC_with_c.pdf");
+  canvas->Close();
+
+  hold = "y";
+  range = {-0.8,0.8};
+  step=0.1;
+  hist = new TH1F("hist", "hist", abs(range[0]-range[1])/step, range[0], range[1]);
+  for(unsigned int c=1;c<=hist->GetNbinsX();c++){
+    cout << c<<setw(15)<<hist->GetXaxis()->GetBinCenter(c)<<setw(15)<<hist->GetXaxis()->GetBinLowEdge(c)<<setw(15)<<hist->GetXaxis()->GetBinUpEdge(c)<<endl;
+  }
+  start=range[0];
+  for(double i=range[0]; i<range[1]; i+=step){
+    double val = i+step/2;
+    string value = to_string(val);
+    TString f_temp = formula;
+    f_temp.ReplaceAll(hold, value);
+    if(hold.EqualTo("x")) f_temp.ReplaceAll('y', 'x');
+    TF1 *func = new TF1("func", f_temp, -1.5, 1.5);
+    double minimum = func->GetMinimum();
+    double xmin = func->GetX(minimum, -1.5, 1.5);
+    double eu = func->GetX(minimum+1, xmin, 1.5)-xmin;
+    double ed = xmin-func->GetX(minimum+1, -1.5, xmin);
+    int bin = hist->FindBin(val);
+    hist->SetBinContent(bin, minimum);
+    hist->SetBinError(bin, (eu+ed)/2);
+    cout << value << "\t" << bin << "\t" <<  minimum << "\t" << xmin << "\t" << eu << "\t" << ed << endl;
+  }
+  fit = new TF1("parabel", "[0]*x*x+[1]*x+[2]", range[0], range[1]);
+  hist->Fit(fit, "MQ", "", range[0], range[1]);
+  cout<< fit->Eval(0.6) << "   " << fit->GetParameter(0) << endl;
+
+  minimum = fit->GetMinimum();
+  ymin = fit->GetX(minimum, range[0], range[1]);
+  eu = fit->GetX(minimum+1, ymin, range[1])-ymin;
+  ed = ymin-fit->GetX(minimum+1, range[0], ymin);
+  cout << minimum << " " << ymin  << " +" << eu  << " -" << ed << endl;
+
+  canvas = new TCanvas("JEC");
+  hist->Draw("L");
+  lmin=new TLine(ymin, 128, ymin, minimum);
+  lerr=new TLine(range[0], minimum+1, range[0], minimum+1);
+  lerrU=new TLine(ymin+eu, 128, ymin+eu, minimum+1);
+  lerrD=new TLine(ymin-ed, 128, ymin-ed, minimum+1);
+  lmin->SetLineColor(kGray+2);
+  lerr->SetLineColor(kGray+2);
+  lerrU->SetLineColor(kGray+2);
+  lerrD->SetLineColor(kGray+2);
+  lmin->SetLineStyle(2);
+  lerr->SetLineStyle(1);
+  lerrU->SetLineStyle(1);
+  lerrD->SetLineStyle(1);
+  lmin->Draw("same");
+  lerr->Draw("same");
+  lerrU->Draw("same");
+  lerrD->Draw("same");
+  // TLegend *leg = new TLegend(0.3, 0.7, 0.7, 0.8);
+  // leg->AddEntry(lmin, "Minimum ('+str("%.2f"%min_x)+','+str("%.2f"%min_y)+')', 'l');
+  // leg->AddEntry(lerr, "1#sigma ('+str("%.2f"%(min_x-ed))+','+str("%.2f"%(min_x+eu))+')', 'l');
+  // leg->Draw();
+  canvas->Print(save_nfs+"1D_XCone_with_c.pdf");
+  canvas->Close();
 
 }
 
