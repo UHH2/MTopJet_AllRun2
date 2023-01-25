@@ -252,6 +252,9 @@ protected:
 
   Event::Handle<float> h_ak8tau, h_ak8mass, h_ak8pt;
 
+  Event::Handle<double> h_gen_sub1_pt, h_gen_sub2_pt, h_gen_sub3_pt;
+  Event::Handle<double> h_gen_dR_sub12, h_gen_dR_sub23, h_gen_dR_sub13;
+
   //width reweight
   std::unique_ptr<tt_width_reweight> width2_reweight;
   std::unique_ptr<tt_width_reweight> width4_reweight;
@@ -362,6 +365,7 @@ protected:
   TString syear = "";
   Year year;
 
+  vector<double> points;
   bool isMC;    //define here to use it in "process" part
   bool isTTbar; //define here to use it in "process" part
   bool debug;
@@ -402,6 +406,12 @@ void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
   h_pt_rec = ctx.declare_event_output<double>("Pt_Rec");
   h_genweight = ctx.declare_event_output<double>("gen_weight");
   h_recweight = ctx.declare_event_output<double>("rec_weight");
+  h_gen_sub1_pt = ctx.declare_event_output<double>("Pt_gen_sub1");
+  h_gen_sub2_pt = ctx.declare_event_output<double>("Pt_gen_sub2");
+  h_gen_sub3_pt = ctx.declare_event_output<double>("Pt_gen_sub3");
+  h_gen_dR_sub12 = ctx.declare_event_output<double>("dR_gen_sub12");
+  h_gen_dR_sub23 = ctx.declare_event_output<double>("dR_gen_sub23");
+  h_gen_dR_sub13 = ctx.declare_event_output<double>("dR_gen_sub13");
   h_genweight_ttfactor = ctx.declare_event_output<double>("gen_weight_ttfactor");
   h_factor_2width = ctx.declare_event_output<double>("factor_2width");
   h_factor_4width = ctx.declare_event_output<double>("factor_4width");
@@ -935,6 +945,58 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
     jms_flavor = ctx.get("JetMassScale_Flavor","nominal");
     jms_channel = ctx.get("JetMassScale_channel","combine");
     BestFit.reset(new CorrectionFactor_JMS(ctx, "XCone33_had_Combined_noJEC", "genXCone33TopJets", year));
+
+    if(jms_channel == "combine"){
+
+      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 130.06
+      if     (jms_direction == "nominal")  points = { 0.603918,  -0.060578}; // BestFit point
+      else if(jms_direction == "upup")     points = { 0.784718,   0.008422}; // clostest point, right
+      else if(jms_direction == "downdown") points = { 0.423118,  -0.129578}; // clostest point, left
+      // else if(jms_direction == "downup")   points = { 0.587951,   0.483947}; // furthest point, up
+      // else if(jms_direction == "updown")   points = { 1.229551,  -1.313053}; // furthest point, down
+
+      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 344.09
+      // if     (jms_direction == "nominal")  points = { 0.880562,  -0.222858}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 1.026562,  -0.174858}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.735562,  -0.272858}; // clostest point, left
+
+      // ========== ONLY LIN + SYS + Fit from nom tt ====== chi2min = 338.96
+      // if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
+
+      // ========== ONLY LIN + SYS =======================
+      // if     (jms_direction == "nominal")  points = { 0.833438,  -0.187411}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 0.984438,  -0.138411}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.683438,  -0.238411}; // clostest point, left
+
+      // ========== ONLY LIN =============================
+      // if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
+      // else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
+      // else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
+      // else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
+      // else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
+
+    }
+    // calculated with muon channel; ud & du are not intresting in these channels
+    else if(jms_channel == "muon"){ // UNCORRELATED
+      // nom points = {0.742004, 0.232502}; uu points = {0.994004, 0.312602}; dd points = {0.490904, 0.147902};
+      if     (jms_direction == "nominal")  points = {0.759732, 0.269837};
+      else if(jms_direction == "upup")     points = {1.01983, 0.344537};
+      else if(jms_direction == "downdown") points = {0.502332, 0.184337};
+      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+    }
+    // calculated with elec channel; ud & du are not intresting in these channels
+    else if(jms_channel == "elec"){ // UNCORRELATED
+      // nom points = {0.318239, 0.338609}; uu points = {0.630539, 0.453809}; dd points = {0.005039, 0.226109};
+      if     (jms_direction == "nominal")  points = {0.501565, 0.0392776}; // BestFit point
+      else if(jms_direction == "upup")     points = {0.825565, 0.160778}; // clostest point, right
+      else if(jms_direction == "downdown") points = {0.178465, -0.0912224}; // clostest point, left
+      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
+    }
+    else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (combine, muon, elec)");
+
+    cout << "Direction " << jms_direction << " | channel " << jms_channel << " | Points " << points[0] << " (JEC) & " << points[1] << " (XCone)" << endl;
   }
 
   // prefiringWeight
@@ -1048,7 +1110,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   // JetMassScale --------------------------------------------------------------
   if(debug) cout << "JMS" << endl;
-  vector<double> points;
   double mass_jms =0;
   double mass_wjms = 0;
   vector<int> WSubjetIndex = jetprod_reco_corrected->GetWSubjetsIndices(event);
@@ -1059,55 +1120,6 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   int PoU = 0;
   if(isMC){
     // calculated with combined channels
-    if(jms_channel == "combine"){
-
-      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 130.06
-      if     (jms_direction == "nominal")  points = { 0.603918,  -0.060578}; // BestFit point
-      else if(jms_direction == "upup")     points = { 0.784718,   0.008422}; // clostest point, right
-      else if(jms_direction == "downdown") points = { 0.423118,  -0.129578}; // clostest point, left
-      // else if(jms_direction == "downup")   points = { 0.587951,   0.483947}; // furthest point, up
-      // else if(jms_direction == "updown")   points = { 1.229551,  -1.313053}; // furthest point, down
-
-      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 344.09
-      // if     (jms_direction == "nominal")  points = { 0.880562,  -0.222858}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 1.026562,  -0.174858}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.735562,  -0.272858}; // clostest point, left
-
-      // ========== ONLY LIN + SYS + Fit from nom tt ====== chi2min = 338.96
-      // if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
-
-      // ========== ONLY LIN + SYS =======================
-      // if     (jms_direction == "nominal")  points = { 0.833438,  -0.187411}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.984438,  -0.138411}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.683438,  -0.238411}; // clostest point, left
-
-      // ========== ONLY LIN =============================
-      // if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
-      // else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
-      // else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
-
-    }
-    // calculated with muon channel; ud & du are not intresting in these channels
-    else if(jms_channel == "muon"){ // UNCORRELATED
-      // nom points = {0.742004, 0.232502}; uu points = {0.994004, 0.312602}; dd points = {0.490904, 0.147902};
-      if     (jms_direction == "nominal")  points = {0.759732, 0.269837};
-      else if(jms_direction == "upup")     points = {1.01983, 0.344537};
-      else if(jms_direction == "downdown") points = {0.502332, 0.184337};
-      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
-    }
-    // calculated with elec channel; ud & du are not intresting in these channels
-    else if(jms_channel == "elec"){ // UNCORRELATED
-      // nom points = {0.318239, 0.338609}; uu points = {0.630539, 0.453809}; dd points = {0.005039, 0.226109};
-      if     (jms_direction == "nominal")  points = {0.501565, 0.0392776}; // BestFit point
-      else if(jms_direction == "upup")     points = {0.825565, 0.160778}; // clostest point, right
-      else if(jms_direction == "downdown") points = {0.178465, -0.0912224}; // clostest point, left
-      else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (nominal, upup, updown, downup, downdown, up, down)");
-    }
-    else throw runtime_error("Your JetMassScale in the Config-File PostSel is not set correctly (combine, muon, elec)");
 
     if(debug) cout << "JMS - get_mass_BestFit" << endl;
     if(jms_direction.EqualTo("up"))   PoU = 1;
