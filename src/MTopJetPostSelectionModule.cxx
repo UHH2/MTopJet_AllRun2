@@ -71,6 +71,7 @@ public:
   explicit MTopJetPostSelectionModule(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
   void declare_output(uhh2::Context& ctx);
+  void init_handels(uhh2::Context& ctx);
   void init_hists(uhh2::Context& ctx);
   void init_MC_hists(uhh2::Context& ctx);
 
@@ -377,6 +378,60 @@ protected:
 
   bool do_ps = false;
 };
+
+void MTopJetPostSelectionModule::init_handels(uhh2::Context& ctx){
+  // weight handles
+  h_weight_prefire = ctx.get_handle<float>("prefiringWeight");
+  h_weight_prefire_up = ctx.get_handle<float>("prefiringWeightUp");
+  h_weight_prefire_down = ctx.get_handle<float>("prefiringWeightDown");
+
+  h_weight_muid = ctx.get_handle<float>("weight_sfmu_tightID");
+  h_weight_muid_up = ctx.get_handle<float>("weight_sfmu_tightID_up");
+  h_weight_muid_down = ctx.get_handle<float>("weight_sfmu_tightID_down");
+  h_weight_mutr = ctx.get_handle<float>("weight_sfmu_trigger");
+  h_weight_mutr_up = ctx.get_handle<float>("weight_sfmu_trigger_up");
+  h_weight_mutr_down = ctx.get_handle<float>("weight_sfmu_trigger_down");
+  h_weight_elid = ctx.get_handle<float>("weight_sfelec_tightID");
+  h_weight_elid_up = ctx.get_handle<float>("weight_sfelec_tightID_up");
+  h_weight_elid_down = ctx.get_handle<float>("weight_sfelec_tightID_down");
+  h_weight_elreco = ctx.get_handle<float>("weight_sfelec_reco");
+  h_weight_elreco_up = ctx.get_handle<float>("weight_sfelec_reco_up");
+  h_weight_elreco_down = ctx.get_handle<float>("weight_sfelec_reco_down");
+  h_weight_eltr = ctx.get_handle<float>("weight_sfelec_trigger");
+  h_weight_eltr_up = ctx.get_handle<float>("weight_sfelec_trigger_up");
+  h_weight_eltr_down = ctx.get_handle<float>("weight_sfelec_trigger_down");
+  h_weight_pu = ctx.get_handle<float>("weight_pu");
+  h_weight_pu_up = ctx.get_handle<float>("weight_pu_up");
+  h_weight_pu_down = ctx.get_handle<float>("weight_pu_down");
+  h_weight_scale_upup = ctx.get_handle<float>("weight_murmuf_upup");
+  h_weight_scale_upnone = ctx.get_handle<float>("weight_murmuf_upnone");
+  h_weight_scale_noneup = ctx.get_handle<float>("weight_murmuf_noneup");
+  h_weight_scale_nonedown = ctx.get_handle<float>("weight_murmuf_nonedown");
+  h_weight_scale_downnone = ctx.get_handle<float>("weight_murmuf_downnone");
+  h_weight_scale_downdown = ctx.get_handle<float>("weight_murmuf_downdown");
+
+  h_weight_btag = ctx.get_handle<float>("weight_btagdisc_central");
+
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_jesup"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfup"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfup"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats1up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats2up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats1up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats2up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr1up"));
+  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr2up"));
+
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_jesdown"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfdown"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfdown"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats1down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats2down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats1down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats2down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr1down"));
+  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr2down"));
+}
 
 void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
   h_matched = ctx.declare_event_output<bool>("matched");
@@ -769,58 +824,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   h_genfatjets = ctx.get_handle<std::vector<GenTopJet>>("genXCone33TopJets");
 
   // weight handles
-  h_weight_prefire = ctx.get_handle<float>("prefiringWeight");
-  h_weight_prefire_up = ctx.get_handle<float>("prefiringWeightUp");
-  h_weight_prefire_down = ctx.get_handle<float>("prefiringWeightDown");
-
-  h_weight_muid = ctx.get_handle<float>("weight_sfmu_tightID");
-  h_weight_muid_up = ctx.get_handle<float>("weight_sfmu_tightID_up");
-  h_weight_muid_down = ctx.get_handle<float>("weight_sfmu_tightID_down");
-  h_weight_mutr = ctx.get_handle<float>("weight_sfmu_trigger");
-  h_weight_mutr_up = ctx.get_handle<float>("weight_sfmu_trigger_up");
-  h_weight_mutr_down = ctx.get_handle<float>("weight_sfmu_trigger_down");
-  h_weight_elid = ctx.get_handle<float>("weight_sfelec_tightID");
-  h_weight_elid_up = ctx.get_handle<float>("weight_sfelec_tightID_up");
-  h_weight_elid_down = ctx.get_handle<float>("weight_sfelec_tightID_down");
-  h_weight_elreco = ctx.get_handle<float>("weight_sfelec_reco");
-  h_weight_elreco_up = ctx.get_handle<float>("weight_sfelec_reco_up");
-  h_weight_elreco_down = ctx.get_handle<float>("weight_sfelec_reco_down");
-  h_weight_eltr = ctx.get_handle<float>("weight_sfelec_trigger");
-  h_weight_eltr_up = ctx.get_handle<float>("weight_sfelec_trigger_up");
-  h_weight_eltr_down = ctx.get_handle<float>("weight_sfelec_trigger_down");
-  h_weight_pu = ctx.get_handle<float>("weight_pu");
-  h_weight_pu_up = ctx.get_handle<float>("weight_pu_up");
-  h_weight_pu_down = ctx.get_handle<float>("weight_pu_down");
-  h_weight_scale_upup = ctx.get_handle<float>("weight_murmuf_upup");
-  h_weight_scale_upnone = ctx.get_handle<float>("weight_murmuf_upnone");
-  h_weight_scale_noneup = ctx.get_handle<float>("weight_murmuf_noneup");
-  h_weight_scale_nonedown = ctx.get_handle<float>("weight_murmuf_nonedown");
-  h_weight_scale_downnone = ctx.get_handle<float>("weight_murmuf_downnone");
-  h_weight_scale_downdown = ctx.get_handle<float>("weight_murmuf_downdown");
-
-  h_weight_btag = ctx.get_handle<float>("weight_btagdisc_central");
-
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_jesup"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfup"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfup"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats1up"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats2up"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats1up"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats2up"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr1up"));
-  h_weight_btag_upvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr2up"));
-
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_jesdown"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfdown"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfdown"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats1down"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_hfstats2down"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats1down"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_lfstats2down"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr1down"));
-  h_weight_btag_downvars.push_back(ctx.get_handle<float>("weight_btagdisc_cferr2down"));
-
-
+  init_handels(ctx);
 
   /*************************** Setup Subjet Corrector **********************************************************************************/
   // Correction.reset(new CorrectionFactor(ctx, "xconeCHS_Corrected"));
