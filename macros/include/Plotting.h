@@ -72,12 +72,12 @@ void SetupCanvas(bool bPlotRatio) // Copied from SPlotter.cxx
   m_pad1->Draw();
   m_pad2->Draw();
 
-  m_rp1_top->Draw();
-  // m_rp2_top->Draw();
-
   if (bPlotRatio){
+    m_rp1_top->Draw();
     m_rp1->Draw();
-    // m_rp2->Draw();
+  }
+  else{
+    m_pad1->Draw();
   }
 
   return;
@@ -275,7 +275,7 @@ void DrawLumi(double m_lumi, bool bPlotRatio, bool DrawCMS, bool forPre, TString
   } else {
     text1->SetTextSize(0.045);
     text1->SetX(0.90);
-    text1->SetY(0.95);
+    text1->SetY(1.);
   }
   if(name.Contains("JMS")) text1->SetX(0.82);
   text1->Draw();
@@ -292,15 +292,15 @@ void DrawLumi(double m_lumi, bool bPlotRatio, bool DrawCMS, bool forPre, TString
       text2->SetY(0.87);
     } else {
       text2->SetTextSize(0.05);
-      text2->SetY(0.945);
+      text2->SetY(0.895);
     }
     if(name.Contains("JMS")) text2->SetX(0.15);
     text2->Draw();
   }
 
   if (forPre){
-    TString preltext = "Preliminary";
-    // TString preltext = "Work in Progress";
+    // TString preltext = "Preliminary";
+    TString preltext = "Work in Progress";
     TLatex *text3 = new TLatex(3.5, 24, preltext);
     text3->SetNDC();
     text3->SetTextAlign(13);
@@ -315,7 +315,7 @@ void DrawLumi(double m_lumi, bool bPlotRatio, bool DrawCMS, bool forPre, TString
       text3->SetTextSize(0.04);
       text3->SetX(0.33); // standard was 0.24
       if(preltext.Contains("Work")) text3->SetX(0.32);
-      text3->SetY(0.94);
+      text3->SetY(0.89);
     }
     if(name.Contains("JMS")) text3->SetX(0.26);
     text3->Draw();
@@ -378,6 +378,30 @@ void DrawLegend(vector<TH1F*> hists, TString hname)
       ysize = 0.08*narr;
     }
   }
+  if (hname.Contains("ECF")){
+    xleft = 0.6;
+    xright = 0.78;
+    top = 0.76;
+    ysize = 0.112*narr;
+  }
+  if (hname.Contains("r21")){
+    xleft = 0.67;
+    xright = 0.85;
+    top = 0.76;
+    ysize = 0.112*narr;
+  }
+  if (hname.Contains("r31")){
+    xleft = 0.7;
+    xright = 0.88;
+    top = 0.76;
+    ysize = 0.112*narr;
+  }
+  if (hname.Contains("r") && hname.Contains("gen")) {
+    xleft = 0.5;
+    xright = 0.68;
+    top = 0.55;
+    ysize = 0.112*narr;
+  }
 
   xright = xleft + 0.22;
   top += 0.02;
@@ -402,7 +426,7 @@ void DrawLegend(vector<TH1F*> hists, TString hname)
       if(i==2) legtitle = "t#bar{t} #it{f}_{FSR} = #frac{1}{4}";
       if(i==3) legtitle = "t#bar{t} #it{f}_{FSR} = 4";
     }
-    else if(hname.Contains("tau32_2016")){
+    else if(hname.Contains("tau32_2016") || hname.Contains("ECF") || hname.Contains("r")){
       if(i==0) legtitle = "Data";
       if(i==1) legtitle = "t#bar{t}";
       if(i==2) legtitle = "t#bar{t} #it{f}_{FSR} = #frac{1}{2}";

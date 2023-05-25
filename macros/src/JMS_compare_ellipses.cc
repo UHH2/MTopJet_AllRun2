@@ -18,7 +18,7 @@ void draw2(vector<TGraph*> graph, vector<TEllipse*> ellipse, vector<int> color, 
 void draw(TF2* dummy, vector<TPolyMarker3D*> min, vector<TPolyMarker3D*> graph, vector<int> color, vector<int> style,  vector<TString> names, TString name);
 void CompareAreas(vector<TEllipse*> ellipse, vector<TString> names);
 MapVD ExtractFromFile(TString path, TString c);
-TPolyMarker3D* ExtractFromROOT(TString name, TString year, TString channel, TString sys);
+TPolyMarker3D* ExtractFromROOT(TString name, TString year, TString channel, TString sys, TString bins = "100");
 TF2* ExtractFunctionFromROOT(TString year, TString channel, TString sys);
 VecD ExtractPoints(TString line, const TString jms);
 TEllipse* build_ellipse(MapVD points, TString name="");
@@ -263,15 +263,15 @@ VecD ExtractPoints(TString line, const TString jms){
   return {x, y};
 }
 
-TPolyMarker3D* ExtractFromROOT(TString name, TString year, TString channel, TString sys){
+TPolyMarker3D* ExtractFromROOT(TString name, TString year, TString channel, TString sys, TString bins){
   TString dir = "/nfs/dust/cms/user/paaschal/UHH2_102X_v2/CMSSW_10_2_17/src/UHH2/MTopJet/macros/plots/JMS/";
-  dir += year+"/"+channel+"/100/";
+  dir += year+"/"+channel+"/"+bins+"/";
   if(!sys.EqualTo("")) dir += sys+"/";
   TFile *file = new TFile(dir+"Ellipse.root");
   // TPolyMarker3D* ellipse = (TPolyMarker3D*) file->Get("Graphs/JMS_ellipse");
   TPolyMarker3D* graph;
-  if(name.Contains("ellipse")) graph = (TPolyMarker3D*) file->Get("Graphs/JMS_ellipse");
-  else if(name.Contains("nominal")) graph = (TPolyMarker3D*) file->Get("Graphs/JMS_nominal");
+  if(name.Contains("ellipse")) graph = (TPolyMarker3D*) file->Get(name);
+  else if(name.Contains("nominal")) graph = (TPolyMarker3D*) file->Get(name);
   return graph;
 }
 
@@ -440,6 +440,7 @@ void draw(TF2* dummy, vector<TPolyMarker3D*> min, vector<TPolyMarker3D*> graph, 
   dummy->SetFillStyle(0);
   dummy->SetLineWidth(4);
   dummy->SetRange(-1.7, -1.7, 1.7, 1.7);
+  // if(name.Contains("AllBins")) dummy->SetRange(-4, -4, 4, 4);
 
   const Int_t Number = 2;
   // Double_t Red[Number]    = { 0.99, 0.49, 0.10, 0.00};
@@ -487,18 +488,19 @@ void draw(TF2* dummy, vector<TPolyMarker3D*> min, vector<TPolyMarker3D*> graph, 
   TLegend *leg = new TLegend(0.2,0.2,0.4,0.4);
   leg->SetTextSize(0.03);
   for(unsigned int i=0; i<color.size(); i++){
-    cout << i << endl;
-    set_graph(graph[i], color[i], style[i],0.05);
-    graph[i]->Draw("same P");
-    leg->AddEntry(graph[i], names[i],"p");
-    cout << i << endl;
-    set_graph(min[i], color[i], style[i],0.2);
-    min[i]->Draw("same P");
+    TH1F* filler = new TH1F();
+    filler->SetMarkerColor(color[i]);
+    filler->SetMarkerStyle(kFullCircle);
+    leg->AddEntry(filler, names[i],"p");
+    if(graph.size()>0){
+      set_graph(graph[i], color[i], style[i],0.05);
+      graph[i]->Draw("same P");
+    }
+    if(min.size()>0){
+      set_graph(min[i], color[i], style[i],0.4);
+      min[i]->Draw("same P");
+    }
   }
-  // for(unsigned int i=0; i<color.size(); i++){
-  //   set_graph(graph[i], color[i], style[i]);
-  //   graph[i]->Draw("same P");
-  // }
   DrawLumi(138., false, true, false, "JMS");
   leg->Draw();
   // gPad->RedrawAxis();

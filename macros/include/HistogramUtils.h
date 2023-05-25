@@ -120,7 +120,7 @@ vector<TH1F*> RebinVector(vector<TH1F*> hists, int rebin){
 // ===                                                                               ===
 // =====================================================================================
 
-TH1F* TrimHistogram(TH1F* hist_, double r_low, double r_high, TString name, bool debug){
+TH1F* TrimHistogram(TH1F* hist_, double r_low, double r_high, TString name, bool debug, bool mustfit=false){
   TH1F* hist = (TH1F*) hist_->Clone();
   int n_hist = hist->GetNbinsX();
   vector<int> bins;
@@ -135,13 +135,15 @@ TH1F* TrimHistogram(TH1F* hist_, double r_low, double r_high, TString name, bool
   int N = bins.size();
   int e_low = hist->GetXaxis()->GetBinLowEdge(bins[0]);
   int e_high = hist->GetXaxis()->GetBinUpEdge(bins[N-1]);
-  if(e_low != r_low){
-    printf("range: %3d vs. edge: %3d\n",r_low,e_low);
-    throw runtime_error("<E> Lower boundaries do not fit - "+name);
-  }
-  if(e_high != r_high){
-    printf("range: %3d vs. edge: %3d\n",r_high,e_high);
-    throw runtime_error("<E> Higher boundaries do not fit - "+name);
+  if(mustfit){
+    if(e_low != r_low){
+      printf("range: %3d vs. edge: %3d\n",r_low,e_low);
+      throw runtime_error("<E> Lower boundaries do not fit - "+name);
+    }
+    if(e_high != r_high){
+      printf("range: %3d vs. edge: %3d\n",r_high,e_high);
+      throw runtime_error("<E> Higher boundaries do not fit - "+name);
+    }
   }
   if(debug) cout << "Consider" << setw(3) << N << "from" << setw(5) << e_low << "to" << setw(5) << e_high << endl;
   TH1F* hist_trim = new TH1F(name, name, N, e_low, e_high);
@@ -469,7 +471,7 @@ void CompareHistStructure(TH1F* h1, TH1F* h2){
 }
 
 // -------------------------------------------------------------------------------------------------------
-TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal){
+TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal, bool isMarker=false){
   CompareHistStructure(h1, h2);
   TH1F* ratio = (TH1F*) h1->Clone();
   int Nbins = h1->GetNbinsX();
@@ -479,9 +481,11 @@ TH1F* GetRatio(TH1F* h1, TH1F* h2, bool equal){
     double E1 = h1->GetBinError(i);
     double E2 = h2->GetBinError(i);
     if(N1==0 || N2==0){
-      if(equal) ratio->SetBinContent(i, 1);
+      // =======================================
+      // Set 0 if draw points to not show marker
+      // Set 1 if draw line to avoid jumps
+      if(equal) ratio->SetBinContent(i, isMarker?0:1);
       else      ratio->SetBinContent(i, 1);
-
       ratio->SetBinError(i, 0);
     }
     else{

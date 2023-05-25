@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
   TString MC_uncert    = "central";         // central avg nominal
   bool    usePeak_in   = false;
   bool    one_Ptbin    = false;
-  int bin_width = 1;
+  int bin_width = 3;
 
   // Input ---------------------------------------------------------------------
   // int bin_width   = stoi(argv[1]);
@@ -93,6 +93,7 @@ int main(int argc, char* argv[]){
   range["comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_hl"] = {75, 104};
   range["comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_lh"] = {62, 98};
   range["comparison_topjet_xcone_pass_rec/wmass_match_ptdiv_ll"] = {63, 101};
+  range["comparison_topjet_xcone_pass_rec/wmass_match"] = {62, 105};
 
   vector<double> means_nominal = {};
   vector<double> means_jec_up = {};
@@ -103,13 +104,13 @@ int main(int argc, char* argv[]){
   for(int ptbin=0; ptbin<5; ptbin++){
 
     // Define ptbins -----------------------------------------------------------
-    if((ptbin==4)) continue;
+    // if((ptbin==4)) continue;
     TString addition="";
     addition="_hh";
     if(ptbin==1) addition="_hl";
     if(ptbin==2) addition="_lh";
     if(ptbin==3) addition="_ll";
-    if(ptbin==4) addition="";
+    if(ptbin==4) addition="_all";
     string add = (string) addition;
 
     cout << endl << "Start with bin " << addition << " ..." << endl;
@@ -583,8 +584,10 @@ int main(int argc, char* argv[]){
 
       if(year==3){
         int nBins = (int) bin_centers_combine[1]-(int) bin_centers_combine[0];
-        TString option = gSystem->AccessPathName("files/PaperPlots_Peak.root")?"recreate":"update";
-        TFile *f_out = new TFile("files/PaperPlots_Peak.root", option);
+        TString filename = "files/PaperPlots_Peak.root";
+        if(bin_width>1) filename = "files/WMassPlots_BinWidth_"+to_string(bin_width)+".root";
+        TString option = gSystem->AccessPathName(filename)?"recreate":"update";
+        TFile *f_out = new TFile(filename, option);
         f_out->cd();
 
         // void WriteHistogramToRoot(TH1F* hist, TString name, int xmin, int xmax){
@@ -597,8 +600,10 @@ int main(int argc, char* argv[]){
         f_out->Close();
       }
 
-      TString option = gSystem->AccessPathName("files/WMassPlots.root")?"recreate":"update";
-      TFile *f_out = new TFile("files/WMassPlots.root", option);
+      TString filename = "files/WMassPlots.root";
+      // if(bin_width>1) filename = "files/WMassPlots_BinWidth_"+to_string(bin_width)+".root";
+      TString option = gSystem->AccessPathName(filename)?"recreate":"update";
+      TFile *f_out = new TFile(filename, option);
       f_out->cd();
 
       // void WriteHistogramToRoot(TH1F* hist, TString name, int xmin, int xmax){

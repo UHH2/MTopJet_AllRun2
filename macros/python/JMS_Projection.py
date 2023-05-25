@@ -1,4 +1,4 @@
-import sys, os, ROOT
+import sys, os, ROOT, math
 from prettytable import PrettyTable
 ROOT.gROOT.SetBatch(1) # Batch mode, e.g. suppress TCanvas on screen
 ROOT.gStyle.SetOptTitle(0);
@@ -16,7 +16,7 @@ def Cosmetics(hist, color=ROOT.kBlack, style=1, width=1, xmin=-2, xmax=2):
     hist.SetMarkerStyle(1)
     hist.SetFillColorAlpha(color, 0.4)
     hist.GetXaxis().SetRangeUser(xmin, xmax)
-    hist.GetYaxis().SetRangeUser(330, 356)
+    hist.GetYaxis().SetRangeUser(128, 180)
 
 def CosmeticsFit(fit, name='JEC', color=ROOT.kBlack, style=1, width=1, xmin=-2, xmax=2):
     fit.SetLineColor(color)
@@ -25,8 +25,8 @@ def CosmeticsFit(fit, name='JEC', color=ROOT.kBlack, style=1, width=1, xmin=-2, 
     fit.SetMarkerStyle(1)
     fit.SetFillColorAlpha(color, 0.4)
     fit.GetXaxis().SetRangeUser(xmin, xmax)
-    ymin = 330 if 'JEC' in name else 330
-    ymax = 600 if 'JEC' in name else 450
+    ymin = 120
+    ymax = 180 if 'JEC' in name else 140
     fit.GetYaxis().SetRangeUser(ymin, ymax)
 
 def Draw(hists, name='', option=['hist']):
@@ -41,10 +41,10 @@ def Draw(hists, name='', option=['hist']):
 def Draw1DChi2(hist, name='', option='hist', xmin=0, xmax=0, min_x=0, min_y=0, eu=0, ed=0):
     canvas = ROOT.TCanvas('canvas'+name)
     hist.Draw(option)
-    lmin=ROOT.TLine(min_x, 330, min_x, min_y)
+    lmin=ROOT.TLine(min_x, 128, min_x, min_y)
     lerr=ROOT.TLine(xmin, min_y+1, xmax, min_y+1)
-    lerrU=ROOT.TLine(min_x+eu, 330, min_x+eu, min_y+1)
-    lerrD=ROOT.TLine(min_x-ed, 330, min_x-ed, min_y+1)
+    lerrU=ROOT.TLine(min_x+eu, 128, min_x+eu, min_y+1)
+    lerrD=ROOT.TLine(min_x-ed, 128, min_x-ed, min_y+1)
     lmin.SetLineColor(ROOT.kGray+2)
     lerr.SetLineColor(ROOT.kGray+2)
     lerrU.SetLineColor(ROOT.kGray+2)
@@ -72,26 +72,36 @@ def Get1DJMS(func, xmin=-3, xmax=3):
     return [ymin, eu, ed, minimum]
 
 def CreateHist(formula, axis='JEC'):
-    hold = 'y' if axis=='JEC' else 'x' if axis=='XCone' else ''
-    YtoX = True if axis=='XCone' else False
-    range = [-0.5, 0.5] if axis=='XCone' else [-1.2, 1.2] if axis=='JEC' else []
-    hist = ROOT.TH1F('hist', axis, 40, -1.99, 1.99)
-    step = 0.05
+    isXCone = True if axis=='XCone' else False
+    hold = 'y' if isXCone else 'x'
+    YtoX = True if not isXCone else False
+    range = [-1.0, 1.0] if isXCone else [-0.5, 1.7]
+    step = 0.1
+    nbins = int(abs(range[0]-range[1])/step)
+    print nbins, int(nbins)
+    hist = ROOT.TH1F('hist', axis, nbins, range[0], range[1])
     start = range[0]
+    print hist.GetNbinsX()
+    c = 1
+    while c<=hist.GetNbinsX():
+        print c,hist.GetXaxis().GetBinCenter(c),hist.GetXaxis().GetBinLowEdge(c),hist.GetXaxis().GetBinUpEdge(c)
+        c+=1
+    print "-----------------------"
     table = PrettyTable()
     table.field_names = ["Value", "bin", "fmin", "fup", "fdown", "chi2 min"]
     while start <= range[1]:
-        value = str(start)
+        value = str(start+step/2)
         f_tmp = formula.replace(hold, value)
         f = f_tmp
         if YtoX:
             f = f_tmp.replace('y', 'x')
         # func = ROOT.TF1("func", f, range[0], range[1])
-        func = ROOT.TF1("func", f, -3, 3)
-        CosmeticsFit(func, name=axis,xmin=-3, xmax=3)
+        func = ROOT.TF1("func", f, range[0], range[1])
+        CosmeticsFit(func, name=axis,xmin=range[0], xmax=range[1])
         Draw([func], 'fits/'+axis+'_'+str(start),'')
         min = Get1DJMS(func)
-        bin = hist.FindBin(start)
+        bin = hist.FindBin(start+step/2)
+        print value,bin,hist.GetXaxis().GetBinLowEdge(bin),hist.GetXaxis().GetBinUpEdge(bin)
         hist.SetBinContent(bin, min[3])
         hist.SetBinError(bin, (min[1]+min[2])/2)
         table.add_row([value,bin,"%.2f"%min[0],"%.2f"%min[1],"%.2f"%min[2],"%.2f"%min[3]])
@@ -127,6 +137,7 @@ def GetProjections():
         sys.exit (1)
     else:
         print 'Get function ... '
+    print chi2.Eval(0.603918,  -0.060578)
     hist = chi2.GetHistogram()
     formula = chi2.GetExpFormula()
     print 'Start to create hists'
