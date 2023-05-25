@@ -1833,22 +1833,28 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(debug) cout << "\t ... pass_measurement_gen or pass_subptmigration_gen" << endl;
   if(pass_measurement_gen || pass_subptmigration_gen){
     if(lowPU){
-      if(isTTbar)h_RecGenHists_lowPU->fill(event);
-      if(isTTbar)h_RecGenHists_lowPU_noJEC->fill(event);
-      if(isTTbar)h_RecGenHists_subjets_lowPU->fill(event);
-      if(isTTbar)h_RecGenHists_subjets_noJEC_lowPU->fill(event);
+      if(isTTbar){
+        h_RecGenHists_lowPU->fill(event);
+        h_RecGenHists_lowPU_noJEC->fill(event);
+        h_RecGenHists_subjets_lowPU->fill(event);
+        h_RecGenHists_subjets_noJEC_lowPU->fill(event);
+      }
     }
     if(midPU){
-      if(isTTbar)h_RecGenHists_medPU->fill(event);
-      if(isTTbar)h_RecGenHists_medPU_noJEC->fill(event);
-      if(isTTbar)h_RecGenHists_subjets_medPU->fill(event);
-      if(isTTbar)h_RecGenHists_subjets_noJEC_medPU->fill(event);
+      if(isTTbar){
+        h_RecGenHists_medPU->fill(event);
+        h_RecGenHists_medPU_noJEC->fill(event);
+        h_RecGenHists_subjets_medPU->fill(event);
+        h_RecGenHists_subjets_noJEC_medPU->fill(event);
+      }
     }
     if(highPU){
-      if(isTTbar)h_RecGenHists_highPU->fill(event);
-      if(isTTbar)h_RecGenHists_highPU_noJEC->fill(event);
-      if(isTTbar)h_RecGenHists_subjets_highPU->fill(event);
-      if(isTTbar)h_RecGenHists_subjets_noJEC_highPU->fill(event);
+      if(isTTbar){
+        h_RecGenHists_highPU->fill(event);
+        h_RecGenHists_highPU_noJEC->fill(event);
+        h_RecGenHists_subjets_highPU->fill(event);
+        h_RecGenHists_subjets_noJEC_highPU->fill(event);
+      }
     }
     h_RecGenHists_RecOnly->fill(event);
     h_RecGenHists_RecOnly_noJEC->fill(event);
