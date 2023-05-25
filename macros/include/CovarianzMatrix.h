@@ -335,7 +335,7 @@ void DrawCov(TH2* h, TString save, TString axis, double zoff){
 
   h->Draw("COLZ");
   B->SaveAs(save+".pdf");
-
+  delete B;
   // h->Reset();
 }
 
