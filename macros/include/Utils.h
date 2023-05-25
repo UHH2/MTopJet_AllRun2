@@ -213,7 +213,7 @@ void CreateSavePath(string path){
   const char *command = temp.c_str();
   int status = system(command); // Creating directories
   if (status == -1) cerr << "Error : " << strerror(errno) << endl;
-  else cout << "Directories are created" << endl;
+  // else cout << "Directories are created" << endl;
 }
 
 // ============================================================================================
