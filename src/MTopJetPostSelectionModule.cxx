@@ -358,6 +358,7 @@ protected:
   std::unique_ptr<uhh2::AnalysisModule> Correction;
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
   std::unique_ptr<CombineXCone33> jetprod_reco_corrected;
+  std::unique_ptr<CombineXCone> GetXConeInfo;
   ////
 
   string BTag_variation ="central";
@@ -1073,6 +1074,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   else throw runtime_error("In PostSelectionModule: There is no Event from 2016_v2, 2017_v2 or 2018!");
 
   // combine jets after correction
+  GetXConeInfo.reset(new CombineXCone());
   jetprod_reco.reset(new CombineXCone33(ctx, "XCone33_had_Combined", "XCone33_lep_Combined", "xconeCHS"));
   jetprod_reco_corrected.reset(new CombineXCone33(ctx, "XCone33_had_Combined_Corrected", "XCone33_lep_Combined_Corrected", "xconeCHS_Corrected"));
 
