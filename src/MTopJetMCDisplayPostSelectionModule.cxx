@@ -36,10 +36,10 @@
 #include <UHH2/MTopJet/include/ClusteringHists.h>
 #include <UHH2/MTopJet/include/JetCluster.h>
 
-class MTopJetGenPostSelectionModule : public ModuleBASE {
+class MTopJetMCDisplayPostSelectionModule : public ModuleBASE {
 
  public:
-  explicit MTopJetGenPostSelectionModule(uhh2::Context&);
+  explicit MTopJetMCDisplayPostSelectionModule(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
 
  protected:
@@ -123,7 +123,7 @@ class MTopJetGenPostSelectionModule : public ModuleBASE {
   bool foundallhists = false;
 };
 
-MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx){
+MTopJetMCDisplayPostSelectionModule::MTopJetMCDisplayPostSelectionModule(uhh2::Context& ctx){
 
   //// CONFIGURATION
   const bool isMC = (ctx.get("dataset_type") == "MC");
@@ -335,7 +335,7 @@ MTopJetGenPostSelectionModule::MTopJetGenPostSelectionModule(uhh2::Context& ctx)
 
 }
 
-bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
+bool MTopJetMCDisplayPostSelectionModule::process(uhh2::Event& event){
 
   // cout<<event.event<<endl;
   //  COMMON MODULES
@@ -670,4 +670,4 @@ bool MTopJetGenPostSelectionModule::process(uhh2::Event& event){
   return true; //false to delete all collections and keep hists
 }
 
-UHH2_REGISTER_ANALYSIS_MODULE(MTopJetGenPostSelectionModule)
+UHH2_REGISTER_ANALYSIS_MODULE(MTopJetMCDisplayPostSelectionModule)
