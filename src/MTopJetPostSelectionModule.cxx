@@ -177,12 +177,18 @@ protected:
   Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen33;
   Event::Handle<double>h_mass_rec;
-  Event::Handle<double>h_ptsub1_rec,h_ptsub1_gen;
-  Event::Handle<double>h_ptsub2_rec,h_ptsub2_gen;
-  Event::Handle<double>h_ptsub3_rec,h_ptsub3_gen;
+  Event::Handle<double>h_sub1_pt_rec,h_sub1_uncor_pt_rec,h_sub1_pt_gen;
+  Event::Handle<double>h_sub2_pt_rec,h_sub2_uncor_pt_rec,h_sub2_pt_gen;
+  Event::Handle<double>h_sub3_pt_rec,h_sub3_uncor_pt_rec,h_sub3_pt_gen;
   Event::Handle<double>h_mass_sub1_rec,h_mass_sub1_gen;
   Event::Handle<double>h_mass_sub2_rec,h_mass_sub2_gen;
   Event::Handle<double>h_mass_sub3_rec,h_mass_sub3_gen;
+  Event::Handle<double>h_factor_jec_0,h_factor_jec_1,h_factor_jec_2;
+  Event::Handle<double>h_sigma_jec_0,h_sigma_jec_1,h_sigma_jec_2;
+  Event::Handle<double>h_factor_cor_0,h_factor_cor_1,h_factor_cor_2;
+  Event::Handle<double>h_sigma_cor_0,h_sigma_cor_1,h_sigma_cor_2;
+  Event::Handle<double>h_factor_jer_0,h_factor_jer_1,h_factor_jer_2;
+  Event::Handle<double>h_factor_jms_jec,h_factor_jms_cor;
   Event::Handle<double>h_mW_rec;
   Event::Handle<double>h_mass_jms;
   Event::Handle<double>h_softdropmass_rec;
@@ -261,9 +267,15 @@ protected:
   Event::Handle<double> h_mass_sub12_rec, h_mass_sub23_rec, h_mass_sub13_rec;
   Event::Handle<double> h_mass_sub12_gen, h_mass_sub23_gen, h_mass_sub13_gen;
 
-  Event::Handle<double> h_sub1_px_rec, h_sub1_py_rec, h_sub1_pz_rec, h_sub1_E_rec, h_sub1_px_gen, h_sub1_py_gen, h_sub1_pz_gen, h_sub1_E_gen;
-  Event::Handle<double> h_sub2_px_rec, h_sub2_py_rec, h_sub2_pz_rec, h_sub2_E_rec, h_sub2_px_gen, h_sub2_py_gen, h_sub2_pz_gen, h_sub2_E_gen;
-  Event::Handle<double> h_sub3_px_rec, h_sub3_py_rec, h_sub3_pz_rec, h_sub3_E_rec, h_sub3_px_gen, h_sub3_py_gen, h_sub3_pz_gen, h_sub3_E_gen;
+  Event::Handle<double> h_sub1_px_rec, h_sub1_py_rec, h_sub1_pz_rec, h_sub1_E_rec, h_sub1_eta_rec, h_sub1_phi_rec, h_sub1_px_gen, h_sub1_py_gen, h_sub1_pz_gen, h_sub1_E_gen, h_sub1_eta_gen, h_sub1_phi_gen;
+  Event::Handle<double> h_sub2_px_rec, h_sub2_py_rec, h_sub2_pz_rec, h_sub2_E_rec, h_sub2_eta_rec, h_sub2_phi_rec, h_sub2_px_gen, h_sub2_py_gen, h_sub2_pz_gen, h_sub2_E_gen, h_sub2_eta_gen, h_sub2_phi_gen;
+  Event::Handle<double> h_sub3_px_rec, h_sub3_py_rec, h_sub3_pz_rec, h_sub3_E_rec, h_sub3_eta_rec, h_sub3_phi_rec, h_sub3_px_gen, h_sub3_py_gen, h_sub3_pz_gen, h_sub3_E_gen, h_sub3_eta_gen, h_sub3_phi_gen;
+  Event::Handle<double> h_matched_index1, h_matched_index2, h_matched_index3;
+  Event::Handle<double> h_index_w1, h_index_w2, h_index_b;
+
+  Event::Handle<double> h_sub1_uncor_px_rec, h_sub1_uncor_py_rec, h_sub1_uncor_pz_rec, h_sub1_uncor_E_rec, h_sub1_uncor_eta_rec, h_sub1_uncor_phi_rec;
+  Event::Handle<double> h_sub2_uncor_px_rec, h_sub2_uncor_py_rec, h_sub2_uncor_pz_rec, h_sub2_uncor_E_rec, h_sub2_uncor_eta_rec, h_sub2_uncor_phi_rec;
+  Event::Handle<double> h_sub3_uncor_px_rec, h_sub3_uncor_py_rec, h_sub3_uncor_pz_rec, h_sub3_uncor_E_rec, h_sub3_uncor_eta_rec, h_sub3_uncor_phi_rec;
 
   //width reweight
   std::unique_ptr<tt_width_reweight> width2_reweight;
@@ -462,12 +474,12 @@ void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
   h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
   h_mass_rec = ctx.declare_event_output<double>("Mass_Rec_old");
   h_mass_jms = ctx.declare_event_output<double>("Mass_Rec");
-  h_ptsub1_rec = ctx.declare_event_output<double>("pt_sub1");
-  h_ptsub2_rec = ctx.declare_event_output<double>("pt_sub2");
-  h_ptsub3_rec = ctx.declare_event_output<double>("pt_sub3");
-  h_ptsub1_gen = ctx.declare_event_output<double>("pt_sub1_gen");
-  h_ptsub2_gen = ctx.declare_event_output<double>("pt_sub2_gen");
-  h_ptsub3_gen = ctx.declare_event_output<double>("pt_sub3_gen");
+  h_sub1_pt_rec = ctx.declare_event_output<double>("pt_sub1_rec");
+  h_sub2_pt_rec = ctx.declare_event_output<double>("pt_sub2_rec");
+  h_sub3_pt_rec = ctx.declare_event_output<double>("pt_sub3_rec");
+  h_sub1_pt_gen = ctx.declare_event_output<double>("pt_sub1_gen");
+  h_sub2_pt_gen = ctx.declare_event_output<double>("pt_sub2_gen");
+  h_sub3_pt_gen = ctx.declare_event_output<double>("pt_sub3_gen");
   h_dR_sub12_gen = ctx.declare_event_output<double>("dR_sub12_gen");
   h_dR_sub23_gen = ctx.declare_event_output<double>("dR_sub23_gen");
   h_dR_sub13_gen = ctx.declare_event_output<double>("dR_sub13_gen");
@@ -487,6 +499,12 @@ void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
   h_mass_sub13_gen = ctx.declare_event_output<double>("mass_sub13_gen");
   h_mass_sub23_gen = ctx.declare_event_output<double>("mass_sub23_gen");
 
+  h_sub1_eta_rec = ctx.declare_event_output<double>("eta_sub1_rec");
+  h_sub2_eta_rec = ctx.declare_event_output<double>("eta_sub2_rec");
+  h_sub3_eta_rec = ctx.declare_event_output<double>("eta_sub3_rec");
+  h_sub1_phi_rec = ctx.declare_event_output<double>("phi_sub1_rec");
+  h_sub2_phi_rec = ctx.declare_event_output<double>("phi_sub2_rec");
+  h_sub3_phi_rec = ctx.declare_event_output<double>("phi_sub3_rec");
   h_sub1_px_rec = ctx.declare_event_output<double>("px_sub1_rec");
   h_sub1_py_rec = ctx.declare_event_output<double>("py_sub1_rec");
   h_sub1_pz_rec = ctx.declare_event_output<double>("pz_sub1_rec");
@@ -511,6 +529,53 @@ void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
   h_sub3_py_gen = ctx.declare_event_output<double>("py_sub3_gen");
   h_sub3_pz_gen = ctx.declare_event_output<double>("pz_sub3_gen");
   h_sub3_E_gen = ctx.declare_event_output<double>("E_sub3_gen");
+  h_matched_index1 = ctx.declare_event_output<double>("matched_index1");
+  h_matched_index2 = ctx.declare_event_output<double>("matched_index2");
+  h_matched_index3 = ctx.declare_event_output<double>("matched_index3");
+
+  h_index_w1 = ctx.declare_event_output<double>("index_w1");
+  h_index_w2 = ctx.declare_event_output<double>("index_w2");
+  h_index_b = ctx.declare_event_output<double>("index_b");
+
+  h_sub1_uncor_pt_rec = ctx.declare_event_output<double>("pt_sub1_uncor_rec");
+  h_sub2_uncor_pt_rec = ctx.declare_event_output<double>("pt_sub2_uncor_rec");
+  h_sub3_uncor_pt_rec = ctx.declare_event_output<double>("pt_sub3_uncor_rec");
+  h_sub1_uncor_eta_rec = ctx.declare_event_output<double>("eta_sub1_uncor_rec");
+  h_sub2_uncor_eta_rec = ctx.declare_event_output<double>("eta_sub2_uncor_rec");
+  h_sub3_uncor_eta_rec = ctx.declare_event_output<double>("eta_sub3_uncor_rec");
+  h_sub1_uncor_phi_rec = ctx.declare_event_output<double>("phi_sub1_uncor_rec");
+  h_sub2_uncor_phi_rec = ctx.declare_event_output<double>("phi_sub2_uncor_rec");
+  h_sub3_uncor_phi_rec = ctx.declare_event_output<double>("phi_sub3_uncor_rec");
+  h_sub1_uncor_px_rec = ctx.declare_event_output<double>("px_sub1_uncor_rec");
+  h_sub1_uncor_py_rec = ctx.declare_event_output<double>("py_sub1_uncor_rec");
+  h_sub1_uncor_pz_rec = ctx.declare_event_output<double>("pz_sub1_uncor_rec");
+  h_sub1_uncor_E_rec = ctx.declare_event_output<double>("E_sub1_uncor_rec");
+  h_sub2_uncor_px_rec = ctx.declare_event_output<double>("px_sub2_uncor_rec");
+  h_sub2_uncor_py_rec = ctx.declare_event_output<double>("py_sub2_uncor_rec");
+  h_sub2_uncor_pz_rec = ctx.declare_event_output<double>("pz_sub2_uncor_rec");
+  h_sub2_uncor_E_rec = ctx.declare_event_output<double>("E_sub2_uncor_rec");
+  h_sub3_uncor_px_rec = ctx.declare_event_output<double>("px_sub3_uncor_rec");
+  h_sub3_uncor_py_rec = ctx.declare_event_output<double>("py_sub3_uncor_rec");
+  h_sub3_uncor_pz_rec = ctx.declare_event_output<double>("pz_sub3_uncor_rec");
+  h_sub3_uncor_E_rec = ctx.declare_event_output<double>("E_sub3_uncor_rec");
+
+  h_factor_jec_0 = ctx.declare_event_output<double>("factor_jec_0");
+  h_factor_jec_1 = ctx.declare_event_output<double>("factor_jec_1");
+  h_factor_jec_2 = ctx.declare_event_output<double>("factor_jec_2");
+  h_sigma_jec_0 = ctx.declare_event_output<double>("sigma_jec_0");
+  h_sigma_jec_1 = ctx.declare_event_output<double>("sigma_jec_1");
+  h_sigma_jec_2 = ctx.declare_event_output<double>("sigma_jec_2");
+  h_factor_cor_0 = ctx.declare_event_output<double>("factor_cor_0");
+  h_factor_cor_1 = ctx.declare_event_output<double>("factor_cor_1");
+  h_factor_cor_2 = ctx.declare_event_output<double>("factor_cor_2");
+  h_sigma_cor_0 = ctx.declare_event_output<double>("sigma_cor_0");
+  h_sigma_cor_1 = ctx.declare_event_output<double>("sigma_cor_1");
+  h_sigma_cor_2 = ctx.declare_event_output<double>("sigma_cor_2");
+  h_factor_jer_0 = ctx.declare_event_output<double>("factor_jer_0");
+  h_factor_jer_1 = ctx.declare_event_output<double>("factor_jer_1");
+  h_factor_jer_2 = ctx.declare_event_output<double>("factor_jer_2");
+  // h_factor_jms_jec = ctx.declare_event_output<double>("factor_jms_jec");
+  // h_factor_jms_cor = ctx.declare_event_output<double>("factor_jms_cor");
 
   h_mW_rec = ctx.declare_event_output<double>("mW");
 
@@ -1242,8 +1307,11 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
   event.set(h_bquark_pt, bquark_pt);
 
-  vector<Jet> subjets_mass = isMC?newsubjets:rec_hadjets[0].subjets();
+  // Not the same order as gen jets. Necessary? TODO
+  // vector<Jet> subjets_mass = isMC?newsubjets:rec_hadjets[0].subjets();
+  vector<Jet> subjets_mass = isMC?newsubjets:hadjets.at(0).subjets();
   LorentzVector lv_sub1, lv_sub2, lv_sub3;
+  // sort subjets on reco level
   lv_sub1 = subjets_mass[0].v4();
   lv_sub2 = subjets_mass[1].v4();
   lv_sub3 = subjets_mass[2].v4();
@@ -1260,19 +1328,166 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_mass_sub13_rec, tlv_sub13.M());
   event.set(h_mass_sub23_rec, tlv_sub23.M());
 
+  vector<Jet> subjets = hadjets.at(0).subjets();
+  vector<Jet> subjets_raw = hadjets_raw.at(0).subjets();
+  double pt1=subjets.at(0).v4().Pt();
+  double pt2=subjets.at(1).v4().Pt();
+  double pt3=subjets.at(2).v4().Pt();
+  int lead1_rec = 0;
+  int lead2_rec = 1;
+  int lead3_rec = 2;
+  if     (pt3<pt2 && pt2<pt1){lead1_rec=0;lead2_rec=1;lead3_rec=2;}
+  else if(pt2<pt3 && pt3<pt1){lead1_rec=0;lead2_rec=2;lead3_rec=1;}
+  else if(pt1<pt3 && pt3<pt2){lead1_rec=1;lead2_rec=2;lead3_rec=0;}
+  else if(pt3<pt1 && pt1<pt2){lead1_rec=1;lead2_rec=0;lead3_rec=2;}
+  else if(pt2<pt1 && pt1<pt3){lead1_rec=2;lead2_rec=0;lead3_rec=1;}
+  else if(pt1<pt2 && pt2<pt3){lead1_rec=2;lead2_rec=1;lead3_rec=0;}
+  Jet jet_w1 = subjets[WSubjetIndex[0]];
+  Jet jet_w2 = subjets[WSubjetIndex[1]];
+  Jet jet_b = subjets[WSubjetIndex[2]];
+  int index_w1 = WSubjetIndex[0];
+  int index_w2 = WSubjetIndex[1];
+  int index_b = WSubjetIndex[2];
+  double d_w1_1 = deltaR( jet_w1, subjets.at(lead1_rec) );
+  double d_w1_2 = deltaR( jet_w1, subjets.at(lead2_rec) );
+  double d_w1_3 = deltaR( jet_w1, subjets.at(lead3_rec) );
+  double d_w2_1 = deltaR( jet_w2, subjets.at(lead1_rec) );
+  double d_w2_2 = deltaR( jet_w2, subjets.at(lead2_rec) );
+  double d_w2_3 = deltaR( jet_w2, subjets.at(lead3_rec) );
+  double d_b_1 = deltaR( jet_b, subjets.at(lead1_rec) );
+  double d_b_2 = deltaR( jet_b, subjets.at(lead2_rec) );
+  double d_b_3 = deltaR( jet_b, subjets.at(lead3_rec) );
+  if     (d_w1_1<d_w1_2 && d_w1_1<d_w1_3) index_w1 = 0;
+  else if(d_w1_2<d_w1_1 && d_w1_2<d_w1_3) index_w1 = 1;
+  else if(d_w1_3<d_w1_1 && d_w1_3<d_w1_2) index_w1 = 2;
+  if     (d_w2_1<d_w2_2 && d_w2_1<d_w2_3) index_w2 = 0;
+  else if(d_w2_2<d_w2_1 && d_w2_2<d_w2_3) index_w2 = 1;
+  else if(d_w2_3<d_w2_1 && d_w2_3<d_w2_2) index_w2 = 2;
+  if     (d_b_1<d_b_2 && d_b_1<d_b_3) index_b = 0;
+  else if(d_b_2<d_b_1 && d_b_2<d_b_3) index_b = 1;
+  else if(d_b_3<d_b_1 && d_b_3<d_b_2) index_b = 2;
+  if(index_w1 == index_w2 || index_w1 == index_b || index_w2 == index_b){
+    printf("Indices:\n");
+    printf("Before: w1 %2d w2 %2d b %2d\n",WSubjetIndex[0],WSubjetIndex[1],WSubjetIndex[2]);
+    printf("After: w1 %2d w2 %2d b %2d\n",index_w1,index_w2,index_b);
+    printf("\nPt:\n");
+    printf("Before: pt1 %5.2f pt2 %5.2f pt3 %5.2f\n",subjets.at(0).v4().Pt(),subjets.at(1).v4().Pt(),subjets.at(2).v4().Pt());
+    printf("After: pt1 %5.2f pt2 %5.2f pt3 %5.2f\n",subjets.at(lead1_rec).v4().Pt(),subjets.at(lead2_rec).v4().Pt(),subjets.at(lead3_rec).v4().Pt());
+    printf("\nDistance:\n");
+    printf("w1: %5.2f %5.2f %5.2f\n",d_w1_1,d_w1_2,d_w1_3);
+    printf("w1: %5.2f %5.2f %5.2f\n",d_w2_1,d_w2_2,d_w2_3);
+    printf("b : %5.2f %5.2f %5.2f\n",d_b_1,d_b_2,d_b_3);
+    throw runtime_error("[ERROR] Ordering the w indices lead to equal indices!");
+  }
+  if(debug){
+    printf("Check sorted jet correction factors:\n");
+    printf(" --- JEC (unsorted / sorted) nominal:\n");
+    printf("\t%6.2f %6.2f %6.2f\n",factors_jec[0][0],factors_jec[1][0],factors_jec[2][0]);
+    printf("\t%6.2f %6.2f %6.2f\n",factors_jec[lead1_rec][0],factors_jec[lead2_rec][0],factors_jec[lead3_rec][0]);
+    printf(" --- JEC (unsorted / sorted) sigma:\n");
+    printf("\t%6.2f %6.2f %6.2f\n",factors_jec[0][1],factors_jec[1][1],factors_jec[2][1]);
+    printf("\t%6.2f %6.2f %6.2f\n",factors_jec[lead1_rec][1],factors_jec[lead2_rec][1],factors_jec[lead3_rec][1]);
+    printf("\n --- XCone (unsorted / sorted) nominal:\n");
+    printf("\t%6.2f %6.2f %6.2f\n",factors_cor[0][0],factors_cor[1][0],factors_cor[2][0]);
+    printf("\t%6.2f %6.2f %6.2f\n",factors_cor[lead1_rec][0],factors_cor[lead2_rec][0],factors_cor[lead3_rec][0]);
+    printf(" --- XCone (unsorted / sorted) sigma:\n");
+    printf("\t%6.2f %6.2f %6.2f\n",factors_cor[0][1],factors_cor[1][1],factors_cor[2][1]);
+    printf("\t%6.2f %6.2f %6.2f\n",factors_cor[lead1_rec][1],factors_cor[lead2_rec][1],factors_cor[lead3_rec][1]);
+  }
+  event.set(h_sub1_pt_rec, subjets.at(lead1_rec).v4().Pt());
+  event.set(h_sub2_pt_rec, subjets.at(lead2_rec).v4().Pt());
+  event.set(h_sub3_pt_rec, subjets.at(lead3_rec).v4().Pt());
+  event.set(h_npv, event.pvs->size());
+  event.set(h_sub1_eta_rec, subjets.at(lead1_rec).eta());
+  event.set(h_sub2_eta_rec, subjets.at(lead2_rec).eta());
+  event.set(h_sub3_eta_rec, subjets.at(lead3_rec).eta());
+  event.set(h_sub1_phi_rec, subjets.at(lead1_rec).phi());
+  event.set(h_sub2_phi_rec, subjets.at(lead2_rec).phi());
+  event.set(h_sub3_phi_rec, subjets.at(lead3_rec).phi());
+  event.set(h_sub1_px_rec, subjets.at(lead1_rec).v4().Px());
+  event.set(h_sub1_py_rec, subjets.at(lead1_rec).v4().Py());
+  event.set(h_sub1_pz_rec, subjets.at(lead1_rec).v4().Pz());
+  event.set(h_sub1_E_rec,  subjets.at(lead1_rec).v4().E());
+  event.set(h_sub2_px_rec, subjets.at(lead2_rec).v4().Px());
+  event.set(h_sub2_py_rec, subjets.at(lead2_rec).v4().Py());
+  event.set(h_sub2_pz_rec, subjets.at(lead2_rec).v4().Pz());
+  event.set(h_sub2_E_rec,  subjets.at(lead2_rec).v4().E());
+  event.set(h_sub3_px_rec, subjets.at(lead3_rec).v4().Px());
+  event.set(h_sub3_py_rec, subjets.at(lead3_rec).v4().Py());
+  event.set(h_sub3_pz_rec, subjets.at(lead3_rec).v4().Pz());
+  event.set(h_sub3_E_rec,  subjets.at(lead3_rec).v4().E());
+
+  event.set(h_index_w1,  index_w1);
+  event.set(h_index_w2,  index_w2);
+  event.set(h_index_b,  index_b);
+
+  event.set(h_sub1_uncor_pt_rec, subjets_raw.at(lead1_rec).v4().Pt());
+  event.set(h_sub2_uncor_pt_rec, subjets_raw.at(lead2_rec).v4().Pt());
+  event.set(h_sub3_uncor_pt_rec, subjets_raw.at(lead3_rec).v4().Pt());
+  event.set(h_sub1_uncor_eta_rec, subjets_raw.at(lead1_rec).eta());
+  event.set(h_sub2_uncor_eta_rec, subjets_raw.at(lead2_rec).eta());
+  event.set(h_sub3_uncor_eta_rec, subjets_raw.at(lead3_rec).eta());
+  event.set(h_sub1_uncor_phi_rec, subjets_raw.at(lead1_rec).phi());
+  event.set(h_sub2_uncor_phi_rec, subjets_raw.at(lead2_rec).phi());
+  event.set(h_sub3_uncor_phi_rec, subjets_raw.at(lead3_rec).phi());
+  event.set(h_sub1_uncor_px_rec, subjets_raw.at(lead1_rec).v4().Px());
+  event.set(h_sub1_uncor_py_rec, subjets_raw.at(lead1_rec).v4().Py());
+  event.set(h_sub1_uncor_pz_rec, subjets_raw.at(lead1_rec).v4().Pz());
+  event.set(h_sub1_uncor_E_rec,  subjets_raw.at(lead1_rec).v4().E());
+  event.set(h_sub2_uncor_px_rec, subjets_raw.at(lead2_rec).v4().Px());
+  event.set(h_sub2_uncor_py_rec, subjets_raw.at(lead2_rec).v4().Py());
+  event.set(h_sub2_uncor_pz_rec, subjets_raw.at(lead2_rec).v4().Pz());
+  event.set(h_sub2_uncor_E_rec,  subjets_raw.at(lead2_rec).v4().E());
+  event.set(h_sub3_uncor_px_rec, subjets_raw.at(lead3_rec).v4().Px());
+  event.set(h_sub3_uncor_py_rec, subjets_raw.at(lead3_rec).v4().Py());
+  event.set(h_sub3_uncor_pz_rec, subjets_raw.at(lead3_rec).v4().Pz());
+  event.set(h_sub3_uncor_E_rec,  subjets_raw.at(lead3_rec).v4().E());
+
+  event.set(h_factor_jec_0, factors_jec[lead1_rec][0]);
+  event.set(h_factor_jec_1, factors_jec[lead2_rec][0]);
+  event.set(h_factor_jec_2, factors_jec[lead3_rec][0]);
+  event.set(h_sigma_jec_0, factors_jec[lead1_rec][1]);
+  event.set(h_sigma_jec_1, factors_jec[lead2_rec][1]);
+  event.set(h_sigma_jec_2, factors_jec[lead3_rec][1]);
+  event.set(h_factor_cor_0, factors_cor[lead1_rec][0]);
+  event.set(h_factor_cor_1, factors_cor[lead2_rec][0]);
+  event.set(h_factor_cor_2, factors_cor[lead3_rec][0]);
+  event.set(h_sigma_cor_0, factors_cor[lead1_rec][1]);
+  event.set(h_sigma_cor_1, factors_cor[lead2_rec][1]);
+  event.set(h_sigma_cor_2, factors_cor[lead3_rec][1]);
+  vector<Jet> subjets_pt_sorted = {subjets[lead1_rec], subjets[lead2_rec], subjets[lead3_rec]};
+
+  map<int, double> rec_sub_pt, rec_sub_dR;
+  // select which gen fatjet is closer to had jet and get those gen subjets
+  rec_sub_dR[12] = deltaR(subjets.at(lead1_rec), subjets.at(lead2_rec));
+  rec_sub_dR[23] = deltaR(subjets.at(lead2_rec), subjets.at(lead3_rec));
+  rec_sub_dR[13] = deltaR(subjets.at(lead1_rec), subjets.at(lead3_rec));
+  event.set(h_dR_sub12_rec, rec_sub_dR[12]);
+  event.set(h_dR_sub23_rec, rec_sub_dR[23]);
+  event.set(h_dR_sub13_rec, rec_sub_dR[13]);
+
   /*************************** Write handles for EFCs & Calculation limits **********************************************************************************/
   if(debug) cout << "Set EFCs & Calculation limits for gen level" << endl;
 
   std::vector<GenTopJet> gen_fatjets; // used later in the code as well
+  vector<TLorentzVector> tlv_subjets_gen;
+  vector<GenJet> subjets_gen = {};
+  vector<GenJet> subjets_gen_pt_sorted;
+  int lead1_gen=0;
+  int lead2_gen=1;
+  int lead3_gen=2;
+  bool mismatch = false;
   if(isMC){ // before is TTbar
     gen_fatjets = event.get(h_genjets33_had);
+    subjets_gen = gen_fatjets[0].subjets();
     map<int, double> gen_sub_pt, gen_sub_dR, gen_sub_mass;
+    if( deltaR(lepjets.at(0), gen_fatjets.at(0)) < deltaR(hadjets.at(0), gen_fatjets.at(0)) ) mismatch=true;
     // select which gen fatjet is closer to had jet and get those gen subjets
     if(debug) cout << "Store pt and dR of subjets on gen level with #subjets=" << gen_fatjets.size() << endl;
-    if(gen_fatjets[0].subjets().size()<3){ // Sometimes, hadronic assigned gen jets have less then 3 subjets, while the leptonic side has 3.
-      event.set(h_ptsub1_gen, -1);
-      event.set(h_ptsub2_gen, -1);
-      event.set(h_ptsub3_gen, -1);
+    if(subjets_gen.size()<3 || mismatch){ // Sometimes, hadronic assigned gen jets have less then 3 subjets, while the leptonic side has 3.
+      event.set(h_sub1_pt_gen, -1);
+      event.set(h_sub2_pt_gen, -1);
+      event.set(h_sub3_pt_gen, -1);
       event.set(h_dR_sub12_gen, -1);
       event.set(h_dR_sub23_gen, -1);
       event.set(h_dR_sub13_gen, -1);
@@ -1296,48 +1511,90 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       event.set(h_sub3_E_gen,  -1);
     }
     else{
-      gen_sub_dR[12] = deltaR(gen_fatjets[0].subjets().at(0), gen_fatjets[0].subjets().at(1));
-      gen_sub_dR[23] = deltaR(gen_fatjets[0].subjets().at(1), gen_fatjets[0].subjets().at(2));
-      gen_sub_dR[13] = deltaR(gen_fatjets[0].subjets().at(0), gen_fatjets[0].subjets().at(2));
-      event.set(h_dR_sub12_gen, gen_sub_dR[12]);
-      event.set(h_dR_sub23_gen, gen_sub_dR[23]);
-      event.set(h_dR_sub13_gen, gen_sub_dR[13]);
       LorentzVector lv_sub1_gen = gen_fatjets[0].subjets().at(0).v4();
       LorentzVector lv_sub2_gen = gen_fatjets[0].subjets().at(1).v4();
       LorentzVector lv_sub3_gen = gen_fatjets[0].subjets().at(2).v4();
       TLorentzVector tlv_sub1_gen(lv_sub1_gen.Px(), lv_sub1_gen.Py(), lv_sub1_gen.Pz(), lv_sub1_gen.E());
       TLorentzVector tlv_sub2_gen(lv_sub2_gen.Px(), lv_sub2_gen.Py(), lv_sub2_gen.Pz(), lv_sub2_gen.E());
       TLorentzVector tlv_sub3_gen(lv_sub3_gen.Px(), lv_sub3_gen.Py(), lv_sub3_gen.Pz(), lv_sub3_gen.E());
-      TLorentzVector tlv_sub12_gen(tlv_sub1_gen+tlv_sub2_gen);  
-      TLorentzVector tlv_sub13_gen(tlv_sub1_gen+tlv_sub3_gen);
-      TLorentzVector tlv_sub23_gen(tlv_sub2_gen+tlv_sub3_gen);  
-      event.set(h_ptsub1_gen, tlv_sub1_gen.Pt());
-      event.set(h_ptsub2_gen, tlv_sub2_gen.Pt());
-      event.set(h_ptsub3_gen, tlv_sub3_gen.Pt());
-      event.set(h_mass_sub1_gen, tlv_sub1_gen.M());
-      event.set(h_mass_sub2_gen, tlv_sub2_gen.M());
-      event.set(h_mass_sub3_gen, tlv_sub3_gen.M());
-      event.set(h_mass_sub12_gen, tlv_sub12_gen.M());
-      event.set(h_mass_sub13_gen, tlv_sub13_gen.M());
-      event.set(h_mass_sub23_gen, tlv_sub23_gen.M());
-      event.set(h_sub1_px_gen, lv_sub1_gen.Px());
-      event.set(h_sub1_py_gen, lv_sub1_gen.Py());
-      event.set(h_sub1_pz_gen, lv_sub1_gen.Pz());
-      event.set(h_sub1_E_gen,  lv_sub1_gen.E());
-      event.set(h_sub2_px_gen, lv_sub2_gen.Px());
-      event.set(h_sub2_py_gen, lv_sub2_gen.Py());
-      event.set(h_sub2_pz_gen, lv_sub2_gen.Pz());
-      event.set(h_sub2_E_gen,  lv_sub2_gen.E());
-      event.set(h_sub3_px_gen, lv_sub3_gen.Px());
-      event.set(h_sub3_py_gen, lv_sub3_gen.Py());
-      event.set(h_sub3_pz_gen, lv_sub3_gen.Pz());
-      event.set(h_sub3_E_gen,  lv_sub3_gen.E());
+      tlv_subjets_gen.push_back(tlv_sub1_gen);
+      tlv_subjets_gen.push_back(tlv_sub2_gen);
+      tlv_subjets_gen.push_back(tlv_sub3_gen);
+      double pt1=tlv_subjets_gen[0].Pt();
+      double pt2=tlv_subjets_gen[1].Pt();
+      double pt3=tlv_subjets_gen[2].Pt();
+
+      // ///////////////////////////////////////////////////
+      // In one event two subjets have the same pt, hence <=
+      //       74.30       74.30      338.70
+      //        0           1           2
+      // dR01   0.63 dR02   0.47 dR12   0.92
+      if(pt3<=pt1 && pt2<=pt1){
+        lead1_gen=0;
+        if(pt3<=pt2) {lead2_gen=1; lead3_gen=2;}
+        else         {lead2_gen=2; lead3_gen=1;}
+      }
+      else if(pt1<=pt2 && pt3<=pt2){
+        lead1_gen=1;
+        if(pt3<=pt1) {lead2_gen=0; lead3_gen=2;}
+        else         {lead2_gen=2; lead3_gen=0;}
+      }
+      else if(pt1<=pt3 && pt2<=pt3){
+        lead1_gen=2;
+        if(pt2<=pt1) {lead2_gen=0; lead3_gen=1;}
+        else         {lead2_gen=1; lead3_gen=0;}
+      }
+      else{
+        printf("pt1   %6.2f pt2   %6.2f pt3   %6.2f\n",pt1,pt2,pt3);
+        printf("lead1 %6d   lead2 %6d   lead2 %6d\n",lead1_gen,lead2_gen,lead3_gen);
+        printf("dR01  %6.2f dR02  %6.2f dR12  %6.2f\n",
+          deltaR(gen_fatjets[0].subjets().at(0), gen_fatjets[0].subjets().at(1)),
+          deltaR(gen_fatjets[0].subjets().at(0), gen_fatjets[0].subjets().at(2)),
+          deltaR(gen_fatjets[0].subjets().at(1), gen_fatjets[0].subjets().at(2))
+        );
+        throw runtime_error("[ERROR] in gen subjet ordering; Who is the largest now?");
+      }
+      if(lead1_gen==lead2_gen || lead1_gen==lead3_gen || lead2_gen==lead3_gen){
+        printf("lead1 %3d lead2 %3d lead3 %3d\n",lead1_gen,lead2_gen,lead3_gen);
+        throw runtime_error("[ERROR] leading indices are equal!");
+      }
+      subjets_gen_pt_sorted = {subjets_gen[lead1_gen], subjets_gen[lead2_gen], subjets_gen[lead3_gen]};
+      TLorentzVector tlv_lead1_gen = tlv_subjets_gen[lead1_gen];
+      TLorentzVector tlv_lead2_gen = tlv_subjets_gen[lead2_gen];
+      TLorentzVector tlv_lead3_gen = tlv_subjets_gen[lead3_gen];
+      gen_sub_dR[12] = deltaR(gen_fatjets[0].subjets().at(lead1_gen), gen_fatjets[0].subjets().at(lead2_gen));
+      gen_sub_dR[23] = deltaR(gen_fatjets[0].subjets().at(lead2_gen), gen_fatjets[0].subjets().at(lead3_gen));
+      gen_sub_dR[13] = deltaR(gen_fatjets[0].subjets().at(lead1_gen), gen_fatjets[0].subjets().at(lead3_gen));
+      event.set(h_dR_sub12_gen, gen_sub_dR[12]);
+      event.set(h_dR_sub23_gen, gen_sub_dR[23]);
+      event.set(h_dR_sub13_gen, gen_sub_dR[13]);
+      event.set(h_sub1_pt_gen, tlv_lead1_gen.Pt());
+      event.set(h_sub2_pt_gen, tlv_lead2_gen.Pt());
+      event.set(h_sub3_pt_gen, tlv_lead3_gen.Pt());
+      event.set(h_mass_sub1_gen, tlv_lead1_gen.M());
+      event.set(h_mass_sub2_gen, tlv_lead2_gen.M());
+      event.set(h_mass_sub3_gen, tlv_lead3_gen.M());
+      event.set(h_mass_sub12_gen, tlv_sub12.M());
+      event.set(h_mass_sub13_gen, tlv_sub13.M());
+      event.set(h_mass_sub23_gen, tlv_sub23.M());
+      event.set(h_sub1_px_gen, tlv_lead1_gen.Px());
+      event.set(h_sub1_py_gen, tlv_lead1_gen.Py());
+      event.set(h_sub1_pz_gen, tlv_lead1_gen.Pz());
+      event.set(h_sub1_E_gen,  tlv_lead1_gen.E());
+      event.set(h_sub2_px_gen, tlv_lead2_gen.Px());
+      event.set(h_sub2_py_gen, tlv_lead2_gen.Py());
+      event.set(h_sub2_pz_gen, tlv_lead2_gen.Pz());
+      event.set(h_sub2_E_gen,  tlv_lead2_gen.E());
+      event.set(h_sub3_px_gen, tlv_lead3_gen.Px());
+      event.set(h_sub3_py_gen, tlv_lead3_gen.Py());
+      event.set(h_sub3_pz_gen, tlv_lead3_gen.Pz());
+      event.set(h_sub3_E_gen,  tlv_lead3_gen.E());
     }
   }
   else{
-    event.set(h_ptsub1_gen, 0);
-    event.set(h_ptsub2_gen, 0);
-    event.set(h_ptsub3_gen, 0);
+    event.set(h_sub1_pt_gen, 0);
+    event.set(h_sub2_pt_gen, 0);
+    event.set(h_sub3_pt_gen, 0);
     event.set(h_dR_sub12_gen, 0);
     event.set(h_dR_sub23_gen, 0);
     event.set(h_dR_sub13_gen, 0);
@@ -1360,6 +1617,79 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_sub3_pz_gen, 0);
     event.set(h_sub3_E_gen,  0);
   }
+
+  // Match reco jets to gen jets to get the same ordering --------------------------------------------------------------
+  // Index of matched reco jet to gen jet
+  int matched_index1 = -1;
+  int matched_index2 = -1;
+  int matched_index3 = -1;
+  if(isMC){
+    // dR_<REC CLUSTERED><GEN LEAD>
+    if(gen_fatjets[0].subjets().size()>=3 && !mismatch){
+      double dR_11 = deltaR(subjets_pt_sorted.at(0), subjets_gen_pt_sorted.at(0));
+      double dR_12 = deltaR(subjets_pt_sorted.at(0), subjets_gen_pt_sorted.at(1));
+      double dR_13 = deltaR(subjets_pt_sorted.at(0), subjets_gen_pt_sorted.at(2));
+      double dR_21 = deltaR(subjets_pt_sorted.at(1), subjets_gen_pt_sorted.at(0));
+      double dR_22 = deltaR(subjets_pt_sorted.at(1), subjets_gen_pt_sorted.at(1));
+      double dR_23 = deltaR(subjets_pt_sorted.at(1), subjets_gen_pt_sorted.at(2));
+      double dR_31 = deltaR(subjets_pt_sorted.at(2), subjets_gen_pt_sorted.at(0));
+      double dR_32 = deltaR(subjets_pt_sorted.at(2), subjets_gen_pt_sorted.at(1));
+      double dR_33 = deltaR(subjets_pt_sorted.at(2), subjets_gen_pt_sorted.at(2));
+      if (dR_11<dR_31 && dR_11<dR_21){
+        if(dR_11 < 0.2){ // if lowest distance >0.2, all distances are
+          matched_index1=0;
+          // remove first rec and gen jet from list
+          if(dR_22<dR_32) {
+            if(dR_22<0.2) matched_index2=1;
+            if(dR_33<0.2) matched_index3=2;
+          }
+          else{
+            if(dR_32<0.2) matched_index2=2;
+            if(dR_23<0.2) matched_index3=1;
+          }
+        }
+      }
+      else if(dR_21<dR_31 && dR_21<dR_11){
+        if(dR_21 < 0.2){
+          matched_index1=1;
+          // remove first rec and gen jet from list
+          if(dR_12<dR_32) {
+            if(dR_12<0.2) matched_index2=0;
+            if(dR_33<0.2) matched_index3=2;
+          }
+          else{
+            if(dR_32<0.2) matched_index2=2;
+            if(dR_23<0.2) matched_index3=0;
+          }
+        }
+      }
+      else if(dR_31<dR_21 && dR_31<dR_11){
+        if(dR_31 < 0.2){
+          matched_index1=2;
+          // remove first rec and gen jet from list
+          if(dR_12<dR_22) {
+            if(dR_12<0.2) matched_index2=0;
+            if(dR_23<0.2) matched_index3=1;
+          }
+          else{
+            if(dR_22<0.2) matched_index2=1;
+            if(dR_13<0.2) matched_index3=0;
+          }
+        }
+      }
+      // else{
+      //   printf("dR11 %3d dR12 %3d dR13 %3d\n",dR_11,dR_21,dR_31);
+      //   throw runtime_error("No jet is the clostest to leading!");
+      // }
+      // if((matched_index1==matched_index2 || matched_index1==matched_index3 || matched_index2==matched_index3)){
+      //   printf("matched_index1 %3d matched_index2 %3d matched_index3 %3d\n",matched_index1,matched_index2,matched_index3);
+      //   throw runtime_error("[ERROR] more then one leading reco jet!");
+      // }
+    }
+  }
+  event.set(h_matched_index1, matched_index1);
+  event.set(h_matched_index2, matched_index2);
+  event.set(h_matched_index3, matched_index3);
 
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
