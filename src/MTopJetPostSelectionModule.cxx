@@ -799,7 +799,8 @@ void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
-  debug = false;
+  debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
+
   /*
   .██████ ████████ ██   ██
   ██         ██     ██ ██

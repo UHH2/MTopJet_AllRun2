@@ -4,6 +4,7 @@
 <!ENTITY NEVT "-1">
 
 <!ENTITY channel "muon">
+<!ENTITY debug "false">
 
 <!ENTITY INdir   "/nfs/dust/cms/user/schwarzd/MTopJet_Run2/Selection/muon">
 <!ENTITY OUTdir   "/nfs/dust/cms/user/paaschal/MTopJet_Run2/PostSel/muon">
@@ -465,6 +466,8 @@
   <Item Name="jersmear_direction" Value="nominal" />       <!-- has to be: nominal, up or down! -->
   <Item Name="JetCorrection_direction" Value="nominal" />  <!-- has to be: nominal, up or down! -->
   <Item Name="NonClosureUncertainty" Value="false" />      <!-- has to be: true or false! -->
+
+  <Item Name="Debug" Value="&debug;"/>
 
   <Item Name="AnalysisModule" Value="MTopJetPostSelectionModule"/>
 </UserConfig>
