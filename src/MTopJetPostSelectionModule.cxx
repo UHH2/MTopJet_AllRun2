@@ -1198,6 +1198,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   vector<Jet> newsubjets;
 
   int PoU = 0;
+  vector<vector<double>> factors_jec, factors_cor;
   if(isMC){
     // calculated with combined channels
 
@@ -1209,6 +1210,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_mass_jms, mass_jms);
     mass_wjms = BestFit->get_wmass_BestFit(newsubjets, WSubjetIndex);
     event.set(h_mW_rec, mass_wjms);
+    factors_jec = BestFit->get_factors_jec();
+    factors_cor = BestFit->get_factors_cor();
+    if(debug) printf("Check extracted correction factors: #jec %3lu #cor %3lu",factors_jec.size(),factors_cor.size());
   }
   else{
     event.set(h_mW_rec, mass_wjet_rec);

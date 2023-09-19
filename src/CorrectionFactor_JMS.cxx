@@ -131,6 +131,9 @@ vector<Jet> CorrectionFactor_JMS::GetSubjetsJMS(uhh2::Event & event, const VecD&
   else if(year == Year::is2017v2) corrections_JEC = get_corrections_JEC(*corrector_MC_2017, oldsubjets, event, uncertainty_MC_2017);
   else if(year == Year::is2018)   corrections_JEC = get_corrections_JEC(*corrector_MC_2018, oldsubjets, event, uncertainty_MC_2018);
 
+  // global variable, clear before new event is filled
+  factors_jec.clear();
+  factors_cor.clear();
   VecD factor_J = get_factor_JEC(corrections_JEC, point_J);
 
   // Now get XCone factor using corrected jet
@@ -230,7 +233,9 @@ double CorrectionFactor_JMS::get_factor_XCone(double pt, double f_c, double f_ud
   // Variations are calculated the same way just with another point_x
   double f_sys = f_c + sqrt(df*df + dg*dg);
   // get calculated factor from chi2 best fit for xcone corrections (point_x)
-  double factor = f_c + point_x*fabs(f_c-f_sys);
+  double sig_c = fabs(f_c-f_sys);
+  double factor = f_c + point_x*sig_c;
+  factors_cor.push_back({f_c, fabs(f_c-f_sys), point_x});
 
   return factor;
 }
@@ -332,7 +337,9 @@ VecDD CorrectionFactor_JMS::get_corrections_JEC(FactorizedJetCorrector & correct
 VecD CorrectionFactor_JMS::get_factor_JEC(VecDD JEC_corrections, double point_J){
   VecD JEC_factors;
   for(unsigned int i=0; i<JEC_corrections.size(); i++){
-    double correctionfactor_jms = JEC_corrections[i][0] + point_J * fabs(JEC_corrections[i][1]-JEC_corrections[i][0]);
+    double sig_jec = fabs(JEC_corrections[i][1]-JEC_corrections[i][0]);
+    double correctionfactor_jms = JEC_corrections[i][0] + point_J * sig_jec;
+    factors_jec.push_back({JEC_corrections[i][0], sig_jec, point_J});
     JEC_factors.push_back(correctionfactor_jms);
   }
   return JEC_factors;
