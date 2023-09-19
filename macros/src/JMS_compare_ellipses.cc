@@ -83,7 +83,7 @@ int main(int argc, char* argv[]){
   // JMS_chi2["combine_cor_syst_2"] = ExtractFunctionFromROOT("combine", "combine", "syst_2");
 
   map<TString, TPolyMarker3D*> JMS_min;
-  JMS_min["combine_cor"]        = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "");
+  JMS_min["combine_cor"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "");
   JMS_min["combine_cor_syst"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst");
   JMS_min["combine_cor_syst_noJER"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_noJER");
   JMS_min["combine_cor_fitall"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "_fitall");
@@ -91,9 +91,12 @@ int main(int argc, char* argv[]){
   JMS_min["combine_cor_syst_peak_m4"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_m4");
   JMS_min["combine_cor_syst_peak_uncor"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_uncor");
   JMS_min["combine_cor_stat_peak"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "stat_peak");
+  JMS_min["epjc"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "syst_peak_m4");
+  JMS_min["arxiv"] = ExtractFromROOT("Graphs/JMS_nominal", "combine", "combine", "_fitall");
 
   map<TString, TPolyMarker3D*> JMS_ellipse;
-  JMS_ellipse["combine_cor"]        = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "");
+  // === For different methods
+  JMS_ellipse["combine_cor"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "");
   JMS_ellipse["combine_cor_syst"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst");
   JMS_ellipse["combine_cor_syst_noJER"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_noJER");
   JMS_ellipse["combine_cor_fitall"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "_fitall");
@@ -101,55 +104,20 @@ int main(int argc, char* argv[]){
   JMS_ellipse["combine_cor_syst_peak_m4"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_m4");
   JMS_ellipse["combine_cor_syst_peak_uncor"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_uncor");
   JMS_ellipse["combine_cor_stat_peak"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "stat_peak");
+  JMS_ellipse["epjc"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "syst_peak_m4");
+  JMS_ellipse["arxiv"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "_fitall");
 
-  // // Fill Graph and Ellipse ------------------------------------------------------------------------
-  // cout << "Create Graphs ... " << endl;
-  // TGraph* extrema_combine              = graph_multiple_points(JMSfactor["combine"]);
-  // TGraph* extrema_combine_cor          = graph_multiple_points(JMSfactor["combine_cor"]);
-  // TGraph* extrema_combine_cor_syst     = graph_multiple_points(JMSfactor["combine_cor_syst"]);
-  // TGraph* extrema_combine_lin_cor      = graph_multiple_points(JMSfactor["combine_lin_cor"]);
-  // TGraph* extrema_combine_cor_noBKGsys = graph_multiple_points(JMSfactor["combine_cor_noBKGsys"]);
-  //
-  // TGraph* extrema_muon     = graph_multiple_points(JMSfactor["muon"]);
-  // TGraph* extrema_elec     = graph_multiple_points(JMSfactor["elec"]);
-  // TGraph* extrema_add_comb = graph_multiple_points(JMSfactor["combine_add"]);
-  // TGraph* extrema_add_muon = graph_multiple_points(JMSfactor["muon_add"]);
-  // TGraph* extrema_add_elec = graph_multiple_points(JMSfactor["elec_add"]);
-  //
-  // TGraph* extrema_V20_comb = graph_multiple_points(JMSfactor["combine_V20"]);
-  // TGraph* extrema_V20_muon = graph_multiple_points(JMSfactor["muon_V20"]);
-  // TGraph* extrema_V20_elec = graph_multiple_points(JMSfactor["elec_V20"]);
-  //
-  // TGraph* extrema_2016_comb     = graph_multiple_points(JMSfactor["2016_combine"]);
-  // TGraph* extrema_2017_comb     = graph_multiple_points(JMSfactor["2017_combine"]);
-  // TGraph* extrema_2018_comb     = graph_multiple_points(JMSfactor["2018_combine"]);
-  // TGraph* extrema_2016_comb_cor = graph_multiple_points(JMSfactor["2016_combine_cor"]);
-  // TGraph* extrema_2017_comb_cor = graph_multiple_points(JMSfactor["2017_combine_cor"]);
-  // TGraph* extrema_2018_comb_cor = graph_multiple_points(JMSfactor["2018_combine_cor"]);
-  //
-  // cout << "Create Ellipses ... " << endl;
-  // TEllipse* ellipse_combine              = build_ellipse(JMSfactor["combine"]);
-  // TEllipse* ellipse_combine_cor          = build_ellipse(JMSfactor["combine_cor"]);
-  // TEllipse* ellipse_combine_cor_syst     = build_ellipse(JMSfactor["combine_cor_syst"]);
-  // TEllipse* ellipse_combine_lin_cor      = build_ellipse(JMSfactor["combine_lin_cor"]);
-  // TEllipse* ellipse_combine_cor_noBKGsys = build_ellipse(JMSfactor["combine_cor_noBKGsys"]);
-  //
-  // TEllipse* ellipse_muon     = build_ellipse(JMSfactor["muon"]);
-  // TEllipse* ellipse_elec     = build_ellipse(JMSfactor["elec"]);
-  // TEllipse* ellipse_add_comb = build_ellipse(JMSfactor["combine_add"]);
-  // TEllipse* ellipse_add_muon = build_ellipse(JMSfactor["muon_add"]);
-  // TEllipse* ellipse_add_elec = build_ellipse(JMSfactor["elec_add"]);
-  //
-  // TEllipse* ellipse_V20_comb = build_ellipse(JMSfactor["combine_V20"]);
-  // TEllipse* ellipse_V20_muon = build_ellipse(JMSfactor["muon_V20"]);
-  // TEllipse* ellipse_V20_elec = build_ellipse(JMSfactor["elec_V20"]);
-  //
-  // TEllipse* ellipse_2016_comb     = build_ellipse(JMSfactor["2016_combine"]);
-  // TEllipse* ellipse_2017_comb     = build_ellipse(JMSfactor["2017_combine"]);
-  // TEllipse* ellipse_2018_comb     = build_ellipse(JMSfactor["2018_combine"]);
-  // TEllipse* ellipse_2016_comb_cor = build_ellipse(JMSfactor["2016_combine_cor"]);
-  // TEllipse* ellipse_2017_comb_cor = build_ellipse(JMSfactor["2017_combine_cor"]);
-  // TEllipse* ellipse_2018_comb_cor = build_ellipse(JMSfactor["2018_combine_cor"]);
+  // === For single bins
+  JMS_ellipse["jms"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "quick_test_2_1");
+  JMS_ellipse["all"] = ExtractFromROOT("Graphs/JMS_ellipse_all", "combine", "combine", "quick_test_2_1");
+  JMS_ellipse["hh"] = ExtractFromROOT("Graphs/JMS_ellipse_hh", "combine", "combine", "quick_test_2_1");
+  JMS_ellipse["hl"] = ExtractFromROOT("Graphs/JMS_ellipse_hl", "combine", "combine", "quick_test_2_1");
+  JMS_ellipse["lh"] = ExtractFromROOT("Graphs/JMS_ellipse_lh", "combine", "combine", "quick_test_2_1");
+  JMS_ellipse["ll"] = ExtractFromROOT("Graphs/JMS_ellipse_ll", "combine", "combine", "quick_test_2_1");
+
+  // === For bin width = 3
+  JMS_ellipse["bin_width=3"] = ExtractFromROOT("Graphs/JMS_ellipse", "combine", "combine", "tmp", "3");
+
 
   // Start drawing ---------------------------------------------------------------------------------
   cout << "Start plotting ... " << endl;
