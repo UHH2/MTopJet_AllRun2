@@ -1159,34 +1159,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
-  vector<Jet> subjets = rec_hadjets.at(0).subjets();
-  if(subjets.size()<3) return false;
-  event.set(h_ptsub1_rec, subjets.at(0).v4().Pt());
-  event.set(h_ptsub2_rec, subjets.at(1).v4().Pt());
-  event.set(h_ptsub3_rec, subjets.at(2).v4().Pt());
-  event.set(h_npv, event.pvs->size());
 
-  event.set(h_sub1_px_rec, subjets.at(0).v4().Px());
-  event.set(h_sub1_py_rec, subjets.at(0).v4().Py());
-  event.set(h_sub1_pz_rec, subjets.at(0).v4().Pz());
-  event.set(h_sub1_E_rec,  subjets.at(0).v4().E());
-  event.set(h_sub2_px_rec, subjets.at(1).v4().Px());
-  event.set(h_sub2_py_rec, subjets.at(1).v4().Py());
-  event.set(h_sub2_pz_rec, subjets.at(1).v4().Pz());
-  event.set(h_sub2_E_rec,  subjets.at(1).v4().E());
-  event.set(h_sub3_px_rec, subjets.at(2).v4().Px());
-  event.set(h_sub3_py_rec, subjets.at(2).v4().Py());
-  event.set(h_sub3_pz_rec, subjets.at(2).v4().Pz());
-  event.set(h_sub3_E_rec,  subjets.at(2).v4().E());
-
-  map<int, double> rec_sub_pt, rec_sub_dR;
-  // select which gen fatjet is closer to had jet and get those gen subjets
-  rec_sub_dR[12] = deltaR(subjets.at(0), subjets.at(1));
-  rec_sub_dR[23] = deltaR(subjets.at(1), subjets.at(2));
-  rec_sub_dR[13] = deltaR(subjets.at(0), subjets.at(2));
-  event.set(h_dR_sub12_rec, rec_sub_dR[12]);
-  event.set(h_dR_sub23_rec, rec_sub_dR[23]);
-  event.set(h_dR_sub13_rec, rec_sub_dR[13]);
+  // Get JER factor ------------------------------------------------------------
+  std::vector<TopJet> rec_rawjets = event.get(h_fatjets_raw);
+  if(debug) cout << "match raw jets with hadjet" << endl;
+  int index_raw_had = deltaR(rec_rawjets[0],rec_hadjets[0])<deltaR(rec_rawjets[1],rec_hadjets[0])?0:1;
+  vector<double> factors_jer = JERSmearing->JER_factors(index_raw_had);
+  event.set(h_factor_jer_0, factors_jer[0]);
+  event.set(h_factor_jer_1, factors_jer[1]);
+  event.set(h_factor_jer_2, factors_jer[2]);
 
   // JetMassScale --------------------------------------------------------------
   if(debug) cout << "JMS" << endl;

@@ -120,8 +120,22 @@ void JER_Smearer_xcone::init(uhh2::Context & ctx, const std::string& jet_collect
     throw runtime_error("Cannot find suitable jet resolution file & scale factors for this year for JetResolutionSmearer");
   }
 
+  jer_factors_wo = {};
+  jer_factors_with = {};
+
   JER_Smearer.reset(new GenericJetResolutionSmearer(ctx,  "xconeCHS", jet_collection_gen, JERFiles::JERPathStringMC(jer_tag,jetCollection,"SF"), JERFiles::JERPathStringMC(jer_tag,jetCollection,"PtResolution")));
 
+}
+
+std::vector<double> JER_Smearer_xcone::JER_factors(int index){
+  if(index!=0 && index!=1){
+    throw runtime_error("Wrong index while obtain JER factors; " + to_string(index));
+  }
+  vector<double> f_jer = {};
+  for(unsigned int i=0; i<jer_factors_wo[index].size(); i++){
+    f_jer.push_back(jer_factors_wo[index][i]/jer_factors_with[index][i]);
+  }
+  return f_jer;
 }
 
 
