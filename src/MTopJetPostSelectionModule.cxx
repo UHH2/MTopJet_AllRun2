@@ -1075,29 +1075,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
       else if(jms_direction == "downdown") points = { 0.423118,  -0.129578}; // clostest point, left
       // else if(jms_direction == "downup")   points = { 0.587951,   0.483947}; // furthest point, up
       // else if(jms_direction == "updown")   points = { 1.229551,  -1.313053}; // furthest point, down
-
-      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 344.09
-      // if     (jms_direction == "nominal")  points = { 0.880562,  -0.222858}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 1.026562,  -0.174858}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.735562,  -0.272858}; // clostest point, left
-
-      // ========== ONLY LIN + SYS + Fit from nom tt ====== chi2min = 338.96
-      // if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
-
-      // ========== ONLY LIN + SYS =======================
-      // if     (jms_direction == "nominal")  points = { 0.833438,  -0.187411}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.984438,  -0.138411}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.683438,  -0.238411}; // clostest point, left
-
-      // ========== ONLY LIN =============================
-      // if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
-      // else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
-      // else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
-
     }
     // calculated with muon channel; ud & du are not intresting in these channels
     else if(jms_channel == "muon"){ // UNCORRELATED
@@ -1162,6 +1139,8 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ctx.undeclare_all_event_output(); // undeclare event output (jet collections etc) to get small root files
   declare_output(ctx); // declare event output used for unfolding
 
+
+
   /*********************************************************************************************************************************/
 
 }
@@ -1217,6 +1196,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isTTbar) ttgenprod->process(event);
   ////
   /***************************  get jets to write mass *****************************************************************************************************/
+
   std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
   if(debug) cout << "Store pt of subjets on reco level" << endl;
   if(rec_hadjets.size()<1) return false;
