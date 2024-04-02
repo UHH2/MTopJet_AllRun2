@@ -88,23 +88,9 @@ def main():
     xmls.append("MTopJetPostSelection_muon.xml")
     xmls.append("MTopJetPostSelection_elec.xml")
 
-    # xmls.append("MTopJetPostSelection_tt_muon.xml")
-    # xmls.append("MTopJetPostSelection_tt_elec.xml")
+    # xmls.append("MTopJetPostSelection_SYS_muon.xml")
+    # xmls.append("MTopJetPostSelection_SYS_elec.xml")
 
-    xmls.append("MTopJetPostSelection_SYS_muon.xml")
-    xmls.append("MTopJetPostSelection_SYS_elec.xml")
-
-    # xmls.append("MTopJetPostSelection_muon_V20.xml")
-    # xmls.append("MTopJetPostSelection_elec_V20.xml")
-    # xmls.append("MTopJetPostSelection_JMSmuon_elec.xml")
-    # xmls.append("MTopJetPostSelection_JMSelec_muon.xml")
-
-    # xmls.append("MTopJetPostSelection_SYS_muon_V20.xml")
-    # xmls.append("MTopJetPostSelection_SYS_elec_V20.xml")
-    # xmls.append("MTopJetPostSelection_JMSelec_SYS_muon.xml")
-    # xmls.append("MTopJetPostSelection_JMSmuon_SYS_elec.xml")
-
-    print "----------------------"
     print "  -- start script... "
     print "  -- submit", year
     print "  -- njobs", n_jobs

@@ -39,6 +39,7 @@
 #include <UHH2/MTopJet/include/RecoHists_puppi.h>
 #include <UHH2/MTopJet/include/SubjetHists_xcone.h>
 #include <UHH2/MTopJet/include/StoreBJet.h>
+#include <UHH2/MTopJet/include/StoreKinematics.h>
 
 #include <UHH2/MTopJet/include/AnalysisOutput.h>
 #include <UHH2/MTopJet/include/CorrectionFactor.h>
@@ -177,12 +178,6 @@ protected:
   Event::Handle<double>h_ttbar_SF;
   Event::Handle<double>h_mass_gen33;
   Event::Handle<double>h_mass_rec;
-  Event::Handle<double>h_ptsub1_rec,h_ptsub1_gen;
-  Event::Handle<double>h_ptsub2_rec,h_ptsub2_gen;
-  Event::Handle<double>h_ptsub3_rec,h_ptsub3_gen;
-  Event::Handle<double>h_mass_sub1_rec,h_mass_sub1_gen;
-  Event::Handle<double>h_mass_sub2_rec,h_mass_sub2_gen;
-  Event::Handle<double>h_mass_sub3_rec,h_mass_sub3_gen;
   Event::Handle<double>h_mW_rec;
   Event::Handle<double>h_mass_jms;
   Event::Handle<double>h_softdropmass_rec;
@@ -233,37 +228,10 @@ protected:
   Event::Handle<float> h_weight_scale_downnone;
   Event::Handle<float> h_weight_scale_downdown;
   Event::Handle<float> h_weight_btag;
-  // Event::Handle<float> h_weight_btag_jesup;
-  // Event::Handle<float> h_weight_btag_jesdown;
-  // Event::Handle<float> h_weight_btag_lfup;
-  // Event::Handle<float> h_weight_btag_lfdown;
-  // Event::Handle<float> h_weight_btag_hfup;
-  // Event::Handle<float> h_weight_btag_hfdown;
-  // Event::Handle<float> h_weight_btag_hfstats1up;
-  // Event::Handle<float> h_weight_btag_hfstats1down;
-  // Event::Handle<float> h_weight_btag_hfstats2up;
-  // Event::Handle<float> h_weight_btag_hfstats2down;
-  // Event::Handle<float> h_weight_btag_lfstats1up;
-  // Event::Handle<float> h_weight_btag_lfstats1down;
-  // Event::Handle<float> h_weight_btag_lfstats2up;
-  // Event::Handle<float> h_weight_btag_lfstats2down;
-  // Event::Handle<float> h_weight_btag_cferr1up;
-  // Event::Handle<float> h_weight_btag_cferr1down;
-  // Event::Handle<float> h_weight_btag_cferr2up;
-  // Event::Handle<float> h_weight_btag_cferr2down;
   std::vector<Event::Handle<float>> h_weight_btag_upvars;
   std::vector<Event::Handle<float>> h_weight_btag_downvars;
 
   Event::Handle<float> h_ak8tau, h_ak8mass, h_ak8pt;
-
-  Event::Handle<double> h_dR_sub12_rec, h_dR_sub23_rec, h_dR_sub13_rec;
-  Event::Handle<double> h_dR_sub12_gen, h_dR_sub23_gen, h_dR_sub13_gen;
-  Event::Handle<double> h_mass_sub12_rec, h_mass_sub23_rec, h_mass_sub13_rec;
-  Event::Handle<double> h_mass_sub12_gen, h_mass_sub23_gen, h_mass_sub13_gen;
-
-  Event::Handle<double> h_sub1_px_rec, h_sub1_py_rec, h_sub1_pz_rec, h_sub1_E_rec, h_sub1_px_gen, h_sub1_py_gen, h_sub1_pz_gen, h_sub1_E_gen;
-  Event::Handle<double> h_sub2_px_rec, h_sub2_py_rec, h_sub2_pz_rec, h_sub2_E_rec, h_sub2_px_gen, h_sub2_py_gen, h_sub2_pz_gen, h_sub2_E_gen;
-  Event::Handle<double> h_sub3_px_rec, h_sub3_py_rec, h_sub3_pz_rec, h_sub3_E_rec, h_sub3_px_gen, h_sub3_py_gen, h_sub3_pz_gen, h_sub3_E_gen;
 
   //width reweight
   std::unique_ptr<tt_width_reweight> width2_reweight;
@@ -359,6 +327,7 @@ protected:
   std::unique_ptr<uhh2::AnalysisModule> jetprod_reco;
   std::unique_ptr<CombineXCone33> jetprod_reco_corrected;
   std::unique_ptr<CombineXCone> GetXConeInfo;
+  std::unique_ptr<StoreKinematics> store_variables;
   ////
 
   string BTag_variation ="central";
@@ -462,55 +431,6 @@ void MTopJetPostSelectionModule::declare_output(uhh2::Context& ctx){
   h_mass_gen33 = ctx.declare_event_output<double>("Mass_Gen33");
   h_mass_rec = ctx.declare_event_output<double>("Mass_Rec_old");
   h_mass_jms = ctx.declare_event_output<double>("Mass_Rec");
-  h_ptsub1_rec = ctx.declare_event_output<double>("pt_sub1");
-  h_ptsub2_rec = ctx.declare_event_output<double>("pt_sub2");
-  h_ptsub3_rec = ctx.declare_event_output<double>("pt_sub3");
-  h_ptsub1_gen = ctx.declare_event_output<double>("pt_sub1_gen");
-  h_ptsub2_gen = ctx.declare_event_output<double>("pt_sub2_gen");
-  h_ptsub3_gen = ctx.declare_event_output<double>("pt_sub3_gen");
-  h_dR_sub12_gen = ctx.declare_event_output<double>("dR_sub12_gen");
-  h_dR_sub23_gen = ctx.declare_event_output<double>("dR_sub23_gen");
-  h_dR_sub13_gen = ctx.declare_event_output<double>("dR_sub13_gen");
-  h_dR_sub12_rec = ctx.declare_event_output<double>("dR_sub12_rec");
-  h_dR_sub23_rec = ctx.declare_event_output<double>("dR_sub23_rec");
-  h_dR_sub13_rec = ctx.declare_event_output<double>("dR_sub13_rec");
-  h_mass_sub1_rec = ctx.declare_event_output<double>("mass_sub1");
-  h_mass_sub2_rec = ctx.declare_event_output<double>("mass_sub2");
-  h_mass_sub3_rec = ctx.declare_event_output<double>("mass_sub3");
-  h_mass_sub1_gen = ctx.declare_event_output<double>("mass_sub1_gen");
-  h_mass_sub2_gen = ctx.declare_event_output<double>("mass_sub2_gen");
-  h_mass_sub3_gen = ctx.declare_event_output<double>("mass_sub3_gen");
-  h_mass_sub12_rec = ctx.declare_event_output<double>("mass_sub12");
-  h_mass_sub13_rec = ctx.declare_event_output<double>("mass_sub13");
-  h_mass_sub23_rec = ctx.declare_event_output<double>("mass_sub23");
-  h_mass_sub12_gen = ctx.declare_event_output<double>("mass_sub12_gen");
-  h_mass_sub13_gen = ctx.declare_event_output<double>("mass_sub13_gen");
-  h_mass_sub23_gen = ctx.declare_event_output<double>("mass_sub23_gen");
-
-  h_sub1_px_rec = ctx.declare_event_output<double>("px_sub1_rec");
-  h_sub1_py_rec = ctx.declare_event_output<double>("py_sub1_rec");
-  h_sub1_pz_rec = ctx.declare_event_output<double>("pz_sub1_rec");
-  h_sub1_E_rec = ctx.declare_event_output<double>("E_sub1_rec");
-  h_sub1_px_gen = ctx.declare_event_output<double>("px_sub1_gen");
-  h_sub1_py_gen = ctx.declare_event_output<double>("py_sub1_gen");
-  h_sub1_pz_gen = ctx.declare_event_output<double>("pz_sub1_gen");
-  h_sub1_E_gen = ctx.declare_event_output<double>("E_sub1_gen");
-  h_sub2_px_rec = ctx.declare_event_output<double>("px_sub2_rec");
-  h_sub2_py_rec = ctx.declare_event_output<double>("py_sub2_rec");
-  h_sub2_pz_rec = ctx.declare_event_output<double>("pz_sub2_rec");
-  h_sub2_E_rec = ctx.declare_event_output<double>("E_sub2_rec");
-  h_sub2_px_gen = ctx.declare_event_output<double>("px_sub2_gen");
-  h_sub2_py_gen = ctx.declare_event_output<double>("py_sub2_gen");
-  h_sub2_pz_gen = ctx.declare_event_output<double>("pz_sub2_gen");
-  h_sub2_E_gen = ctx.declare_event_output<double>("E_sub2_gen");
-  h_sub3_px_rec = ctx.declare_event_output<double>("px_sub3_rec");
-  h_sub3_py_rec = ctx.declare_event_output<double>("py_sub3_rec");
-  h_sub3_pz_rec = ctx.declare_event_output<double>("pz_sub3_rec");
-  h_sub3_E_rec = ctx.declare_event_output<double>("E_sub3_rec");
-  h_sub3_px_gen = ctx.declare_event_output<double>("px_sub3_gen");
-  h_sub3_py_gen = ctx.declare_event_output<double>("py_sub3_gen");
-  h_sub3_pz_gen = ctx.declare_event_output<double>("pz_sub3_gen");
-  h_sub3_E_gen = ctx.declare_event_output<double>("E_sub3_gen");
 
   h_mW_rec = ctx.declare_event_output<double>("mW");
 
@@ -799,7 +719,9 @@ void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
 
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
-  debug = false;
+  debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
+  printf("Setting debug to %1d\n",debug);
+
   /*
   .██████ ████████ ██   ██
   ██         ██     ██ ██
@@ -994,6 +916,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isMC) init_MC_hists(ctx);
 
   // Best Fit
+  points = {-1, -1}; // set default for data handle
   if(isMC){
     if(debug) cout << "BestFit" << endl;
     jms_direction = ctx.get("JetMassScale_direction","nominal");
@@ -1009,29 +932,6 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
       else if(jms_direction == "downdown") points = { 0.423118,  -0.129578}; // clostest point, left
       // else if(jms_direction == "downup")   points = { 0.587951,   0.483947}; // furthest point, up
       // else if(jms_direction == "updown")   points = { 1.229551,  -1.313053}; // furthest point, down
-
-      // ========== ONLY LIN + SYS with bin correlation + Fit from nom tt ====== chi2min = 344.09
-      // if     (jms_direction == "nominal")  points = { 0.880562,  -0.222858}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 1.026562,  -0.174858}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.735562,  -0.272858}; // clostest point, left
-
-      // ========== ONLY LIN + SYS + Fit from nom tt ====== chi2min = 338.96
-      // if     (jms_direction == "nominal")  points = { 0.837747,  -0.153164}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.986747,  -0.105164}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.689747,  -0.203164}; // clostest point, left
-
-      // ========== ONLY LIN + SYS =======================
-      // if     (jms_direction == "nominal")  points = { 0.833438,  -0.187411}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.984438,  -0.138411}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.683438,  -0.238411}; // clostest point, left
-
-      // ========== ONLY LIN =============================
-      // if     (jms_direction == "nominal")  points = { 0.851987,  -0.287289}; // BestFit point
-      // else if(jms_direction == "upup")     points = { 0.985587,  -0.235289}; // clostest point, right
-      // else if(jms_direction == "downdown") points = { 0.718387,  -0.339289}; // clostest point, left
-      // else if(jms_direction == "downup")   points = { 0.577587,   0.502711}; // furthest point, up
-      // else if(jms_direction == "updown")   points = { 1.126387,  -1.077289}; // furthest point, down
-
     }
     // calculated with muon channel; ud & du are not intresting in these channels
     else if(jms_channel == "muon"){ // UNCORRELATED
@@ -1096,6 +996,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   ctx.undeclare_all_event_output(); // undeclare event output (jet collections etc) to get small root files
   declare_output(ctx); // declare event output used for unfolding
 
+  store_variables.reset(new StoreKinematics(ctx, points, isTTbar, isMC, debug));
   /*********************************************************************************************************************************/
 
 }
@@ -1110,7 +1011,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
-  if(debug) cout << "Start process --------------------------------------------------------------" << endl;
+  if(debug){
+    cout << "\n --- Start process ----------------------------------" << endl;
+    cout << "#Event " << event.event << endl;
+  }
   // cout << "Start process --------------------------------------------------------------" << endl;
 
   /***************************  First do JEC/JER/XCONE *******************************************************************************/
@@ -1151,52 +1055,48 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(isTTbar) ttgenprod->process(event);
   ////
   /***************************  get jets to write mass *****************************************************************************************************/
+
   std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
   if(debug) cout << "Store pt of subjets on reco level" << endl;
   if(rec_hadjets.size()<1) return false;
+  if(rec_hadjets[0].subjets().size()==0){
+    cout << "[WARNING] Discard event with no subjets for hadjet" << endl;
+    return false; // one event in 2017 hadmp Up
+  }
   double mass_rec = rec_hadjets.at(0).v4().M();
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
   event.set(h_pt_rec, pt_rec);
-  vector<Jet> subjets = rec_hadjets.at(0).subjets();
-  if(subjets.size()<3) return false;
-  event.set(h_ptsub1_rec, subjets.at(0).v4().Pt());
-  event.set(h_ptsub2_rec, subjets.at(1).v4().Pt());
-  event.set(h_ptsub3_rec, subjets.at(2).v4().Pt());
-  event.set(h_npv, event.pvs->size());
 
-  event.set(h_sub1_px_rec, subjets.at(0).v4().Px());
-  event.set(h_sub1_py_rec, subjets.at(0).v4().Py());
-  event.set(h_sub1_pz_rec, subjets.at(0).v4().Pz());
-  event.set(h_sub1_E_rec,  subjets.at(0).v4().E());
-  event.set(h_sub2_px_rec, subjets.at(1).v4().Px());
-  event.set(h_sub2_py_rec, subjets.at(1).v4().Py());
-  event.set(h_sub2_pz_rec, subjets.at(1).v4().Pz());
-  event.set(h_sub2_E_rec,  subjets.at(1).v4().E());
-  event.set(h_sub3_px_rec, subjets.at(2).v4().Px());
-  event.set(h_sub3_py_rec, subjets.at(2).v4().Py());
-  event.set(h_sub3_pz_rec, subjets.at(2).v4().Pz());
-  event.set(h_sub3_E_rec,  subjets.at(2).v4().E());
+  // Get JER factor ------------------------------------------------------------
+  std::vector<TopJet> rec_rawjets = event.get(h_fatjets_raw);
+  if(debug) cout << "match raw jets with hadjet" << endl;
+  int index_raw_had = deltaR(rec_rawjets[0],rec_hadjets[0])<deltaR(rec_rawjets[1],rec_hadjets[0])?0:1;
+  vector<double> factors_jer = {1,1,1};
+  if(isMC) factors_jer = JERSmearing->JER_factors(index_raw_had);
+  // event.set(h_factor_jer_1, factors_jer[0]);
+  // event.set(h_factor_jer_2, factors_jer[1]);
+  // event.set(h_factor_jer_3, factors_jer[2]);
 
-  map<int, double> rec_sub_pt, rec_sub_dR;
-  // select which gen fatjet is closer to had jet and get those gen subjets
-  rec_sub_dR[12] = deltaR(subjets.at(0), subjets.at(1));
-  rec_sub_dR[23] = deltaR(subjets.at(1), subjets.at(2));
-  rec_sub_dR[13] = deltaR(subjets.at(0), subjets.at(2));
-  event.set(h_dR_sub12_rec, rec_sub_dR[12]);
-  event.set(h_dR_sub23_rec, rec_sub_dR[23]);
-  event.set(h_dR_sub13_rec, rec_sub_dR[13]);
+  // event.set(h_factor_jms_jec, points[0]);
+  // event.set(h_factor_jms_cor, points[1]);
 
   // JetMassScale --------------------------------------------------------------
   if(debug) cout << "JMS" << endl;
   double mass_jms =0;
   double mass_wjms = 0;
   vector<int> WSubjetIndex = jetprod_reco_corrected->GetWSubjetsIndices(event);
+  if(debug) printf("\t ... #wjet indices %3lu\n",WSubjetIndex.size());
   TopJet wjet = jetprod_reco_corrected->GetHadronicWJet(event, WSubjetIndex);
+  if(debug) printf("\t ... got the wjets\n");
   double mass_wjet_rec = wjet.v4().M();
   vector<Jet> newsubjets;
 
   int PoU = 0;
+  // TODO: Default for data, but extract the correct value!
+  //       Not from JMS but from real jet corrector
+  vector<vector<double>> factors_jec = {{-1,-1},{-1,-1},{-1,-1}};
+  vector<vector<double>> factors_cor = {{-1,-1},{-1,-1},{-1,-1}};
   if(isMC){
     // calculated with combined channels
 
@@ -1208,6 +1108,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     event.set(h_mass_jms, mass_jms);
     mass_wjms = BestFit->get_wmass_BestFit(newsubjets, WSubjetIndex);
     event.set(h_mW_rec, mass_wjms);
+    factors_jec = BestFit->get_factors_jec();
+    factors_cor = BestFit->get_factors_cor();
+    if(debug) printf("Check extracted correction factors: #jec %3lu #cor %3lu",factors_jec.size(),factors_cor.size());
   }
   else{
     event.set(h_mW_rec, mass_wjet_rec);
@@ -1217,8 +1120,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(debug) cout << "Gen Mass" << endl;
   double mass_gen33 = 0;
   double pt_gen33 = 0;
+  std::vector<GenTopJet> gen_hadjets33; // HERE
   if(isTTbar){
-    std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
+    gen_hadjets33 = event.get(h_genjets33_had);
     if(gen_hadjets33.size()>0){
       mass_gen33 = gen_hadjets33.at(0).v4().M();
       pt_gen33 = gen_hadjets33.at(0).v4().Pt();
@@ -1253,127 +1157,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
       bquark_pt[0] = bot1.pt();
       bquark_pt[1] = bot2.pt();
     }
+
   }
   event.set(h_bquark_pt, bquark_pt);
-
-  vector<Jet> subjets_mass = isMC?newsubjets:rec_hadjets[0].subjets();
-  LorentzVector lv_sub1, lv_sub2, lv_sub3;
-  lv_sub1 = subjets_mass[0].v4();
-  lv_sub2 = subjets_mass[1].v4();
-  lv_sub3 = subjets_mass[2].v4();
-  TLorentzVector tlv_sub1(lv_sub1.Px(), lv_sub1.Py(), lv_sub1.Pz(), lv_sub1.E());
-  TLorentzVector tlv_sub2(lv_sub2.Px(), lv_sub2.Py(), lv_sub2.Pz(), lv_sub2.E());
-  TLorentzVector tlv_sub3(lv_sub3.Px(), lv_sub3.Py(), lv_sub3.Pz(), lv_sub3.E());
-  TLorentzVector tlv_sub12(tlv_sub1+tlv_sub2);  
-  TLorentzVector tlv_sub13(tlv_sub1+tlv_sub3);
-  TLorentzVector tlv_sub23(tlv_sub2+tlv_sub3);  
-  event.set(h_mass_sub1_rec, tlv_sub1.M());
-  event.set(h_mass_sub2_rec, tlv_sub2.M());
-  event.set(h_mass_sub3_rec, tlv_sub3.M());
-  event.set(h_mass_sub12_rec, tlv_sub12.M());
-  event.set(h_mass_sub13_rec, tlv_sub13.M());
-  event.set(h_mass_sub23_rec, tlv_sub23.M());
-
-  /*************************** Write handles for EFCs & Calculation limits **********************************************************************************/
-  if(debug) cout << "Set EFCs & Calculation limits for gen level" << endl;
-
-  std::vector<GenTopJet> gen_fatjets; // used later in the code as well
-  if(isMC){ // before is TTbar
-    gen_fatjets = event.get(h_genjets33_had);
-    map<int, double> gen_sub_pt, gen_sub_dR, gen_sub_mass;
-    // select which gen fatjet is closer to had jet and get those gen subjets
-    if(debug) cout << "Store pt and dR of subjets on gen level with #subjets=" << gen_fatjets.size() << endl;
-    if(gen_fatjets[0].subjets().size()<3){ // Sometimes, hadronic assigned gen jets have less then 3 subjets, while the leptonic side has 3.
-      event.set(h_ptsub1_gen, -1);
-      event.set(h_ptsub2_gen, -1);
-      event.set(h_ptsub3_gen, -1);
-      event.set(h_dR_sub12_gen, -1);
-      event.set(h_dR_sub23_gen, -1);
-      event.set(h_dR_sub13_gen, -1);
-      event.set(h_mass_sub1_gen, -1);
-      event.set(h_mass_sub2_gen, -1);
-      event.set(h_mass_sub3_gen, -1);
-      event.set(h_mass_sub12_gen, -1);
-      event.set(h_mass_sub23_gen, -1);
-      event.set(h_mass_sub13_gen, -1);
-      event.set(h_sub1_px_gen, -1);
-      event.set(h_sub1_py_gen, -1);
-      event.set(h_sub1_pz_gen, -1);
-      event.set(h_sub1_E_gen,  -1);
-      event.set(h_sub2_px_gen, -1);
-      event.set(h_sub2_py_gen, -1);
-      event.set(h_sub2_pz_gen, -1);
-      event.set(h_sub2_E_gen,  -1);
-      event.set(h_sub3_px_gen, -1);
-      event.set(h_sub3_py_gen, -1);
-      event.set(h_sub3_pz_gen, -1);
-      event.set(h_sub3_E_gen,  -1);
-    }
-    else{
-      gen_sub_dR[12] = deltaR(gen_fatjets[0].subjets().at(0), gen_fatjets[0].subjets().at(1));
-      gen_sub_dR[23] = deltaR(gen_fatjets[0].subjets().at(1), gen_fatjets[0].subjets().at(2));
-      gen_sub_dR[13] = deltaR(gen_fatjets[0].subjets().at(0), gen_fatjets[0].subjets().at(2));
-      event.set(h_dR_sub12_gen, gen_sub_dR[12]);
-      event.set(h_dR_sub23_gen, gen_sub_dR[23]);
-      event.set(h_dR_sub13_gen, gen_sub_dR[13]);
-      LorentzVector lv_sub1_gen = gen_fatjets[0].subjets().at(0).v4();
-      LorentzVector lv_sub2_gen = gen_fatjets[0].subjets().at(1).v4();
-      LorentzVector lv_sub3_gen = gen_fatjets[0].subjets().at(2).v4();
-      TLorentzVector tlv_sub1_gen(lv_sub1_gen.Px(), lv_sub1_gen.Py(), lv_sub1_gen.Pz(), lv_sub1_gen.E());
-      TLorentzVector tlv_sub2_gen(lv_sub2_gen.Px(), lv_sub2_gen.Py(), lv_sub2_gen.Pz(), lv_sub2_gen.E());
-      TLorentzVector tlv_sub3_gen(lv_sub3_gen.Px(), lv_sub3_gen.Py(), lv_sub3_gen.Pz(), lv_sub3_gen.E());
-      TLorentzVector tlv_sub12_gen(tlv_sub1_gen+tlv_sub2_gen);  
-      TLorentzVector tlv_sub13_gen(tlv_sub1_gen+tlv_sub3_gen);
-      TLorentzVector tlv_sub23_gen(tlv_sub2_gen+tlv_sub3_gen);  
-      event.set(h_ptsub1_gen, tlv_sub1_gen.Pt());
-      event.set(h_ptsub2_gen, tlv_sub2_gen.Pt());
-      event.set(h_ptsub3_gen, tlv_sub3_gen.Pt());
-      event.set(h_mass_sub1_gen, tlv_sub1_gen.M());
-      event.set(h_mass_sub2_gen, tlv_sub2_gen.M());
-      event.set(h_mass_sub3_gen, tlv_sub3_gen.M());
-      event.set(h_mass_sub12_gen, tlv_sub12_gen.M());
-      event.set(h_mass_sub13_gen, tlv_sub13_gen.M());
-      event.set(h_mass_sub23_gen, tlv_sub23_gen.M());
-      event.set(h_sub1_px_gen, lv_sub1_gen.Px());
-      event.set(h_sub1_py_gen, lv_sub1_gen.Py());
-      event.set(h_sub1_pz_gen, lv_sub1_gen.Pz());
-      event.set(h_sub1_E_gen,  lv_sub1_gen.E());
-      event.set(h_sub2_px_gen, lv_sub2_gen.Px());
-      event.set(h_sub2_py_gen, lv_sub2_gen.Py());
-      event.set(h_sub2_pz_gen, lv_sub2_gen.Pz());
-      event.set(h_sub2_E_gen,  lv_sub2_gen.E());
-      event.set(h_sub3_px_gen, lv_sub3_gen.Px());
-      event.set(h_sub3_py_gen, lv_sub3_gen.Py());
-      event.set(h_sub3_pz_gen, lv_sub3_gen.Pz());
-      event.set(h_sub3_E_gen,  lv_sub3_gen.E());
-    }
-  }
-  else{
-    event.set(h_ptsub1_gen, 0);
-    event.set(h_ptsub2_gen, 0);
-    event.set(h_ptsub3_gen, 0);
-    event.set(h_dR_sub12_gen, 0);
-    event.set(h_dR_sub23_gen, 0);
-    event.set(h_dR_sub13_gen, 0);
-    event.set(h_mass_sub1_gen, 0);
-    event.set(h_mass_sub2_gen, 0);
-    event.set(h_mass_sub3_gen, 0);
-    event.set(h_mass_sub12_gen, 0);
-    event.set(h_mass_sub23_gen, 0);
-    event.set(h_mass_sub13_gen, 0);
-    event.set(h_sub1_px_gen, 0);
-    event.set(h_sub1_py_gen, 0);
-    event.set(h_sub1_pz_gen, 0);
-    event.set(h_sub1_E_gen,  0);
-    event.set(h_sub2_px_gen, 0);
-    event.set(h_sub2_py_gen, 0);
-    event.set(h_sub2_pz_gen, 0);
-    event.set(h_sub2_E_gen,  0);
-    event.set(h_sub3_px_gen, 0);
-    event.set(h_sub3_py_gen, 0);
-    event.set(h_sub3_pz_gen, 0);
-    event.set(h_sub3_E_gen,  0);
-  }
+  event.set(h_npv, event.pvs->size());
 
   /***************************  apply weight *****************************************************************************************************/
   // bool reweight_ttbar = false;       // apply ttbar reweight?
@@ -1868,7 +1655,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_ak4->fill(event);
     h_RecGenHists_ak4_noJEC->fill(event);
   }
+  if(debug) cout << "\t ... Fill gen jets for MC" << endl;
   if(isMC){
+    std::vector<GenTopJet> gen_fatjets = event.get(h_genfatjets);
     double pt = gen_fatjets.at(0).v4().Pt();
     double mjet = gen_fatjets.at(0).v4().M();
     if(pt > 400 && mjet > 120){
@@ -1883,6 +1672,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_ak8mass, -1.); // set default value
   event.set(h_ak8pt, -1.); // set default value
 
+  if(debug) cout << "\t ... pass_measurement_rec" << endl;
   if(pass_measurement_rec){
     h_PDFHists->fill(event);
     h_BTagHists->fill(event);
@@ -2022,12 +1812,22 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /*************************** also store factor from ttbar reweighting ****************************************************************************/
   double ttfactor = 1.0;
+  if(debug) cout << "ttbar reweighting" << endl;
   if(isTTbar){
     double weight_before = event.weight;
     ttbar_reweight->process(event);
     double weight_after = event.weight;
     ttfactor = weight_after / weight_before;
   }
+
+  /*************************** also store factor from ttbar reweighting ****************************************************************************/
+  if(debug) cout << "store kinematics" << endl;
+  // vector<Jet> subjets_mass = isMC?newsubjets:rec_hadjets[0].subjets();
+  vector<Jet> subjets_mass = isMC?newsubjets:hadjets.at(0).subjets();
+  store_variables->store(event, subjets_mass, WSubjetIndex, factors_jec, factors_cor, factors_jer);
+  // uhh2::Event & event,
+  // vector<Jet>& subjets_jms,
+  // vector<int>& w_index, vector<vector<double>>& jecs, vector<vector<double>>& cors, vector<double>& jers
 
   /*************************** Extract "perfect" boosted ttbar events for ISpy **********************************************************************/
   if(false){

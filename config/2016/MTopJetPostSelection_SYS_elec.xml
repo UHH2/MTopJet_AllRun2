@@ -18,7 +18,7 @@
 
 <!--
 <ConfigParse NEventsBreak="200000" LastBreak="0" FileSplit="0"/>
-<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="workdir"/>
+<ConfigSGE RAM="4" DISK="2" Mail="alexander.paasch@desy.de" Notification="as" Workdir="workdir_2016"/>
 -->
 
 <JobConfiguration JobName="MTopJetPostSelectionJob" OutputLevel="INFO">

@@ -41,6 +41,8 @@ public:
   vector<Jet> GetSubjetsJMS(uhh2::Event &, const VecD&, const int &);
   double get_mass_BestFit(vector<Jet>, const std::vector<int>& WSubIndices, TString var);
   double get_wmass_BestFit(vector<Jet>, const std::vector<int>&);
+  VecDD get_factors_jec(){return factors_jec;}
+  VecDD get_factors_cor(){return factors_cor;}
 
 private:
 
@@ -53,6 +55,7 @@ private:
   std::unique_ptr<YearSwitcher> jet_corrector_MC, jet_corrector_data;
   std::shared_ptr<RunSwitcher> jec_switcher_16, jec_switcher_17, jec_switcher_18;
   std::unique_ptr<GenericJetResolutionSmearer> JER_Smearer;
+  VecDD factors_jec, factors_cor; // Get factors in Module to assign to sorted subjets
 
   // XCone ---------------------------------------------------------------------
   void get_function(TString &);
