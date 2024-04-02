@@ -131,8 +131,17 @@ std::vector<double> JER_Smearer_xcone::JER_factors(int index){
   if(index!=0 && index!=1){
     throw runtime_error("Wrong index while obtain JER factors; " + to_string(index));
   }
+  int size_wo = jer_factors_wo[index].size();
+  int size_with = jer_factors_with[index].size();
   vector<double> f_jer = {};
-  for(unsigned int i=0; i<jer_factors_wo[index].size(); i++){
+  if(size_wo==0 || size_with==0){
+    if(size_wo!=0 || size_with!=0){
+      cout << "index " << index << " - size wo " << size_wo << " size with " << size_with << endl;
+      throw runtime_error("Stored jer factors should have the same size, but only one is empty");
+    }
+    return {-1,-1,-1};
+  }
+  for(int i=0; i<size_wo; i++){
     f_jer.push_back(jer_factors_wo[index][i]/jer_factors_with[index][i]);
   }
   return f_jer;
@@ -162,10 +171,15 @@ bool JER_Smearer_xcone::process(uhh2::Event & event){
       i1 = 0;
     }
 
+    jer_factors_wo.clear();
+    jer_factors_with.clear();
+
     // first smear subjets of topjet with index 0
     std::vector<Jet> rec_subjets0;
+    jer_factors_wo.push_back({});
     for(unsigned int j=0; j<rec_topjets->at(0).subjets().size(); j++){
       rec_subjets0.push_back((rec_topjets->at(0).subjets().at(j)));
+      jer_factors_wo[0].push_back(rec_subjets0[j].JEC_factor_raw());
     }
     std::vector<GenJet> gen_subjets0;
     for(unsigned int j=0; j<gen_topjets->at(i0).subjets().size(); j++){
@@ -173,11 +187,17 @@ bool JER_Smearer_xcone::process(uhh2::Event & event){
     }
     JER_Smearer->apply_JER_smearing(rec_subjets0, gen_subjets0, 0.4, event.rho);
     rec_topjets->at(0).set_subjets(rec_subjets0);
+    jer_factors_with.push_back({});
+    for(unsigned int j=0; j<rec_topjets->at(0).subjets().size(); j++){
+      jer_factors_with[0].push_back(rec_subjets0[j].JEC_factor_raw());
+    }
 
     // then smear subjets of topjet with index 1
     std::vector<Jet> rec_subjets1;
+    jer_factors_wo.push_back({});
     for(unsigned int j=0; j<rec_topjets->at(1).subjets().size(); j++){
       rec_subjets1.push_back((rec_topjets->at(1).subjets().at(j)));
+      jer_factors_wo[1].push_back(rec_subjets1[j].JEC_factor_raw());
     }
     std::vector<GenJet> gen_subjets1;
     for(unsigned int j=0; j<gen_topjets->at(i1).subjets().size(); j++){
@@ -185,6 +205,10 @@ bool JER_Smearer_xcone::process(uhh2::Event & event){
     }
     JER_Smearer->apply_JER_smearing(rec_subjets1, gen_subjets1, 0.4, event.rho);
     rec_topjets->at(1).set_subjets(rec_subjets1);
+    jer_factors_with.push_back({});
+    for(unsigned int j=0; j<rec_topjets->at(1).subjets().size(); j++){
+      jer_factors_with[1].push_back(rec_subjets1[j].JEC_factor_raw());
+    }
   }
   else
 
