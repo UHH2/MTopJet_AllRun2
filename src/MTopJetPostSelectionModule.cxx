@@ -916,6 +916,7 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
   if(isMC) init_MC_hists(ctx);
 
   // Best Fit
+  points = {-1, -1}; // set default for data handle
   if(isMC){
     if(debug) cout << "BestFit" << endl;
     jms_direction = ctx.get("JetMassScale_direction","nominal");
