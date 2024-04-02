@@ -1120,8 +1120,9 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   if(debug) cout << "Gen Mass" << endl;
   double mass_gen33 = 0;
   double pt_gen33 = 0;
+  std::vector<GenTopJet> gen_hadjets33; // HERE
   if(isTTbar){
-    std::vector<GenTopJet> gen_hadjets33 = event.get(h_genjets33_had);
+    gen_hadjets33 = event.get(h_genjets33_had);
     if(gen_hadjets33.size()>0){
       mass_gen33 = gen_hadjets33.at(0).v4().M();
       pt_gen33 = gen_hadjets33.at(0).v4().Pt();
@@ -1656,6 +1657,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   }
   if(debug) cout << "\t ... Fill gen jets for MC" << endl;
   if(isMC){
+    std::vector<GenTopJet> gen_fatjets = event.get(h_genfatjets);
     double pt = gen_fatjets.at(0).v4().Pt();
     double mjet = gen_fatjets.at(0).v4().M();
     if(pt > 400 && mjet > 120){
