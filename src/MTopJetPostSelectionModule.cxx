@@ -1804,6 +1804,15 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     ttfactor = weight_after / weight_before;
   }
 
+  /*************************** also store factor from ttbar reweighting ****************************************************************************/
+  if(debug) cout << "store kinematics" << endl;
+  // vector<Jet> subjets_mass = isMC?newsubjets:rec_hadjets[0].subjets();
+  vector<Jet> subjets_mass = isMC?newsubjets:hadjets.at(0).subjets();
+  store_variables->store(event, subjets_mass, WSubjetIndex, factors_jec, factors_cor, factors_jer);
+  // uhh2::Event & event,
+  // vector<Jet>& subjets_jms,
+  // vector<int>& w_index, vector<vector<double>>& jecs, vector<vector<double>>& cors, vector<double>& jers
+
   /*************************** Extract "perfect" boosted ttbar events for ISpy **********************************************************************/
   if(false){
     bool BtoB = TMath::Abs(TVector2::Phi_mpi_pi((hadjet.phi() - lepjets[0].phi()))) > 2.7;
