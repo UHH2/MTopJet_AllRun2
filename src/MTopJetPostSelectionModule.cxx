@@ -1059,6 +1059,10 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   std::vector<TopJet> rec_hadjets = event.get(h_recjets_had);
   if(debug) cout << "Store pt of subjets on reco level" << endl;
   if(rec_hadjets.size()<1) return false;
+  if(rec_hadjets[0].subjets().size()==0){
+    cout << "[WARNING] Discard event with no subjets for hadjet" << endl;
+    return false; // one event in 2017 hadmp Up
+  }
   double mass_rec = rec_hadjets.at(0).v4().M();
   double pt_rec = rec_hadjets.at(0).v4().Pt();
   event.set(h_mass_rec, mass_rec);
@@ -1068,22 +1072,31 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   std::vector<TopJet> rec_rawjets = event.get(h_fatjets_raw);
   if(debug) cout << "match raw jets with hadjet" << endl;
   int index_raw_had = deltaR(rec_rawjets[0],rec_hadjets[0])<deltaR(rec_rawjets[1],rec_hadjets[0])?0:1;
-  vector<double> factors_jer = JERSmearing->JER_factors(index_raw_had);
-  event.set(h_factor_jer_0, factors_jer[0]);
-  event.set(h_factor_jer_1, factors_jer[1]);
-  event.set(h_factor_jer_2, factors_jer[2]);
+  vector<double> factors_jer = {1,1,1};
+  if(isMC) factors_jer = JERSmearing->JER_factors(index_raw_had);
+  // event.set(h_factor_jer_1, factors_jer[0]);
+  // event.set(h_factor_jer_2, factors_jer[1]);
+  // event.set(h_factor_jer_3, factors_jer[2]);
+
+  // event.set(h_factor_jms_jec, points[0]);
+  // event.set(h_factor_jms_cor, points[1]);
 
   // JetMassScale --------------------------------------------------------------
   if(debug) cout << "JMS" << endl;
   double mass_jms =0;
   double mass_wjms = 0;
   vector<int> WSubjetIndex = jetprod_reco_corrected->GetWSubjetsIndices(event);
+  if(debug) printf("\t ... #wjet indices %3lu\n",WSubjetIndex.size());
   TopJet wjet = jetprod_reco_corrected->GetHadronicWJet(event, WSubjetIndex);
+  if(debug) printf("\t ... got the wjets\n");
   double mass_wjet_rec = wjet.v4().M();
   vector<Jet> newsubjets;
 
   int PoU = 0;
-  vector<vector<double>> factors_jec, factors_cor;
+  // TODO: Default for data, but extract the correct value!
+  //       Not from JMS but from real jet corrector
+  vector<vector<double>> factors_jec = {{-1,-1},{-1,-1},{-1,-1}};
+  vector<vector<double>> factors_cor = {{-1,-1},{-1,-1},{-1,-1}};
   if(isMC){
     // calculated with combined channels
 
