@@ -219,6 +219,7 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
   // Select Subjets for Wjet ---------------------------------------------------------------------------------------
   // Select only ak4 jets with are close to the hadronic xcone jet
   std::vector<TopJet> fatjets = event.get(h_fatjets);
+  std::vector<TopJet> hadjet = event.get(h_xcone33hadjets);
 
   //------------- define had and lep jet (deltaR) -----------------------------------------
   CombineXCone* combine = new CombineXCone();
@@ -226,6 +227,7 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
   TopJet fathadjet, fatlepjet;
   if(fatjets.size()<2) return {0,1};
   if(lepton_in_event){
+  if(debug) std::cout << " - lepton in event" << '\n';
     Particle lepton = combine->GetLepton(event);
     float dR1 = deltaR(lepton, fatjets.at(0));
     float dR2 = deltaR(lepton, fatjets.at(1));
@@ -239,6 +241,7 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
     }
   }
   else{
+    if(debug) std::cout << " - no lepton in event" << '\n';
     fatlepjet = fatjets.at(1);
     fathadjet = fatjets.at(0);
   }
@@ -269,8 +272,8 @@ vector<int> CombineXCone33::GetWSubjetsIndices(uhh2::Event & event){
     }
   }
 
-  if(debug) std::cout << " - Identify Wjet: Distance AK4 to subjets" << '\n';
   std::vector<Jet> xcone_had_subjets = fathadjet.subjets();
+  if(debug) std::cout << " - Identify Wjet: Distance AK4 to subjets with size of " << xcone_had_subjets.size() << '\n';
   // Matching AK4 jet with highest btag to the three XCone subjets
   double dR_subjet1_ak4 = deltaR(xcone_had_subjets[0], ak4_highest_btag);
   double dR_subjet2_ak4 = deltaR(xcone_had_subjets[1], ak4_highest_btag);
