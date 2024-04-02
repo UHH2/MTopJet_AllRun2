@@ -720,6 +720,7 @@ void MTopJetPostSelectionModule::init_hists(uhh2::Context& ctx){
 MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
   debug = string2bool(ctx.get("Debug","false")); // look for Debug, expect false if not found
+  printf("Setting debug to %1d\n",debug);
 
   /*
   .██████ ████████ ██   ██
@@ -1009,7 +1010,10 @@ MTopJetPostSelectionModule::MTopJetPostSelectionModule(uhh2::Context& ctx){
 
 bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
-  if(debug) cout << "Start process --------------------------------------------------------------" << endl;
+  if(debug){
+    cout << "\n --- Start process ----------------------------------" << endl;
+    cout << "#Event " << event.event << endl;
+  }
   // cout << "Start process --------------------------------------------------------------" << endl;
 
   /***************************  First do JEC/JER/XCONE *******************************************************************************/
@@ -1636,6 +1640,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
     h_RecGenHists_ak4->fill(event);
     h_RecGenHists_ak4_noJEC->fill(event);
   }
+  if(debug) cout << "\t ... Fill gen jets for MC" << endl;
   if(isMC){
     double pt = gen_fatjets.at(0).v4().Pt();
     double mjet = gen_fatjets.at(0).v4().M();
@@ -1651,6 +1656,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
   event.set(h_ak8mass, -1.); // set default value
   event.set(h_ak8pt, -1.); // set default value
 
+  if(debug) cout << "\t ... pass_measurement_rec" << endl;
   if(pass_measurement_rec){
     h_PDFHists->fill(event);
     h_BTagHists->fill(event);
@@ -1790,6 +1796,7 @@ bool MTopJetPostSelectionModule::process(uhh2::Event& event){
 
   /*************************** also store factor from ttbar reweighting ****************************************************************************/
   double ttfactor = 1.0;
+  if(debug) cout << "ttbar reweighting" << endl;
   if(isTTbar){
     double weight_before = event.weight;
     ttbar_reweight->process(event);
